@@ -22,11 +22,11 @@ export function Toggle({ className, ...props }: ToggleProps) {
 
 export const ToggleGroup = BaseToggleGroup;
 
-type ToggleGroupItemProps = React.ComponentProps<typeof BaseToggleGroup.Item>;
+type ToggleGroupItemProps = React.ComponentProps<typeof BaseToggle>;
 
 export function ToggleGroupItem({ className, ...props }: ToggleGroupItemProps) {
   return (
-    <BaseToggleGroup.Item
+    <BaseToggle
       {...props}
       className={cn(
         "inline-flex items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-semibold text-on-surface-variant transition-colors",
