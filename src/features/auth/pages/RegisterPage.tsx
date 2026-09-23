@@ -8,10 +8,7 @@ export function RegisterPage() {
         <h1 className="mb-6 text-2xl font-bold">Đăng ký tài khoản</h1>
         <RegisterForm />
         <p className="mt-4 text-center text-sm text-gray-600">
-          Đã có tài khoản?{" "}
-          <Link to="/login" className="text-blue-600 hover:underline">
-            Đăng nhập
-          </Link>
+          Đã có tài khoản? <Link to="/login" className="text-blue-600 hover:underline">Đăng nhập</Link>
         </p>
       </div>
     </div>

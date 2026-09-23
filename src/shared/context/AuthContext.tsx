@@ -1,22 +1,20 @@
 "use client";
-import React, { createContext, useContext, useState, useEffect } from 'react';
+
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { axiosClient } from "@/shared/api/axiosClient";
 
 export type UserInfo = {
   userId: string;
   username: string;
   email: string;
-  tenantId: string;
-  tenantName?: string;
-  roles: string[];
-  permissions: string[];
+  role: number;
 };
 
 type AuthContextType = {
   user: UserInfo | null;
   setUser: (user: UserInfo | null) => void;
-  hasRole: (role: string) => boolean;
-  hasAnyRole: (roles: string[]) => boolean;
-  hasPermission: (permission: string) => boolean;
+  hasRole: (role: number) => boolean;
+  hasAnyRole: (roles: number[]) => boolean;
   logout: () => Promise<void>;
   isLoading: boolean;
 };
@@ -27,88 +25,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUserState] = useState<UserInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load user from localStorage on mount
   useEffect(() => {
-    const stored = localStorage.getItem('user');
-    if (stored) {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
       try {
-        setUserState(JSON.parse(stored));
-      } catch (e) {
-        console.error('Failed to parse user from localStorage', e);
+        setUserState(JSON.parse(storedUser) as UserInfo);
+      } catch {
+        localStorage.removeItem("user");
       }
     }
     setIsLoading(false);
   }, []);
 
-  const setUser = (user: UserInfo | null) => {
-    setUserState(user);
-    if (user) {
-      console.log('setUser', user);
-      localStorage.setItem('user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('user');
+  const setUser = (nextUser: UserInfo | null) => {
+    setUserState(nextUser);
+    if (nextUser) {
+      localStorage.setItem("user", JSON.stringify(nextUser));
+      return;
     }
+    localStorage.removeItem("user");
   };
 
-  const hasRole = (role: string): boolean => {
-    if (!user?.roles || user.roles.length === 0) {
-      return false;
-    }
-    
-    // Check exact match first
-    if (user.roles.includes(role)) {
-      return true;
-    }
-    
-    // Check case-insensitive match
-    const roleLower = role.toLowerCase();
-    const rolesLower = user.roles.map(r => r.toLowerCase());
-    if (rolesLower.includes(roleLower)) {
-      return true;
-    }
-    
-    // Check if role exists with ROLE_ prefix
-    if (rolesLower.includes(`role_${roleLower}`) || rolesLower.includes(`role_${role}`)) {
-      return true;
-    }
-    
-    // Check if role exists without ROLE_ prefix
-    const roleWithoutPrefix = role.replace(/^role_/i, '');
-    if (rolesLower.includes(roleWithoutPrefix.toLowerCase())) {
-      return true;
-    }
-    
-    return false;
-  };
+  const hasRole = (role: number) => user?.role === role;
+  const hasAnyRole = (roles: number[]) => user ? roles.includes(user.role) : false;
 
-  const hasAnyRole = (roles: string[]): boolean => {
-    return roles.some(role => user?.roles?.includes(role)) ?? false;
-  };
-
-  const hasPermission = (permission: string): boolean => {
-    return user?.permissions?.includes(permission) ?? false;
-  };
-
-  const logout = async (): Promise<void> => {
-    setUser(null);
+  const logout = async () => {
     try {
-      // await authService.logout();
+      await axiosClient.post("/auth/logout");
     } finally {
-      // Redirect to login
+      setUser(null);
+      localStorage.removeItem("accessToken");
       window.location.href = "/login";
     }
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      setUser, 
-      hasRole, 
-      hasAnyRole, 
-      hasPermission, 
-      logout,
-      isLoading 
-    }}>
+    <AuthContext.Provider value={{ user, setUser, hasRole, hasAnyRole, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
@@ -117,9 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
+    throw new Error("useAuth phải được sử dụng bên trong AuthProvider");
   }
   return context;
 }
-
-
