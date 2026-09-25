@@ -52,12 +52,9 @@ function ToastList() {
             "data-starting-style:translate-y-2 data-starting-style:opacity-0",
             "data-ending-style:translate-y-2 data-ending-style:opacity-0",
             "data-limited:opacity-0",
-            toastItem.type === "success" &&
-              "border-primary/30 bg-surface-container-lowest",
-            toastItem.type === "error" &&
-              "border-error/30 bg-error-container/20",
-            (!toastItem.type || toastItem.type === "info") &&
-              "border-outline-variant/40 bg-surface-container-lowest"
+            toastItem.type === "success" && "border-primary/30 bg-surface-container-lowest",
+            toastItem.type === "error" && "border-error/30 bg-error-container/20",
+            (!toastItem.type || toastItem.type === "info") && "border-outline-variant/40 bg-surface-container-lowest"
           )}
         >
           <span

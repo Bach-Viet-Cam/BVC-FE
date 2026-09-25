@@ -17,12 +17,7 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit(login)} className="flex flex-col gap-4">
       <div>
-        <input
-          {...register("email")}
-          type="email"
-          placeholder="Email"
-          className="w-full rounded border px-3 py-2"
-        />
+        <input {...register("email")} type="email" placeholder="Email" className="w-full rounded border px-3 py-2" />
         {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>}
       </div>
 

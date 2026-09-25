@@ -1,9 +1,5 @@
 import { axiosClient } from "@/shared/api/axiosClient";
-import {
-  type LoginRequest,
-  type RegisterRequest,
-  type AuthResponse,
-} from "@/features/auth/types/authTypes";
+import { type LoginRequest, type RegisterRequest, type AuthResponse } from "@/features/auth/types/authTypes";
 
 export const authApi = {
   login: (data: LoginRequest) => axiosClient.post<AuthResponse>("/auth/login", data),

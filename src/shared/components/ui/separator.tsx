@@ -9,11 +9,7 @@ export function Separator({ className, orientation = "horizontal", ...props }: S
     <BaseSeparator
       orientation={orientation}
       {...props}
-      className={cn(
-        "bg-outline-variant/40",
-        orientation === "horizontal" ? "h-px w-full" : "h-full w-px",
-        className
-      )}
+      className={cn("bg-outline-variant/40", orientation === "horizontal" ? "h-px w-full" : "h-full w-px", className)}
     />
   );
 }

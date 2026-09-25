@@ -19,6 +19,7 @@ There is no test runner configured in this project (no test script, no test file
 ## What this repo is
 
 Read these docs before working on any feature — they are the actual spec, not duplicated here:
+
 - **`docs/RULES.md`** — binding FE conventions (folder layout, import rules, component/form/API patterns, styling). Every file you write must follow this.
 - **`docs/STRUCTURE.md`** — file map, boot flow, and wiring (page→hook→api, auth/guard/toast chains), Tailwind token table, done-checklist. Read it when scaffolding a feature, adding a route/primitive/token, or tracing a screen.
 - **`../docs/modules-bvc-fe.md`** — the module/screen breakdown (M02–M06, rental module M06-07 explicitly excluded), build order, and a list of open spec ambiguities to check with BE before implementing a given screen. Cross-reference this before starting any new feature so you land in the right `features/{name}/` folder with the right scope.
@@ -40,22 +41,20 @@ AppRouter (src/app/router.tsx)
                  └─ <SomeFeaturePage/>
 ```
 
-
 ### Feature domains
 
 `src/features/` has one folder per module, mapped from the spec's M02–M06 breakdown:
 
-| Folder | Spec module | Status |
-|---|---|---|
-| `auth` | (unspecced — FE-only login/register/role) | Implemented |
-| `music-library` | M02 — songs, sheets, discovery, categorization | Structure only (`.gitkeep`, no code yet) |
-| `classes` | M03 — classes, roadmap, assignments | Structure only |
-| `community` | M04 — bonus, submissions, verified content, leaderboard, challenges | Structure only |
-| `ensemble` | M05 — ensemble practice session, mixer panel, tempo/timing analysis, playback | Structure only |
-| `platform` | M06 — users, system config, categories, notifications, help center | Structure only |
+| Folder          | Spec module                                                                   | Status                                   |
+| --------------- | ----------------------------------------------------------------------------- | ---------------------------------------- |
+| `auth`          | (unspecced — FE-only login/register/role)                                     | Implemented                              |
+| `music-library` | M02 — songs, sheets, discovery, categorization                                | Structure only (`.gitkeep`, no code yet) |
+| `classes`       | M03 — classes, roadmap, assignments                                           | Structure only                           |
+| `community`     | M04 — bonus, submissions, verified content, leaderboard, challenges           | Structure only                           |
+| `ensemble`      | M05 — ensemble practice session, mixer panel, tempo/timing analysis, playback | Structure only                           |
+| `platform`      | M06 — users, system config, categories, notifications, help center            | Structure only                           |
 
 Each feature follows the exact `pages/components/hooks/api/types/utils` layout from `docs/RULES.md` §13 — `features/auth/**` is the reference implementation to copy the shape of (thin `api/*Api.ts` wrapper around `axiosClient`, a hook owning loading/error state, `types/*Types.ts` plain interfaces, `utils/validate*.ts` zod schema + inferred form type).
-
 
 ### Shared UI kit
 

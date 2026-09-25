@@ -14,7 +14,9 @@ export function TableHead({ className, ...props }: HTMLAttributes<HTMLTableSecti
 }
 
 export function TableBody({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>) {
-  return <tbody {...props} className={cn("divide-y divide-outline-variant/20 bg-surface-container-lowest", className)} />;
+  return (
+    <tbody {...props} className={cn("divide-y divide-outline-variant/20 bg-surface-container-lowest", className)} />
+  );
 }
 
 export function TableRow({ className, ...props }: HTMLAttributes<HTMLTableRowElement>) {
@@ -25,10 +27,7 @@ export function TableHeaderCell({ className, ...props }: ThHTMLAttributes<HTMLTa
   return (
     <th
       {...props}
-      className={cn(
-        "px-4 py-3 text-xs font-semibold uppercase tracking-wider text-on-surface-variant",
-        className
-      )}
+      className={cn("px-4 py-3 text-xs font-semibold uppercase tracking-wider text-on-surface-variant", className)}
     />
   );
 }

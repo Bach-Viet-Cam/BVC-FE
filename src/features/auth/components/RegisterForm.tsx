@@ -17,21 +17,12 @@ export function RegisterForm() {
   return (
     <form onSubmit={handleSubmit(registerUser)} className="flex flex-col gap-4">
       <div>
-        <input
-          {...register("name")}
-          placeholder="Họ và tên"
-          className="w-full rounded border px-3 py-2"
-        />
+        <input {...register("name")} placeholder="Họ và tên" className="w-full rounded border px-3 py-2" />
         {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>}
       </div>
 
       <div>
-        <input
-          {...register("email")}
-          type="email"
-          placeholder="Email"
-          className="w-full rounded border px-3 py-2"
-        />
+        <input {...register("email")} type="email" placeholder="Email" className="w-full rounded border px-3 py-2" />
         {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>}
       </div>
 
@@ -52,9 +43,7 @@ export function RegisterForm() {
           placeholder="Xác nhận mật khẩu"
           className="w-full rounded border px-3 py-2"
         />
-        {errors.confirmPassword && (
-          <p className="mt-1 text-sm text-red-500">{errors.confirmPassword.message}</p>
-        )}
+        {errors.confirmPassword && <p className="mt-1 text-sm text-red-500">{errors.confirmPassword.message}</p>}
       </div>
 
       {error && <p className="text-sm text-red-500">{error}</p>}

@@ -1,7 +1,7 @@
 import { type HTMLAttributes } from "react";
 import { cn } from "@/shared/utils/cn";
 
-interface CardProps extends HTMLAttributes<HTMLDivElement> {}
+type CardProps = HTMLAttributes<HTMLDivElement>;
 
 export function Card({ className, ...props }: CardProps) {
   return (
@@ -28,7 +28,5 @@ export function CardContent({ className, ...props }: CardProps) {
 }
 
 export function CardFooter({ className, ...props }: CardProps) {
-  return (
-    <div {...props} className={cn("mt-4 flex items-center justify-end gap-2", className)} />
-  );
+  return <div {...props} className={cn("mt-4 flex items-center justify-end gap-2", className)} />;
 }
