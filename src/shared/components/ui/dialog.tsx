@@ -38,23 +38,13 @@ export function DialogPopup({ className, children, ...props }: DialogPopupProps)
 type DialogTitleProps = React.ComponentProps<typeof BaseDialog.Title>;
 
 export function DialogTitle({ className, ...props }: DialogTitleProps) {
-  return (
-    <BaseDialog.Title
-      {...props}
-      className={cn("text-xl font-semibold text-on-surface", className)}
-    />
-  );
+  return <BaseDialog.Title {...props} className={cn("text-xl font-semibold text-on-surface", className)} />;
 }
 
 type DialogDescriptionProps = React.ComponentProps<typeof BaseDialog.Description>;
 
 export function DialogDescription({ className, ...props }: DialogDescriptionProps) {
-  return (
-    <BaseDialog.Description
-      {...props}
-      className={cn("text-sm text-on-surface-variant", className)}
-    />
-  );
+  return <BaseDialog.Description {...props} className={cn("text-sm text-on-surface-variant", className)} />;
 }
 
 type DialogCloseProps = React.ComponentProps<typeof BaseDialog.Close>;

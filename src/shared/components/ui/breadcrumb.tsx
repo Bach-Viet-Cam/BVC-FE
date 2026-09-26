@@ -25,9 +25,7 @@ export function Breadcrumb({ items, className }: BreadcrumbProps) {
                 {item.label}
               </Link>
             ) : (
-              <span className={isLast ? "font-semibold text-on-surface" : "text-on-surface-variant"}>
-                {item.label}
-              </span>
+              <span className={isLast ? "font-semibold text-on-surface" : "text-on-surface-variant"}>{item.label}</span>
             )}
           </span>
         );

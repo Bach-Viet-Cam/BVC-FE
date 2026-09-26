@@ -10,10 +10,7 @@ export function TabsList({ className, ...props }: TabsListProps) {
   return (
     <BaseTabs.List
       {...props}
-      className={cn(
-        "inline-flex items-center gap-1 rounded-lg bg-surface-container p-1",
-        className
-      )}
+      className={cn("inline-flex items-center gap-1 rounded-lg bg-surface-container p-1", className)}
     />
   );
 }

@@ -69,9 +69,7 @@ export function SelectPopup({ className, children, ...props }: SelectPopupProps)
           <BaseSelect.ScrollUpArrow className="flex h-5 w-full cursor-default items-center justify-center text-on-surface-variant">
             <ChevronUpIcon className="size-4" />
           </BaseSelect.ScrollUpArrow>
-          <BaseSelect.List className="max-h-[var(--available-height)] overflow-y-auto py-1">
-            {children}
-          </BaseSelect.List>
+          <BaseSelect.List className="max-h-[var(--available-height)] overflow-y-auto py-1">{children}</BaseSelect.List>
           <BaseSelect.ScrollDownArrow className="flex h-5 w-full cursor-default items-center justify-center text-on-surface-variant">
             <ChevronDownIcon className="size-4" />
           </BaseSelect.ScrollDownArrow>

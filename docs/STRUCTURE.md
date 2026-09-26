@@ -59,7 +59,7 @@ src/
 - **Màn hình → dữ liệu:** `pages/XPage.tsx` render `components/XForm.tsx` + gọi `hooks/useX.ts`
   → hook giữ `isLoading/error` → gọi `api/xApi.ts` → `axiosClient.<get|post><Type>(url)`
   → type Request/Response trong `types/xTypes.ts`. Mẫu đầy đủ: `LoginPage → LoginForm →
-  useLogin → authApi.login → axiosClient` (`features/auth/`).
+useLogin → authApi.login → axiosClient` (`features/auth/`).
 - **Form:** schema + `type XFormValues = z.infer` trong `utils/validateX.ts` → component
   `useForm<XFormValues>({ resolver: zodResolver(schema) })` → `register()` + đoạn `<p>` lỗi
   có điều kiện (`LoginForm.tsx:17-49`). Không quản form bằng `useState`.
@@ -90,14 +90,14 @@ Mọi màu/border/shadow trong class phải là token `@theme` trong `index.css`
 (`bg-[#14b8a6]`, `text-red-500`) chỉ xuất hiện trong `:root` khi định nghĩa token mới.
 Bảng token hiện tại (`index.css:71-133`):
 
-| Nhóm | Token (→ hex) |
-|---|---|
-| Nền/chữ | `background` #f4fbf8, `foreground`/`on-surface` #161d1b, `on-surface-variant` #3c4947, `inverse-surface` #2b3230, `inverse-on-surface` #ecf2ef |
+| Nhóm        | Token (→ hex)                                                                                                                                                                                         |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Nền/chữ     | `background` #f4fbf8, `foreground`/`on-surface` #161d1b, `on-surface-variant` #3c4947, `inverse-surface` #2b3230, `inverse-on-surface` #ecf2ef                                                        |
 | Thương hiệu | `primary`/`accent` #14b8a6 (+`on`: trắng/`00423b`), `primary-container` #14b8a6, `on-primary-container` #00423b, `secondary` #0058be, `secondary-container` #14b8a6, `on-secondary-container` #fefcff |
-| Bề mặt | `surface-container-lowest` #ffffff, `-low` #eff5f2, `-container` #e9efec, `-high` #e3eae7 |
-| Viền/lỗi | `outline` #6c7a77, `outline-variant` #bbcac6, `error`/`destructive` #ba1a1a, `on-error` trắng, `error-container` #ffdad6, `on-error-container` #93000a |
-| Khác | `muted` #e9efec, `card`/`popover` trắng, `border`/`input` #bbcac6, `ring` #14b8a6, `chart-1..5`, `sidebar*` (xanh slate #0f172a...) |
-| Bo/bóng | `rounded-md` 0.5rem (`radius-*`), `shadow-level-1/2` |
+| Bề mặt      | `surface-container-lowest` #ffffff, `-low` #eff5f2, `-container` #e9efec, `-high` #e3eae7                                                                                                             |
+| Viền/lỗi    | `outline` #6c7a77, `outline-variant` #bbcac6, `error`/`destructive` #ba1a1a, `on-error` trắng, `error-container` #ffdad6, `on-error-container` #93000a                                                |
+| Khác        | `muted` #e9efec, `card`/`popover` trắng, `border`/`input` #bbcac6, `ring` #14b8a6, `chart-1..5`, `sidebar*` (xanh slate #0f172a...)                                                                   |
+| Bo/bóng     | `rounded-md` 0.5rem (`radius-*`), `shadow-level-1/2`                                                                                                                                                  |
 
 Base layer đã set sẵn: `body` nền/chữ + `h1–h3` cỡ 48/36/24px, `a` xanh + hover, nút con trỏ pointer,
 `.material-symbols-outlined`. Thêm token màu mới = thêm cặp `--color-*` trong `@theme` +

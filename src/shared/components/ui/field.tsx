@@ -14,10 +14,7 @@ export function FieldLabel({ className, ...props }: FieldLabelProps) {
   return (
     <BaseField.Label
       {...props}
-      className={cn(
-        "text-xs font-semibold uppercase tracking-wider text-on-surface-variant",
-        className
-      )}
+      className={cn("text-xs font-semibold uppercase tracking-wider text-on-surface-variant", className)}
     />
   );
 }
@@ -27,21 +24,11 @@ export const FieldControl = BaseField.Control;
 type FieldMessageProps = React.ComponentProps<typeof BaseField.Description>;
 
 export function FieldDescription({ className, ...props }: FieldMessageProps) {
-  return (
-    <BaseField.Description
-      {...props}
-      className={cn("text-xs text-on-surface-variant", className)}
-    />
-  );
+  return <BaseField.Description {...props} className={cn("text-xs text-on-surface-variant", className)} />;
 }
 
 type FieldErrorProps = React.ComponentProps<typeof BaseField.Error>;
 
 export function FieldError({ className, ...props }: FieldErrorProps) {
-  return (
-    <BaseField.Error
-      {...props}
-      className={cn("text-xs font-medium text-error", className)}
-    />
-  );
+  return <BaseField.Error {...props} className={cn("text-xs font-medium text-error", className)} />;
 }

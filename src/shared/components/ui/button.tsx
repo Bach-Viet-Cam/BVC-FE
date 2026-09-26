@@ -24,7 +24,8 @@ export function Button({
         "inline-flex items-center justify-center gap-2 rounded-md font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
         variant === "primary" && "bg-primary text-white shadow-sm hover:brightness-110 active:scale-[0.98]",
-        variant === "secondary" && "border border-outline-variant bg-surface-container-lowest text-on-surface hover:bg-surface-container",
+        variant === "secondary" &&
+          "border border-outline-variant bg-surface-container-lowest text-on-surface hover:bg-surface-container",
         variant === "danger" && "bg-error text-white shadow-sm hover:brightness-110 active:scale-[0.98]",
         variant === "ghost" && "bg-transparent text-on-surface-variant hover:bg-primary/5 hover:text-primary",
         size === "sm" && "px-3 py-1.5 text-sm",

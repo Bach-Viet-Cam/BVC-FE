@@ -2,19 +2,19 @@
 
 ## 1. Stack & Versions
 
-| Layer | Package | Version |
-|---|---|---|
-| Build | Vite | ^8.0.0 |
-| UI | React | ^19.1.0 |
-| Language | TypeScript | ^5.8.3 |
-| Styling | Tailwind CSS v4 | ^4.1.6 |
-| Routing | react-router-dom | ^7.5.3 |
-| Forms | react-hook-form + zod + @hookform/resolvers | ^7.55.0 / ^3.24.4 / ^5.2.2 |
-| HTTP | axios | ^1.8.4 |
-| Date | date-fns | ^4.1.0 |
-| Primitives | @base-ui/react | ^1.8.0 |
-| Icons | lucide-react | ^1.47.0 |
-| Excel | xlsx | ^0.18.5 |
+| Layer      | Package                                     | Version                    |
+| ---------- | ------------------------------------------- | -------------------------- |
+| Build      | Vite                                        | ^8.0.0                     |
+| UI         | React                                       | ^19.1.0                    |
+| Language   | TypeScript                                  | ^5.8.3                     |
+| Styling    | Tailwind CSS v4                             | ^4.1.6                     |
+| Routing    | react-router-dom                            | ^7.5.3                     |
+| Forms      | react-hook-form + zod + @hookform/resolvers | ^7.55.0 / ^3.24.4 / ^5.2.2 |
+| HTTP       | axios                                       | ^1.8.4                     |
+| Date       | date-fns                                    | ^4.1.0                     |
+| Primitives | @base-ui/react                              | ^1.8.0                     |
+| Icons      | lucide-react                                | ^1.47.0                    |
+| Excel      | xlsx                                        | ^0.18.5                    |
 
 ---
 
@@ -57,6 +57,7 @@ public/
 ```
 
 **Rule quyết định vị trí file:**
+
 - Code chỉ dùng trong 1 feature → `features/{feature}/`
 - Code dùng ở ≥ 2 features → `shared/`
 - Setup global (router, providers) → `app/`
@@ -117,8 +118,8 @@ export function ProductCard({ product, onSelect }: { product: any; onSelect: any
 - Export kiểu tường minh: dùng `export type` cho types/interfaces
 
 ```ts
-export type { LoginFormValues };   // ✅
-export { loginSchema };            // ✅
+export type { LoginFormValues }; // ✅
+export { loginSchema }; // ✅
 ```
 
 ---
@@ -199,8 +200,7 @@ const { register, handleSubmit, formState: { errors } } = useForm<LoginFormValue
 // features/{feature}/api/{feature}Api.ts — gọi axiosClient
 
 export const authApi = {
-  login: (data: LoginRequest) =>
-    axiosClient.post<AuthResponse>("/auth/login", data),
+  login: (data: LoginRequest) => axiosClient.post<AuthResponse>("/auth/login", data),
 };
 ```
 
@@ -237,14 +237,14 @@ import { readExcelFile, exportToExcel } from "@/shared/utils/fileUtils";
 
 ## 12. Naming Conventions
 
-| Loại | Convention | Ví dụ |
-|---|---|---|
-| Component file | PascalCase | `LoginForm.tsx` |
-| Hook file | camelCase | `useLogin.ts` |
-| Util / helper | camelCase | `formatDate.ts` |
-| Type / interface | PascalCase | `AuthResponse`, `LoginRequest` |
-| Const (enum-like) | SCREAMING_SNAKE | `API_BASE_URL` |
-| API object | camelCase + `Api` suffix | `authApi`, `productApi` |
+| Loại              | Convention               | Ví dụ                          |
+| ----------------- | ------------------------ | ------------------------------ |
+| Component file    | PascalCase               | `LoginForm.tsx`                |
+| Hook file         | camelCase                | `useLogin.ts`                  |
+| Util / helper     | camelCase                | `formatDate.ts`                |
+| Type / interface  | PascalCase               | `AuthResponse`, `LoginRequest` |
+| Const (enum-like) | SCREAMING_SNAKE          | `API_BASE_URL`                 |
+| API object        | camelCase + `Api` suffix | `authApi`, `productApi`        |
 
 ---
 
