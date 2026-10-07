@@ -34,8 +34,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.removeItem("user");
       }
     }
-  });
-  const [isLoading] = useState(false);
+    setIsLoading(false);
+  }, []);
 
   const setUser = (nextUser: UserInfo | null) => {
     setUserState(nextUser);

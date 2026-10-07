@@ -1,7 +1,34 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: "Inter", sans-serif;
+  /* BVC brand fonts */
+  --font-bvc-sans: "Hanken Grotesk", "Manrope", ui-rounded, system-ui, sans-serif;
+  --font-bvc-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* BVC brand colors */
+  --color-bvc-accent:        #2F7A62;
+  --color-bvc-accent-tint:   #FBF3DE;
+  --color-bvc-accent-text:   #8A6A12;
+  --color-bvc-ink:           #123F33;
+  --color-bvc-muted:         #5E6F66;
+  --color-bvc-faint:         #93A199;
+  --color-bvc-surface:       #EDF2EE;
+  --color-bvc-line:          #EDF2EE;
+  --color-bvc-border:        #E2EAE4;
+  --color-bvc-border-strong: #CFDCD3;
+  --color-bvc-bar:           #D7E2DA;
+  --color-bvc-bar-strong:    #9FB0A5;
+  --color-bvc-ok:            #2E7D4F;
+  --color-bvc-warn:          #D99B1E;
+  --color-bvc-error:         #F4622E;
+
+  /* BVC border radii */
+  --radius-bvc-sm: 11px;
+  --radius-bvc-md: 14px;
+  --radius-bvc-lg: 17px;
+  --radius-bvc-xl: 20px;
+
+  --font-sans: "Hanken Grotesk", "Manrope", ui-rounded, system-ui, sans-serif;
 
   --radius: 0.5rem;
   --radius-sm: 0.25rem;
