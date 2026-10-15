@@ -90,11 +90,7 @@ export function MyAssignmentsPage() {
 
         {/* Filter chips */}
         <div className="shrink-0 pb-[2px]">
-          <FilterChips
-            chips={CHIPS}
-            active={activeFilter}
-            onChange={setActiveFilter}
-          />
+          <FilterChips chips={CHIPS} active={activeFilter} onChange={setActiveFilter} />
         </div>
 
         {/* Assignment list */}
@@ -107,13 +103,8 @@ export function MyAssignmentsPage() {
               className="mx-[14px] mb-3 block w-[calc(100%-28px)] cursor-pointer rounded-[18px] border border-bvc-border p-[13px] text-left"
             >
               <div className="flex items-start justify-between gap-2">
-                <span className="flex-1 text-[14px] font-bold leading-snug text-bvc-ink">
-                  {assignment.title}
-                </span>
-                <TagBadge
-                  label={assignment.statusLabel}
-                  variant={assignment.statusVariant}
-                />
+                <span className="flex-1 text-[14px] font-bold leading-snug text-bvc-ink">{assignment.title}</span>
+                <TagBadge label={assignment.statusLabel} variant={assignment.statusVariant} />
               </div>
               <p className="mt-1 text-[12px] text-bvc-muted">
                 {assignment.course} · Tuần {assignment.week} · Hạn: {assignment.deadline}

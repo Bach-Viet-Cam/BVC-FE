@@ -21,12 +21,48 @@ interface WeekItem {
 }
 
 const WEEKS: WeekItem[] = [
-  { num: 1, title: "Làm quen nhạc cụ", content: "Tư thế, cách cầm, vị trí ngón cơ bản", assignment: "Scale Đô trưởng", done: true },
-  { num: 2, title: "Kỹ thuật cơ bản", content: "Luyện ngón, bài tập nhịp 4/4", assignment: "Bèo dạt mây trôi", done: true },
-  { num: 3, title: "Tác phẩm 1", content: "Lý ngựa ô — bè chính + kiểm tra", assignment: "Recording Lý ngựa ô", done: true },
-  { num: 4, title: "Hòa tấu", content: "Ghép bè, nghe nhau, đồng bộ tempo", assignment: "Recording Trống cơm", current: true },
-  { num: 5, title: "Ghép nhóm", content: "Full ensemble 2 bè trở lên", assignment: "Ensemble performance", upcoming: true },
-  { num: 6, title: "Final Performance", content: "Trình diễn cuối kỳ, tổng kết", assignment: "Final recording", upcoming: true },
+  {
+    num: 1,
+    title: "Làm quen nhạc cụ",
+    content: "Tư thế, cách cầm, vị trí ngón cơ bản",
+    assignment: "Scale Đô trưởng",
+    done: true,
+  },
+  {
+    num: 2,
+    title: "Kỹ thuật cơ bản",
+    content: "Luyện ngón, bài tập nhịp 4/4",
+    assignment: "Bèo dạt mây trôi",
+    done: true,
+  },
+  {
+    num: 3,
+    title: "Tác phẩm 1",
+    content: "Lý ngựa ô — bè chính + kiểm tra",
+    assignment: "Recording Lý ngựa ô",
+    done: true,
+  },
+  {
+    num: 4,
+    title: "Hòa tấu",
+    content: "Ghép bè, nghe nhau, đồng bộ tempo",
+    assignment: "Recording Trống cơm",
+    current: true,
+  },
+  {
+    num: 5,
+    title: "Ghép nhóm",
+    content: "Full ensemble 2 bè trở lên",
+    assignment: "Ensemble performance",
+    upcoming: true,
+  },
+  {
+    num: 6,
+    title: "Final Performance",
+    content: "Trình diễn cuối kỳ, tổng kết",
+    assignment: "Final recording",
+    upcoming: true,
+  },
 ];
 
 const ASSIGNMENT_TABLE = [
@@ -47,10 +83,7 @@ function weekCardClass(w: WeekItem): string {
 export function RoadmapPage() {
   return (
     <div className="flex h-screen w-full overflow-hidden bg-white">
-      <DesktopSidebar
-        items={NAV_ITEMS}
-        user={{ initials: "NH", name: "Nguyễn Thu Hương", role: "Giảng viên" }}
-      />
+      <DesktopSidebar items={NAV_ITEMS} user={{ initials: "NH", name: "Nguyễn Thu Hương", role: "Giảng viên" }} />
 
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <DesktopPageHeader
@@ -83,17 +116,13 @@ export function RoadmapPage() {
               >
                 {/* Week header row */}
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-bvc-muted">
-                    Tuần {w.num}
-                  </span>
+                  <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-bvc-muted">Tuần {w.num}</span>
                   {w.done && (
                     <span className="size-[18px] shrink-0 rounded-full bg-bvc-ok flex items-center justify-center">
                       <Check size={11} color="white" />
                     </span>
                   )}
-                  {w.current && (
-                    <span className="size-[7px] rounded-full bg-bvc-accent" />
-                  )}
+                  {w.current && <span className="size-[7px] rounded-full bg-bvc-accent" />}
                 </div>
 
                 {/* Title */}

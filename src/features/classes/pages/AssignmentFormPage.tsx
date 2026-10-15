@@ -33,12 +33,8 @@ export function AssignmentFormPage() {
         </button>
 
         <div className="flex flex-col gap-[3px]">
-          <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-bvc-muted">
-            TRD301 · Tuần 5
-          </span>
-          <span className="text-[24px] font-extrabold tracking-[-0.025em] text-bvc-ink">
-            Tạo bài tập
-          </span>
+          <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-bvc-muted">TRD301 · Tuần 5</span>
+          <span className="text-[24px] font-extrabold tracking-[-0.025em] text-bvc-ink">Tạo bài tập</span>
         </div>
 
         <div className="ml-auto flex items-center gap-[10px]">
@@ -101,9 +97,7 @@ export function AssignmentFormPage() {
 
             {/* Mô tả */}
             <div className="flex flex-col gap-[6px]">
-              <label className="text-[13px] font-semibold text-bvc-muted">
-                Mô tả cho sinh viên
-              </label>
+              <label className="text-[13px] font-semibold text-bvc-muted">Mô tả cho sinh viên</label>
               <textarea
                 rows={3}
                 defaultValue="Thu phần bè của mình trên nền virtual ensemble. Nghe kỹ bộ gõ để vào đúng phách 1."
@@ -115,15 +109,10 @@ export function AssignmentFormPage() {
             <div className="flex items-center gap-3 rounded-[14px] bg-bvc-surface p-[12px_14px]">
               <Activity size={20} strokeWidth={1.8} className="shrink-0 text-bvc-muted" />
               <div className="flex flex-1 flex-col gap-[2px]">
-                <span className="text-[13.5px] font-bold text-bvc-ink">
-                  Trống cơm — 4 bè + bộ gõ
-                </span>
+                <span className="text-[13.5px] font-bold text-bvc-ink">Trống cơm — 4 bè + bộ gõ</span>
                 <span className="text-[12.5px] text-bvc-muted">Đã gắn bản nhạc</span>
               </div>
-              <button
-                type="button"
-                className="cursor-pointer text-[13px] font-semibold text-bvc-accent-text"
-              >
+              <button type="button" className="cursor-pointer text-[13px] font-semibold text-bvc-accent-text">
                 Đổi bài nhạc
               </button>
             </div>
@@ -138,10 +127,7 @@ export function AssignmentFormPage() {
 
             <div className="flex flex-col gap-[10px]">
               {RUBRIC_ROWS.map((row) => (
-                <div
-                  key={row.id}
-                  className="flex items-center gap-[12px] rounded-[14px] bg-bvc-surface p-[11px_14px]"
-                >
+                <div key={row.id} className="flex items-center gap-[12px] rounded-[14px] bg-bvc-surface p-[11px_14px]">
                   <span className="flex-1 text-[14px] text-bvc-ink">{row.label}</span>
                   <input
                     type="number"
@@ -166,9 +152,7 @@ export function AssignmentFormPage() {
         <aside className="flex w-[372px] shrink-0 flex-col gap-[18px] overflow-y-auto border-l border-bvc-border-strong bg-bvc-surface p-[22px_20px]">
           {/* Giao cho */}
           <div className="flex flex-col gap-[10px]">
-            <span className="text-[13px] font-bold uppercase tracking-[0.1em] text-bvc-muted">
-              Giao cho
-            </span>
+            <span className="text-[13px] font-bold uppercase tracking-[0.1em] text-bvc-muted">Giao cho</span>
             <div className="flex gap-[8px]">
               {ASSIGN_TO.map((option) => {
                 const isActive = activeAssignTo === option;
@@ -255,19 +239,13 @@ export function AssignmentFormPage() {
 
           {/* Preview */}
           <div className="flex flex-col gap-[10px]">
-            <span className="text-[13px] font-bold uppercase tracking-[0.1em] text-bvc-muted">
-              Xem trước thông báo
-            </span>
+            <span className="text-[13px] font-bold uppercase tracking-[0.1em] text-bvc-muted">Xem trước thông báo</span>
             <div className="flex flex-col gap-[6px] rounded-[18px] border border-bvc-border bg-white p-[14px]">
               <span className="text-[14px] font-bold text-bvc-ink">
                 Giao bài mới: Recording hòa tấu — Trống cơm, bè của bạn
               </span>
-              <span className="text-[12.5px] text-bvc-muted">
-                Hạn: Thứ 6, 26/09/2026 · 23:59
-              </span>
-              <span className="text-[12.5px] text-bvc-muted">
-                3 lần nộp · AI phân tích bật
-              </span>
+              <span className="text-[12.5px] text-bvc-muted">Hạn: Thứ 6, 26/09/2026 · 23:59</span>
+              <span className="text-[12.5px] text-bvc-muted">3 lần nộp · AI phân tích bật</span>
             </div>
           </div>
         </aside>

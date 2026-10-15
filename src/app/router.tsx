@@ -52,6 +52,10 @@ import { TeacherPage } from "@/features/classes/pages/TeacherPage";
 import { TeacherHomePage } from "@/features/classes/pages/TeacherHomePage";
 import { ClassListPage } from "@/features/classes/pages/ClassListPage";
 import { ClassFormPage } from "@/features/classes/pages/ClassFormPage";
+import { ClassDetailPage } from "@/features/classes/pages/ClassDetailPage";
+import { AddStudentPage } from "@/features/classes/pages/AddStudentPage";
+import { ImportStudentsPage } from "@/features/classes/pages/ImportStudentsPage";
+import { ROLES } from "@/shared/constants/roles";
 import { EnsembleAssignPage } from "@/features/classes/pages/EnsembleAssignPage";
 import { RoadmapPage } from "@/features/classes/pages/RoadmapPage";
 import { TeacherAssignmentsPage } from "@/features/classes/pages/TeacherAssignmentsPage";
@@ -152,8 +156,15 @@ export function AppRouter() {
           {/* Teacher / classes */}
           <Route path="/teacher" element={<TeacherPage />} />
           <Route path="/teacher/home" element={<TeacherHomePage />} />
-          <Route path="/teacher/classes" element={<ClassListPage />} />
-          <Route path="/teacher/classes/new" element={<ClassFormPage />} />
+          {/* M03 classes & members — mobile-first screens from UI/, wired to the API */}
+          <Route element={<ProtectedRoute allowedRoles={[ROLES.TEACHER]} />}>
+            <Route path="/teacher/classes" element={<ClassListPage />} />
+            <Route path="/teacher/classes/new" element={<ClassFormPage />} />
+            <Route path="/teacher/classes/:classId" element={<ClassDetailPage />} />
+            <Route path="/teacher/classes/:classId/edit" element={<ClassFormPage />} />
+            <Route path="/teacher/classes/:classId/members/new" element={<AddStudentPage />} />
+            <Route path="/teacher/classes/:classId/import" element={<ImportStudentsPage />} />
+          </Route>
           <Route path="/teacher/classes/:classId/assign" element={<EnsembleAssignPage />} />
           <Route path="/teacher/roadmap" element={<RoadmapPage />} />
           <Route path="/teacher/assignments" element={<TeacherAssignmentsPage />} />

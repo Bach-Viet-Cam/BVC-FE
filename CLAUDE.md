@@ -12,9 +12,10 @@ npm run lint          # eslint .
 npm run lint:fix       # eslint . --fix
 npm run format         # prettier --write .
 npm run format:check   # prettier --check .
+npm test              # Vitest + Testing Library (jsdom); tests live next to features, e.g. src/features/classes/__tests__/
 ```
 
-There is no test runner configured in this project (no test script, no test files, no test framework in `package.json`).
+Tests: Vitest (`vitest.config.ts`, setup in `src/test/setupTests.ts`). Name files `*.test.ts(x)` under `src/`.
 
 ## What this repo is
 

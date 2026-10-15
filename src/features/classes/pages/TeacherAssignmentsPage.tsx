@@ -84,10 +84,7 @@ export function TeacherAssignmentsPage() {
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-white">
-      <DesktopSidebar
-        items={TEACHER_NAV}
-        user={{ initials: "NH", name: "Nguyễn Thu Hương", role: "Giảng viên" }}
-      />
+      <DesktopSidebar items={TEACHER_NAV} user={{ initials: "NH", name: "Nguyễn Thu Hương", role: "Giảng viên" }} />
 
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <DesktopPageHeader
@@ -125,9 +122,7 @@ export function TeacherAssignmentsPage() {
                 />
                 Quá hạn
               </span>
-              <span className="font-mono text-[29px] font-semibold leading-none text-bvc-ink">
-                2
-              </span>
+              <span className="font-mono text-[29px] font-semibold leading-none text-bvc-ink">2</span>
             </div>
           </div>
 
@@ -170,9 +165,7 @@ export function TeacherAssignmentsPage() {
 
                 <span className="font-mono text-bvc-ink">{a.submitted}</span>
 
-                <span
-                  className={`font-mono ${a.pending > 0 ? "font-bold text-bvc-accent-text" : "text-bvc-muted"}`}
-                >
+                <span className={`font-mono ${a.pending > 0 ? "font-bold text-bvc-accent-text" : "text-bvc-muted"}`}>
                   {a.pending > 0 ? a.pending : "—"}
                 </span>
 
