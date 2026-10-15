@@ -1,128 +1,201 @@
-import { useNavigate } from "react-router-dom";
-import { DesktopSidebar, DesktopPageHeader, StatCard } from "@/shared/components/bvc";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { Plus } from "lucide-react";
+import { TeacherShell } from "@/shared/components/bvc/TeacherShell";
+import { SearchField } from "@/shared/components/bvc/SearchField";
+import { FilterPill } from "@/shared/components/bvc/FilterPill";
+import { Pagination } from "@/shared/components/bvc/Pagination";
+import { EmptyState } from "@/shared/components/bvc/EmptyState";
+import { ConfirmDialog } from "@/shared/components/bvc/ConfirmDialog";
+import { ActionButton } from "@/shared/components/bvc/ActionButton";
+import { actionButtonClass } from "@/shared/components/bvc/actionButtonStyles";
+import { useDebouncedCallback } from "@/shared/hooks/useDebouncedCallback";
+import { cn } from "@/shared/utils/cn";
+import { MANAGED_GRID_COLUMNS, ManagedSongRow } from "@/features/music-library/components/ManagedSongRow";
+import {
+  KEYWORD_MAX_LENGTH,
+  LIBRARY_MESSAGES,
+  MANAGE_PAGE_SIZE,
+  VISIBILITY_LABELS,
+} from "@/features/music-library/constants/musicLibraryConstants";
+import { INITIAL_MANAGED_QUERY, useManagedSongs } from "@/features/music-library/hooks/useManagedSongs";
+import { useMusicCategories } from "@/features/music-library/hooks/useMusicCategories";
+import { useVisibilityConfirm } from "@/features/music-library/hooks/useVisibilityConfirm";
+import type { ManagedSong, Visibility } from "@/features/music-library/types/musicLibraryTypes";
 
-const NAV_ITEMS = [
-  { label: "Lớp học", to: "/teacher" },
-  { label: "Bài tập", to: "/teacher/assignments" },
-  { label: "Duyệt bài nộp", to: "/teacher/review" },
-  { label: "Thư viện bài nhạc", to: "/songs" },
-  { label: "Phân loại nội dung", to: "/categories" },
-];
+// Object.keys trả string[]; key của VISIBILITY_LABELS chính là Visibility
+const VISIBILITY_OPTIONS = (Object.keys(VISIBILITY_LABELS) as Visibility[]).map((value) => ({
+  value,
+  label: VISIBILITY_LABELS[value],
+}));
 
-const SONGS = [
-  { name: "Lý ngựa ô", genre: "Dân ca Nam Bộ", level: "Trung cấp", sheets: "4 / 4", updated: "12/09", status: "ok", statusLabel: "Verified", highlight: false },
-  { name: "Trống cơm", genre: "Dân ca Bắc Bộ", level: "Hòa tấu", sheets: "5 / 5", updated: "10/09", status: "ok", statusLabel: "Verified", highlight: false },
-  { name: "Lưu thủy kim tiền", genre: "Nhạc lễ", level: "Nâng cao", sheets: "2 / 4", updated: "06/09", status: "error", statusLabel: "Thiếu bản nhạc", highlight: true },
-  { name: "Bèo dạt mây trôi", genre: "Dân ca · cộng đồng", level: "Cơ bản", sheets: "1 / 4", updated: "15/09", status: "warn", statusLabel: "Chờ duyệt", highlight: false },
-  { name: "Se chỉ luồn kim", genre: "Quan họ Bắc Ninh", level: "Cơ bản", sheets: "3 / 4", updated: "02/09", status: "ok", statusLabel: "Verified", highlight: false },
-  { name: "Ru con Nam Bộ", genre: "Dân ca Nam Bộ", level: "Cơ bản", sheets: "4 / 4", updated: "28/08", status: "ok", statusLabel: "Verified", highlight: false },
-] as const;
-
-const STATUS_COLORS = {
-  ok: "var(--color-bvc-ok)",
-  warn: "var(--color-bvc-warn)",
-  error: "var(--color-bvc-error)",
-};
+const COLUMN_HEADERS = ["", "Tiêu đề", "Nhạc cụ", "Trình độ", "Bản nhạc", "Hiển thị", "Cập nhật", ""];
 
 export function SongManagePage() {
-  const navigate = useNavigate();
+  const { options } = useMusicCategories();
+  const songs = useManagedSongs();
+  const visibility = useVisibilityConfirm(songs.changeVisibility);
+  const [keyword, setKeyword] = useState("");
+  const debouncedSearch = useDebouncedCallback((value: string) => songs.updateQuery({ keyword: value.trim() }));
+
+  const { query, result } = songs;
+  const hasFilters = Boolean(query.keyword || query.genreId || query.instrumentId || query.levelId || query.visibility);
+
+  const requestVisibility = (song: ManagedSong, nextVisible: boolean) =>
+    visibility.request(song, nextVisible ? "VISIBLE" : "HIDDEN", nextVisible && song.visibleSheetCount === 0);
+
+  const resetFilters = () => {
+    debouncedSearch.cancel();
+    setKeyword("");
+    songs.updateQuery(INITIAL_MANAGED_QUERY);
+  };
+
+  const pendingSong = visibility.pending?.item;
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-white">
-      <DesktopSidebar
-        items={NAV_ITEMS}
-        user={{ initials: "NH", name: "Nguyễn Thu Hương", role: "Giảng viên" }}
-        showLogo={false}
-      />
+    <TeacherShell>
+      <header className="flex shrink-0 flex-wrap items-end justify-between gap-4 px-[18px] pt-5 pb-4 md:px-8 md:pt-7">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-[27px] leading-tight font-extrabold tracking-[-0.03em] text-bvc-ink md:text-[34px]">
+            Thư viện bài hát của tôi
+          </h1>
+          <span className="text-sm text-bvc-muted">
+            {result ? `${result.total} bài · ` : ""}
+            {MANAGE_PAGE_SIZE} bài mỗi trang, mới cập nhật trước
+          </span>
+        </div>
+        <Link to="/songs/new" className={actionButtonClass("primary", "md", "hover:text-white")}>
+          <Plus className="size-[18px]" aria-hidden />
+          Thêm bài hát
+        </Link>
+      </header>
 
-      <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        <DesktopPageHeader
-          breadcrumb="M02 · Thư viện học liệu"
-          title="Quản lý bài nhạc"
-          actions={
-            <>
-              <button type="button" className="flex min-h-[44px] cursor-pointer items-center rounded-[14px] border border-bvc-border-strong bg-white px-[16px] text-[14px] font-semibold text-bvc-ink">
-                Quản lý bản nhạc
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate("/songs/new")}
-                className="flex min-h-[44px] cursor-pointer items-center rounded-[14px] bg-bvc-ink px-[18px] text-[14px] font-bold text-white"
-              >
-                Tạo bài nhạc
-              </button>
-            </>
-          }
+      <div className="flex shrink-0 flex-col gap-2.5 px-[18px] pb-3.5 md:px-8 lg:flex-row lg:items-center">
+        <SearchField
+          label="Tìm bài hát"
+          value={keyword}
+          onChange={(value) => {
+            setKeyword(value);
+            debouncedSearch.run(value);
+          }}
+          maxLength={KEYWORD_MAX_LENGTH}
+          placeholder="Tên bài hoặc tác giả"
+          className="lg:w-[340px]"
         />
+        <div className="-mx-[18px] flex gap-2 overflow-x-auto px-[18px] [scrollbar-width:none] md:mx-0 md:px-0">
+          <FilterPill
+            label="Thể loại"
+            value={query.genreId}
+            options={options.genres}
+            onChange={(genreId) => songs.updateQuery({ genreId })}
+          />
+          <FilterPill
+            label="Nhạc cụ"
+            value={query.instrumentId}
+            options={options.instruments}
+            onChange={(instrumentId) => songs.updateQuery({ instrumentId })}
+          />
+          <FilterPill
+            label="Trình độ"
+            value={query.levelId}
+            options={options.levels}
+            onChange={(levelId) => songs.updateQuery({ levelId })}
+          />
+          <FilterPill
+            label="Hiển thị"
+            value={query.visibility}
+            options={VISIBILITY_OPTIONS}
+            // Option lấy từ VISIBILITY_LABELS nên giá trị luôn là Visibility hoặc rỗng
+            onChange={(value) => songs.updateQuery({ visibility: value as Visibility | "" })}
+          />
+        </div>
+      </div>
 
-        <div className="flex flex-1 flex-col gap-[18px] overflow-hidden p-[22px_32px_26px]">
-          <div className="grid grid-cols-4 gap-[12px]">
-            <StatCard label="Bài nhạc" value="42" />
-            <StatCard label="Bản nhạc" value="137" />
-            <div className="flex flex-col gap-[5px] rounded-[18px] border border-bvc-border p-[15px_16px]">
-              <span className="flex items-center gap-[7px] text-[12.5px] text-bvc-muted">
-                <span className="size-[7px] shrink-0 rounded-full bg-bvc-warn" />Chờ duyệt
-              </span>
-              <span className="font-bvc-mono text-[29px] font-semibold leading-none">6</span>
-            </div>
-            <div className="flex flex-col gap-[5px] rounded-[18px] border border-bvc-border p-[15px_16px]">
-              <span className="flex items-center gap-[7px] text-[12.5px] text-bvc-muted">
-                <span className="size-[7px] shrink-0 rounded-full bg-bvc-error" />Thiếu bản nhạc
-              </span>
-              <span className="font-bvc-mono text-[29px] font-semibold leading-none">3</span>
-            </div>
-          </div>
-
-          <div className="flex flex-1 flex-col overflow-hidden rounded-[20px] border border-bvc-border bg-white">
-            <div className="flex shrink-0 items-center justify-between gap-[16px] border-b border-bvc-border px-[18px] py-[15px]">
-              <span className="text-[15px] font-bold">Danh sách bài nhạc</span>
-              <div className="flex items-center gap-[8px]">
-                <label className="text-[13px] text-bvc-muted">Tìm</label>
-                <input
-                  type="search"
-                  placeholder="Tên bài, tác giả, thể loại"
-                  className="h-[38px] w-[260px] rounded-[12px] border border-bvc-border-strong bg-white px-[12px] text-[13px] text-bvc-ink focus:outline-none"
-                />
-                <button type="button" className="min-h-[38px] cursor-pointer rounded-[12px] border border-bvc-border-strong bg-white px-[13px] text-[13px] text-bvc-ink">
-                  Lọc trạng thái
-                </button>
-              </div>
-            </div>
-
-            <div className="grid shrink-0 grid-cols-[2.2fr_1.4fr_1fr_1.2fr_1.1fr_1fr] gap-[14px] border-b border-bvc-border px-[18px] py-[11px] text-[12px] font-bold uppercase tracking-[0.08em] text-bvc-muted">
-              <span>Bài nhạc</span><span>Thể loại</span><span>Độ khó</span><span>Bản nhạc</span><span>Cập nhật</span><span>Trạng thái</span>
-            </div>
-
-            {SONGS.map((song) => (
-              <button
-                key={song.name}
-                type="button"
-                onClick={() => navigate(`/songs/${encodeURIComponent(song.name)}`)}
-                className="grid w-full cursor-pointer grid-cols-[2.2fr_1.4fr_1fr_1.2fr_1.1fr_1fr] items-center gap-[14px] border-b border-bvc-line px-[18px] py-[14px] text-left text-[14px] last:border-b-0"
-                style={{ backgroundColor: song.highlight ? "var(--color-bvc-accent-tint)" : undefined }}
-              >
-                <span className="font-semibold">{song.name}</span>
-                <span className="text-bvc-muted">{song.genre}</span>
-                <span className="text-bvc-muted">{song.level}</span>
-                <span
-                  className="font-bvc-mono"
-                  style={{ color: song.status === "error" ? "var(--color-bvc-accent-text)" : undefined }}
-                >
-                  {song.sheets} nhạc cụ
-                </span>
-                <span className="text-bvc-muted">{song.updated}</span>
-                <span className="flex items-center gap-[7px] text-[13.5px]">
-                  <span
-                    className="size-[7px] shrink-0 rounded-full"
-                    style={{ backgroundColor: STATUS_COLORS[song.status] }}
-                  />
-                  {song.statusLabel}
-                </span>
-              </button>
+      <section aria-label="Danh sách bài hát" className="flex flex-1 flex-col px-[18px] pb-6 md:px-8 xl:px-[18px]">
+        {songs.error ? (
+          <EmptyState
+            title="Không tải được danh sách"
+            description={songs.error}
+            actions={<ActionButton onClick={songs.reload}>Thử lại</ActionButton>}
+          />
+        ) : songs.isFirstLoad ? (
+          <div aria-hidden className="flex animate-pulse flex-col gap-2">
+            {Array.from({ length: 6 }, (_, index) => (
+              <span key={index} className="h-[68px] rounded-2xl bg-bvc-surface" />
             ))}
           </div>
-        </div>
-      </main>
-    </div>
+        ) : result && result.data.length === 0 ? (
+          <EmptyState
+            title={hasFilters ? "Không có bài hát khớp bộ lọc" : "Bạn chưa có bài hát nào"}
+            description={
+              hasFilters
+                ? "Thử bỏ bớt từ khóa hoặc bộ lọc."
+                : "Thêm bài hát đầu tiên, rồi tải lên bản nhạc cho từng nhạc cụ."
+            }
+            actions={
+              hasFilters ? (
+                <ActionButton onClick={resetFilters}>Xóa bộ lọc</ActionButton>
+              ) : (
+                <Link to="/songs/new" className={actionButtonClass("primary", "md", "hover:text-white")}>
+                  Thêm bài hát
+                </Link>
+              )
+            }
+          />
+        ) : (
+          <>
+            <div
+              aria-hidden
+              className={cn(
+                "hidden px-3.5 pb-2.5 text-xs font-bold tracking-[0.06em] text-bvc-muted uppercase",
+                MANAGED_GRID_COLUMNS
+              )}
+            >
+              {COLUMN_HEADERS.map((header, index) => (
+                <span key={index}>{header}</span>
+              ))}
+            </div>
+            <ul className={cn("border-b border-bvc-border transition-opacity", songs.isLoading && "opacity-60")}>
+              {result?.data.map((song) => (
+                <ManagedSongRow
+                  key={song.id}
+                  song={song}
+                  isUpdating={songs.updatingId === song.id}
+                  onRequestVisibility={requestVisibility}
+                />
+              ))}
+            </ul>
+            {result && (
+              <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-4">
+                <span className="font-bvc-mono text-[13px] text-bvc-muted">
+                  Trang {result.page} / {result.totalPages}
+                </span>
+                <Pagination
+                  page={result.page}
+                  totalPages={result.totalPages}
+                  onChange={(page) => songs.updateQuery({ page })}
+                />
+              </div>
+            )}
+          </>
+        )}
+      </section>
+
+      <ConfirmDialog
+        open={visibility.pending !== null}
+        onOpenChange={(open) => !open && visibility.cancel()}
+        title={
+          visibility.pending?.reason === "hide" ? `Ẩn “${pendingSong?.title}”?` : `Công khai “${pendingSong?.title}”?`
+        }
+        description={
+          visibility.pending?.reason === "hide"
+            ? "Sinh viên sẽ không còn thấy bài này. Bài đã lưu sẽ hiện “Không khả dụng”."
+            : LIBRARY_MESSAGES.noVisibleSheet
+        }
+        confirmLabel={visibility.pending?.reason === "hide" ? "Ẩn" : "Vẫn công khai"}
+        onConfirm={visibility.confirm}
+        isLoading={visibility.isApplying}
+      />
+    </TeacherShell>
   );
 }

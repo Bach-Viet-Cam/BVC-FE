@@ -1,6 +1,32 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ChevronRight, ChevronLeft, Layers } from "lucide-react";
+import { DEV_VIEWER_ROLE_KEY } from "@/shared/hooks/useViewerRole";
+
+const VIEWER_ROLE_OPTIONS = [
+  { value: "", label: "Theo tài khoản" },
+  { value: "guest", label: "Khách" },
+  { value: "student", label: "Sinh viên" },
+  { value: "teacher", label: "Giảng viên" },
+];
+
+function readViewerRole() {
+  try {
+    return localStorage.getItem(DEV_VIEWER_ROLE_KEY) ?? "";
+  } catch {
+    return "";
+  }
+}
+
+function changeViewerRole(value: string) {
+  try {
+    if (value) localStorage.setItem(DEV_VIEWER_ROLE_KEY, value);
+    else localStorage.removeItem(DEV_VIEWER_ROLE_KEY);
+  } catch {
+    // localStorage bị chặn: bỏ qua, vẫn dùng vai trò theo tài khoản
+  }
+  window.location.reload();
+}
 
 const SECTIONS = [
   {
@@ -44,7 +70,7 @@ const SECTIONS = [
     routes: [
       { label: "Thư viện", path: "/library" },
       { label: "Chi tiết bài", path: "/library/ly-ngua-o" },
-      { label: "Bản nhạc", path: "/library/ly-ngua-o/sheet" },
+      { label: "Bản nhạc", path: "/library/ly-ngua-o/sheets/lno-tranh-chinh" },
       { label: "Đã lưu", path: "/saved" },
       { label: "Tải lên", path: "/library/upload" },
     ],
@@ -95,9 +121,10 @@ const SECTIONS = [
     label: "Desktop — Thư viện",
     color: "#1A1714",
     routes: [
-      { label: "Quản lý bài nhạc", path: "/songs" },
-      { label: "Tạo/Sửa bài nhạc", path: "/songs/new" },
-      { label: "Quản lý bản nhạc", path: "/songs/sheets" },
+      { label: "Quản lý bài hát", path: "/songs" },
+      { label: "Thêm bài hát", path: "/songs/new" },
+      { label: "Sửa bài hát", path: "/songs/ly-ngua-o/edit" },
+      { label: "Quản lý bản nhạc", path: "/songs/ly-ngua-o/sheets" },
       { label: "Phân loại nội dung", path: "/categories" },
     ],
   },
@@ -197,6 +224,22 @@ export function DevNav() {
         <div style={{ padding: "6px 14px", borderBottom: "1px solid #F2F1EF", background: "#F7F5F3" }}>
           <span style={{ fontSize: 11, color: "#6E6A64", fontFamily: "monospace" }}>{location.pathname}</span>
         </div>
+
+        {/* Vai trò xem thử (M02: khách / sinh viên / giảng viên) */}
+        <label style={{ padding: "8px 14px", borderBottom: "1px solid #F2F1EF", display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "#6E6A64" }}>
+          Xem với vai trò
+          <select
+            defaultValue={readViewerRole()}
+            onChange={(event) => changeViewerRole(event.target.value)}
+            style={{ flex: 1, fontSize: 12, padding: "3px 4px", border: "1px solid #E0DDD9", borderRadius: 6 }}
+          >
+            {VIEWER_ROLE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
 
         {/* Sections */}
         <div style={{ flex: 1, overflowY: "auto", padding: "8px 0" }}>

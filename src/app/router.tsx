@@ -99,6 +99,11 @@ export function AppRouter() {
         <Route path="/forgot" element={<ForgotPage />} />
         <Route path="/403" element={<ForbiddenPage />} />
 
+        {/* M02 — thư viện mở cho cả khách; khách bấm Lưu thì được mời đăng nhập */}
+        <Route path="/library" element={<LibraryPage />} />
+        <Route path="/library/:songId" element={<SongDetailPage />} />
+        <Route path="/library/:songId/sheets/:sheetId" element={<SheetPage />} />
+
         <Route element={<ProtectedRoute />}>
           {/* ── Mobile screens — full-screen, no AppLayout sidebar ─────── */}
 
@@ -121,10 +126,7 @@ export function AppRouter() {
           <Route path="/practice/:songId/song-analysis" element={<SongAnalysisPage />} />
 
           {/* Library */}
-          <Route path="/library" element={<LibraryPage />} />
           <Route path="/library/upload" element={<SongUploadPage />} />
-          <Route path="/library/:songId" element={<SongDetailPage />} />
-          <Route path="/library/:songId/sheet" element={<SheetPage />} />
           <Route path="/saved" element={<SavedPage />} />
 
           {/* Classes */}
@@ -163,7 +165,7 @@ export function AppRouter() {
           <Route path="/songs" element={<SongManagePage />} />
           <Route path="/songs/new" element={<SongFormPage />} />
           <Route path="/songs/:songId/edit" element={<SongFormPage />} />
-          <Route path="/songs/sheets" element={<SheetManagePage />} />
+          <Route path="/songs/:songId/sheets" element={<SheetManagePage />} />
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/admin/users" element={<UserManagePage />} />
