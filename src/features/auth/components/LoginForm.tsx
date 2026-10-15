@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
+import { useLogin } from "@/features/auth/hooks/useLogin";
 
 interface LoginFields {
   email: string;
@@ -11,19 +12,10 @@ interface LoginFields {
 export function LoginForm() {
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFields>();
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { loginWithEmail, isLoading, error } = useLogin();
 
-  const onSubmit = async (_data: LoginFields) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      // TODO: connect to email/password auth endpoint
-    } catch {
-      setError("Đăng nhập thất bại. Kiểm tra lại email hoặc mật khẩu.");
-    } finally {
-      setIsLoading(false);
-    }
+  const onSubmit = async (data: LoginFields) => {
+    await loginWithEmail(data.email, data.password);
   };
 
   return (
@@ -81,7 +73,7 @@ export function LoginForm() {
       </div>
 
       {error && (
-        <p className="rounded-[12px] bg-bvc-accent-tint px-[12px] py-[9px] text-[13.5px] text-bvc-accent-text">
+        <p className="rounded-[12px] bg-red-50 px-[12px] py-[9px] text-[13.5px] text-bvc-error">
           {error}
         </p>
       )}

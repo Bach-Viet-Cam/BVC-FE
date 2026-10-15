@@ -1,149 +1,244 @@
-import { MoreHorizontal } from "lucide-react";
-import { DesktopSidebar, DesktopPageHeader, StatCard } from "@/shared/components/bvc";
+import { useEffect, useState } from "react";
+import { ArrowDown, ArrowUp } from "lucide-react";
+import { DesktopPageHeader } from "@/shared/components/bvc";
+import { Button } from "@/shared/components/ui/button";
+import { Dialog, DialogDescription, DialogPopup, DialogTitle } from "@/shared/components/ui/dialog";
+import { UserFormDialog } from "@/features/platform/components/UserFormDialog";
+import {
+  USER_ROLE_LABELS,
+  USER_ROLE_OPTIONS,
+  USER_STATUS_DOT,
+  USER_STATUS_OPTIONS,
+} from "@/features/platform/constants/userConstants";
+import { useUsers } from "@/features/platform/hooks/useUsers";
+import { type UserItem, type UserSortKey, type UserStatus } from "@/features/platform/types/userTypes";
 
-const NAV_ITEMS = [
-  { label: "Tổng quan", to: "/admin" },
-  { label: "Người dùng", to: "/admin/users" },
-  { label: "Cấu hình hệ thống", to: "/admin/config" },
-  { label: "Phân loại nội dung", to: "/admin/categories" },
-  { label: "Giám sát hệ thống", to: "/admin/monitoring" },
-  { label: "Quản lý thông báo", to: "/admin/notifications" },
-  { label: "Nội dung đã xác minh", to: "/community/verified" },
+const COLUMNS = "grid-cols-[2fr_2.2fr_1.2fr_1fr_1.1fr_1fr]";
+const STATUS_LABELS: Record<UserStatus, string> = Object.fromEntries(
+  USER_STATUS_OPTIONS.map((option) => [option.value, option.label])
+) as Record<UserStatus, string>; // Object.fromEntries trả về kiểu rộng; khóa luôn là UserStatus.
+
+const SORTABLE_COLUMNS: { key: UserSortKey; label: string }[] = [
+  { key: "username", label: "Họ tên" },
+  { key: "email", label: "Email" },
+  { key: "role", label: "Vai trò" },
 ];
-
-type Role = "Sinh viên" | "Giảng viên" | "Admin" | "Provider";
-type Status = "active" | "inactive";
-
-interface UserRow {
-  initials: string;
-  name: string;
-  email: string;
-  role: Role;
-  class: string;
-  status: Status;
-  lastActive: string;
-}
-
-const USERS: UserRow[] = [
-  { initials: "MA", name: "Trần Minh Anh", email: "anhtm@fpt.edu.vn", role: "Sinh viên", class: "TRD301", status: "active", lastActive: "Hôm nay" },
-  { initials: "PL", name: "Nguyễn Phương Linh", email: "linhnp@fpt.edu.vn", role: "Sinh viên", class: "TRD301", status: "active", lastActive: "Hôm nay" },
-  { initials: "QB", name: "Lê Quốc Bảo", email: "baolq@fpt.edu.vn", role: "Sinh viên", class: "TRD201", status: "inactive", lastActive: "10/09" },
-  { initials: "NH", name: "Nguyễn Thu Hương", email: "huongnt@fpt.edu.vn", role: "Giảng viên", class: "—", status: "active", lastActive: "Hôm nay" },
-  { initials: "GH", name: "Phạm Gia Hân", email: "hangp@fpt.edu.vn", role: "Sinh viên", class: "TRD301", status: "active", lastActive: "Hôm qua" },
-  { initials: "AD", name: "Lê Văn Admin", email: "admin@bvc.edu.vn", role: "Admin", class: "—", status: "active", lastActive: "Hôm nay" },
-  { initials: "HT", name: "Hoàng Văn Tùng", email: "tunghv@fpt.edu.vn", role: "Sinh viên", class: "TRD401", status: "active", lastActive: "23/09" },
-  { initials: "RP", name: "Nhạc cụ Minh Long", email: "minhlong@rental.vn", role: "Provider", class: "—", status: "active", lastActive: "22/09" },
-];
-
-const ROLE_BADGE: Record<Role, string> = {
-  "Sinh viên": "bg-bvc-surface text-bvc-muted",
-  "Giảng viên": "border border-bvc-border text-bvc-ink",
-  "Admin": "bg-bvc-ink text-white",
-  "Provider": "bg-bvc-accent-tint text-bvc-accent-text",
-};
 
 export function UserManagePage() {
-  return (
-    <div className="flex h-screen w-full overflow-hidden bg-white">
-      <DesktopSidebar
-        items={NAV_ITEMS}
-        user={{ initials: "AD", name: "Admin BVC", role: "Quản trị viên" }}
-      />
+  const { filters, updateFilters, items, total, error, isLoading, pageSize, saveUser, toggleLock } = useUsers();
+  const [searchText, setSearchText] = useState("");
+  const [formTarget, setFormTarget] = useState<UserItem | null>(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [lockTarget, setLockTarget] = useState<UserItem | null>(null);
 
+  const appliedQuery = filters.q;
+  useEffect(() => {
+    const nextQuery = searchText.trim();
+    if (nextQuery === appliedQuery) return;
+    const timer = window.setTimeout(() => updateFilters({ q: nextQuery }), 300);
+    return () => window.clearTimeout(timer);
+  }, [searchText, appliedQuery, updateFilters]);
+
+  const firstRow = total === 0 ? 0 : (filters.page - 1) * pageSize + 1;
+  const lastRow = Math.min(filters.page * pageSize, total);
+  const lastPage = Math.max(1, Math.ceil(total / pageSize));
+
+  const openForm = (user: UserItem | null) => {
+    setFormTarget(user);
+    setIsFormOpen(true);
+  };
+
+  const toggleSort = (key: UserSortKey) => {
+    const isSame = filters.sortBy === key;
+    updateFilters({ sortBy: key, sortDir: isSame && filters.sortDir === "asc" ? "desc" : "asc" });
+  };
+
+  const confirmLockChange = async () => {
+    if (!lockTarget) return;
+    await toggleLock(lockTarget);
+    setLockTarget(null);
+  };
+
+  return (
+    <>
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <DesktopPageHeader
-          breadcrumb="M06 · Quản trị"
-          title="Quản lý người dùng"
+          breadcrumb="SCR-M06-05 · Quản lý người dùng"
+          title="Người dùng"
           actions={
-            <>
-              <input
-                type="search"
-                placeholder="Tìm theo tên, email..."
-                className="h-[44px] w-[220px] rounded-[14px] border border-bvc-border-strong bg-white px-4 text-[14px] text-bvc-ink placeholder:text-bvc-faint focus:outline-none"
-              />
-              <select className="h-[44px] cursor-pointer rounded-[14px] border border-bvc-border-strong bg-white px-4 text-[14px] text-bvc-ink focus:outline-none">
-                <option>Tất cả vai trò</option>
-                <option>Sinh viên</option>
-                <option>Giảng viên</option>
-                <option>Admin</option>
-                <option>Provider</option>
-              </select>
-              <button
-                type="button"
-                className="flex min-h-[44px] cursor-pointer items-center rounded-[14px] bg-bvc-ink px-[18px] text-[14px] font-bold text-white"
-              >
-                Tạo tài khoản
-              </button>
-            </>
+            <button
+              type="button"
+              onClick={() => openForm(null)}
+              className="flex min-h-[44px] cursor-pointer items-center rounded-[14px] bg-bvc-ink px-[18px] text-[14px] font-bold text-white"
+            >
+              Thêm người dùng
+            </button>
           }
         />
 
-        <div className="flex flex-1 flex-col gap-[18px] overflow-y-auto p-[22px_32px_26px]">
-          <div className="grid grid-cols-4 gap-[12px]">
-            <StatCard label="Tổng" value="312" />
-            <StatCard label="Sinh viên" value="278" />
-            <StatCard label="Giảng viên" value="28" />
-            <StatCard label="Admin + Provider" value="6" />
+        <div className="flex flex-1 flex-col gap-[16px] overflow-y-auto p-[22px_32px_26px]">
+          <div className="flex flex-wrap items-center gap-[10px]">
+            <select
+              aria-label="Vai trò"
+              value={filters.role ?? ""}
+              onChange={(event) => updateFilters({ role: event.target.value ? Number(event.target.value) : undefined })}
+              className="h-[44px] cursor-pointer rounded-[14px] border border-bvc-border-strong bg-white px-4 text-[14px] text-bvc-ink focus:outline-none"
+            >
+              <option value="">Tất cả vai trò</option>
+              {USER_ROLE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <select
+              aria-label="Trạng thái tài khoản"
+              value={filters.status ?? ""}
+              onChange={(event) =>
+                updateFilters({ status: (event.target.value || undefined) as UserStatus | undefined })
+              }
+              className="h-[44px] cursor-pointer rounded-[14px] border border-bvc-border-strong bg-white px-4 text-[14px] text-bvc-ink focus:outline-none"
+            >
+              <option value="">Tất cả trạng thái</option>
+              {USER_STATUS_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <input
+              type="search"
+              value={searchText}
+              onChange={(event) => setSearchText(event.target.value)}
+              placeholder="Tên, email hoặc mã sinh viên"
+              maxLength={100}
+              className="h-[44px] w-[280px] rounded-[14px] border border-bvc-border-strong bg-white px-4 text-[14px] text-bvc-ink placeholder:text-bvc-faint focus:outline-none"
+            />
+            <span className="ml-auto font-mono text-[13px] text-bvc-muted">{total} người dùng</span>
           </div>
 
           <div className="flex flex-col overflow-hidden rounded-[20px] border border-bvc-border bg-white">
-            {/* Table header */}
-            <div className="grid shrink-0 grid-cols-[2fr_2fr_1.1fr_0.9fr_0.9fr_1.1fr_0.7fr] gap-[14px] border-b border-bvc-border px-[20px] py-[11px] text-[12px] font-bold uppercase tracking-[0.08em] text-bvc-muted">
-              <span>Họ tên</span>
-              <span>Email</span>
-              <span>Vai trò</span>
-              <span>Lớp</span>
-              <span>Trạng thái</span>
-              <span>Hoạt động cuối</span>
+            <div
+              className={`grid shrink-0 ${COLUMNS} gap-[14px] border-b border-bvc-border px-[20px] py-[11px] text-[12px] font-bold uppercase tracking-[0.08em] text-bvc-muted`}
+            >
+              {SORTABLE_COLUMNS.map((column) => (
+                <button
+                  key={column.key}
+                  type="button"
+                  onClick={() => toggleSort(column.key)}
+                  className="flex cursor-pointer items-center gap-[4px] text-left uppercase"
+                >
+                  {column.label}
+                  {filters.sortBy === column.key &&
+                    (filters.sortDir === "asc" ? <ArrowUp size={12} /> : <ArrowDown size={12} />)}
+                </button>
+              ))}
+              <span>Mã SV</span>
+              <button
+                type="button"
+                onClick={() => toggleSort("status")}
+                className="flex cursor-pointer items-center gap-[4px] text-left uppercase"
+              >
+                Trạng thái
+                {filters.sortBy === "status" &&
+                  (filters.sortDir === "asc" ? <ArrowUp size={12} /> : <ArrowDown size={12} />)}
+              </button>
               <span>Hành động</span>
             </div>
 
-            {USERS.map((u) => (
-              <div
-                key={u.email}
-                className="grid h-[52px] grid-cols-[2fr_2fr_1.1fr_0.9fr_0.9fr_1.1fr_0.7fr] items-center gap-[14px] border-b border-bvc-line px-[20px] text-[13px] last:border-0"
-              >
-                {/* Name + avatar */}
-                <span className="flex items-center gap-[10px]">
-                  <span className="flex size-[32px] shrink-0 items-center justify-center rounded-full bg-bvc-surface text-[12px] font-bold text-bvc-ink">
-                    {u.initials}
+            {isLoading && <p className="px-[20px] py-[28px] text-[14px] text-bvc-muted">Đang tải...</p>}
+            {!isLoading && error && <p className="px-[20px] py-[28px] text-[14px] text-bvc-error">{error}</p>}
+            {!isLoading && !error && items.length === 0 && (
+              <p className="px-[20px] py-[28px] text-[14px] text-bvc-muted">Không tìm thấy người dùng phù hợp.</p>
+            )}
+            {!isLoading &&
+              !error &&
+              items.map((user) => (
+                <div
+                  key={user.id}
+                  className={`grid min-h-[52px] ${COLUMNS} items-center gap-[14px] border-b border-bvc-line px-[20px] py-[8px] text-[13px] last:border-0`}
+                >
+                  <span className="truncate font-semibold text-bvc-ink">{user.username}</span>
+                  <span className="truncate text-bvc-muted">{user.email}</span>
+                  <span className="text-bvc-ink">{USER_ROLE_LABELS[user.role] ?? "—"}</span>
+                  <span className="font-mono text-bvc-muted">{user.studentCode ?? "—"}</span>
+                  <span className="flex items-center gap-[6px]">
+                    <span className={`size-[7px] shrink-0 rounded-full ${USER_STATUS_DOT[user.status]}`} />
+                    <span className="text-bvc-muted">{STATUS_LABELS[user.status]}</span>
                   </span>
-                  <span className="font-semibold text-bvc-ink">{u.name}</span>
-                </span>
-                {/* Email */}
-                <span className="text-bvc-muted">{u.email}</span>
-                {/* Role badge */}
-                <span>
-                  <span className={`rounded-[9px] px-2 py-0.5 text-[12px] font-semibold ${ROLE_BADGE[u.role]}`}>
-                    {u.role}
+                  <span className="flex items-center gap-[12px] font-semibold">
+                    <button type="button" onClick={() => openForm(user)} className="cursor-pointer text-bvc-ink">
+                      Sửa
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setLockTarget(user)}
+                      className="cursor-pointer text-bvc-accent-text"
+                    >
+                      {user.status === "LOCKED" ? "Mở khóa" : "Khóa"}
+                    </button>
                   </span>
-                </span>
-                {/* Class */}
-                <span className="text-bvc-muted">{u.class}</span>
-                {/* Status dot */}
-                <span className="flex items-center gap-[6px]">
-                  <span
-                    className={`size-[7px] shrink-0 rounded-full ${u.status === "active" ? "bg-bvc-ok" : "bg-bvc-bar-strong"}`}
-                  />
-                  <span className="text-bvc-muted">{u.status === "active" ? "Hoạt động" : "Không hoạt động"}</span>
-                </span>
-                {/* Last active */}
-                <span className="font-mono text-bvc-muted">{u.lastActive}</span>
-                {/* Action */}
-                <span className="flex items-center">
-                  <button
-                    type="button"
-                    className="flex size-[34px] cursor-pointer items-center justify-center rounded-[10px] border border-bvc-border text-bvc-muted"
-                    aria-label="Thêm hành động"
-                  >
-                    <MoreHorizontal size={16} />
-                  </button>
-                </span>
-              </div>
-            ))}
+                </div>
+              ))}
           </div>
+
+          <div className="flex items-center justify-between text-[13px] text-bvc-muted">
+            <span>
+              Hiển thị {firstRow}-{lastRow} / {total}
+            </span>
+            <span className="flex items-center gap-[8px]">
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={filters.page <= 1}
+                onClick={() => updateFilters({ page: filters.page - 1 })}
+              >
+                Trước
+              </Button>
+              <span className="font-mono">
+                {filters.page} / {lastPage}
+              </span>
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={filters.page >= lastPage}
+                onClick={() => updateFilters({ page: filters.page + 1 })}
+              >
+                Sau
+              </Button>
+            </span>
+          </div>
+          <p className="text-[12.5px] text-bvc-muted">
+            Tài khoản “Chờ kích hoạt” chuyển sang “Hoạt động” ở lần đăng nhập Google đầu tiên.
+          </p>
         </div>
       </main>
-    </div>
+
+      <UserFormDialog
+        isOpen={isFormOpen}
+        user={formTarget}
+        onOpenChange={setIsFormOpen}
+        onSubmit={(values) => saveUser(formTarget?.id ?? null, values)}
+      />
+
+      <Dialog open={lockTarget !== null} onOpenChange={(isOpen) => !isOpen && setLockTarget(null)}>
+        <DialogPopup>
+          <DialogTitle>{lockTarget?.status === "LOCKED" ? "Mở khóa tài khoản" : "Khóa tài khoản"}</DialogTitle>
+          <DialogDescription>
+            {lockTarget?.status === "LOCKED"
+              ? `Mở khóa tài khoản ${lockTarget.username}?`
+              : `Khóa tài khoản ${lockTarget?.username}? Người dùng sẽ bị đăng xuất và không thể đăng nhập cho đến khi được mở khóa.`}
+          </DialogDescription>
+          <div className="flex justify-end gap-2">
+            <Button variant="secondary" onClick={() => setLockTarget(null)}>
+              Hủy
+            </Button>
+            <Button variant={lockTarget?.status === "LOCKED" ? "primary" : "danger"} onClick={confirmLockChange}>
+              Xác nhận
+            </Button>
+          </div>
+        </DialogPopup>
+      </Dialog>
+    </>
   );
 }
