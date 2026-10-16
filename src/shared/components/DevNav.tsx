@@ -8,8 +8,6 @@ const SECTIONS = [
     color: "#6E6A64",
     routes: [
       { label: "Đăng nhập", path: "/login" },
-      { label: "Đăng ký", path: "/register" },
-      { label: "Quên mật khẩu", path: "/forgot" },
     ],
   },
   {

@@ -1,13 +1,7 @@
 import { type UserInfo } from "@/shared/context/AuthContext";
 
-export interface LoginRequest {
-  email: string;
-  password?: string;
-}
-
 export interface GoogleAuthRequest {
   credential: string;
-  role?: number;
 }
 
 export interface AuthResponse {

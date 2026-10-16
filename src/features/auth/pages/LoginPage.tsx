@@ -1,9 +1,15 @@
 import { GoogleLogin } from "@react-oauth/google";
+import { Navigate } from "react-router-dom";
 import { useLogin } from "@/features/auth/hooks/useLogin";
-import { LoginForm } from "@/features/auth/components/LoginForm";
+import { useAuth } from "@/shared/context/AuthContext";
+import { getRoleHome } from "@/shared/utils/roleHome";
 
 export function LoginPage() {
-  const { login, isLoading, error } = useLogin();
+  const { login, isLoading, error, setError } = useLogin();
+  const { user, isLoading: isAuthLoading } = useAuth();
+
+  if (isAuthLoading) return <p className="p-6 text-center text-bvc-muted">Đang kiểm tra phiên đăng nhập...</p>;
+  if (user) return <Navigate to={getRoleHome(user.role)} replace />;
 
   return (
     <div className="flex min-h-dvh justify-center bg-bvc-surface">
@@ -34,27 +40,21 @@ export function LoginPage() {
           </div>
         </div>
 
-        {/* Form */}
-        <LoginForm />
-
-        {/* Divider + Google / FPT SSO */}
+        {/* Google / FPT SSO */}
         <div className="flex flex-col gap-[12px]">
-          <div className="flex items-center gap-[12px]">
-            <span className="h-px flex-1 bg-bvc-border-strong" />
-            <span className="text-[12.5px] text-bvc-faint">hoặc đăng nhập bằng Google (FPT)</span>
-            <span className="h-px flex-1 bg-bvc-border-strong" />
-          </div>
+          <p className="m-0 text-center text-[14px] text-bvc-muted">Đăng nhập bằng tài khoản Google đã được cấp quyền.</p>
 
           <div className="flex w-full justify-center">
             <GoogleLogin
               onSuccess={({ credential }) => {
                 if (credential) void login(credential);
+                else setError("Google không trả về thông tin đăng nhập. Vui lòng thử lại.");
               }}
-              onError={() => undefined}
+              onError={() => setError("Không thể đăng nhập bằng Google. Vui lòng thử lại.")}
               useOneTap={false}
               width="380"
               size="large"
-              text="continue_with"
+              text="signin_with"
               shape="rectangular"
             />
           </div>
@@ -67,7 +67,7 @@ export function LoginPage() {
         </div>
 
         <p className="m-0 text-[12.5px] leading-[1.55] text-bvc-muted">
-          Hệ thống tự nhận vai trò từ tài khoản: sinh viên, giảng viên, quản trị hoặc đơn vị cho thuê nhạc cụ.
+          Vai trò của bạn do quản trị viên cấp theo tài khoản trong hệ thống.
         </p>
       </div>
     </div>

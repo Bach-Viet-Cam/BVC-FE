@@ -6,8 +6,6 @@ import {
 } from "@/features/auth/types/authTypes";
 
 export const authApi = {
-  login: (data: { email: string; password?: string }) =>
-    axiosClient.post<ApiResponse<AuthResponse>>("/auth/login", data),
   googleAuth: (data: GoogleAuthRequest) =>
     axiosClient.post<ApiResponse<AuthResponse>>("/auth/google", data),
   refresh: () => axiosClient.post<ApiResponse<AuthResponse>>("/auth/refresh"),
