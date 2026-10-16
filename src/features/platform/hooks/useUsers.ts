@@ -122,5 +122,6 @@ export function useUsers() {
     pageSize: USER_PAGE_SIZE,
     saveUser,
     toggleLock,
+    reload,
   };
 }
