@@ -9,6 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Copy,
+  FileSpreadsheet,
   GraduationCap,
   Info,
   Lock,
@@ -35,6 +36,7 @@ import {
 } from "@/shared/components/ui/dropdown-menu";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { toast } from "@/shared/components/ui/toast";
+import { StudentImportDialog } from "@/features/platform/components/StudentImportDialog";
 import { UserFormDialog } from "@/features/platform/components/UserFormDialog";
 import { USER_ROLE_LABELS, USER_STATUS_OPTIONS } from "@/features/platform/constants/userConstants";
 import { useUsers } from "@/features/platform/hooks/useUsers";
@@ -61,6 +63,7 @@ export function UserManagePage() {
   const [searchText, setSearchText] = useState("");
   const [formTarget, setFormTarget] = useState<UserItem | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
   const [lockTarget, setLockTarget] = useState<UserItem | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
@@ -131,6 +134,15 @@ export function UserManagePage() {
                 className="flex size-[42px] cursor-pointer items-center justify-center rounded-[12px] border border-bvc-border bg-white text-bvc-muted transition-colors hover:border-bvc-border-strong hover:text-bvc-ink disabled:opacity-50"
               >
                 <RotateCw size={16} className={cn(isLoading && "animate-spin text-bvc-ink")} />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsImportOpen(true)}
+                className="flex min-h-[42px] cursor-pointer items-center gap-2 rounded-[12px] border border-bvc-border bg-white px-4 text-[13.5px] font-semibold text-bvc-ink transition-colors hover:border-bvc-border-strong"
+              >
+                <FileSpreadsheet size={16} />
+                <span>Nhập từ Excel</span>
               </button>
 
               <button
@@ -630,6 +642,8 @@ export function UserManagePage() {
           </div>
         </div>
       </main>
+
+      <StudentImportDialog isOpen={isImportOpen} onOpenChange={setIsImportOpen} onImported={reload} />
 
       <UserFormDialog
         isOpen={isFormOpen}
