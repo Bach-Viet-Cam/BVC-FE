@@ -55,6 +55,7 @@ import { ClassFormPage } from "@/features/classes/pages/ClassFormPage";
 import { ClassDetailPage } from "@/features/classes/pages/ClassDetailPage";
 import { AddStudentPage } from "@/features/classes/pages/AddStudentPage";
 import { ImportStudentsPage } from "@/features/classes/pages/ImportStudentsPage";
+import { AdminRoadmapPage } from "@/features/classes/pages/AdminRoadmapPage";
 import { ROLES } from "@/shared/constants/roles";
 import { EnsembleAssignPage } from "@/features/classes/pages/EnsembleAssignPage";
 import { RoadmapPage } from "@/features/classes/pages/RoadmapPage";
@@ -164,6 +165,10 @@ export function AppRouter() {
             <Route path="/teacher/classes/:classId/edit" element={<ClassFormPage />} />
             <Route path="/teacher/classes/:classId/members/new" element={<AddStudentPage />} />
             <Route path="/teacher/classes/:classId/import" element={<ImportStudentsPage />} />
+          </Route>
+          {/* M03 roadmap management — System Admin, desktop layout from UI/Giám sát hệ thống-html */}
+          <Route element={<ProtectedRoute allowedRoles={[ROLES.SYSTEM_ADMIN]} />}>
+            <Route path="/admin/roadmaps" element={<AdminRoadmapPage />} />
           </Route>
           <Route path="/teacher/classes/:classId/assign" element={<EnsembleAssignPage />} />
           <Route path="/teacher/roadmap" element={<RoadmapPage />} />

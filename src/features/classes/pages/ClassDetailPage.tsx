@@ -5,6 +5,7 @@ import { type ClassTabKey, ClassTabs } from "@/features/classes/components/Class
 import { ConfirmDialog } from "@/features/classes/components/ConfirmDialog";
 import { ListState } from "@/features/classes/components/ListState";
 import { MembersTab } from "@/features/classes/components/MembersTab";
+import { RoadmapTab } from "@/features/classes/components/RoadmapTab";
 import { useClassActions } from "@/features/classes/hooks/useClassActions";
 import { useClassDetail } from "@/features/classes/hooks/useClassDetail";
 import { MobileHeader } from "@/shared/components/bvc/MobileHeader";
@@ -55,10 +56,10 @@ export function ClassDetailPage() {
             activeTab={activeTab}
             onChange={(tab) => setSearchParams(tab === "members" ? {} : { tab }, { replace: true })}
           />
-          {activeTab === "members" ? (
-            <MembersTab classDetail={classDetail} onMembersChanged={reload} />
-          ) : (
-            // Roadmap / assignments / progress tabs wait for their UI designs (sub-projects 2–4).
+          {activeTab === "members" && <MembersTab classDetail={classDetail} onMembersChanged={reload} />}
+          {activeTab === "roadmap" && <RoadmapTab classId={classDetail.id} />}
+          {(activeTab === "assignments" || activeTab === "progress") && (
+            // Assignments / progress tabs come with sub-projects 3–4.
             <p className="m-[18px] rounded-[18px] bg-bvc-soft p-[15px] text-[13.5px] text-bvc-muted">
               Chức năng đang phát triển.
             </p>
