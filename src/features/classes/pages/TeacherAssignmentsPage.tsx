@@ -1,14 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { DesktopSidebar, DesktopPageHeader, StatCard } from "@/shared/components/bvc";
-
-const TEACHER_NAV = [
-  { label: "Trang chủ GV", to: "/teacher/home" },
-  { label: "Danh sách lớp", to: "/teacher/classes" },
-  { label: "Lộ trình học tập", to: "/teacher/roadmap" },
-  { label: "Bài tập", to: "/teacher/assignments" },
-  { label: "Duyệt bài nộp", to: "/teacher/review", badge: 18 },
-  { label: "Thư viện bài nhạc", to: "/songs" },
-];
+import { DesktopPageHeader, StatCard } from "@/shared/components/bvc";
 
 type AssignmentStatus = "pending" | "done" | "active";
 
@@ -83,12 +74,7 @@ export function TeacherAssignmentsPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-white">
-      <DesktopSidebar
-        items={TEACHER_NAV}
-        user={{ initials: "NH", name: "Nguyễn Thu Hương", role: "Giảng viên" }}
-      />
-
+    <>
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <DesktopPageHeader
           breadcrumb="M03 · Lớp học"
@@ -112,7 +98,6 @@ export function TeacherAssignmentsPage() {
         />
 
         <div className="flex flex-1 flex-col gap-[18px] overflow-y-auto p-[22px_32px_26px]">
-          {/* Stat cards */}
           <div className="grid grid-cols-4 gap-[12px]">
             <StatCard label="Tổng bài tập" value="24" />
             <StatCard label="Chờ duyệt" value="18" variant="accent" />
@@ -131,9 +116,7 @@ export function TeacherAssignmentsPage() {
             </div>
           </div>
 
-          {/* Table */}
           <div className="flex flex-1 flex-col overflow-hidden rounded-[20px] border border-bvc-border bg-white">
-            {/* Table header */}
             <div className="grid shrink-0 grid-cols-[2.4fr_1.1fr_0.8fr_0.8fr_0.9fr_0.9fr_0.8fr] gap-[12px] border-b border-bvc-border px-[20px] py-[11px] text-[12px] font-bold uppercase tracking-[0.08em] text-bvc-muted">
               <span>Tiêu đề</span>
               <span>Loại</span>
@@ -144,7 +127,6 @@ export function TeacherAssignmentsPage() {
               <span>Hành động</span>
             </div>
 
-            {/* Table rows */}
             {ASSIGNMENTS.map((a) => (
               <div
                 key={a.title}
@@ -198,6 +180,6 @@ export function TeacherAssignmentsPage() {
           </div>
         </div>
       </main>
-    </div>
+    </>
   );
 }

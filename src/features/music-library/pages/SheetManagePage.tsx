@@ -1,12 +1,4 @@
-import { DesktopSidebar, DesktopPageHeader, StatCard } from "@/shared/components/bvc";
-
-const NAV_ITEMS = [
-  { label: "Lớp học", to: "/teacher" },
-  { label: "Bài tập", to: "/teacher/assignments" },
-  { label: "Duyệt bài nộp", to: "/teacher/review" },
-  { label: "Thư viện bài nhạc", to: "/songs" },
-  { label: "Phân loại nội dung", to: "/categories" },
-];
+import { DesktopPageHeader, StatCard } from "@/shared/components/bvc";
 
 interface SheetRow {
   name: string;
@@ -34,13 +26,7 @@ const STATUS_COLORS = {
 
 export function SheetManagePage() {
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-white">
-      <DesktopSidebar
-        items={NAV_ITEMS}
-        user={{ initials: "NH", name: "Nguyễn Thu Hương", role: "Giảng viên" }}
-        showLogo={false}
-      />
-
+    <>
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <DesktopPageHeader
           breadcrumb="M02 · Thư viện học liệu"
@@ -56,7 +42,6 @@ export function SheetManagePage() {
         />
 
         <div className="flex flex-1 flex-col gap-[18px] overflow-hidden p-[22px_32px_26px]">
-          {/* Stats */}
           <div className="grid grid-cols-4 gap-[12px]">
             <StatCard label="Tổng bản nhạc" value="137" />
             <div className="flex flex-col gap-[5px] rounded-[18px] border border-bvc-border p-[15px_16px]">
@@ -70,9 +55,7 @@ export function SheetManagePage() {
             <StatCard label="File MusicXML" value="18" />
           </div>
 
-          {/* Sheet table */}
           <div className="flex flex-1 flex-col overflow-hidden rounded-[20px] border border-bvc-border bg-white">
-            {/* Toolbar */}
             <div className="flex shrink-0 items-center justify-between gap-[16px] border-b border-bvc-border px-[18px] py-[15px]">
               <span className="text-[15px] font-bold text-bvc-ink">Danh sách bản nhạc</span>
               <div className="flex items-center gap-[8px]">
@@ -90,7 +73,6 @@ export function SheetManagePage() {
               </div>
             </div>
 
-            {/* Column headers */}
             <div className="grid shrink-0 grid-cols-[2fr_1.4fr_1.2fr_1.1fr_1fr_1fr] gap-[14px] border-b border-bvc-border px-[18px] py-[11px] text-[12px] font-bold uppercase tracking-[0.08em] text-bvc-muted">
               <span>Bản nhạc</span>
               <span>Bài nhạc</span>
@@ -100,7 +82,6 @@ export function SheetManagePage() {
               <span>Trạng thái</span>
             </div>
 
-            {/* Rows */}
             <div className="flex-1 overflow-y-auto">
               {SHEETS.map((sheet) => (
                 <div
@@ -127,6 +108,6 @@ export function SheetManagePage() {
           </div>
         </div>
       </main>
-    </div>
+    </>
   );
 }

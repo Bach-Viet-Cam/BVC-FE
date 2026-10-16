@@ -1,15 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { DesktopSidebar, DesktopPageHeader, StatCard } from "@/shared/components/bvc";
-
-const NAV_ITEMS = [
-  { label: "Trang chủ GV", to: "/teacher/home" },
-  { label: "Danh sách lớp", to: "/teacher/classes" },
-  { label: "Lộ trình học tập", to: "/teacher/roadmap" },
-  { label: "Bài tập", to: "/teacher/assignments" },
-  { label: "Duyệt bài nộp", to: "/teacher/review", badge: 18 },
-  { label: "Thư viện bài nhạc", to: "/songs" },
-];
+import { DesktopPageHeader, StatCard } from "@/shared/components/bvc";
 
 const SEMESTER_CHIPS = ["Fall 2026", "Spring 2026", "Fall 2025"] as const;
 
@@ -27,12 +18,7 @@ export function ClassListPage() {
   const [activeSemester, setActiveSemester] = useState<string>("Fall 2026");
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-white">
-      <DesktopSidebar
-        items={NAV_ITEMS}
-        user={{ initials: "NH", name: "Nguyễn Thu Hương", role: "Giảng viên" }}
-      />
-
+    <>
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <DesktopPageHeader
           breadcrumb="M03 · Lớp học"
@@ -67,7 +53,6 @@ export function ClassListPage() {
         />
 
         <div className="flex flex-1 flex-col gap-[18px] overflow-y-auto p-[22px_32px_26px]">
-          {/* Stats */}
           <div className="grid grid-cols-4 gap-[12px]">
             <StatCard label="Tổng lớp" value="8" />
             <StatCard label="Đang hoạt động" value="3" variant="ok" />
@@ -75,9 +60,7 @@ export function ClassListPage() {
             <StatCard label="Sinh viên" value="78" />
           </div>
 
-          {/* Table */}
           <div className="flex flex-1 flex-col overflow-hidden rounded-[20px] border border-bvc-border bg-white">
-            {/* Table header */}
             <div className="grid shrink-0 grid-cols-[1.2fr_2fr_1.2fr_0.8fr_1fr_1.1fr_0.8fr] items-center gap-[14px] border-b border-bvc-border bg-bvc-surface px-[20px] text-[12px] font-bold uppercase tracking-[0.08em] text-bvc-muted h-[46px]">
               <span>Mã lớp</span>
               <span>Tên môn</span>
@@ -123,6 +106,6 @@ export function ClassListPage() {
           </div>
         </div>
       </main>
-    </div>
+    </>
   );
 }

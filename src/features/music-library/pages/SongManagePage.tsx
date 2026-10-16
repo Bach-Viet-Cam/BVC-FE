@@ -1,13 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { DesktopSidebar, DesktopPageHeader, StatCard } from "@/shared/components/bvc";
-
-const NAV_ITEMS = [
-  { label: "Lớp học", to: "/teacher" },
-  { label: "Bài tập", to: "/teacher/assignments" },
-  { label: "Duyệt bài nộp", to: "/teacher/review" },
-  { label: "Thư viện bài nhạc", to: "/songs" },
-  { label: "Phân loại nội dung", to: "/categories" },
-];
+import { DesktopPageHeader, StatCard } from "@/shared/components/bvc";
 
 const SONGS = [
   { name: "Lý ngựa ô", genre: "Dân ca Nam Bộ", level: "Trung cấp", sheets: "4 / 4", updated: "12/09", status: "ok", statusLabel: "Verified", highlight: false },
@@ -28,13 +20,7 @@ export function SongManagePage() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-white">
-      <DesktopSidebar
-        items={NAV_ITEMS}
-        user={{ initials: "NH", name: "Nguyễn Thu Hương", role: "Giảng viên" }}
-        showLogo={false}
-      />
-
+    <>
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <DesktopPageHeader
           breadcrumb="M02 · Thư viện học liệu"
@@ -123,6 +109,6 @@ export function SongManagePage() {
           </div>
         </div>
       </main>
-    </div>
+    </>
   );
 }
