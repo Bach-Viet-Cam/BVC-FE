@@ -37,7 +37,6 @@ export interface ClassRoadmapWeek extends RoadmapWeek {
   startDate: string;
   endDate: string;
   status: RoadmapWeekStatus;
-  assignments: [];
 }
 
 export interface ClassRoadmap {
@@ -46,4 +45,6 @@ export interface ClassRoadmap {
 
 export interface SaveRoadmapPayload {
   weeks: Array<{ weekNumber: number; title: string; content: string; exerciseIds: string[] }>;
+  // Version being edited (null = standard framework); the server rejects a stale one with 409.
+  baseVersion: number | null;
 }

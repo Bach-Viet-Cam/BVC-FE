@@ -34,7 +34,7 @@ export function RoadmapEditor({ roadmap, isSaving, onSave }: RoadmapEditorProps)
   });
 
   const submit = handleSubmit(async (values) => {
-    const fieldErrors = await onSave(toSaveRoadmapPayload(values));
+    const fieldErrors = await onSave(toSaveRoadmapPayload(values, roadmap.version));
     for (const fieldError of fieldErrors ?? []) {
       const path = toRoadmapFormPath(fieldError.field);
       // "as never": the path is built from the server field and matches a RoadmapFormValues path by construction.

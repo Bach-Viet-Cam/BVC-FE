@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { AssignmentList } from "@/features/classes/components/AssignmentList";
 import { ClassInfoPanel } from "@/features/classes/components/ClassInfoPanel";
 import { type ClassTabKey, ClassTabs } from "@/features/classes/components/ClassTabs";
 import { ConfirmDialog } from "@/features/classes/components/ConfirmDialog";
@@ -57,9 +58,12 @@ export function ClassDetailPage() {
             onChange={(tab) => setSearchParams(tab === "members" ? {} : { tab }, { replace: true })}
           />
           {activeTab === "members" && <MembersTab classDetail={classDetail} onMembersChanged={reload} />}
-          {activeTab === "roadmap" && <RoadmapTab classId={classDetail.id} />}
-          {(activeTab === "assignments" || activeTab === "progress") && (
-            // Assignments / progress tabs come with sub-projects 3–4.
+          {activeTab === "roadmap" && <RoadmapTab classId={classDetail.id} isClassFinished={classDetail.isReadOnly} />}
+          {activeTab === "assignments" && (
+            <AssignmentList classId={classDetail.id} canCreate={!classDetail.isReadOnly} />
+          )}
+          {activeTab === "progress" && (
+            // The progress tab comes with sub-project 4.
             <p className="m-[18px] rounded-[18px] bg-bvc-soft p-[15px] text-[13.5px] text-bvc-muted">
               Chức năng đang phát triển.
             </p>

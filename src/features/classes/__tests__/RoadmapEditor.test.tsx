@@ -72,6 +72,18 @@ describe("RoadmapEditor", () => {
     expect(exerciseTitles(1)).toEqual(["Gẩy đơn", "Vê"]);
   });
 
+  it("sends the loaded version as baseVersion (null for the standard framework)", async () => {
+    const onSave = renderEditor();
+    await userEvent.click(screen.getByRole("button", { name: "Lưu" }));
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ baseVersion: 2 }));
+  });
+
+  it("sends baseVersion null when saving the standard framework", async () => {
+    const onSave = renderEditor(buildRoadmap({ id: null, version: null, isTemplate: true, createdAt: null }));
+    await userEvent.click(screen.getByRole("button", { name: "Lưu" }));
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ baseVersion: null }));
+  });
+
   it("removes an exercise and Hủy restores it", async () => {
     renderEditor();
     await userEvent.click(within(week(1)).getByRole("button", { name: "Xóa Vê" }));

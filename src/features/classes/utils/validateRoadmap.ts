@@ -63,7 +63,7 @@ export function toRoadmapFormValues(roadmap: RoadmapVersion): RoadmapFormValues 
   };
 }
 
-export function toSaveRoadmapPayload(values: RoadmapFormValues): SaveRoadmapPayload {
+export function toSaveRoadmapPayload(values: RoadmapFormValues, baseVersion: number | null): SaveRoadmapPayload {
   return {
     weeks: values.weeks.map((week) => ({
       weekNumber: week.weekNumber,
@@ -71,6 +71,7 @@ export function toSaveRoadmapPayload(values: RoadmapFormValues): SaveRoadmapPayl
       content: week.content.trim(),
       exerciseIds: week.exercises.map((exercise) => exercise.pieceId),
     })),
+    baseVersion,
   };
 }
 

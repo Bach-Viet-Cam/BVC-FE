@@ -31,7 +31,7 @@ describe("ExercisePickerDialog", () => {
       () => expect(screen.queryByRole("checkbox", { name: "Luyện ngón — Gẩy đơn" })).not.toBeInTheDocument(),
       { timeout: 2000 }
     );
-    await userEvent.click(screen.getByRole("checkbox", { name: "Luyện ngón — Vê" }));
+    await userEvent.click(await screen.findByRole("checkbox", { name: "Luyện ngón — Vê" }, { timeout: 2000 }));
     await userEvent.click(screen.getByRole("button", { name: "Thêm" }));
     expect(onAdd).toHaveBeenCalledWith([EXERCISES[0], EXERCISES[1]]);
   });

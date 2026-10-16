@@ -15,6 +15,7 @@ const ADMIN_NAV = [
   { label: "Người dùng", to: "/admin/users" },
   { label: "Nội dung & danh mục", to: "/admin/categories" },
   { label: "Lộ trình học tập", to: "/admin/roadmaps" },
+  { label: "Cấu hình chấm điểm", to: "/admin/grading-settings" },
   { label: "Thông báo", to: "/admin/notifications" },
   { label: "Giám sát hệ thống", to: "/admin/monitoring" },
   { label: "Cấu hình", to: "/admin/config" },

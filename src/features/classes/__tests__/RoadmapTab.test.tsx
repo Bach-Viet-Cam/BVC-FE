@@ -32,7 +32,6 @@ const roadmapWithWeeks: ClassRoadmap = {
               { pieceId: "p2", title: "Bản cũ", isAvailable: false },
             ]
           : [],
-      assignments: [],
     })),
   },
 };
@@ -48,6 +47,12 @@ describe("RoadmapTab", () => {
         "Lớp chưa có lộ trình. Lộ trình sẽ được gắn khi quản trị viên tạo lộ trình cho nhạc cụ này."
       )
     ).toBeInTheDocument();
+  });
+
+  it("tells that a finished class without a roadmap will not get one", async () => {
+    mockRoadmap({ roadmap: null });
+    render(<RoadmapTab classId="c1" isClassFinished />);
+    expect(await screen.findByText("Lớp đã kết thúc và không có lộ trình.")).toBeInTheDocument();
   });
 
   it("renders 6 week cards with dd/mm range, status labels and 'Tuần này' highlighted", async () => {

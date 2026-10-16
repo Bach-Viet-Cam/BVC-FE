@@ -11,7 +11,7 @@ interface ShellNavItem {
 // Lecturer navigation from UI/Danh sách lớp. Items without a screen yet stay visible but disabled.
 const LECTURER_NAV: ShellNavItem[] = [
   { label: "Lớp học", to: "/teacher/classes" },
-  { label: "Bài tập" },
+  { label: "Bài tập", to: "/teacher/assignments" },
   { label: "Đánh giá" },
   { label: "Thư viện" },
   { label: "Thông báo" },

@@ -56,10 +56,13 @@ import { ClassDetailPage } from "@/features/classes/pages/ClassDetailPage";
 import { AddStudentPage } from "@/features/classes/pages/AddStudentPage";
 import { ImportStudentsPage } from "@/features/classes/pages/ImportStudentsPage";
 import { AdminRoadmapPage } from "@/features/classes/pages/AdminRoadmapPage";
+import { GradingSettingsPage } from "@/features/platform/pages/GradingSettingsPage";
+import { AssignmentListPage } from "@/features/classes/pages/AssignmentListPage";
+import { TeacherAssignmentDetailPage } from "@/features/classes/pages/TeacherAssignmentDetailPage";
+import { StudentSubmissionsPage } from "@/features/classes/pages/StudentSubmissionsPage";
 import { ROLES } from "@/shared/constants/roles";
 import { EnsembleAssignPage } from "@/features/classes/pages/EnsembleAssignPage";
 import { RoadmapPage } from "@/features/classes/pages/RoadmapPage";
-import { TeacherAssignmentsPage } from "@/features/classes/pages/TeacherAssignmentsPage";
 import { ReviewPage } from "@/features/classes/pages/ReviewPage";
 import { AssignmentFormPage } from "@/features/classes/pages/AssignmentFormPage";
 
@@ -165,16 +168,20 @@ export function AppRouter() {
             <Route path="/teacher/classes/:classId/edit" element={<ClassFormPage />} />
             <Route path="/teacher/classes/:classId/members/new" element={<AddStudentPage />} />
             <Route path="/teacher/classes/:classId/import" element={<ImportStudentsPage />} />
+            <Route path="/teacher/assignments" element={<AssignmentListPage />} />
+            <Route path="/teacher/assignments/new" element={<AssignmentFormPage />} />
+            <Route path="/teacher/assignments/:assignmentId/edit" element={<AssignmentFormPage />} />
+            <Route path="/teacher/assignments/:assignmentId" element={<TeacherAssignmentDetailPage />} />
+            <Route path="/teacher/assignments/:assignmentId/students/:studentId" element={<StudentSubmissionsPage />} />
           </Route>
           {/* M03 roadmap management — System Admin, desktop layout from UI/Giám sát hệ thống-html */}
           <Route element={<ProtectedRoute allowedRoles={[ROLES.SYSTEM_ADMIN]} />}>
             <Route path="/admin/roadmaps" element={<AdminRoadmapPage />} />
+            <Route path="/admin/grading-settings" element={<GradingSettingsPage />} />
           </Route>
           <Route path="/teacher/classes/:classId/assign" element={<EnsembleAssignPage />} />
           <Route path="/teacher/roadmap" element={<RoadmapPage />} />
-          <Route path="/teacher/assignments" element={<TeacherAssignmentsPage />} />
           <Route path="/teacher/review" element={<ReviewPage />} />
-          <Route path="/teacher/assignments/new" element={<AssignmentFormPage />} />
           <Route path="/teacher/student-review" element={<StudentReviewPage />} />
           <Route path="/songs" element={<SongManagePage />} />
           <Route path="/songs/new" element={<SongFormPage />} />
