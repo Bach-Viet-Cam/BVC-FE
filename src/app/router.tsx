@@ -1,3 +1,4 @@
+import { AudioAnalysisTestPage } from '@/features/practice/pages/AudioAnalysisTestPage';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { DevNav } from "@/shared/components/DevNav";
 
@@ -101,6 +102,7 @@ export function AppRouter() {
 
         {/* Mọi người dùng đã đăng nhập */}
         <Route element={<ProtectedRoute />}>
+          <Route path="/dev/audio-analysis" element={<AudioAnalysisTestPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/help" element={<HelpCenterPage />} />

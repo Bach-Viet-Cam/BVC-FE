@@ -22,6 +22,7 @@ const SECTIONS = [
     label: "Practice",
     color: "#F4622E",
     routes: [
+      { label: "Phân tích audio thử nghiệm", path: "/dev/audio-analysis" },
       { label: "Phòng luyện", path: "/practice/ly-ngua-o" },
       { label: "Kiểm tra mic", path: "/practice/ly-ngua-o/quality" },
       { label: "Chọn chế độ", path: "/practice/ly-ngua-o/modes" },

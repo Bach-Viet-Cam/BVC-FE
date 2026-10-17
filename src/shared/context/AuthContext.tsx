@@ -46,6 +46,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const setUser = (nextUser: UserInfo | null) => {
+    if (!nextUser) {
+      for (const key of Object.keys(sessionStorage)) {
+        if (key.startsWith('audio-evaluation:')) sessionStorage.removeItem(key);
+      }
+    }
     setUserState(nextUser);
     localStorage.removeItem("user");
   };
