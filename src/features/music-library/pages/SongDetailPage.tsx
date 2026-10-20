@@ -138,7 +138,7 @@ export function SongDetailPage() {
                 />
               )}
               <Link
-                to={`/ensemble/${song.id}`}
+                to={`/ensemble/new?pieceId=${song.id}`}
                 className={actionButtonClass("primary", "lg", "bg-bvc-accent hover:bg-bvc-accent/90 hover:text-white")}
               >
                 <Users className="size-[18px]" strokeWidth={1.8} aria-hidden />
