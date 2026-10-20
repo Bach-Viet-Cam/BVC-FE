@@ -46,8 +46,8 @@ export function SheetManagePage() {
     <TeacherShell className="lg:flex-row lg:overflow-hidden">
       <div className="flex min-w-0 flex-1 flex-col lg:overflow-y-auto">
         <FocusHeader
-          backTo="/songs"
-          backLabel="Quay lại thư viện bài hát của tôi"
+          backTo={song && !song.canEdit ? `/library/${song.id}` : "/songs"}
+          backLabel={song && !song.canEdit ? "Quay lại trang bài hát" : "Quay lại thư viện bài hát của tôi"}
           title={song ? `Bản nhạc — ${song.title}` : "Bản nhạc"}
           subtitle={
             song &&

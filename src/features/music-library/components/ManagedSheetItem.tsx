@@ -64,9 +64,13 @@ export function ManagedSheetItem({
             disabled={isBusy || !sheet.canChangeVisibility || cannotPublish}
             onRequestChange={(nextVisible) => onRequestVisibility(sheet, nextVisible)}
           />
-          <ActionButton variant="secondary" size="sm" onClick={() => onEdit(sheet)} disabled={isBusy}>
-            Sửa
-          </ActionButton>
+          {sheet.canManage ? (
+            <ActionButton variant="secondary" size="sm" onClick={() => onEdit(sheet)} disabled={isBusy}>
+              Sửa
+            </ActionButton>
+          ) : (
+            <span className="text-[12.5px] text-bvc-muted">Bản của giảng viên khác</span>
+          )}
         </span>
       </div>
 
@@ -90,7 +94,7 @@ export function ManagedSheetItem({
           meta={formatFileSize(sheetFile?.sizeBytes)}
           emptyText="Chưa có file bản nhạc"
           rule={FILE_RULES.sheet}
-          disabled={isBusy}
+          disabled={isBusy || !sheet.canManage}
           onReplace={(file) => onReplaceFile(sheet, "sheet", file)}
         />
         <AssetRow
@@ -102,7 +106,7 @@ export function ManagedSheetItem({
           }
           emptyTone={sheet.isMain ? "warn" : "muted"}
           rule={FILE_RULES.recording}
-          disabled={isBusy}
+          disabled={isBusy || !sheet.canManage}
           onReplace={(file) => onReplaceFile(sheet, "audio", file)}
         />
         <AssetRow
@@ -111,7 +115,7 @@ export function ManagedSheetItem({
           meta={formatDuration(video?.durationSec)}
           emptyText="Chưa có video hướng dẫn"
           rule={FILE_RULES.video}
-          disabled={isBusy}
+          disabled={isBusy || !sheet.canManage}
           onReplace={(file) => onReplaceFile(sheet, "video", file)}
         />
       </div>

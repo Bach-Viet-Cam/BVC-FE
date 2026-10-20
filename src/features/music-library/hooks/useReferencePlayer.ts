@@ -1,17 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useAudioSource } from "@/features/music-library/hooks/useAudioSource";
 import type { MediaFile } from "@/features/music-library/types/musicLibraryTypes";
 
 // Phát bản thu bằng HTMLAudioElement; bản thu chưa có url (đang xử lý) thì không phát được
 export function useReferencePlayer(recording: MediaFile | undefined, rate = 1) {
-  const url = recording?.url;
+  const source = useAudioSource(recording?.url, recording?.name ?? "");
+  const src = source.playableUrl;
   const [isPlaying, setPlaying] = useState(false);
   const [position, setPosition] = useState(0);
   const [loadedDuration, setLoadedDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    if (!url) return;
-    const audio = new Audio(url);
+    if (!src) return;
+    const audio = new Audio(src);
     audioRef.current = audio;
     const handleTime = () => setPosition(audio.currentTime);
     const handleMetadata = () => setLoadedDuration(Number.isFinite(audio.duration) ? audio.duration : 0);
@@ -29,7 +31,7 @@ export function useReferencePlayer(recording: MediaFile | undefined, rate = 1) {
       audio.removeEventListener("ended", handleEnd);
       audioRef.current = null;
     };
-  }, [url]);
+  }, [src]);
 
   useEffect(() => {
     if (audioRef.current) audioRef.current.playbackRate = rate;
@@ -59,6 +61,8 @@ export function useReferencePlayer(recording: MediaFile | undefined, rate = 1) {
     duration: recording?.durationSec || loadedDuration,
     toggle,
     seek,
-    isAvailable: Boolean(url),
+    peaks: source.peaks,
+    isLoading: source.isLoading,
+    isAvailable: Boolean(src),
   };
 }

@@ -1,183 +1,109 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  Bell,
-  Music2,
-  Home,
-  BookOpen,
-  ClipboardList,
-  Users,
-} from "lucide-react";
+import { Link } from "react-router-dom";
+import { Bookmark, ClipboardList, LibraryBig } from "lucide-react";
+import { StudentShell } from "@/shared/components/bvc/StudentShell";
+import { EmptyState } from "@/shared/components/bvc/EmptyState";
+import { TagBadge } from "@/shared/components/bvc/TagBadge";
+import { actionButtonClass } from "@/shared/components/bvc/actionButtonStyles";
+import { useAuth } from "@/shared/context/AuthContext";
+import { formatDate } from "@/shared/utils/formatDate";
+import { useMyAssignments } from "@/features/classes/hooks/useMyAssignments";
+import { ASSIGNMENT_STATUS_META, formatShortDeadline } from "@/features/classes/utils/assignmentFormat";
 
+const UPCOMING_LIMIT = 3;
+
+const QUICK_LINKS = [
+  { label: "Thư viện bài hát", description: "Tìm bản nhạc để luyện", to: "/library", icon: LibraryBig },
+  { label: "Bài tập của tôi", description: "Xem hạn nộp và kết quả", to: "/assignments", icon: ClipboardList },
+  { label: "Đã lưu", description: "Bài hát và bản nhạc đã lưu", to: "/saved", icon: Bookmark },
+];
+
+// Trang chủ sinh viên: chỉ hiện dữ liệu BE đã có (bài tập); tiến độ luyện / chuỗi ngày chờ API M01
 export function HomePage() {
-  const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("today");
-
-  const tabs = [
-    { value: "today", label: "Hôm nay", icon: Home },
-    { value: "practice", label: "Luyện tập", icon: Music2 },
-    { value: "library", label: "Thư viện", icon: BookOpen },
-    { value: "assignment", label: "Bài tập", icon: ClipboardList },
-    { value: "ensemble", label: "Hòa tấu", icon: Users },
-  ];
-
-  const streakDays = Array.from({ length: 28 }, (_, i) => {
-    if (i < 21) return "past";
-    if (i === 21) return "today";
-    return "future";
-  });
+  const { user } = useAuth();
+  const { items, isLoading, error } = useMyAssignments("NON_BONUS");
+  const upcoming = items.filter((item) => item.status === "NOT_SUBMITTED").slice(0, UPCOMING_LIMIT);
 
   return (
-    <div className="flex min-h-dvh justify-center bg-bvc-surface">
-      <div className="flex h-dvh w-full max-w-[428px] flex-col overflow-hidden bg-white">
-        {/* Top bar */}
-        <div className="flex shrink-0 items-center justify-between px-[14px] pb-[14px] pt-[26px]">
-          <div className="flex items-center gap-[10px]">
-            <div className="flex size-[34px] items-center justify-center rounded-[10px] bg-bvc-accent">
-              <Music2 size={20} color="white" strokeWidth={2} />
-            </div>
-            <span className="text-[17px] font-bold text-bvc-ink">
-              Bách Việt Cầm
-            </span>
-          </div>
-          <div className="flex items-center gap-[8px]">
-            <button
-              type="button"
-              aria-label="Thông báo"
-              className="flex size-[44px] cursor-pointer items-center justify-center rounded-[14px] text-bvc-ink"
-            >
-              <Bell size={20} strokeWidth={1.8} />
-            </button>
-            <div className="flex size-[34px] items-center justify-center rounded-full bg-bvc-surface">
-              <span className="text-[13px] font-bold text-bvc-ink">TM</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto">
-          {/* Date */}
-          <p className="px-[14px] text-[12px] font-semibold uppercase tracking-[0.12em] text-bvc-muted">
-            Hôm nay · Thứ 5
+    <StudentShell>
+      <div className="mx-auto flex w-full max-w-[1200px] flex-1 flex-col gap-7 px-[18px] pt-4 pb-8 md:px-14 md:pt-8">
+        <div className="flex flex-col gap-1">
+          <p className="text-[12px] font-semibold tracking-[0.12em] text-bvc-muted uppercase">
+            Hôm nay · {formatDate(new Date().toISOString(), "EEEE, dd/MM")}
           </p>
-
-          {/* Greeting */}
-          <h1 className="mt-[3px] px-[14px] text-[26px] font-extrabold text-bvc-ink">
-            Xin chào, Minh Anh
+          <h1 className="text-[27px] leading-tight font-extrabold tracking-[-0.025em] text-bvc-ink md:text-[40px] md:tracking-[-0.03em]">
+            Xin chào, {user?.username}
           </h1>
+        </div>
 
-          {/* Continue card */}
-          <div className="mx-[14px] mt-4 rounded-[20px] border border-bvc-border p-[16px]">
-            <p className="text-[11.5px] font-bold uppercase tracking-[0.12em] text-bvc-muted">
-              Tiếp tục luyện
-            </p>
-            <h2 className="mt-1 text-[20px] font-extrabold text-bvc-ink">
-              Lý ngựa ô
+        <section aria-labelledby="upcoming-heading" className="flex flex-col gap-3">
+          <div className="flex items-center justify-between gap-3">
+            <h2 id="upcoming-heading" className="text-xl font-extrabold tracking-[-0.02em] text-bvc-ink md:text-2xl">
+              Bài tập sắp đến hạn
             </h2>
-            <p className="text-[13px] text-bvc-muted">
-              Đàn tranh · Trung cấp · trang 2/3
-            </p>
-            <div className="mt-3 flex items-center gap-3">
-              <span className="text-[12px] text-bvc-muted">74% hoàn thành</span>
-              <div className="h-[6px] flex-1 overflow-hidden rounded-full bg-bvc-border">
-                <div
-                  className="h-full rounded-full bg-bvc-ok"
-                  style={{ width: "74%" }}
-                />
-              </div>
-            </div>
-            <div className="mt-3 flex justify-end">
-              <button
-                type="button"
-                onClick={() => navigate("/practice/ly-ngua-o")}
-                className="flex h-[40px] cursor-pointer items-center rounded-[14px] bg-bvc-ink px-[16px] text-[14px] font-bold text-white"
-              >
-                Luyện tiếp
-              </button>
-            </div>
+            <Link to="/assignments" className="text-[13.5px] font-semibold text-bvc-accent-text">
+              Xem tất cả
+            </Link>
           </div>
-
-          {/* Streak section */}
-          <div className="px-[14px] mt-4">
-            <p className="text-[12px] font-bold uppercase text-bvc-muted">
-              Chuỗi luyện tập
+          {isLoading ? (
+            <p className="text-[14px] text-bvc-muted">Đang tải...</p>
+          ) : error ? (
+            <p role="alert" className="text-[14px] text-bvc-error">
+              {error}
             </p>
-            <p className="mt-[4px] text-[15px] font-bold text-bvc-ink">
-              7 ngày liên tục 🔥
-            </p>
-            <div className="mt-3 grid grid-cols-7 gap-1">
-              {streakDays.map((type, i) => (
-                <div
-                  key={i}
-                  className={`h-[14px] w-[14px] rounded-[3px] ${
-                    type === "past"
-                      ? "bg-bvc-ok"
-                      : type === "today"
-                        ? "bg-bvc-accent"
-                        : "bg-bvc-border"
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
+          ) : upcoming.length === 0 ? (
+            <EmptyState title="Không có bài tập cần nộp" description="Bài tập giảng viên giao sẽ hiện ở đây." />
+          ) : (
+            <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+              {upcoming.map((item) => {
+                const status = ASSIGNMENT_STATUS_META[item.status];
+                return (
+                  <li key={item.id}>
+                    <Link
+                      to={`/assignment/${item.id}`}
+                      className="flex h-full flex-col gap-2 rounded-bvc-xl border border-bvc-border p-4 text-bvc-ink hover:bg-bvc-surface hover:text-bvc-ink"
+                    >
+                      <span className="flex items-start justify-between gap-2">
+                        <span className="text-[15px] font-bold">{item.title}</span>
+                        <TagBadge label={status.label} variant={status.variant} />
+                      </span>
+                      <span className="text-[13px] text-bvc-muted">{item.className}</span>
+                      <span className="mt-auto text-[12.5px] font-semibold text-bvc-warn">
+                        Hạn: {formatShortDeadline(item.deadline)}
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
 
-          {/* Assignment card */}
-          <div className="mx-[14px] mt-4 rounded-[20px] border border-bvc-border p-[16px]">
-            <div className="flex items-center justify-between">
-              <span className="text-[15px] font-bold text-bvc-ink">
-                Bài tập tuần 4
-              </span>
-              <span className="text-[12px] font-semibold text-bvc-warn">
-                Hạn: Thứ 6, 26/09
-              </span>
-            </div>
-            <p className="mt-1 text-[13px] text-bvc-muted">
-              Recording hòa tấu — Trống cơm
-            </p>
-            <button
-              type="button"
-              onClick={() => navigate("/assignment/week4")}
-              className="mt-3 flex h-[38px] cursor-pointer items-center rounded-[14px] bg-bvc-accent px-[14px] text-[13px] font-bold text-white"
-            >
-              Nộp bài
-            </button>
-          </div>
-
-          <div className="h-4" />
-        </div>
-
-        {/* Bottom tab bar */}
-        <div className="shrink-0 border-t border-bvc-border bg-white px-[6px] pb-[20px] pt-[10px]">
-          <div className="flex">
-            {tabs.map(({ value, label, icon: Icon }) => {
-              const isActive = activeTab === value;
-              return (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => setActiveTab(value)}
-                  className="flex flex-1 cursor-pointer flex-col items-center gap-[3px]"
+        <section aria-labelledby="quick-heading" className="flex flex-col gap-3">
+          <h2 id="quick-heading" className="text-xl font-extrabold tracking-[-0.02em] text-bvc-ink md:text-2xl">
+            Truy cập nhanh
+          </h2>
+          <ul className="grid gap-3 sm:grid-cols-3">
+            {QUICK_LINKS.map(({ label, description, to, icon: Icon }) => (
+              <li key={to}>
+                <Link
+                  to={to}
+                  className="flex h-full items-center gap-3 rounded-bvc-xl bg-bvc-surface p-4 text-bvc-ink hover:bg-bvc-border hover:text-bvc-ink"
                 >
-                  <Icon
-                    size={22}
-                    strokeWidth={isActive ? 2.2 : 1.7}
-                    className={
-                      isActive ? "text-bvc-accent-text" : "text-bvc-faint"
-                    }
-                  />
-                  <span
-                    className={`text-[11px] font-semibold ${
-                      isActive ? "text-bvc-accent-text" : "text-bvc-faint"
-                    }`}
-                  >
-                    {label}
+                  <Icon className="size-5 shrink-0 text-bvc-accent-text" strokeWidth={1.8} aria-hidden />
+                  <span className="flex min-w-0 flex-col">
+                    <span className="text-[14.5px] font-bold">{label}</span>
+                    <span className="text-[12.5px] text-bvc-muted">{description}</span>
                   </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <Link to="/library" className={actionButtonClass("primary", "lg", "self-start hover:text-white")}>
+          Bắt đầu luyện tập
+        </Link>
       </div>
-    </div>
+    </StudentShell>
   );
 }
