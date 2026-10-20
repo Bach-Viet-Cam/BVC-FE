@@ -5,6 +5,7 @@ import { useAuth } from "@/shared/context/AuthContext";
 import { useViewerRole } from "@/shared/hooks/useViewerRole";
 import { UserAvatar } from "@/shared/components/bvc/UserAvatar";
 import { actionButtonClass } from "@/shared/components/bvc/actionButtonStyles";
+import { getRoleHome } from "@/shared/utils/roleHome";
 import { cn } from "@/shared/utils/cn";
 
 interface StudentShellProps {
@@ -21,6 +22,9 @@ const NAV_ITEMS = [
   { label: "Hòa tấu", to: "/ensemble/session-1" },
 ];
 
+// Giảng viên / quản trị viên chỉ ghé thư viện công khai, các mục sinh viên ở trên sẽ trả 403
+const STAFF_NAV_ITEMS = [{ label: "Thư viện", to: "/library" }];
+
 const ROLE_FALLBACK_NAMES = { student: "Sinh viên", teacher: "Giảng viên", admin: "Quản trị viên", guest: "Khách" };
 
 const iconLinkClass =
@@ -31,12 +35,15 @@ export function StudentShell({ children, className }: StudentShellProps) {
   const role = useViewerRole();
   const location = useLocation();
   const displayName = user?.username ?? ROLE_FALLBACK_NAMES[role];
+  const isStaff = role === "teacher" || role === "admin";
+  const homePath = user ? getRoleHome(user.role) : "/library";
+  const navItems = isStaff ? [{ label: "Trang chủ", to: homePath }, ...STAFF_NAV_ITEMS] : NAV_ITEMS;
 
   return (
     <div className="flex min-h-dvh flex-col bg-white font-bvc-sans text-bvc-ink">
       <header className="flex shrink-0 flex-wrap items-center gap-2.5 border-b border-bvc-border px-[18px] pt-[26px] md:h-[68px] md:flex-nowrap md:gap-11 md:px-14 md:pt-0">
         <Link
-          to={role === "guest" ? "/library" : "/home"}
+          to={homePath}
           className="flex-1 text-[21px] font-extrabold tracking-[-0.02em] text-bvc-ink hover:text-bvc-ink md:flex-none md:text-[19px]"
         >
           Bách Việt Cầm
@@ -46,7 +53,7 @@ export function StudentShell({ children, className }: StudentShellProps) {
           aria-label="Điều hướng chính"
           className="order-last -mx-[18px] mt-3.5 flex w-[calc(100%+36px)] justify-center gap-[13px] overflow-x-auto px-[18px] md:order-none md:mx-0 md:mt-0 md:h-full md:w-auto md:flex-1 md:justify-start md:gap-[30px] md:px-0"
         >
-          {NAV_ITEMS.map((item) => (
+          {navItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}

@@ -39,6 +39,8 @@ export interface LecturerPiece {
   effectiveVisibility: Visibility;
   moderationReason: string | null;
   canChangeVisibility: boolean;
+  // Chỉ chủ bài sửa thông tin bài hát; giảng viên khác vẫn thêm được bản nhạc
+  canEdit: boolean;
   sheetMusicCount: number;
   publicSheetMusicCount: number;
   createdAt: string;
@@ -97,6 +99,8 @@ export interface LecturerSheetMusic {
   moderation: Moderation;
   effectiveVisibility: Visibility;
   canChangeVisibility: boolean;
+  // Người tạo bản hoặc chủ bài mới sửa / ẩn / thay file được
+  canManage: boolean;
   canPublish: boolean;
   files: Record<SheetFileSlot, StoredFile | null>;
   usesMainRecording: boolean;

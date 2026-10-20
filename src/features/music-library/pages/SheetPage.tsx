@@ -167,7 +167,6 @@ export function SheetPage() {
                 title={sheet.referenceRecording ? "Bản thu mẫu" : "Bản thu của bản chính"}
                 subtitle={sheet.referenceRecording ? undefined : "Bản này dùng bản thu của bản chính"}
                 rate={speed}
-                barCount={32}
                 className="border border-bvc-border"
               />
               <SpeedSelector value={speed} onChange={setSpeed} />
