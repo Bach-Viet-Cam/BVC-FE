@@ -1,14 +1,5 @@
-import { DesktopSidebar, DesktopPageHeader } from "@/shared/components/bvc";
+import { DesktopPageHeader } from "@/shared/components/bvc";
 import { Check, Music } from "lucide-react";
-
-const NAV_ITEMS = [
-  { label: "Trang chủ GV", to: "/teacher/home" },
-  { label: "Danh sách lớp", to: "/teacher/classes" },
-  { label: "Lộ trình học tập", to: "/teacher/roadmap" },
-  { label: "Bài tập", to: "/teacher/assignments" },
-  { label: "Duyệt bài nộp", to: "/teacher/review", badge: 18 },
-  { label: "Thư viện bài nhạc", to: "/songs" },
-];
 
 interface WeekItem {
   num: number;
@@ -46,12 +37,7 @@ function weekCardClass(w: WeekItem): string {
 
 export function RoadmapPage() {
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-white">
-      <DesktopSidebar
-        items={NAV_ITEMS}
-        user={{ initials: "NH", name: "Nguyễn Thu Hương", role: "Giảng viên" }}
-      />
-
+    <>
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <DesktopPageHeader
           breadcrumb="TRD301 · Fall 2026"
@@ -74,14 +60,12 @@ export function RoadmapPage() {
         />
 
         <div className="flex flex-1 flex-col gap-[18px] overflow-y-auto p-[22px_32px_26px]">
-          {/* 6-week grid */}
           <div className="grid grid-cols-6 gap-[14px]">
             {WEEKS.map((w) => (
               <div
                 key={w.num}
                 className={`flex flex-col gap-[10px] rounded-[20px] border p-[14px] ${weekCardClass(w)}`}
               >
-                {/* Week header row */}
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-bvc-muted">
                     Tuần {w.num}
@@ -96,23 +80,19 @@ export function RoadmapPage() {
                   )}
                 </div>
 
-                {/* Title */}
                 <div
                   className={`border-b border-transparent text-[13px] font-bold text-bvc-ink hover:border-bvc-border-strong ${w.current ? "text-bvc-accent-text" : ""}`}
                 >
                   {w.title}
                 </div>
 
-                {/* Content */}
                 <p className="text-[12px] leading-[1.5] text-bvc-muted">{w.content}</p>
 
-                {/* Assignment */}
                 <div className="flex items-center gap-[6px]">
                   <Music size={14} className="shrink-0 text-bvc-muted" />
                   <span className="text-[12px] font-semibold text-bvc-ink">{w.assignment}</span>
                 </div>
 
-                {/* Edit button */}
                 <button
                   type="button"
                   className="mt-auto cursor-pointer pt-2 text-left text-[12px] font-semibold text-bvc-accent-text"
@@ -123,13 +103,11 @@ export function RoadmapPage() {
             ))}
           </div>
 
-          {/* Assignment table */}
           <div className="flex flex-col rounded-[20px] border border-bvc-border bg-white overflow-hidden">
             <div className="border-b border-bvc-border px-[20px] py-[14px]">
               <span className="text-[15px] font-extrabold tracking-[-0.025em]">Bài tập gắn kèm theo tuần</span>
             </div>
 
-            {/* Table header */}
             <div className="grid grid-cols-[0.5fr_2fr_1fr_1fr] items-center gap-[14px] border-b border-bvc-border bg-bvc-surface px-[20px] text-[12px] font-bold uppercase tracking-[0.08em] text-bvc-muted h-[40px]">
               <span>Tuần</span>
               <span>Bài tập</span>
@@ -170,6 +148,6 @@ export function RoadmapPage() {
           </div>
         </div>
       </main>
-    </div>
+    </>
   );
 }

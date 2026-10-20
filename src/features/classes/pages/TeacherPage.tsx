@@ -1,13 +1,4 @@
-import { DesktopSidebar, DesktopPageHeader, StatCard } from "@/shared/components/bvc";
-
-const NAV_ITEMS = [
-  { label: "Lớp học", to: "/teacher" },
-  { label: "Lộ trình 6 tuần", to: "/teacher/roadmap" },
-  { label: "Bài tập", to: "/teacher/assignments" },
-  { label: "Duyệt bài nộp", to: "/teacher/review", badge: 18 },
-  { label: "Thư viện bài nhạc", to: "/songs" },
-  { label: "Thông báo", to: "/teacher/notifications" },
-];
+import { DesktopPageHeader, StatCard } from "@/shared/components/bvc";
 
 const WEEKS = [
   { code: "W1", label: "Làm quen nhạc cụ", done: true },
@@ -33,9 +24,7 @@ const STATUS_COLORS = {
 
 export function TeacherPage() {
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-white">
-      <DesktopSidebar items={NAV_ITEMS} user={{ initials: "NH", name: "Nguyễn Thu Hương", role: "Giảng viên" }} />
-
+    <>
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <DesktopPageHeader
           breadcrumb="Học kỳ Fall 2026 · Tuần 4 / 6"
@@ -54,7 +43,6 @@ export function TeacherPage() {
 
         <div className="flex flex-1 gap-[20px] overflow-hidden p-[20px_32px_24px]">
           <div className="flex min-w-0 flex-1 flex-col gap-[18px]">
-            {/* Stats */}
             <div className="grid grid-cols-4 gap-[12px]">
               <StatCard label="Sĩ số" value="32" />
               <StatCard label="On Track" value="24" variant="ok" />
@@ -62,7 +50,6 @@ export function TeacherPage() {
               <StatCard label="Behind" value="3" variant="accent" />
             </div>
 
-            {/* Roadmap */}
             <div className="flex flex-col gap-[13px] rounded-[20px] border border-bvc-border bg-white p-[16px_18px]">
               <div className="flex items-baseline justify-between">
                 <span className="text-[15px] font-bold">Lộ trình 6 tuần</span>
@@ -101,7 +88,6 @@ export function TeacherPage() {
               </div>
             </div>
 
-            {/* Students table */}
             <div className="flex flex-1 flex-col overflow-hidden rounded-[20px] border border-bvc-border bg-white">
               <div className="flex shrink-0 items-center justify-between gap-[16px] border-b border-bvc-border px-[18px] py-[15px]">
                 <span className="text-[15px] font-bold">Tiến độ sinh viên</span>
@@ -152,6 +138,6 @@ export function TeacherPage() {
           </div>
         </div>
       </main>
-    </div>
+    </>
   );
 }

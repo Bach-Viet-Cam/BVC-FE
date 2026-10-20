@@ -6,8 +6,6 @@ export const ROLES = {
 
 export type Role = (typeof ROLES)[keyof typeof ROLES];
 
-export const REGISTERABLE_ROLES = [ROLES.STUDENT, ROLES.TEACHER] as const;
-
 export const ROLE_LABELS: Record<Role, string> = {
   [ROLES.STUDENT]: "Học viên",
   [ROLES.TEACHER]: "Giáo viên",

@@ -1,114 +1,90 @@
-import { useNavigate } from "react-router-dom";
-import { Music } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import { MobileHeader, TagBadge } from "@/shared/components/bvc";
+import { useAssignmentDetail } from "@/features/classes/hooks/useAssignmentDetail";
+import {
+  ASSIGNMENT_STATUS_META,
+  SUBMIT_BLOCKED_MESSAGE,
+  formatFullDeadline,
+} from "@/features/classes/utils/assignmentFormat";
 
-import { MobileHeader } from "@/shared/components/bvc/MobileHeader";
+interface InfoRowProps {
+  label: string;
+  value: string;
+}
 
-// ── Mock data ─────────────────────────────────────────────────────────────────
-
-const BONUS = {
-  title: "Recording Lý ngựa ô — bè thứ 2",
-  description:
-    "Hãy thu âm lại bản bè thứ 2 của bài Lý ngựa ô theo đúng tốc độ quy định. GV sẽ xem xét và chấm điểm trong vòng 48 giờ.",
-  sheet: "Lý ngựa ô — Bè 2.pdf",
-  thresholds: [
-    { range: "≥90%", reward: "+2 điểm" },
-    { range: "80–89%", reward: "+1 điểm" },
-    { range: "<80%", reward: "Nộp lại" },
-  ],
-  stats: {
-    joined: 14,
-    remaining: "6/20",
-    deadline: "30/09",
-  },
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
+function InfoRow({ label, value }: InfoRowProps) {
+  return (
+    <div className="flex items-center justify-between gap-3 border-b border-bvc-line py-[10px] text-[13px] last:border-0">
+      <span className="text-bvc-muted">{label}</span>
+      <span className="text-right font-semibold text-bvc-ink">{value}</span>
+    </div>
+  );
+}
 
 export function BonusDetailPage() {
   const navigate = useNavigate();
+  const { bonusId = "" } = useParams();
+  const { assignment, error, isLoading } = useAssignmentDetail(bonusId);
+
+  if (isLoading || !assignment) {
+    return (
+      <>
+        <MobileHeader title="Chi tiết bài bonus" onBack={() => navigate("/community/bonus")} />
+        <p className={`px-[14px] text-[14px] ${error ? "text-bvc-error" : "text-bvc-muted"}`}>
+          {isLoading ? "Đang tải..." : error}
+        </p>
+      </>
+    );
+  }
+
+  const status = ASSIGNMENT_STATUS_META[assignment.status];
 
   return (
-    <div className="flex min-h-dvh justify-center bg-bvc-surface">
-      <div className="flex h-dvh w-full max-w-[428px] flex-col overflow-hidden bg-white">
-
-        {/* Header */}
-        <MobileHeader title="Chi tiết Bonus" variant="back" />
-
-        {/* Scrollable body */}
-        <div className="flex-1 overflow-y-auto px-[14px] pb-[88px]">
-
-          {/* Top card */}
-          <div className="rounded-[20px] border border-bvc-border p-[16px]">
-            <p className="text-[17px] font-extrabold leading-tight tracking-[-0.025em] text-bvc-ink">
-              {BONUS.title}
-            </p>
-            <p className="mt-2 text-[13px] leading-relaxed text-bvc-muted">
-              {BONUS.description}
-            </p>
-
-            {/* Attached sheet pill */}
-            <div className="mt-[14px] inline-flex items-center gap-2 rounded-[11px] border border-bvc-border px-3 py-2">
-              <Music size={14} className="shrink-0 text-bvc-muted" />
-              <span className="text-[13px] font-medium text-bvc-ink">
-                {BONUS.sheet}
-              </span>
-            </div>
+    <>
+      <MobileHeader
+        title="Chi tiết bài bonus"
+        subtitle={assignment.className}
+        onBack={() => navigate("/community/bonus")}
+      />
+      <div className="flex-1 overflow-y-auto">
+        <div className="mx-[14px] mt-3 rounded-[20px] border border-bvc-border p-[16px]">
+          <div className="flex items-start justify-between gap-2">
+            <h2 className="text-[17px] font-extrabold leading-snug text-bvc-ink">{assignment.title}</h2>
+            <TagBadge label={status.label} variant={status.variant} />
           </div>
-
-          {/* Threshold table */}
-          <div className="mt-[12px] rounded-[20px] border border-bvc-border p-[14px]">
-            <p className="mb-[4px] text-[15px] font-bold text-bvc-ink">
-              Điểm thưởng
-            </p>
-            {BONUS.thresholds.map((row) => (
-              <div
-                key={row.range}
-                className="flex h-[44px] items-center justify-between border-b border-bvc-line last:border-0"
-              >
-                <span className="text-[14px] text-bvc-ink">{row.range}</span>
-                <span className="font-mono text-[14px] font-semibold text-bvc-ink">
-                  {row.reward}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          {/* Stats row — 3 mini cards */}
-          <div className="mt-[12px] grid grid-cols-3 gap-[8px]">
-            <div className="rounded-[14px] bg-bvc-surface p-[12px] text-center">
-              <p className="font-mono text-[16px] font-bold text-bvc-ink">
-                {BONUS.stats.joined}
-              </p>
-              <p className="mt-[2px] text-[11px] text-bvc-muted">
-                Đã tham gia
-              </p>
-            </div>
-            <div className="rounded-[14px] bg-bvc-surface p-[12px] text-center">
-              <p className="font-mono text-[16px] font-bold text-bvc-ink">
-                {BONUS.stats.remaining}
-              </p>
-              <p className="mt-[2px] text-[11px] text-bvc-muted">Còn lại</p>
-            </div>
-            <div className="rounded-[14px] bg-bvc-surface p-[12px] text-center">
-              <p className="font-mono text-[16px] font-bold text-bvc-ink">
-                {BONUS.stats.deadline}
-              </p>
-              <p className="mt-[2px] text-[11px] text-bvc-muted">Hạn</p>
-            </div>
+          {assignment.description && (
+            <p className="mt-2 text-[13px] leading-relaxed text-bvc-muted">{assignment.description}</p>
+          )}
+          <div className="mt-3">
+            <InfoRow label="Accuracy tối thiểu" value={`${assignment.minAccuracy}%`} />
+            <InfoRow label="Hạn nộp" value={formatFullDeadline(assignment.deadline)} />
+            {assignment.targetBpm !== null && <InfoRow label="BPM yêu cầu" value={String(assignment.targetBpm)} />}
+            <InfoRow label="Lượt nộp" value={`${assignment.usedSubmissions} / ${assignment.maxSubmissions}`} />
+            {assignment.bonusPoints !== null && (
+              <InfoRow label="Điểm có thể nhận" value={`+${assignment.bonusPoints}`} />
+            )}
           </div>
         </div>
-
-        {/* Bottom sticky CTA */}
-        <div className="shrink-0 px-[14px] pb-5 pt-3">
-          <button
-            type="button"
-            onClick={() => navigate("submit")}
-            className="flex h-[54px] w-full cursor-pointer items-center justify-center rounded-[16px] bg-bvc-ink text-[16px] font-bold text-white"
-          >
-            Bắt đầu luyện
-          </button>
+        <div className="mx-[14px] mt-3 rounded-[20px] border border-bvc-border p-[16px]">
+          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-bvc-muted">Cách tính điểm</p>
+          <p className="mt-2 text-[13px] leading-relaxed text-bvc-muted">
+            Bài bonus được đánh giá theo % accuracy của bài nộp, không có điểm chữ hay điểm số. Điểm bonus chỉ được cộng
+            vào tổng sau khi giảng viên xác nhận.
+          </p>
         </div>
+        <div className="h-4" />
       </div>
-    </div>
+      <div className="flex shrink-0 flex-col gap-[8px] px-[14px] pb-5 pt-3">
+        {!assignment.canSubmit && <p className="text-center text-[12.5px] text-bvc-error">{SUBMIT_BLOCKED_MESSAGE}</p>}
+        <button
+          type="button"
+          disabled={!assignment.canSubmit}
+          onClick={() => navigate(`/community/bonus/${assignment.id}/submit`)}
+          className="flex h-[54px] w-full cursor-pointer items-center justify-center rounded-[16px] bg-bvc-accent text-[16px] font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Do &amp; Submit
+        </button>
+      </div>
+    </>
   );
 }

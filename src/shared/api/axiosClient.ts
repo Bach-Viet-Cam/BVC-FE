@@ -26,7 +26,7 @@ axiosClient.interceptors.response.use(
     if (error.response?.status !== 401 || !originalRequest || originalRequest._retry) {
       return Promise.reject(error);
     }
-    if (originalRequest.url?.includes("/auth/refresh")) {
+    if (["/auth/google", "/auth/refresh", "/auth/logout"].some((path) => originalRequest.url?.includes(path))) {
       return Promise.reject(error);
     }
 
@@ -47,7 +47,6 @@ axiosClient.interceptors.response.use(
       return axiosClient(originalRequest);
     } catch (refreshError) {
       localStorage.removeItem("accessToken");
-      localStorage.removeItem("user");
       window.location.href = "/login";
       return Promise.reject(refreshError);
     }

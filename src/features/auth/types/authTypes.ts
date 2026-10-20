@@ -2,7 +2,6 @@ import { type UserInfo } from "@/shared/context/AuthContext";
 
 export interface GoogleAuthRequest {
   credential: string;
-  role?: number;
 }
 
 export interface AuthResponse {

@@ -34,8 +34,6 @@ const SECTIONS = [
     color: "#6E6A64",
     routes: [
       { label: "Đăng nhập", path: "/login" },
-      { label: "Đăng ký", path: "/register" },
-      { label: "Quên mật khẩu", path: "/forgot" },
     ],
   },
   {
@@ -50,6 +48,7 @@ const SECTIONS = [
     label: "Practice",
     color: "#F4622E",
     routes: [
+      { label: "Phân tích audio thử nghiệm", path: "/dev/audio-analysis" },
       { label: "Phòng luyện", path: "/practice/ly-ngua-o" },
       { label: "Kiểm tra mic", path: "/practice/ly-ngua-o/quality" },
       { label: "Chọn chế độ", path: "/practice/ly-ngua-o/modes" },
