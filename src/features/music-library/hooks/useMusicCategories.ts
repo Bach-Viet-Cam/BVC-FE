@@ -15,7 +15,9 @@ const toOptions = (items: CategoryRef[] = []): SelectOption[] =>
   items.map((item) => ({ value: item.id, label: item.name }));
 
 export function useMusicCategories(source: keyof typeof LOADERS = "library") {
-  const { data, error, isFirstLoad } = useAsyncData(LOADERS[source], `music-categories:${source}`);
+  const { data, error, isFirstLoad } = useAsyncData(LOADERS[source], `music-categories:${source}`, undefined, {
+    cache: true,
+  });
 
   const options = useMemo(
     () => ({

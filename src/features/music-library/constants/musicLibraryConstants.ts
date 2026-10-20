@@ -63,6 +63,9 @@ export const LIBRARY_MESSAGES = {
   guestSaveTitle: "Đăng nhập để lưu",
   guestSaveBody:
     "Bạn cần đăng nhập để lưu bài hát và bản nhạc vào danh sách của mình. Sau khi đăng nhập, hệ thống đưa bạn về đúng trang này.",
+  guestPracticeTitle: "Đăng nhập để luyện tập",
+  guestPracticeBody:
+    "Bạn cần đăng nhập để luyện tập và lưu kết quả các lần thu. Sau khi đăng nhập, hệ thống mở ngay màn luyện tập với bản nhạc này.",
   unavailable: "Nội dung này đã bị ẩn nên không mở được. Bạn vẫn có thể bỏ lưu.",
   mainNeedsRecording: "Bản chính cần bản thu mẫu trước khi công khai",
 } as const;

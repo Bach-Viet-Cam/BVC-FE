@@ -106,7 +106,9 @@ export function StudentShell({ children, className }: StudentShellProps) {
         )}
       </header>
 
-      <main className={cn("flex flex-1 flex-col", className)}>{children}</main>
+      <main key={location.pathname} className={cn("flex flex-1 flex-col motion-safe:animate-page-enter", className)}>
+        {children}
+      </main>
     </div>
   );
 }

@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Minus, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Mic, Minus, Plus } from "lucide-react";
 import { StudentShell } from "@/shared/components/bvc/StudentShell";
 import { EmptyState } from "@/shared/components/bvc/EmptyState";
 import { PillTabs } from "@/shared/components/bvc/PillTabs";
 import { StepperControl } from "@/shared/components/bvc/StepperControl";
 import { actionButtonClass } from "@/shared/components/bvc/actionButtonStyles";
+import { useViewerRole } from "@/shared/hooks/useViewerRole";
 import { cn } from "@/shared/utils/cn";
 import { CoverArt } from "@/features/music-library/components/CoverArt";
 import { GuestSaveDialog } from "@/features/music-library/components/GuestSaveDialog";
@@ -14,20 +15,25 @@ import { SaveToggleButton } from "@/features/music-library/components/SaveToggle
 import { SheetCanvas } from "@/features/music-library/components/SheetCanvas";
 import { SpeedSelector } from "@/features/music-library/components/SpeedSelector";
 import { TutorialVideoCard } from "@/features/music-library/components/TutorialVideoCard";
-import { SHEET_ZOOM } from "@/features/music-library/constants/musicLibraryConstants";
+import { LIBRARY_MESSAGES, SHEET_ZOOM } from "@/features/music-library/constants/musicLibraryConstants";
 import { useSaveToggle } from "@/features/music-library/hooks/useSaveToggle";
 import { useSheetViewer } from "@/features/music-library/hooks/useSheetViewer";
 
 type SidePanel = "recording" | "video";
 
+const headerButtonSize = "min-h-11 rounded-bvc-md px-4 text-sm";
+
 export function SheetPage() {
   const { songId = "", sheetId = "" } = useParams();
   const { viewer, error, isLoading, setSheetSaved } = useSheetViewer(songId, sheetId);
+  const role = useViewerRole();
   const save = useSaveToggle();
-  const [zoom, setZoom] = useState<number>(SHEET_ZOOM.initial);
+  // null = vừa trang, mở bản nhạc là thấy trọn một trang
+  const [zoom, setZoom] = useState<number | null>(null);
   const [page, setPage] = useState(1);
   const [speed, setSpeed] = useState(1);
   const [panel, setPanel] = useState<SidePanel>("recording");
+  const [isPracticePromptOpen, setPracticePromptOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -59,6 +65,16 @@ export function SheetPage() {
   const recording = sheet.referenceRecording ?? fallbackRecording;
   const pageCount = sheet.sheetFile.pageCount;
   const currentPage = Math.min(page, pageCount);
+  const zoomBase = zoom ?? SHEET_ZOOM.initial;
+
+  // Màn luyện tập chỉ dành cho sinh viên; khách đăng nhập xong quay lại đúng bản này
+  const practicePath = `/practice/${song.id}?sheetId=${sheet.id}`;
+  const practiceClass = actionButtonClass(
+    "primary",
+    "md",
+    cn(headerButtonSize, "flex-1 hover:text-white sm:flex-none")
+  );
+  const practiceIcon = <Mic className="size-[18px]" strokeWidth={1.8} aria-hidden />;
 
   return (
     <StudentShell className="lg:flex-row lg:overflow-hidden">
@@ -90,33 +106,77 @@ export function SheetPage() {
               {sheet.isMain && " · bản của giảng viên"}
             </span>
           </div>
-          <div className="flex w-full items-center justify-between gap-2 sm:w-auto">
-            <StepperControl
-              value={`${zoom}%`}
-              decrementLabel="Thu nhỏ"
-              incrementLabel="Phóng to"
-              decrementIcon={<Minus className="size-4" />}
-              incrementIcon={<Plus className="size-4" />}
-              onDecrement={() => setZoom((value) => Math.max(SHEET_ZOOM.min, value - SHEET_ZOOM.step))}
-              onIncrement={() => setZoom((value) => Math.min(SHEET_ZOOM.max, value + SHEET_ZOOM.step))}
-              canDecrement={zoom > SHEET_ZOOM.min}
-              canIncrement={zoom < SHEET_ZOOM.max}
-            />
-            <StepperControl
-              value={`${currentPage} / ${pageCount}`}
-              decrementLabel="Trang trước"
-              incrementLabel="Trang sau"
-              decrementIcon={<ChevronLeft className="size-4" />}
-              incrementIcon={<ChevronRight className="size-4" />}
-              onDecrement={() => setPage(Math.max(1, currentPage - 1))}
-              onIncrement={() => setPage(Math.min(pageCount, currentPage + 1))}
-              canDecrement={currentPage > 1}
-              canIncrement={currentPage < pageCount}
-            />
+          <div className="flex w-full items-center gap-2 sm:w-auto">
+            {save.canSave && (
+              <SaveToggleButton
+                itemName={sheet.name}
+                isSaved={save.isSavedForViewer(sheet.isSaved)}
+                savedLabel="Đã lưu"
+                unsavedLabel="Lưu bản này"
+                disabled={save.isPending(sheet.id)}
+                onToggle={() =>
+                  save.toggle({ target: "sheet", id: sheet.id, isSaved: sheet.isSaved, onChange: setSheetSaved })
+                }
+                className={cn(headerButtonSize, "flex-1 sm:flex-none")}
+              />
+            )}
+            {role === "student" && (
+              <Link to={practicePath} className={practiceClass}>
+                {practiceIcon}
+                Luyện tập
+              </Link>
+            )}
+            {role === "guest" && (
+              <button type="button" onClick={() => setPracticePromptOpen(true)} className={practiceClass}>
+                {practiceIcon}
+                Luyện tập
+              </button>
+            )}
           </div>
         </div>
 
-        <div className="flex min-h-[420px] flex-1 justify-center overflow-auto rounded-bvc-xl bg-bvc-surface p-3 md:p-6">
+        <div className="flex items-center justify-between gap-2 sm:justify-end">
+          <button
+            type="button"
+            aria-pressed={zoom === null}
+            onClick={() => setZoom(null)}
+            className={cn(
+              actionButtonClass(zoom === null ? "soft" : "secondary", "sm"),
+              "min-h-11 rounded-bvc-md border-bvc-border"
+            )}
+          >
+            Vừa trang
+          </button>
+          <StepperControl
+            value={zoom === null ? "Vừa" : `${zoom}%`}
+            decrementLabel="Thu nhỏ"
+            incrementLabel="Phóng to"
+            decrementIcon={<Minus className="size-4" />}
+            incrementIcon={<Plus className="size-4" />}
+            onDecrement={() => setZoom(Math.max(SHEET_ZOOM.min, zoomBase - SHEET_ZOOM.step))}
+            onIncrement={() => setZoom(Math.min(SHEET_ZOOM.max, zoomBase + SHEET_ZOOM.step))}
+            canDecrement={zoomBase > SHEET_ZOOM.min}
+            canIncrement={zoomBase < SHEET_ZOOM.max}
+          />
+          <StepperControl
+            value={`${currentPage} / ${pageCount}`}
+            decrementLabel="Trang trước"
+            incrementLabel="Trang sau"
+            decrementIcon={<ChevronLeft className="size-4" />}
+            incrementIcon={<ChevronRight className="size-4" />}
+            onDecrement={() => setPage(Math.max(1, currentPage - 1))}
+            onIncrement={() => setPage(Math.min(pageCount, currentPage + 1))}
+            canDecrement={currentPage > 1}
+            canIncrement={currentPage < pageCount}
+          />
+        </div>
+
+        <div
+          className={cn(
+            "flex min-h-[420px] flex-1 overflow-auto rounded-bvc-xl bg-bvc-surface p-3 md:p-5",
+            zoom === null ? "items-center justify-center lg:min-h-0" : "justify-center"
+          )}
+        >
           <SheetCanvas
             file={sheet.sheetFile}
             heading={`${song.title} — ${sheet.instrument.name.toLowerCase()}`}
@@ -126,20 +186,7 @@ export function SheetPage() {
         </div>
       </section>
 
-      <aside className="flex shrink-0 flex-col gap-[18px] border-bvc-border px-[18px] pb-6 lg:w-[420px] lg:overflow-y-auto lg:border-l lg:px-7 lg:pt-5">
-        {save.canSave && (
-          <SaveToggleButton
-            itemName={sheet.name}
-            isSaved={save.isSavedForViewer(sheet.isSaved)}
-            savedLabel="Đã lưu bản này"
-            unsavedLabel="Lưu bản này"
-            disabled={save.isPending(sheet.id)}
-            onToggle={() =>
-              save.toggle({ target: "sheet", id: sheet.id, isSaved: sheet.isSaved, onChange: setSheetSaved })
-            }
-          />
-        )}
-
+      <aside className="flex shrink-0 flex-col gap-[18px] border-bvc-border px-[18px] pb-6 lg:w-2/5 lg:overflow-y-auto lg:border-l lg:px-7 lg:pt-5">
         <PillTabs<SidePanel>
           label="Nội dung kèm bản nhạc"
           value={panel}
@@ -151,14 +198,8 @@ export function SheetPage() {
           className="lg:hidden"
         />
 
-        <div className={cn(panel !== "video" && "hidden", "lg:block")}>
-          <TutorialVideoCard video={sheet.tutorialVideo} />
-        </div>
-
         <div className={cn("flex flex-col gap-3", panel !== "recording" && "hidden", "lg:flex")}>
-          <div className="flex items-baseline justify-between">
-            <span className="text-[15px] font-bold text-bvc-ink">Bản thu mẫu · {sheet.instrument.name}</span>
-          </div>
+          <span className="text-[15px] font-bold text-bvc-ink">Bản thu mẫu · {sheet.instrument.name}</span>
           {recording ? (
             <>
               <ReferencePlayer
@@ -178,21 +219,19 @@ export function SheetPage() {
           )}
         </div>
 
-        {viewer.practice.isAvailable ? (
-          <Link
-            to={`/practice/${song.id}?sheetId=${sheet.id}`}
-            className={actionButtonClass("primary", "lg", "mt-auto w-full hover:text-white")}
-          >
-            Luyện bản này
-          </Link>
-        ) : (
-          <p className="mt-auto rounded-2xl bg-bvc-surface px-4 py-3 text-center text-[13px] text-bvc-muted">
-            {viewer.practice.reason}
-          </p>
-        )}
+        <div className={cn(panel !== "video" && "hidden", "lg:block")}>
+          <TutorialVideoCard video={sheet.tutorialVideo} />
+        </div>
       </aside>
 
       <GuestSaveDialog open={save.isGuestPromptOpen} onOpenChange={save.setGuestPromptOpen} />
+      <GuestSaveDialog
+        open={isPracticePromptOpen}
+        onOpenChange={setPracticePromptOpen}
+        title={LIBRARY_MESSAGES.guestPracticeTitle}
+        description={LIBRARY_MESSAGES.guestPracticeBody}
+        redirectTo={practicePath}
+      />
     </StudentShell>
   );
 }

@@ -37,15 +37,12 @@ interface SheetFormPanelProps {
 
 type SheetKind = "main" | "variant";
 
-// Quy tắc bản chính: bản đầu tiên của nhạc cụ bắt buộc là bản chính, mỗi nhạc cụ chỉ 1 bản chính
+// Quy tắc bản chính: mỗi nhạc cụ chỉ 1 bản chính, được tạo bản theo độ khó trước khi có bản chính
 function mainRuleFor(instrumentId: string, sheets: LecturerSheetMusic[], editing?: LecturerSheetMusic) {
-  const siblings = sheets.filter((sheet) => sheet.instrument.id === instrumentId && sheet.id !== editing?.id);
-  const hasOtherMain = siblings.some((sheet) => sheet.isMain);
-  return {
-    mustBeMain: !hasOtherMain,
-    canBeMain: !hasOtherMain,
-    isFirst: siblings.length === 0,
-  };
+  const hasOtherMain = sheets.some(
+    (sheet) => sheet.instrument.id === instrumentId && sheet.id !== editing?.id && sheet.isMain
+  );
+  return { canBeMain: !hasOtherMain };
 }
 
 // Ưu tiên nhạc cụ được bấm "Thêm", rồi nhạc cụ đã có bản nhưng chưa có bản chính; còn lại để giảng viên tự chọn
@@ -78,7 +75,8 @@ export function SheetFormPanel({
     [sheets, editing]
   );
 
-  const initialInstrumentId = editing?.instrument.id ?? pickDefaultInstrument(availableInstruments, sheets, presetInstrumentId);
+  const initialInstrumentId =
+    editing?.instrument.id ?? pickDefaultInstrument(availableInstruments, sheets, presetInstrumentId);
 
   const {
     register,
@@ -94,7 +92,7 @@ export function SheetFormPanel({
       description: editing?.description ?? "",
       instrumentId: initialInstrumentId,
       levelId: editing?.level.id ?? song.level.id,
-      isMain: editing?.isMain ?? mainRuleFor(initialInstrumentId, sheets).mustBeMain,
+      isMain: editing?.isMain ?? mainRuleFor(initialInstrumentId, sheets).canBeMain,
       visibility: editing?.visibility ?? "HIDDEN",
       sheetFile: null,
       referenceRecording: null,
@@ -109,13 +107,12 @@ export function SheetFormPanel({
   const recordingFile = useWatch({ control, name: "referenceRecording" });
   const videoFile = useWatch({ control, name: "tutorialVideo" });
 
-  const instrumentName = availableInstruments.find((instrument) => instrument.id === instrumentId)?.name ?? "Nhạc cụ này";
+  const instrumentName =
+    availableInstruments.find((instrument) => instrument.id === instrumentId)?.name ?? "Nhạc cụ này";
   const rule = mainRuleFor(instrumentId, sheets, editing);
-  const kindHint = rule.isFirst
-    ? `${instrumentName} chưa có bản nào nên bản này là bản chính.`
-    : rule.mustBeMain
-      ? `${instrumentName} chưa có bản chính nên bản này phải là bản chính.`
-      : `${instrumentName} đã có bản chính.`;
+  const kindHint = rule.canBeMain
+    ? `${instrumentName} chưa có bản chính, có thể tạo bản theo độ khó trước.`
+    : `${instrumentName} đã có bản chính nên chỉ thêm được bản theo độ khó.`;
 
   const instrumentOptions =
     !editing || availableInstruments.some((instrument) => instrument.id === editing.instrument.id)
@@ -168,7 +165,7 @@ export function SheetFormPanel({
               {...register("instrumentId", {
                 onChange: (event: { target: { value: string } }) => {
                   const next = mainRuleFor(event.target.value, sheets, editing);
-                  setValue("isMain", next.mustBeMain);
+                  if (!next.canBeMain) setValue("isMain", false);
                 },
               })}
               id="sheet-instrument"
@@ -208,7 +205,7 @@ export function SheetFormPanel({
             value={isMain ? "main" : "variant"}
             options={[
               { value: "main", label: "Bản chính", disabled: !rule.canBeMain },
-              { value: "variant", label: "Theo độ khó", disabled: rule.mustBeMain },
+              { value: "variant", label: "Theo độ khó" },
             ]}
             onChange={(kind) => setValue("isMain", kind === "main", { shouldValidate: true })}
           />

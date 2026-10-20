@@ -5,7 +5,9 @@ import { musicLibraryApi } from "@/features/music-library/api/musicLibraryApi";
 export function useSheetViewer(songId: string, sheetId: string) {
   const { data, error, isFirstLoad, mutate } = useAsyncData(
     () => musicLibraryApi.getSheetViewer(songId, sheetId),
-    `sheet-viewer:${songId}:${sheetId}`
+    `sheet-viewer:${songId}:${sheetId}`,
+    undefined,
+    { cache: true }
   );
 
   const setSheetSaved = useCallback(

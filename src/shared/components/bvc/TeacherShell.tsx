@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { Bell } from "lucide-react";
 import { useAuth } from "@/shared/context/AuthContext";
+import { TEACHER_NAV } from "@/shared/config/navConfig";
 import { UserAvatar } from "@/shared/components/bvc/UserAvatar";
 import { cn } from "@/shared/utils/cn";
 
@@ -10,19 +11,12 @@ interface TeacherShellProps {
   className?: string;
 }
 
-const NAV_ITEMS = [
-  { label: "Lớp học", to: "/teacher/classes" },
-  { label: "Bài tập", to: "/teacher/assignments" },
-  { label: "Đánh giá sinh viên", to: "/teacher/student-review" },
-  { label: "Thư viện bài hát", to: "/songs" },
-  { label: "Thông báo", to: "/notifications" },
-];
-
 const bellClass =
   "flex size-10 shrink-0 items-center justify-center rounded-bvc-md border border-bvc-border bg-white text-bvc-ink hover:text-bvc-ink";
 
 export function TeacherShell({ children, className }: TeacherShellProps) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const location = useLocation();
   const displayName = user?.username ?? "Giảng viên";
 
   return (
@@ -36,7 +30,7 @@ export function TeacherShell({ children, className }: TeacherShellProps) {
           </Link>
         </div>
         <nav aria-label="Điều hướng giảng viên" className="flex flex-col gap-[3px]">
-          {NAV_ITEMS.map((item) => (
+          {TEACHER_NAV.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
@@ -53,16 +47,25 @@ export function TeacherShell({ children, className }: TeacherShellProps) {
             </NavLink>
           ))}
         </nav>
-        <Link
-          to="/profile"
-          className="mt-auto flex items-center gap-2.5 rounded-2xl border border-bvc-border bg-white p-[13px] text-bvc-ink hover:text-bvc-ink"
-        >
-          <UserAvatar name={displayName} size="sm" />
-          <span className="flex min-w-0 flex-col gap-px">
-            <span className="truncate text-[13.5px] font-bold">{displayName}</span>
-            <span className="text-xs text-bvc-muted">Giảng viên</span>
-          </span>
-        </Link>
+        <div className="mt-auto flex flex-col gap-2">
+          <Link
+            to="/profile"
+            className="flex items-center gap-2.5 rounded-2xl border border-bvc-border bg-white p-[13px] text-bvc-ink hover:text-bvc-ink"
+          >
+            <UserAvatar name={displayName} size="sm" />
+            <span className="flex min-w-0 flex-col gap-px">
+              <span className="truncate text-[13.5px] font-bold">{displayName}</span>
+              <span className="text-xs text-bvc-muted">Giảng viên</span>
+            </span>
+          </Link>
+          <button
+            type="button"
+            onClick={logout}
+            className="min-h-10 cursor-pointer rounded-[13px] text-[13.5px] font-semibold text-bvc-muted hover:bg-bvc-border"
+          >
+            Đăng xuất
+          </button>
+        </div>
       </aside>
 
       {/* Mobile / tablet: thanh trên + nav cuộn ngang */}
@@ -80,7 +83,7 @@ export function TeacherShell({ children, className }: TeacherShellProps) {
           aria-label="Điều hướng giảng viên"
           className="mt-3 flex gap-4 overflow-x-auto px-[18px] [scrollbar-width:none]"
         >
-          {NAV_ITEMS.map((item) => (
+          {TEACHER_NAV.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
@@ -99,7 +102,13 @@ export function TeacherShell({ children, className }: TeacherShellProps) {
         </nav>
       </header>
 
-      <main className={cn("flex min-w-0 flex-1 flex-col lg:overflow-y-auto", className)}>{children}</main>
+      {/* key theo đường dẫn: khi làm layout (Outlet), mỗi lần chuyển màn vẫn chạy hiệu ứng hiện dần */}
+      <main
+        key={location.pathname}
+        className={cn("flex min-w-0 flex-1 flex-col motion-safe:animate-page-enter lg:overflow-y-auto", className)}
+      >
+        {children}
+      </main>
     </div>
   );
 }

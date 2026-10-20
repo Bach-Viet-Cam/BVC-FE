@@ -46,7 +46,8 @@ export function useAudioSource(url: string | undefined, cacheKey: string) {
   const current = state?.url === url ? state : null;
   return {
     playableUrl: current?.playableUrl,
-    peaks: current?.peaks ?? null,
+    // Đã có hình sóng từ lần mở trước thì vẽ ngay, không đợi tải lại file
+    peaks: current?.peaks ?? (url ? (peaksCache.get(cacheKey) ?? null) : null),
     isLoading: Boolean(url) && current === null,
   };
 }
