@@ -38,11 +38,7 @@ export function SongAnalysisPage() {
   return (
     <div className="flex min-h-dvh justify-center bg-bvc-surface">
       <div className="flex h-dvh w-full max-w-[428px] flex-col overflow-hidden bg-white">
-        <MobileHeader
-          title="Phân tích bài nhạc"
-          subtitle="Lý ngựa ô"
-          variant="back"
-        />
+        <MobileHeader title="Phân tích bài nhạc" subtitle="Lý ngựa ô" variant="back" />
 
         <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
           {/* Mini stat cards */}
@@ -56,12 +52,8 @@ export function SongAnalysisPage() {
                 key={s.label}
                 className="flex flex-col items-center gap-[4px] rounded-[16px] border border-bvc-border bg-white p-[12px_8px]"
               >
-                <span className="text-[11px] font-bold uppercase tracking-wide text-bvc-muted">
-                  {s.label}
-                </span>
-                <span className="font-bvc-mono text-[13px] font-semibold text-bvc-ink">
-                  {s.value}
-                </span>
+                <span className="text-[11px] font-bold uppercase tracking-wide text-bvc-muted">{s.label}</span>
+                <span className="font-bvc-mono text-[13px] font-semibold text-bvc-ink">{s.value}</span>
               </div>
             ))}
           </div>
@@ -74,20 +66,12 @@ export function SongAnalysisPage() {
             <div className="flex flex-col gap-1">
               <div className="grid h-8 gap-1" style={{ gridTemplateColumns: "repeat(16, 1fr)" }}>
                 {BEAT_ROW1.map((type, i) => (
-                  <span
-                    key={`r1-${i}`}
-                    className="rounded-[3px]"
-                    style={{ backgroundColor: beatColor(type) }}
-                  />
+                  <span key={`r1-${i}`} className="rounded-[3px]" style={{ backgroundColor: beatColor(type) }} />
                 ))}
               </div>
               <div className="grid h-8 gap-1" style={{ gridTemplateColumns: "repeat(16, 1fr)" }}>
                 {BEAT_ROW2.map((type, i) => (
-                  <span
-                    key={`r2-${i}`}
-                    className="rounded-[3px]"
-                    style={{ backgroundColor: beatColor(type) }}
-                  />
+                  <span key={`r2-${i}`} className="rounded-[3px]" style={{ backgroundColor: beatColor(type) }} />
                 ))}
               </div>
             </div>
@@ -105,9 +89,7 @@ export function SongAnalysisPage() {
               ))}
             </div>
 
-            <span className="font-bvc-mono text-[12px] text-bvc-muted">
-              Đang phát · Bar 18
-            </span>
+            <span className="font-bvc-mono text-[12px] text-bvc-muted">Đang phát · Bar 18</span>
           </div>
 
           {/* Lyrics card */}
@@ -117,20 +99,14 @@ export function SongAnalysisPage() {
               <div
                 key={i}
                 className={
-                  line.current
-                    ? "flex gap-[10px] rounded-[10px] bg-bvc-accent-tint p-2"
-                    : "flex gap-[10px] p-2"
+                  line.current ? "flex gap-[10px] rounded-[10px] bg-bvc-accent-tint p-2" : "flex gap-[10px] p-2"
                 }
               >
-                <span className="font-bvc-mono mt-[2px] shrink-0 text-[12px] text-bvc-muted">
-                  {line.time}
-                </span>
+                <span className="font-bvc-mono mt-[2px] shrink-0 text-[12px] text-bvc-muted">{line.time}</span>
                 <span
                   className="text-[14px] leading-snug"
                   style={{
-                    color: line.current
-                      ? "var(--color-bvc-accent-text)"
-                      : "var(--color-bvc-ink)",
+                    color: line.current ? "var(--color-bvc-accent-text)" : "var(--color-bvc-ink)",
                     fontWeight: line.current ? 600 : undefined,
                   }}
                 >

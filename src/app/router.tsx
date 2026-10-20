@@ -1,6 +1,5 @@
-import { AudioAnalysisTestPage } from '@/features/practice/pages/AudioAnalysisTestPage';
+import { AudioAnalysisTestPage } from "@/features/practice/pages/AudioAnalysisTestPage";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { DevNav } from "@/shared/components/DevNav";
 
 import { LoginPage } from "@/features/auth/pages/LoginPage";
 import { NotFoundPage } from "@/shared/pages/NotFoundPage";
@@ -100,6 +99,11 @@ export function AppRouter() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/403" element={<ForbiddenPage />} />
 
+        {/* M02 — thư viện mở cho cả khách; khách bấm Lưu thì được mời đăng nhập */}
+        <Route path="/library" element={<LibraryPage />} />
+        <Route path="/library/:songId" element={<SongDetailPage />} />
+        <Route path="/library/:songId/sheets/:sheetId" element={<SheetPage />} />
+
         {/* Mọi người dùng đã đăng nhập */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dev/audio-analysis" element={<AudioAnalysisTestPage />} />
@@ -136,12 +140,9 @@ export function AppRouter() {
           <Route path="/practice/:songId/history" element={<HistoryPage />} />
           <Route path="/practice/:songId/song-analysis" element={<SongAnalysisPage />} />
 
-          <Route path="/library" element={<LibraryPage />} />
+          {/* Library */}
           <Route path="/library/upload" element={<SongUploadPage />} />
-          <Route path="/library/:songId" element={<SongDetailPage />} />
-          <Route path="/library/:songId/sheet" element={<SheetPage />} />
           <Route path="/saved" element={<SavedPage />} />
-
 
           <Route path="/ensemble/:sessionId/playback" element={<EnsemblePlaybackPage />} />
           <Route path="/rental" element={<RentalPage />} />
@@ -162,8 +163,6 @@ export function AppRouter() {
             <Route path="/teacher/roadmap" element={<RoadmapPage />} />
             <Route path="/teacher/progress" element={<StudentProgressPage />} />
             <Route path="/teacher/assignments" element={<TeacherAssignmentsPage />} />
-            <Route path="/songs" element={<SongManagePage />} />
-            <Route path="/songs/sheets" element={<SheetManagePage />} />
             <Route path="/categories" element={<CategoriesPage />} />
           </Route>
           <Route path="/teacher/classes/new" element={<ClassFormPage />} />
@@ -171,8 +170,14 @@ export function AppRouter() {
           <Route path="/teacher/review" element={<ReviewPage />} />
           <Route path="/teacher/assignments/new" element={<AssignmentFormPage />} />
           <Route path="/teacher/student-review" element={<StudentReviewPage />} />
+
+          {/* M02 — quản lý bài hát (trang tự bọc TeacherShell) */}
+          <Route path="/songs" element={<SongManagePage />} />
           <Route path="/songs/new" element={<SongFormPage />} />
           <Route path="/songs/:songId/edit" element={<SongFormPage />} />
+          <Route path="/songs/:songId/sheets" element={<SheetManagePage />} />
+
+          {/* Community — desktop */}
           <Route path="/community/bonus/new" element={<BonusFormPage />} />
           <Route path="/community/challenges/new" element={<ChallengeFormPage />} />
         </Route>
@@ -200,7 +205,6 @@ export function AppRouter() {
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
-      <DevNav />
     </BrowserRouter>
   );
 }

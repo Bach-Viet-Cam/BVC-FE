@@ -35,7 +35,7 @@ export function MobileHeader({
       </button>
 
       <div className="flex min-w-0 flex-1 flex-col gap-[1px]">
-        <div className="truncate text-[18px] font-extrabold leading-tight tracking-[-0.02em] text-bvc-ink">
+        <div className="truncate font-bvc-display text-[18px] font-extrabold leading-tight tracking-[-0.02em] text-bvc-ink">
           {title}
         </div>
         {subtitle && (

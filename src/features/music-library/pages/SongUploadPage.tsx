@@ -14,10 +14,7 @@ export function SongUploadPage() {
         <MobileHeader title="Tải lên bản nhạc" variant="close" />
 
         {/* Scrollable body */}
-        <div
-          className="flex-1 overflow-y-auto"
-          style={{ scrollbarWidth: "none" }}
-        >
+        <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
           {/* Upload type selector */}
           <div className="mx-[14px] mt-4 flex gap-3">
             {/* PDF card */}
@@ -26,23 +23,16 @@ export function SongUploadPage() {
               onClick={() => setUploadType("pdf")}
               className={cn(
                 "flex flex-1 cursor-pointer flex-col items-center gap-[8px] rounded-[20px] border p-[16px]",
-                uploadType === "pdf"
-                  ? "border-bvc-accent bg-bvc-accent-tint"
-                  : "border-bvc-border bg-white"
+                uploadType === "pdf" ? "border-bvc-accent bg-bvc-accent-tint" : "border-bvc-border bg-white"
               )}
             >
               <FileText
                 size={32}
                 strokeWidth={1.6}
-                className={
-                  uploadType === "pdf" ? "text-bvc-accent-text" : "text-bvc-muted"
-                }
+                className={uploadType === "pdf" ? "text-bvc-accent-text" : "text-bvc-muted"}
               />
               <span
-                className={cn(
-                  "text-[14px] font-bold",
-                  uploadType === "pdf" ? "text-bvc-accent-text" : "text-bvc-ink"
-                )}
+                className={cn("text-[14px] font-bold", uploadType === "pdf" ? "text-bvc-accent-text" : "text-bvc-ink")}
               >
                 Bản nhạc PDF
               </span>
@@ -62,17 +52,13 @@ export function SongUploadPage() {
               onClick={() => setUploadType("musicxml")}
               className={cn(
                 "flex flex-1 cursor-pointer flex-col items-center gap-[8px] rounded-[20px] border p-[16px]",
-                uploadType === "musicxml"
-                  ? "border-bvc-accent bg-bvc-accent-tint"
-                  : "border-bvc-border bg-white"
+                uploadType === "musicxml" ? "border-bvc-accent bg-bvc-accent-tint" : "border-bvc-border bg-white"
               )}
             >
               <FileCode
                 size={32}
                 strokeWidth={1.6}
-                className={
-                  uploadType === "musicxml" ? "text-bvc-accent-text" : "text-bvc-muted"
-                }
+                className={uploadType === "musicxml" ? "text-bvc-accent-text" : "text-bvc-muted"}
               />
               <span
                 className={cn(
@@ -96,13 +82,9 @@ export function SongUploadPage() {
           {/* Upload drop zone */}
           <div className="mx-[14px] mt-3 flex flex-col items-center gap-[8px] rounded-[20px] border-2 border-dashed border-bvc-border-strong p-[20px]">
             <Upload size={40} strokeWidth={1.6} className="text-bvc-muted" />
-            <span className="text-[15px] font-bold text-bvc-ink">
-              Chọn file để tải lên
-            </span>
+            <span className="text-[15px] font-bold text-bvc-ink">Chọn file để tải lên</span>
             <span className="text-center text-[13px] text-bvc-faint">
-              {uploadType === "pdf"
-                ? ".pdf · Tối đa 10 MB"
-                : ".xml · .mxl · .musicxml · Tối đa 10 MB"}
+              {uploadType === "pdf" ? ".pdf · Tối đa 10 MB" : ".xml · .mxl · .musicxml · Tối đa 10 MB"}
             </span>
             <button
               type="button"
@@ -114,9 +96,7 @@ export function SongUploadPage() {
 
           {/* Song metadata card */}
           <div className="mx-[14px] mt-3 flex flex-col gap-[10px] rounded-[20px] border border-bvc-border p-[14px]">
-            <span className="text-[14px] font-bold text-bvc-ink">
-              Thông tin bản nhạc
-            </span>
+            <span className="text-[14px] font-bold text-bvc-ink">Thông tin bản nhạc</span>
 
             {/* Bài nhạc select */}
             <div className="relative">
@@ -131,9 +111,7 @@ export function SongUploadPage() {
                 <option value="trong-com">Trống cơm</option>
                 <option value="bac-kim-thang">Bắc kim thang</option>
               </select>
-              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-bvc-faint">
-                ▾
-              </span>
+              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-bvc-faint">▾</span>
             </div>
 
             {/* Nhạc cụ select */}
@@ -150,9 +128,7 @@ export function SongUploadPage() {
                 <option value="dan-nhi">Đàn nhị</option>
                 <option value="dan-ty-ba">Đàn tỳ bà</option>
               </select>
-              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-bvc-faint">
-                ▾
-              </span>
+              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-bvc-faint">▾</span>
             </div>
 
             {/* Description textarea */}
@@ -175,9 +151,7 @@ export function SongUploadPage() {
           >
             Tải lên
           </button>
-          <p className="mt-2 cursor-pointer text-center text-[13px] text-bvc-accent-text">
-            Tải lên và gửi duyệt
-          </p>
+          <p className="mt-2 cursor-pointer text-center text-[13px] text-bvc-accent-text">Tải lên và gửi duyệt</p>
         </div>
       </div>
     </div>

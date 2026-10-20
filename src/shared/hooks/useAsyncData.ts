@@ -1,43 +1,57 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getApiErrorMessage } from "@/shared/utils/getApiErrorMessage";
+import { getErrorMessage } from "@/shared/utils/getErrorMessage";
 
-interface LoadedData<T> {
-  requestKey: string;
+interface AsyncState<T> {
+  key: string;
   data: T | null;
   error: string | null;
 }
 
-export function useAsyncData<T>(load: () => Promise<T>, dependencyKey: string, fallbackError: string) {
-  const [reloadCount, setReloadCount] = useState(0);
-  const [loaded, setLoaded] = useState<LoadedData<T> | null>(null);
-  const loadRef = useRef(load);
-  const requestKey = `${dependencyKey}#${reloadCount}`;
+/**
+ * Gọi fetcher mỗi khi `key` đổi. Giữ data cũ trong lúc tải lại để danh sách không nháy;
+ * `isLoading` suy ra từ việc kết quả hiện có thuộc về key nào.
+ * `fallbackError` dùng khi lỗi không mang message từ BE.
+ */
+export function useAsyncData<T>(fetcher: () => Promise<T>, key: string, fallbackError?: string) {
+  const [state, setState] = useState<AsyncState<T> | null>(null);
+  const [version, setVersion] = useState(0);
+  const fetcherRef = useRef(fetcher);
+  const requestKey = `${key}#${version}`;
 
   useEffect(() => {
-    loadRef.current = load;
+    fetcherRef.current = fetcher;
   });
 
   useEffect(() => {
-    let isCancelled = false;
-    loadRef
-      .current()
-      .then((data) => {
-        if (!isCancelled) setLoaded({ requestKey, data, error: null });
-      })
-      .catch((error: unknown) => {
-        if (!isCancelled) setLoaded({ requestKey, data: null, error: getApiErrorMessage(error, fallbackError) });
-      });
+    let cancelled = false;
+    fetcherRef.current().then(
+      (data) => {
+        if (!cancelled) setState({ key: requestKey, data, error: null });
+      },
+      (error: unknown) => {
+        if (!cancelled) setState({ key: requestKey, data: null, error: getErrorMessage(error, fallbackError) });
+      }
+    );
     return () => {
-      isCancelled = true;
+      cancelled = true;
     };
   }, [requestKey, fallbackError]);
 
-  const reload = useCallback(() => setReloadCount((count) => count + 1), []);
+  const reload = useCallback(() => setVersion((value) => value + 1), []);
+
+  const mutate = useCallback((updater: (current: T) => T) => {
+    setState((current) => (current?.data == null ? current : { ...current, data: updater(current.data) }));
+  }, []);
+
+  const isLoading = state?.key !== requestKey;
+  const data = state?.data ?? null;
 
   return {
-    data: loaded?.data ?? null,
-    error: loaded?.error ?? null,
-    isLoading: loaded?.requestKey !== requestKey,
+    data,
+    error: isLoading ? null : (state?.error ?? null),
+    isLoading,
+    isFirstLoad: isLoading && data === null,
     reload,
+    mutate,
   };
 }
