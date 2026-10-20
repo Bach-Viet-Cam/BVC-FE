@@ -14,12 +14,15 @@ interface FilterPillProps {
 export function FilterPill({ label, value, options, onChange, size = "md" }: FilterPillProps) {
   const selected = options.find((option) => option.value === value);
   const height = size === "sm" ? "min-h-9 text-[13px]" : "min-h-10 text-[13.5px]";
+  // Pill thường nằm trong hàng overflow-x-auto: chừa 1px trên/dưới để mép cắt của hàng không ăn mất viền
+  const clipGap = "my-px";
 
   if (selected) {
     return (
       <span
         className={cn(
           "inline-flex shrink-0 items-center gap-1.5 rounded-full bg-bvc-ink pr-1 pl-4 font-semibold whitespace-nowrap text-white",
+          clipGap,
           height
         )}
       >
@@ -37,14 +40,14 @@ export function FilterPill({ label, value, options, onChange, size = "md" }: Fil
   }
 
   return (
-    <span className={cn("relative inline-flex shrink-0 items-center", height)}>
+    <span className={cn("relative inline-flex shrink-0 items-center", clipGap, height)}>
       <select
         aria-label={`Lọc theo ${label}`}
         value=""
         onChange={(event) => onChange(event.target.value)}
         className={cn(
-          "h-full cursor-pointer appearance-none rounded-full border border-bvc-border-strong bg-white pr-8 pl-4 text-bvc-ink",
-          "hover:border-bvc-ink focus-visible:outline-2 focus-visible:outline-bvc-accent",
+          "h-full cursor-pointer appearance-none [-webkit-appearance:none] rounded-full border border-bvc-border-strong bg-white pr-8 pl-4 text-bvc-ink",
+          "outline-none hover:border-bvc-bar-strong focus-visible:border-bvc-bar-strong",
           height
         )}
       >

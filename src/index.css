@@ -99,6 +99,19 @@
   --color-outline-variant: var(--outline-variant);
   --color-inverse-surface: var(--inverse-surface);
   --color-inverse-on-surface: var(--inverse-on-surface);
+
+  /* Chuyển màn: nội dung mới hiện dần và nhích lên nhẹ */
+  --animate-page-enter: page-enter 180ms ease-out;
+  @keyframes page-enter {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
 }
 
 :root {
@@ -168,6 +181,11 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+  }
+
+  /* Giữ chỗ cho thanh cuộn: sang màn ngắn/dài không bị xô ngang */
+  html {
+    scrollbar-gutter: stable;
   }
 
   body {

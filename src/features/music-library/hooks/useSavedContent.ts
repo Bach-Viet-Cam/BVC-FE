@@ -6,8 +6,8 @@ import { musicLibraryApi } from "@/features/music-library/api/musicLibraryApi";
 import type { SavedSheet, SavedSong } from "@/features/music-library/types/musicLibraryTypes";
 
 export function useSavedContent() {
-  const songs = useAsyncData(() => musicLibraryApi.listSavedSongs(), "saved-songs");
-  const sheets = useAsyncData(() => musicLibraryApi.listSavedSheets(), "saved-sheets");
+  const songs = useAsyncData(() => musicLibraryApi.listSavedSongs(), "saved-songs", undefined, { cache: true });
+  const sheets = useAsyncData(() => musicLibraryApi.listSavedSheets(), "saved-sheets", undefined, { cache: true });
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
 
   const markPending = (id: string, isPending: boolean) =>

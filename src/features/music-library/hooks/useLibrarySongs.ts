@@ -6,7 +6,9 @@ import type { LibrarySongQuery } from "@/features/music-library/types/musicLibra
 export function useLibrarySongs(query: LibrarySongQuery) {
   const { data, error, isLoading, isFirstLoad, reload, mutate } = useAsyncData(
     () => musicLibraryApi.listLibrarySongs(query),
-    `library-songs:${JSON.stringify(query)}`
+    `library-songs:${JSON.stringify(query)}`,
+    undefined,
+    { cache: true }
   );
 
   const setSongSaved = useCallback(

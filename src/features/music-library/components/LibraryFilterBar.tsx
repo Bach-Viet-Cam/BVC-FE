@@ -1,3 +1,4 @@
+import { ChevronDown } from "lucide-react";
 import { FilterPill } from "@/shared/components/bvc/FilterPill";
 import type { SelectOption } from "@/shared/types/commonTypes";
 import { LIBRARY_SORT_OPTIONS } from "@/features/music-library/constants/musicLibraryConstants";
@@ -74,19 +75,25 @@ export function LibraryFilterBar({
           <label htmlFor="library-sort" className="sr-only">
             Sắp xếp
           </label>
-          <select
-            id="library-sort"
-            value={query.sort}
-            // Giá trị select chỉ đến từ LIBRARY_SORT_OPTIONS
-            onChange={(event) => onChange({ sort: event.target.value as LibrarySort })}
-            className="h-9 cursor-pointer rounded-full border border-bvc-border-strong bg-white px-3 text-[13px] text-bvc-ink md:h-10 md:px-3.5 md:text-[13.5px]"
-          >
-            {LIBRARY_SORT_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+          <span className="relative inline-flex items-center">
+            <select
+              id="library-sort"
+              value={query.sort}
+              // Giá trị select chỉ đến từ LIBRARY_SORT_OPTIONS
+              onChange={(event) => onChange({ sort: event.target.value as LibrarySort })}
+              className="h-9 cursor-pointer appearance-none rounded-full border border-bvc-border-strong bg-white pr-9 pl-3 text-[13px] text-bvc-ink [-webkit-appearance:none] md:h-10 md:pr-[38px] md:pl-3.5 md:text-[13.5px]"
+            >
+              {LIBRARY_SORT_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              className="pointer-events-none absolute right-3 size-4 text-bvc-muted md:right-3.5"
+              aria-hidden
+            />
+          </span>
         </span>
       </div>
     </div>

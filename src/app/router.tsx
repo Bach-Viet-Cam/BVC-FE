@@ -6,6 +6,7 @@ import { NotFoundPage } from "@/shared/pages/NotFoundPage";
 import { ForbiddenPage } from "@/shared/pages/ForbiddenPage";
 import { DashboardPage } from "@/shared/pages/DashboardPage";
 import { ProtectedRoute } from "@/shared/components/ProtectedRoute";
+import { ScrollToTop } from "@/shared/components/ScrollToTop";
 import { AppLayout } from "@/shared/components/AppLayout";
 import { DesktopLayout } from "@/shared/components/DesktopLayout";
 import { MobileLayout } from "@/shared/components/MobileLayout";
@@ -93,6 +94,7 @@ import { ChallengeFormPage } from "@/features/community/pages/ChallengeFormPage"
 export function AppRouter() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         {/* Public */}
         <Route path="/" element={<LoginPage />} />

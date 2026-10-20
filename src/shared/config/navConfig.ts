@@ -5,16 +5,19 @@ export interface NavItem {
   to: string;
 }
 
-const TEACHER_NAV: NavItem[] = [
+// Menu duy nhất của giảng viên, TeacherShell render cho mọi trang có sidebar
+export const TEACHER_NAV: NavItem[] = [
   { label: "Trang chủ GV", to: "/teacher/home" },
-  { label: "Danh sách lớp", to: "/teacher/classes" },
+  { label: "Lớp học", to: "/teacher/classes" },
   { label: "Lộ trình học tập", to: "/teacher/roadmap" },
   { label: "Bài tập", to: "/teacher/assignments" },
   { label: "Tiến độ sinh viên", to: "/teacher/progress" },
   { label: "Duyệt bài nộp", to: "/teacher/review" },
-  { label: "Thư viện bài nhạc", to: "/songs" },
+  { label: "Đánh giá sinh viên", to: "/teacher/student-review" },
+  { label: "Thư viện bài hát", to: "/songs" },
   { label: "Phân loại nội dung", to: "/categories" },
   { label: "Nội dung đã xác minh", to: "/community/verified" },
+  { label: "Thông báo", to: "/notifications" },
 ];
 
 const ADMIN_NAV: NavItem[] = [

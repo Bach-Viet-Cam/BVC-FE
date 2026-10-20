@@ -1,4 +1,5 @@
 import type { MediaFile } from "@/features/music-library/types/musicLibraryTypes";
+import { claimPlayback } from "@/features/music-library/utils/exclusivePlayback";
 import { formatDuration } from "@/features/music-library/utils/mediaUtils";
 
 interface TutorialVideoCardProps {
@@ -15,7 +16,12 @@ export function TutorialVideoCard({ video }: TutorialVideoCardProps) {
         )}
       </div>
       {video?.url ? (
-        <video src={video.url} controls className="aspect-video w-full rounded-2xl bg-bvc-ink" />
+        <video
+          src={video.url}
+          controls
+          onPlay={(event) => claimPlayback(event.currentTarget)}
+          className="aspect-video w-full rounded-2xl bg-bvc-ink"
+        />
       ) : (
         <p className="rounded-2xl bg-bvc-surface px-4 py-6 text-center text-[13px] text-bvc-muted">
           {video ? "Video hướng dẫn đang được xử lý." : "Bản này chưa có video hướng dẫn."}

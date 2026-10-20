@@ -36,7 +36,8 @@ export function useManagedSongs() {
   const { data, error, isLoading, isFirstLoad, reload, mutate } = useAsyncData(
     () => lecturerApi.listPieces(toApiQuery(query)).then(({ data: body }) => body.data),
     `lecturer-pieces:${JSON.stringify(query)}`,
-    LOAD_ERROR
+    LOAD_ERROR,
+    { cache: true }
   );
 
   // Đổi bộ lọc thì về trang 1
