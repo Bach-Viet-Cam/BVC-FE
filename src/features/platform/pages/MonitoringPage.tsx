@@ -165,7 +165,7 @@ export function MonitoringPage() {
   return (
     <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
       <DesktopPageHeader
-        breadcrumb="M06 · Quản trị"
+        breadcrumb="Quản trị"
         title="Giám sát hệ thống"
         actions={
           <button

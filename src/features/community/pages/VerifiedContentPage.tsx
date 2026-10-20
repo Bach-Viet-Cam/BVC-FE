@@ -376,7 +376,7 @@ export function VerifiedContentPage() {
   return (
     <main className="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#FAF9F7]">
       <DesktopPageHeader
-        breadcrumb="M04 · Quản lý nội dung cộng đồng"
+        breadcrumb="Quản lý nội dung cộng đồng"
         title="Nội dung đã xác minh"
         actions={
           <div className="flex items-center gap-2.5">

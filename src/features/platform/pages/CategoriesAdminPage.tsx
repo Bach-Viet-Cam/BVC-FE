@@ -124,7 +124,7 @@ export function CategoriesAdminPage() {
   return (
     <main className="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#FAF9F7]">
       <DesktopPageHeader
-        breadcrumb="M06 · Quản trị nội dung"
+        breadcrumb="Quản trị nội dung"
         title="Phân loại nội dung"
         actions={
           <div className="flex items-center gap-2.5">

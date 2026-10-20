@@ -84,7 +84,7 @@ export function ContentApprovalPage() {
     <>
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <DesktopPageHeader
-          breadcrumb="M06 · Quản trị"
+          breadcrumb="Quản trị"
           title="Duyệt nội dung cộng đồng"
           actions={
             <>

@@ -14,7 +14,7 @@ export function TeacherHomePage() {
     <>
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <DesktopPageHeader
-          breadcrumb="M00-04 · Trang chủ giảng viên"
+          breadcrumb="Trang chủ giảng viên"
           title="Trang chủ"
           actions={
             <button

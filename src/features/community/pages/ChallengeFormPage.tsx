@@ -31,7 +31,7 @@ export function ChallengeFormPage() {
 
         <div className="flex flex-col gap-[3px]">
           <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-bvc-muted">
-            M04 · Community
+            Community
           </span>
           <h1 className="text-[24px] font-extrabold tracking-[-0.025em] text-bvc-ink">
             Tạo Community Challenge

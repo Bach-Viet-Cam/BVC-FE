@@ -77,7 +77,7 @@ export function TeacherAssignmentsPage() {
     <>
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <DesktopPageHeader
-          breadcrumb="M03 · Lớp học"
+          breadcrumb="Lớp học"
           title="Danh sách bài tập"
           actions={
             <>
