@@ -24,7 +24,7 @@ export function RentalProviderPage() {
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-white">
       <DesktopPageHeader
-        breadcrumb="M06 · Cho thuê nhạc cụ"
+        breadcrumb="Cho thuê nhạc cụ"
         title="Quản lý cho thuê"
         actions={
           <>

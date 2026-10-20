@@ -67,7 +67,7 @@ export function EnsemblePage() {
 
   return (
     <>
-      <MobileHeader title="Luyện hòa tấu" subtitle="SCR-M05-01" variant="close" onBack={leave} />
+      <MobileHeader title="Luyện hòa tấu" subtitle={tracksResult?.pieceTitle} variant="close" onBack={leave} />
 
       <div className="flex-1 overflow-y-auto px-[14px] pb-4">
         <div className="mt-2 rounded-[20px] border border-bvc-border px-[16px] py-[4px]">

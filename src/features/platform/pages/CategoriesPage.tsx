@@ -63,7 +63,7 @@ export function CategoriesPage() {
     <>
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <DesktopPageHeader
-          breadcrumb="M02 · Thư viện học liệu"
+          breadcrumb="Thư viện học liệu"
           title="Phân loại nội dung"
           actions={
             <button

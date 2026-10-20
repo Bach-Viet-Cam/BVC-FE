@@ -122,7 +122,7 @@ export function UserManagePage() {
     <>
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#FAF9F7]">
         <DesktopPageHeader
-          breadcrumb="SCR-M06-05 · Quản lý người dùng"
+          breadcrumb="Quản trị"
           title="Người dùng"
           actions={
             <div className="flex items-center gap-2.5">

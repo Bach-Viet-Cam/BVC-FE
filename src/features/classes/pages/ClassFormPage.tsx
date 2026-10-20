@@ -24,7 +24,7 @@ export function ClassFormPage() {
 
         <div className="flex flex-col gap-[3px]">
           <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-bvc-muted">
-            M03 · Lớp học
+            Lớp học
           </span>
           <span className="text-[24px] font-extrabold tracking-[-0.025em] text-bvc-ink">
             Tạo lớp học

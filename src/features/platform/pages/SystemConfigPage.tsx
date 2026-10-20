@@ -601,7 +601,7 @@ export function SystemConfigPage() {
   return (
     <main className="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#FAF9F7]">
       <DesktopPageHeader
-        breadcrumb="SCR-M06-06 · Quản trị hệ thống"
+        breadcrumb="Quản trị"
         title="Cấu hình hệ thống"
       />
 

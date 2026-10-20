@@ -40,7 +40,7 @@ export function StudentProgressPage() {
   return (
     <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
       <DesktopPageHeader
-        breadcrumb="SCR-M03-06 · Lớp học"
+        breadcrumb="Lớp học"
         title="Tiến độ sinh viên"
         actions={
           <select
