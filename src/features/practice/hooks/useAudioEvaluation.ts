@@ -7,7 +7,7 @@ import type { AudioEvaluation, AudioEvaluationInput } from "../types/audioAnalys
 
 export function useAudioEvaluation() {
   const { user } = useAuth();
-  const storageKey = `audio-evaluation:${user!.userId}`;
+  const storageKey = `audio-evaluation:${user?.userId ?? "guest"}`;
   const [evaluationId, setEvaluationId] = useState(() => sessionStorage.getItem(storageKey) || "");
   const [evaluation, setEvaluation] = useState<AudioEvaluation | null>(null);
   const [error, setError] = useState("");

@@ -6,25 +6,10 @@ import { NotFoundPage } from "@/shared/pages/NotFoundPage";
 import { ForbiddenPage } from "@/shared/pages/ForbiddenPage";
 import { DashboardPage } from "@/shared/pages/DashboardPage";
 import { ProtectedRoute } from "@/shared/components/ProtectedRoute";
-import { ScrollToTop } from "@/shared/components/ScrollToTop";
 import { AppLayout } from "@/shared/components/AppLayout";
 import { DesktopLayout } from "@/shared/components/DesktopLayout";
 import { MobileLayout } from "@/shared/components/MobileLayout";
 import { ROLES } from "@/shared/constants/roles";
-
-// Mobile — practice
-import { PracticePage } from "@/features/practice/pages/PracticePage";
-import { TunerPage } from "@/features/practice/pages/TunerPage";
-import { MetronomePage } from "@/features/practice/pages/MetronomePage";
-import { RecordingPage } from "@/features/practice/pages/RecordingPage";
-import { AnalysisPage } from "@/features/practice/pages/AnalysisPage";
-import { ErrorDetailPage } from "@/features/practice/pages/ErrorDetailPage";
-import { SectionPage } from "@/features/practice/pages/SectionPage";
-import { ComparePage } from "@/features/practice/pages/ComparePage";
-import { HistoryPage } from "@/features/practice/pages/HistoryPage";
-import { QualityCheckPage } from "@/features/practice/pages/QualityCheckPage";
-import { ModesPage } from "@/features/practice/pages/ModesPage";
-import { SongAnalysisPage } from "@/features/music-library/pages/SongAnalysisPage";
 
 // Mobile — home
 import { HomePage } from "@/features/home/pages/HomePage";
@@ -118,7 +103,7 @@ export function AppRouter() {
         </Route>
 
         {/* Sinh viên — màn hình mobile */}
-        <Route element={<ProtectedRoute allowedRoles={[ROLES.STUDENT]} />}>
+        {/* <Route element={<ProtectedRoute allowedRoles={[ROLES.STUDENT]} />}> */}
           <Route path="/home" element={<HomePage />} />
 
           <Route element={<MobileLayout />}>
@@ -129,18 +114,7 @@ export function AppRouter() {
             <Route path="/community/bonus/:bonusId" element={<BonusDetailPage />} />
           </Route>
 
-          <Route path="/practice/:songId" element={<PracticePage />} />
-          <Route path="/practice/:songId/tuner" element={<TunerPage />} />
-          <Route path="/practice/:songId/metronome" element={<MetronomePage />} />
-          <Route path="/practice/:songId/recording" element={<RecordingPage />} />
-          <Route path="/practice/:songId/quality" element={<QualityCheckPage />} />
-          <Route path="/practice/:songId/modes" element={<ModesPage />} />
-          <Route path="/practice/:songId/analysis/:recordingId" element={<AnalysisPage />} />
-          <Route path="/practice/:songId/error/:errorId" element={<ErrorDetailPage />} />
-          <Route path="/practice/:songId/section" element={<SectionPage />} />
-          <Route path="/practice/:songId/compare" element={<ComparePage />} />
-          <Route path="/practice/:songId/history" element={<HistoryPage />} />
-          <Route path="/practice/:songId/song-analysis" element={<SongAnalysisPage />} />
+          {/* practice routes — will be re-added with new Smart Practice Studio pages */}
 
           {/* Library */}
           <Route path="/library/upload" element={<SongUploadPage />} />
@@ -154,7 +128,7 @@ export function AppRouter() {
           <Route path="/community/leaderboard" element={<LeaderboardPage />} />
           <Route path="/community/challenges" element={<ChallengesPage />} />
           <Route path="/community/challenges/:challengeId" element={<ChallengeDetailPage />} />
-        </Route>
+        {/* </Route> */}
 
         {/* Giảng viên — màn hình desktop */}
         <Route element={<ProtectedRoute allowedRoles={[ROLES.TEACHER]} />}>
