@@ -7,9 +7,8 @@ export const songSchema = z.object({
   composer: z.string().trim().max(200, "Tác giả tối đa 200 ký tự"),
   description: z.string().trim().max(1000, "Mô tả tối đa 1.000 ký tự"),
   genreId: z.string().min(1, "Chọn thể loại"),
-  instrumentIds: z.array(z.string()).min(1, "Chọn ít nhất 1 nhạc cụ"),
   levelId: z.string().min(1, "Chọn trình độ"),
-  visibility: z.enum(["VISIBLE", "HIDDEN"]),
+  visibility: z.enum(["PUBLIC", "HIDDEN"]),
   coverFile: z
     .instanceof(File)
     .nullable()

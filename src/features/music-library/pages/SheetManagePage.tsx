@@ -12,15 +12,15 @@ import { SheetFormPanel } from "@/features/music-library/components/SheetFormPan
 import { useMusicCategories } from "@/features/music-library/hooks/useMusicCategories";
 import { useSongSheets } from "@/features/music-library/hooks/useSongSheets";
 import { useVisibilityConfirm } from "@/features/music-library/hooks/useVisibilityConfirm";
-import type { SheetPayload, SheetVersion } from "@/features/music-library/types/musicLibraryTypes";
-import { groupSheetsByInstrument } from "@/features/music-library/utils/sheetUtils";
+import type { LecturerSheetMusic } from "@/features/music-library/types/lecturerTypes";
+import type { SheetFormValues } from "@/features/music-library/utils/validateSheet";
 
-type PanelState = { mode: "create"; instrumentId?: string } | { mode: "edit"; sheet: SheetVersion } | null;
+type PanelState = { mode: "create"; instrumentId?: string } | { mode: "edit"; sheet: LecturerSheetMusic } | null;
 
 export function SheetManagePage() {
   const { songId = "" } = useParams();
   const [params, setParams] = useSearchParams();
-  const { options } = useMusicCategories();
+  const { options } = useMusicCategories("lecturer");
   const data = useSongSheets(songId);
   const visibility = useVisibilityConfirm(data.changeVisibility);
   // Mở sẵn form khi đi từ nút "Tạo bản nhạc" ở trang chi tiết bài hát (?new=1&instrument=...)
@@ -33,14 +33,13 @@ export function SheetManagePage() {
     if (params.has("new")) setParams({}, { replace: true });
   };
 
-  const submitSheet = async (payload: SheetPayload, editingId?: string) => {
-    await data.saveSheet(payload, editingId);
-    closePanel();
+  const submitSheet = async (values: SheetFormValues, editing?: LecturerSheetMusic) => {
+    const failure = await data.saveSheet(values, editing);
+    if (!failure) closePanel();
+    return failure;
   };
 
-  const { song, sheets } = data;
-  const groups = song ? groupSheetsByInstrument(sheets, song.instruments) : [];
-  const instrumentWithSheets = groups.filter((group) => group.sheets.length > 0).length;
+  const { song, sheets, groups } = data;
   const pendingSheet = visibility.pending?.item;
 
   return (
@@ -52,7 +51,7 @@ export function SheetManagePage() {
           title={song ? `Bản nhạc — ${song.title}` : "Bản nhạc"}
           subtitle={
             song &&
-            `${sheets.length} bản · ${instrumentWithSheets}/${song.instruments.length} nhạc cụ có bản · mỗi nhạc cụ 1 bản chính`
+            `${sheets.length} bản · ${groups.length} nhạc cụ · mỗi nhạc cụ 1 bản chính`
           }
           actions={
             <ActionButton onClick={() => setPanel({ mode: "create" })} disabled={!song}>
@@ -75,6 +74,12 @@ export function SheetManagePage() {
                 <span key={index} className="h-44 rounded-[18px] bg-bvc-surface" />
               ))}
             </div>
+          ) : groups.length === 0 ? (
+            <EmptyState
+              title="Bài hát chưa có bản nhạc"
+              description="Nhạc cụ của bài hát được lấy từ các bản nhạc. Thêm bản nhạc đầu tiên và chọn nhạc cụ cho bản đó."
+              actions={<ActionButton onClick={() => setPanel({ mode: "create" })}>Thêm bản nhạc</ActionButton>}
+            />
           ) : (
             groups.map((group) => (
               <InstrumentSheetGroup
@@ -85,9 +90,9 @@ export function SheetManagePage() {
                 busySheetId={data.busySheetId}
                 onAdd={(instrumentId) => setPanel({ mode: "create", instrumentId })}
                 onEdit={(sheet) => setPanel({ mode: "edit", sheet })}
-                onReplaceAsset={data.replaceAsset}
+                onReplaceFile={data.replaceFile}
                 onRequestVisibility={(sheet, nextVisible) =>
-                  visibility.request(sheet, nextVisible ? "VISIBLE" : "HIDDEN")
+                  visibility.request(sheet, nextVisible ? "PUBLIC" : "HIDDEN")
                 }
               />
             ))
@@ -102,6 +107,7 @@ export function SheetManagePage() {
           sheets={sheets}
           editing={panel.mode === "edit" ? panel.sheet : undefined}
           presetInstrumentId={panel.mode === "create" ? panel.instrumentId : undefined}
+          instrumentOptions={data.instrumentOptions}
           levelOptions={options.levels}
           onCancel={closePanel}
           onSubmit={submitSheet}

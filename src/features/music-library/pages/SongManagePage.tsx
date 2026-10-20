@@ -21,7 +21,8 @@ import {
 import { INITIAL_MANAGED_QUERY, useManagedSongs } from "@/features/music-library/hooks/useManagedSongs";
 import { useMusicCategories } from "@/features/music-library/hooks/useMusicCategories";
 import { useVisibilityConfirm } from "@/features/music-library/hooks/useVisibilityConfirm";
-import type { ManagedSong, Visibility } from "@/features/music-library/types/musicLibraryTypes";
+import type { LecturerPiece } from "@/features/music-library/types/lecturerTypes";
+import type { Visibility } from "@/features/music-library/types/musicLibraryTypes";
 
 // Object.keys trả string[]; key của VISIBILITY_LABELS chính là Visibility
 const VISIBILITY_OPTIONS = (Object.keys(VISIBILITY_LABELS) as Visibility[]).map((value) => ({
@@ -32,7 +33,7 @@ const VISIBILITY_OPTIONS = (Object.keys(VISIBILITY_LABELS) as Visibility[]).map(
 const COLUMN_HEADERS = ["", "Tiêu đề", "Nhạc cụ", "Trình độ", "Bản nhạc", "Hiển thị", "Cập nhật", ""];
 
 export function SongManagePage() {
-  const { options } = useMusicCategories();
+  const { options } = useMusicCategories("lecturer");
   const songs = useManagedSongs();
   const visibility = useVisibilityConfirm(songs.changeVisibility);
   const [keyword, setKeyword] = useState("");
@@ -41,8 +42,9 @@ export function SongManagePage() {
   const { query, result } = songs;
   const hasFilters = Boolean(query.keyword || query.genreId || query.instrumentId || query.levelId || query.visibility);
 
-  const requestVisibility = (song: ManagedSong, nextVisible: boolean) =>
-    visibility.request(song, nextVisible ? "VISIBLE" : "HIDDEN", nextVisible && song.visibleSheetCount === 0);
+  // R-03: công khai bài chưa có bản nhạc công khai thì hỏi lại trước
+  const requestVisibility = (song: LecturerPiece, nextVisible: boolean) =>
+    visibility.request(song, nextVisible ? "PUBLIC" : "HIDDEN", nextVisible && song.publicSheetMusicCount === 0);
 
   const resetFilters = () => {
     debouncedSearch.cancel();
@@ -124,7 +126,7 @@ export function SongManagePage() {
               <span key={index} className="h-[68px] rounded-2xl bg-bvc-surface" />
             ))}
           </div>
-        ) : result && result.data.length === 0 ? (
+        ) : result && result.items.length === 0 ? (
           <EmptyState
             title={hasFilters ? "Không có bài hát khớp bộ lọc" : "Bạn chưa có bài hát nào"}
             description={
@@ -156,7 +158,7 @@ export function SongManagePage() {
               ))}
             </div>
             <ul className={cn("border-b border-bvc-border transition-opacity", songs.isLoading && "opacity-60")}>
-              {result?.data.map((song) => (
+              {result?.items.map((song) => (
                 <ManagedSongRow
                   key={song.id}
                   song={song}

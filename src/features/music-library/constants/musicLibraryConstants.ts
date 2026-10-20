@@ -16,13 +16,13 @@ export const LIBRARY_SORT_OPTIONS: { value: LibrarySort; label: string }[] = [
 ];
 
 export const VISIBILITY_LABELS: Record<Visibility, string> = {
-  VISIBLE: "Công khai",
+  PUBLIC: "Công khai",
   HIDDEN: "Đã ẩn",
-  HIDDEN_BY_ADMIN: "Admin đã ẩn",
+  ADMIN_HIDDEN: "Admin đã ẩn",
 };
 
 export const EDITABLE_VISIBILITY_OPTIONS: { value: EditableVisibility; label: string }[] = [
-  { value: "VISIBLE", label: "Công khai" },
+  { value: "PUBLIC", label: "Công khai" },
   { value: "HIDDEN", label: "Đã ẩn" },
 ];
 
@@ -37,20 +37,20 @@ export const COVER_TONE_CLASSES: Record<CoverTone, { bg: string; fg: string }> =
 
 export const MB = 1024 * 1024;
 
-// Giới hạn dung lượng thực tế lấy từ cấu hình Admin (M06); tạm cố định phía FE
+// Mặc định theo docs/m02.md mục 2; Admin đổi được ở cấu hình hệ thống (FILE_LIMIT) và BE luôn kiểm tra lại
 export const FILE_RULES = {
   cover: { accept: ".jpg,.jpeg,.png,.webp", mimeTypes: ["image/jpeg", "image/png", "image/webp"], maxBytes: 5 * MB },
   sheet: {
     accept: ".pdf,.png,.jpg,.jpeg",
     mimeTypes: ["application/pdf", "image/png", "image/jpeg"],
-    maxBytes: 20 * MB,
+    maxBytes: 10 * MB,
   },
   recording: {
     accept: ".mp3,.wav,.m4a",
     mimeTypes: ["audio/mpeg", "audio/wav", "audio/x-wav", "audio/wave", "audio/mp4", "audio/x-m4a", "audio/m4a"],
-    maxBytes: 50 * MB,
+    maxBytes: 20 * MB,
   },
-  video: { accept: ".mp4", mimeTypes: ["video/mp4"], maxBytes: 300 * MB },
+  video: { accept: ".mp4", mimeTypes: ["video/mp4"], maxBytes: 200 * MB },
 } as const;
 
 export const REFERENCE_SPEEDS = [0.5, 0.75, 1, 1.25, 1.5] as const;

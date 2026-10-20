@@ -1,4 +1,5 @@
 import type { CategoryRef, SheetVersion } from "@/features/music-library/types/musicLibraryTypes";
+import type { LecturerSheetMusic, LecturerSheetMusicList } from "@/features/music-library/types/lecturerTypes";
 
 export interface InstrumentSheetGroup<T extends SheetVersion> {
   instrument: CategoryRef;
@@ -27,4 +28,14 @@ export function groupSheetsByInstrument<T extends SheetVersion>(
 
 export function sheetViewerHref(songId: string, sheetId: string) {
   return `/library/${songId}/sheets/${sheetId}`;
+}
+
+export interface LecturerInstrumentGroup {
+  instrument: CategoryRef;
+  sheets: LecturerSheetMusic[];
+}
+
+// Nhạc cụ của bài hát lấy từ bản nhạc: chỉ những nhạc cụ đã có bản mới thành nhóm
+export function lecturerSheetGroups(list: LecturerSheetMusicList): LecturerInstrumentGroup[] {
+  return list.groups.map((group) => ({ instrument: group.instrument, sheets: group.items }));
 }

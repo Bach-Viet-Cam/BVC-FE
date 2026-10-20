@@ -8,26 +8,37 @@ import { FileField } from "@/shared/components/bvc/FileField";
 import { FormField } from "@/shared/components/bvc/FormField";
 import { fieldClass } from "@/shared/components/bvc/fieldStyles";
 import type { SelectOption } from "@/shared/types/commonTypes";
-import { getErrorMessage } from "@/shared/utils/getErrorMessage";
-import { EDITABLE_VISIBILITY_OPTIONS, FILE_RULES } from "@/features/music-library/constants/musicLibraryConstants";
-import type { ManagedSong, SheetPayload, SheetVersion } from "@/features/music-library/types/musicLibraryTypes";
+import {
+  EDITABLE_VISIBILITY_OPTIONS,
+  FILE_RULES,
+  LIBRARY_MESSAGES,
+} from "@/features/music-library/constants/musicLibraryConstants";
+import type { LecturerPiece, LecturerSheetMusic } from "@/features/music-library/types/lecturerTypes";
+import type { CategoryRef } from "@/features/music-library/types/musicLibraryTypes";
+import { withCurrentOptions } from "@/features/music-library/utils/categoryOptions";
+import type { FormFailure } from "@/features/music-library/utils/formFailure";
 import { formatDuration, formatFileSize } from "@/features/music-library/utils/mediaUtils";
 import { createSheetSchema, type SheetFormValues } from "@/features/music-library/utils/validateSheet";
 
 interface SheetFormPanelProps {
-  song: ManagedSong;
-  sheets: SheetVersion[];
-  editing?: SheetVersion;
+  song: LecturerPiece;
+  sheets: LecturerSheetMusic[];
+  editing?: LecturerSheetMusic;
   presetInstrumentId?: string;
+  // Mọi nhạc cụ đang hoạt động + nhạc cụ bài đã dùng; nhạc cụ của bài suy ra từ các bản nhạc
+  instrumentOptions: CategoryRef[];
   levelOptions: SelectOption[];
   onCancel: () => void;
-  onSubmit: (payload: SheetPayload, editingId?: string) => Promise<unknown>;
+  onSubmit: (
+    values: SheetFormValues,
+    editing?: LecturerSheetMusic
+  ) => Promise<FormFailure<keyof SheetFormValues> | null>;
 }
 
 type SheetKind = "main" | "variant";
 
 // Quy tắc bản chính: bản đầu tiên của nhạc cụ bắt buộc là bản chính, mỗi nhạc cụ chỉ 1 bản chính
-function mainRuleFor(instrumentId: string, sheets: SheetVersion[], editing?: SheetVersion) {
+function mainRuleFor(instrumentId: string, sheets: LecturerSheetMusic[], editing?: LecturerSheetMusic) {
   const siblings = sheets.filter((sheet) => sheet.instrument.id === instrumentId && sheet.id !== editing?.id);
   const hasOtherMain = siblings.some((sheet) => sheet.isMain);
   return {
@@ -37,12 +48,12 @@ function mainRuleFor(instrumentId: string, sheets: SheetVersion[], editing?: She
   };
 }
 
-function pickDefaultInstrument(song: ManagedSong, sheets: SheetVersion[], preset?: string) {
-  if (preset && song.instruments.some((instrument) => instrument.id === preset)) return preset;
-  const withoutMain = song.instruments.find(
-    (instrument) => !sheets.some((sheet) => sheet.instrument.id === instrument.id && sheet.isMain)
-  );
-  return withoutMain?.id ?? song.instruments[0]?.id ?? "";
+// Ưu tiên nhạc cụ được bấm "Thêm", rồi nhạc cụ đã có bản nhưng chưa có bản chính; còn lại để giảng viên tự chọn
+function pickDefaultInstrument(options: CategoryRef[], sheets: LecturerSheetMusic[], preset?: string) {
+  if (preset && options.some((instrument) => instrument.id === preset)) return preset;
+  const usedIds = new Set(sheets.map((sheet) => sheet.instrument.id));
+  const withoutMain = [...usedIds].find((id) => !sheets.some((sheet) => sheet.instrument.id === id && sheet.isMain));
+  return withoutMain ?? "";
 }
 
 export function SheetFormPanel({
@@ -50,6 +61,7 @@ export function SheetFormPanel({
   sheets,
   editing,
   presetInstrumentId,
+  instrumentOptions: availableInstruments,
   levelOptions,
   onCancel,
   onSubmit,
@@ -60,19 +72,20 @@ export function SheetFormPanel({
     () =>
       createSheetSchema({
         siblingNames: sheets.filter((sheet) => sheet.id !== editing?.id).map((sheet) => sheet.name),
-        hasExistingSheetFile: Boolean(editing?.sheetFile),
-        hasExistingRecording: Boolean(editing?.referenceRecording),
+        hasExistingSheetFile: Boolean(editing?.files.sheet),
+        hasExistingRecording: Boolean(editing?.files.audio),
       }),
     [sheets, editing]
   );
 
-  const initialInstrumentId = editing?.instrument.id ?? pickDefaultInstrument(song, sheets, presetInstrumentId);
+  const initialInstrumentId = editing?.instrument.id ?? pickDefaultInstrument(availableInstruments, sheets, presetInstrumentId);
 
   const {
     register,
     handleSubmit,
     control,
     setValue,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<SheetFormValues>({
     resolver: zodResolver(schema),
@@ -82,7 +95,7 @@ export function SheetFormPanel({
       instrumentId: initialInstrumentId,
       levelId: editing?.level.id ?? song.level.id,
       isMain: editing?.isMain ?? mainRuleFor(initialInstrumentId, sheets).mustBeMain,
-      visibility: editing?.visibility === "VISIBLE" ? "VISIBLE" : "HIDDEN",
+      visibility: editing?.visibility ?? "HIDDEN",
       sheetFile: null,
       referenceRecording: null,
       tutorialVideo: null,
@@ -96,7 +109,7 @@ export function SheetFormPanel({
   const recordingFile = useWatch({ control, name: "referenceRecording" });
   const videoFile = useWatch({ control, name: "tutorialVideo" });
 
-  const instrumentName = song.instruments.find((instrument) => instrument.id === instrumentId)?.name ?? "Nhạc cụ này";
+  const instrumentName = availableInstruments.find((instrument) => instrument.id === instrumentId)?.name ?? "Nhạc cụ này";
   const rule = mainRuleFor(instrumentId, sheets, editing);
   const kindHint = rule.isFirst
     ? `${instrumentName} chưa có bản nào nên bản này là bản chính.`
@@ -105,20 +118,22 @@ export function SheetFormPanel({
       : `${instrumentName} đã có bản chính.`;
 
   const instrumentOptions =
-    song.instruments.some((instrument) => instrument.id === editing?.instrument.id) || !editing
-      ? song.instruments
-      : [...song.instruments, editing.instrument];
+    !editing || availableInstruments.some((instrument) => instrument.id === editing.instrument.id)
+      ? availableInstruments
+      : [...availableInstruments, editing.instrument];
+
+  const levels = withCurrentOptions(levelOptions, editing ? [editing.level] : []);
 
   const submit = async (values: SheetFormValues) => {
     setSubmitError(null);
-    try {
-      await onSubmit(values, editing?.id);
-    } catch (error) {
-      setSubmitError(getErrorMessage(error, "Không lưu được bản nhạc."));
-    }
+    const failure = await onSubmit(values, editing);
+    if (!failure) return;
+    if (failure.field) setError(failure.field, { message: failure.message }, { shouldFocus: true });
+    else setSubmitError(failure.message);
   };
 
-  const recordingDuration = recordingFile ? undefined : editing?.referenceRecording?.durationSec;
+  const existingFiles = editing?.files;
+  const recordingDuration = recordingFile ? undefined : (existingFiles?.audio?.durationSec ?? undefined);
 
   return (
     <aside
@@ -159,6 +174,7 @@ export function SheetFormPanel({
               id="sheet-instrument"
               className={fieldClass(Boolean(errors.instrumentId), "h-[46px]")}
             >
+              <option value="">Chọn nhạc cụ</option>
               {instrumentOptions.map((instrument) => (
                 <option key={instrument.id} value={instrument.id}>
                   {instrument.name}
@@ -172,7 +188,7 @@ export function SheetFormPanel({
               id="sheet-level"
               className={fieldClass(Boolean(errors.levelId), "h-[46px]")}
             >
-              {levelOptions.map((option) => (
+              {levels.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
@@ -181,7 +197,11 @@ export function SheetFormPanel({
           </FormField>
         </div>
 
-        <FormField label="Loại bản" hint={`${kindHint} Mỗi bài, mỗi nhạc cụ chỉ có 1 bản chính.`}>
+        <FormField
+          label="Loại bản"
+          error={errors.isMain?.message}
+          hint={`${kindHint} Mỗi bài, mỗi nhạc cụ chỉ có 1 bản chính.`}
+        >
           <ChoiceCards<SheetKind>
             name="sheet-kind"
             label="Loại bản"
@@ -236,8 +256,8 @@ export function SheetFormPanel({
             accept={FILE_RULES.sheet.accept}
             icon={<FileText className="size-4" strokeWidth={1.8} />}
             emptyLabel="Chọn file PDF, PNG, JPG"
-            currentName={sheetFile?.name ?? editing?.sheetFile.name}
-            currentMeta={formatFileSize(sheetFile?.size ?? editing?.sheetFile.sizeBytes)}
+            currentName={sheetFile?.name ?? existingFiles?.sheet?.name}
+            currentMeta={formatFileSize(sheetFile?.size ?? existingFiles?.sheet?.sizeBytes)}
             hasError={Boolean(errors.sheetFile)}
             onSelect={(file) => setValue("sheetFile", file, { shouldValidate: true })}
           />
@@ -245,7 +265,7 @@ export function SheetFormPanel({
 
         <FormField
           label="Bản thu mẫu"
-          required={isMain && visibility === "VISIBLE"}
+          required={isMain && visibility === "PUBLIC"}
           hint="Bắt buộc với bản chính khi công khai, tùy chọn với bản theo độ khó · MP3, WAV, M4A"
           error={errors.referenceRecording?.message}
         >
@@ -254,7 +274,7 @@ export function SheetFormPanel({
             accept={FILE_RULES.recording.accept}
             icon={<AudioLines className="size-4" strokeWidth={1.8} />}
             emptyLabel="Chọn file MP3, WAV, M4A"
-            currentName={recordingFile?.name ?? editing?.referenceRecording?.name}
+            currentName={recordingFile?.name ?? existingFiles?.audio?.name}
             currentMeta={recordingDuration !== undefined ? formatDuration(recordingDuration) : undefined}
             hasError={Boolean(errors.referenceRecording)}
             onSelect={(file) => setValue("referenceRecording", file, { shouldValidate: true })}
@@ -267,7 +287,7 @@ export function SheetFormPanel({
             accept={FILE_RULES.video.accept}
             icon={<Video className="size-4" strokeWidth={1.8} />}
             emptyLabel="Chọn file MP4"
-            currentName={videoFile?.name ?? editing?.tutorialVideo?.name}
+            currentName={videoFile?.name ?? existingFiles?.video?.name}
             hasError={Boolean(errors.tutorialVideo)}
             onSelect={(file) => setValue("tutorialVideo", file, { shouldValidate: true })}
           />
@@ -286,13 +306,17 @@ export function SheetFormPanel({
           </span>
         </div>
 
-        <FormField label="Hiển thị">
+        <FormField
+          label="Hiển thị"
+          hint={editing?.canChangeVisibility === false ? LIBRARY_MESSAGES.hiddenByAdmin : undefined}
+          error={errors.visibility?.message}
+        >
           <ChoiceCards
             name="sheet-visibility"
             label="Hiển thị"
             value={visibility}
             options={EDITABLE_VISIBILITY_OPTIONS}
-            disabled={editing?.visibility === "HIDDEN_BY_ADMIN"}
+            disabled={editing?.canChangeVisibility === false}
             onChange={(next) => setValue("visibility", next, { shouldValidate: true })}
           />
         </FormField>

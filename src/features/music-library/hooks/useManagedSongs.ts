@@ -2,12 +2,12 @@ import { useCallback, useState } from "react";
 import { toast } from "@/shared/components/ui/toast";
 import { useAsyncData } from "@/shared/hooks/useAsyncData";
 import { getErrorMessage } from "@/shared/utils/getErrorMessage";
-import { musicLibraryApi } from "@/features/music-library/api/musicLibraryApi";
-import type {
-  EditableVisibility,
-  ManagedSong,
-  ManagedSongQuery,
-} from "@/features/music-library/types/musicLibraryTypes";
+import { lecturerApi } from "@/features/music-library/api/lecturerApi";
+import { MANAGE_PAGE_SIZE } from "@/features/music-library/constants/musicLibraryConstants";
+import type { LecturerPiece, LecturerPieceQuery } from "@/features/music-library/types/lecturerTypes";
+import type { EditableVisibility, ManagedSongQuery } from "@/features/music-library/types/musicLibraryTypes";
+
+const LOAD_ERROR = "Tải danh sách bài hát thất bại. Vui lòng thử lại.";
 
 export const INITIAL_MANAGED_QUERY: ManagedSongQuery = {
   keyword: "",
@@ -18,12 +18,25 @@ export const INITIAL_MANAGED_QUERY: ManagedSongQuery = {
   page: 1,
 };
 
+function toApiQuery(query: ManagedSongQuery): LecturerPieceQuery {
+  return {
+    q: query.keyword || undefined,
+    genreId: query.genreId || undefined,
+    instrumentId: query.instrumentId || undefined,
+    levelId: query.levelId || undefined,
+    visibility: query.visibility || "ALL",
+    page: query.page,
+    pageSize: MANAGE_PAGE_SIZE,
+  };
+}
+
 export function useManagedSongs() {
   const [query, setQuery] = useState<ManagedSongQuery>(INITIAL_MANAGED_QUERY);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const { data, error, isLoading, isFirstLoad, reload, mutate } = useAsyncData(
-    () => musicLibraryApi.listMySongs(query),
-    `my-songs:${JSON.stringify(query)}`
+    () => lecturerApi.listPieces(toApiQuery(query)).then(({ data: body }) => body.data),
+    `lecturer-pieces:${JSON.stringify(query)}`,
+    LOAD_ERROR
   );
 
   // Đổi bộ lọc thì về trang 1
@@ -32,15 +45,16 @@ export function useManagedSongs() {
   }, []);
 
   const changeVisibility = useCallback(
-    async (song: ManagedSong, visibility: EditableVisibility) => {
+    async (song: LecturerPiece, visibility: EditableVisibility) => {
       setUpdatingId(song.id);
       try {
-        const updated = await musicLibraryApi.setSongVisibility(song.id, visibility);
+        const { data: body } = await lecturerApi.setPieceVisibility(song.id, visibility);
+        const updated = body.data.piece;
         mutate((current) => ({
           ...current,
-          data: current.data.map((item) => (item.id === updated.id ? updated : item)),
+          items: current.items.map((item) => (item.id === updated.id ? updated : item)),
         }));
-        toast.success(visibility === "VISIBLE" ? "Đã công khai bài hát" : "Đã ẩn bài hát", song.title);
+        toast.success(body.message, song.title);
       } catch (changeError) {
         toast.error("Không đổi được trạng thái", getErrorMessage(changeError));
       } finally {

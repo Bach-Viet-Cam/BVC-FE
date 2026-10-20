@@ -41,8 +41,10 @@ export function ReferencePlayer({
       <button
         type="button"
         onClick={player.toggle}
+        disabled={!player.isAvailable}
+        title={player.isAvailable ? undefined : "Bản thu đang được xử lý"}
         aria-label={player.isPlaying ? "Tạm dừng bản thu mẫu" : "Phát bản thu mẫu"}
-        className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full bg-bvc-accent text-white hover:bg-bvc-accent/90"
+        className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full bg-bvc-accent text-white hover:bg-bvc-accent/90 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {player.isPlaying ? (
           <Pause className="size-[18px]" fill="currentColor" />
@@ -75,7 +77,7 @@ export function ReferencePlayer({
       </span>
       <span className="ml-auto shrink-0 font-bvc-mono text-[13px] text-bvc-muted">
         {player.position > 0 && `${formatDuration(player.position)} / `}
-        {formatDuration(recording.durationSec)}
+        {formatDuration(player.duration)}
       </span>
     </div>
   );

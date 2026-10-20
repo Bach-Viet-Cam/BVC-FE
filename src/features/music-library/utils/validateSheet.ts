@@ -35,7 +35,7 @@ export function createSheetSchema({ siblingNames, hasExistingSheetFile, hasExist
       instrumentId: z.string().min(1, "Chọn nhạc cụ"),
       levelId: z.string().min(1, "Chọn trình độ"),
       isMain: z.boolean(),
-      visibility: z.enum(["VISIBLE", "HIDDEN"]),
+      visibility: z.enum(["PUBLIC", "HIDDEN"]),
       sheetFile: optionalFile(FILE_RULES.sheet),
       referenceRecording: optionalFile(FILE_RULES.recording),
       tutorialVideo: optionalFile(FILE_RULES.video),
@@ -44,7 +44,7 @@ export function createSheetSchema({ siblingNames, hasExistingSheetFile, hasExist
       if (!values.sheetFile && !hasExistingSheetFile) {
         context.addIssue({ code: z.ZodIssueCode.custom, path: ["sheetFile"], message: "Chọn file bản nhạc" });
       }
-      if (values.isMain && values.visibility === "VISIBLE" && !values.referenceRecording && !hasExistingRecording) {
+      if (values.isMain && values.visibility === "PUBLIC" && !values.referenceRecording && !hasExistingRecording) {
         context.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["referenceRecording"],

@@ -1,18 +1,18 @@
 import { Plus } from "lucide-react";
 import { ActionButton } from "@/shared/components/bvc/ActionButton";
 import { ManagedSheetItem } from "@/features/music-library/components/ManagedSheetItem";
-import type { SheetAsset } from "@/features/music-library/hooks/useSongSheets";
-import type { CategoryRef, SheetVersion } from "@/features/music-library/types/musicLibraryTypes";
+import type { LecturerSheetMusic, SheetFileSlot } from "@/features/music-library/types/lecturerTypes";
+import type { CategoryRef } from "@/features/music-library/types/musicLibraryTypes";
 
 interface InstrumentSheetGroupProps {
   instrument: CategoryRef;
-  sheets: SheetVersion[];
+  sheets: LecturerSheetMusic[];
   selectedSheetId?: string;
   busySheetId: string | null;
   onAdd: (instrumentId: string) => void;
-  onEdit: (sheet: SheetVersion) => void;
-  onReplaceAsset: (sheet: SheetVersion, asset: SheetAsset, file: File) => void;
-  onRequestVisibility: (sheet: SheetVersion, nextVisible: boolean) => void;
+  onEdit: (sheet: LecturerSheetMusic) => void;
+  onReplaceFile: (sheet: LecturerSheetMusic, slot: SheetFileSlot, file: File) => void;
+  onRequestVisibility: (sheet: LecturerSheetMusic, nextVisible: boolean) => void;
 }
 
 export function InstrumentSheetGroup({

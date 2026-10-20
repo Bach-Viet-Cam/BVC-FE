@@ -5,12 +5,13 @@ import { formatDate } from "@/shared/utils/formatDate";
 import { CoverArt } from "@/features/music-library/components/CoverArt";
 import { VisibilitySwitch } from "@/features/music-library/components/VisibilitySwitch";
 import { LIBRARY_MESSAGES } from "@/features/music-library/constants/musicLibraryConstants";
-import type { ManagedSong } from "@/features/music-library/types/musicLibraryTypes";
+import type { LecturerPiece } from "@/features/music-library/types/lecturerTypes";
+import { coverToneOf } from "@/features/music-library/utils/coverTone";
 
 interface ManagedSongRowProps {
-  song: ManagedSong;
+  song: LecturerPiece;
   isUpdating: boolean;
-  onRequestVisibility: (song: ManagedSong, nextVisible: boolean) => void;
+  onRequestVisibility: (song: LecturerPiece, nextVisible: boolean) => void;
 }
 
 export const MANAGED_GRID_COLUMNS =
@@ -24,7 +25,7 @@ export function ManagedSongRow({ song, isUpdating, onRequestVisibility }: Manage
   return (
     <li className={`flex flex-col gap-3 border-t border-bvc-border px-3.5 py-4 xl:py-2.5 ${MANAGED_GRID_COLUMNS}`}>
       <div className="flex items-start gap-3 xl:contents">
-        <CoverArt title={song.title} tone={song.coverTone} url={song.coverUrl} size="thumb" />
+        <CoverArt title={song.title} tone={coverToneOf(song.id)} url={song.coverUrl ?? undefined} size="thumb" />
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
           <Link to={editHref} className="truncate text-[15px] font-bold text-bvc-ink hover:text-bvc-accent-text">
             {song.title}
@@ -44,13 +45,13 @@ export function ManagedSongRow({ song, isUpdating, onRequestVisibility }: Manage
           <Chip>{song.level.name}</Chip>
         </span>
         <span className="font-bvc-mono text-[13px] text-bvc-ink">
-          {song.sheetCount}
+          {song.sheetMusicCount}
           <span className="font-bvc-sans text-bvc-muted xl:hidden"> bản</span>
         </span>
         <VisibilitySwitch
-          visibility={song.visibility}
+          visibility={song.effectiveVisibility}
           itemName={song.title}
-          disabled={isUpdating}
+          disabled={isUpdating || !song.canChangeVisibility}
           onRequestChange={(nextVisible) => onRequestVisibility(song, nextVisible)}
           className="order-first xl:order-none"
         />
@@ -65,8 +66,11 @@ export function ManagedSongRow({ song, isUpdating, onRequestVisibility }: Manage
         </span>
       </div>
 
-      {song.visibility === "HIDDEN_BY_ADMIN" && (
-        <p className="text-xs text-bvc-accent-text xl:hidden">{LIBRARY_MESSAGES.hiddenByAdmin}</p>
+      {song.moderation === "ADMIN_HIDDEN" && (
+        <p className="text-xs text-bvc-accent-text xl:col-span-full">
+          {LIBRARY_MESSAGES.hiddenByAdmin}
+          {song.moderationReason && ` Lý do: ${song.moderationReason}`}
+        </p>
       )}
     </li>
   );

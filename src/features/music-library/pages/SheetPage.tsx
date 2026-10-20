@@ -120,7 +120,6 @@ export function SheetPage() {
           <SheetCanvas
             file={sheet.sheetFile}
             heading={`${song.title} — ${sheet.instrument.name.toLowerCase()}`}
-            meta={sheet.level.name}
             page={currentPage}
             zoom={zoom}
           />
@@ -180,12 +179,18 @@ export function SheetPage() {
           )}
         </div>
 
-        <Link
-          to={`/practice/${song.id}`}
-          className={actionButtonClass("primary", "lg", "mt-auto w-full hover:text-white")}
-        >
-          Luyện bản này
-        </Link>
+        {viewer.practice.isAvailable ? (
+          <Link
+            to={`/practice/${song.id}?sheetId=${sheet.id}`}
+            className={actionButtonClass("primary", "lg", "mt-auto w-full hover:text-white")}
+          >
+            Luyện bản này
+          </Link>
+        ) : (
+          <p className="mt-auto rounded-2xl bg-bvc-surface px-4 py-3 text-center text-[13px] text-bvc-muted">
+            {viewer.practice.reason}
+          </p>
+        )}
       </aside>
 
       <GuestSaveDialog open={save.isGuestPromptOpen} onOpenChange={save.setGuestPromptOpen} />

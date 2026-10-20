@@ -1,36 +1,39 @@
+import { useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TriangleAlert } from "lucide-react";
 import { FormField } from "@/shared/components/bvc/FormField";
+import { Chip } from "@/shared/components/bvc/Chip";
 import { ChoiceCards } from "@/shared/components/bvc/ChoiceCards";
 import { fieldClass } from "@/shared/components/bvc/fieldStyles";
 import type { SelectOption } from "@/shared/types/commonTypes";
 import { CoverPicker } from "@/features/music-library/components/CoverPicker";
-import { InstrumentPicker } from "@/features/music-library/components/InstrumentPicker";
 import {
   EDITABLE_VISIBILITY_OPTIONS,
   LIBRARY_MESSAGES,
 } from "@/features/music-library/constants/musicLibraryConstants";
-import type { ManagedSong } from "@/features/music-library/types/musicLibraryTypes";
+import type { LecturerPiece } from "@/features/music-library/types/lecturerTypes";
+import { withCurrentOptions } from "@/features/music-library/utils/categoryOptions";
+import { coverToneOf } from "@/features/music-library/utils/coverTone";
+import type { FormFailure } from "@/features/music-library/utils/formFailure";
 import { songSchema, type SongFormValues } from "@/features/music-library/utils/validateSong";
 
 interface SongFormProps {
   formId: string;
-  song?: ManagedSong;
-  options: { genres: SelectOption[]; instruments: SelectOption[]; levels: SelectOption[] };
-  onSubmit: (values: SongFormValues) => void;
+  song?: LecturerPiece;
+  options: { genres: SelectOption[]; levels: SelectOption[] };
+  onSubmit: (values: SongFormValues) => Promise<FormFailure<keyof SongFormValues> | null>;
 }
 
-function defaultValuesOf(song?: ManagedSong): SongFormValues {
+function defaultValuesOf(song?: LecturerPiece): SongFormValues {
   return {
     title: song?.title ?? "",
     composer: song?.composer ?? "",
     description: song?.description ?? "",
     genreId: song?.genre.id ?? "",
-    instrumentIds: song?.instruments.map((instrument) => instrument.id) ?? [],
     levelId: song?.level.id ?? "",
     // Bài mới mặc định ẩn
-    visibility: song?.visibility === "VISIBLE" ? "VISIBLE" : "HIDDEN",
+    visibility: song?.visibility ?? "HIDDEN",
     coverFile: null,
     removeCover: false,
   };
@@ -42,32 +45,44 @@ export function SongForm({ formId, song, options, onSubmit }: SongFormProps) {
     handleSubmit,
     control,
     setValue,
+    setError,
     formState: { errors },
   } = useForm<SongFormValues>({
     resolver: zodResolver(songSchema),
     defaultValues: defaultValuesOf(song),
   });
+  const selectOptions = useMemo(
+    () => ({
+      genres: withCurrentOptions(options.genres, song ? [song.genre] : []),
+      levels: withCurrentOptions(options.levels, song ? [song.level] : []),
+    }),
+    [options, song]
+  );
+
+  const submit = async (values: SongFormValues) => {
+    const failure = await onSubmit(values);
+    if (failure?.field) setError(failure.field, { message: failure.message }, { shouldFocus: true });
+  };
 
   const title = useWatch({ control, name: "title" });
   const visibility = useWatch({ control, name: "visibility" });
-  const instrumentIds = useWatch({ control, name: "instrumentIds" });
   const coverFile = useWatch({ control, name: "coverFile" });
   const removeCover = useWatch({ control, name: "removeCover" });
   const descriptionLength = useWatch({ control, name: "description" }).length;
-  const lockedByAdmin = song?.visibility === "HIDDEN_BY_ADMIN";
-  const showNoSheetWarning = visibility === "VISIBLE" && !lockedByAdmin && (song?.visibleSheetCount ?? 0) === 0;
+  const lockedByAdmin = song?.canChangeVisibility === false;
+  const showNoSheetWarning = visibility === "PUBLIC" && !lockedByAdmin && (song?.publicSheetMusicCount ?? 0) === 0;
 
   return (
     <form
       id={formId}
       noValidate
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleSubmit(submit)}
       className="grid gap-8 px-[18px] py-6 md:px-8 md:py-7 lg:grid-cols-[240px_minmax(0,1fr)_minmax(0,1fr)] lg:items-start lg:gap-10 xl:grid-cols-[280px_minmax(0,1fr)_minmax(0,1fr)]"
     >
       <CoverPicker
         title={title}
-        tone={song?.coverTone ?? "ink"}
-        currentUrl={song?.coverUrl}
+        tone={song ? coverToneOf(song.id) : "ink"}
+        currentUrl={song?.coverUrl ?? undefined}
         file={coverFile}
         isRemoved={removeCover}
         error={errors.coverFile?.message}
@@ -132,25 +147,19 @@ export function SongForm({ formId, song, options, onSubmit }: SongFormProps) {
               className={fieldClass(Boolean(errors.genreId), "h-[46px]")}
             >
               <option value="">Chọn thể loại</option>
-              {options.genres.map((option) => (
+              {selectOptions.genres.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
               ))}
             </select>
           </FormField>
-          <FormField
-            label="Nhạc cụ"
-            required
-            hint="Chọn nhiều, tối thiểu 1, từ danh mục nhạc cụ đang bật"
-            error={errors.instrumentIds?.message}
-          >
-            <InstrumentPicker
-              options={options.instruments}
-              value={instrumentIds}
-              hasError={Boolean(errors.instrumentIds)}
-              onChange={(next) => setValue("instrumentIds", next, { shouldValidate: true, shouldDirty: true })}
-            />
+          <FormField label="Nhạc cụ" hint="Tự lấy từ nhạc cụ của các bản nhạc trong bài, không chọn ở đây">
+            <p className="flex min-h-[46px] flex-wrap items-center gap-1.5 rounded-[13px] bg-bvc-surface px-[13px] py-2 text-[14px] text-bvc-muted">
+              {song?.instruments.length
+                ? song.instruments.map((instrument) => <Chip key={instrument.id}>{instrument.name}</Chip>)
+                : "Chưa có bản nhạc nào"}
+            </p>
           </FormField>
           <FormField
             label="Trình độ"
@@ -165,7 +174,7 @@ export function SongForm({ formId, song, options, onSubmit }: SongFormProps) {
               className={fieldClass(Boolean(errors.levelId), "h-[46px]")}
             >
               <option value="">Chọn trình độ</option>
-              {options.levels.map((option) => (
+              {selectOptions.levels.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
@@ -178,9 +187,10 @@ export function SongForm({ formId, song, options, onSubmit }: SongFormProps) {
           <h2 className="text-base font-extrabold text-bvc-ink">Trạng thái</h2>
           <FormField
             label="Hiển thị"
+            error={errors.visibility?.message}
             hint={
               lockedByAdmin
-                ? LIBRARY_MESSAGES.hiddenByAdmin
+                ? `${LIBRARY_MESSAGES.hiddenByAdmin}${song?.moderationReason ? ` Lý do: ${song.moderationReason}` : ""}`
                 : "Bài mới mặc định ở trạng thái ẩn. Chọn công khai khi chưa có bản nhạc nào công khai sẽ hiện cảnh báo."
             }
           >

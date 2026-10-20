@@ -1,6 +1,5 @@
 import { AudioAnalysisTestPage } from "@/features/practice/pages/AudioAnalysisTestPage";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { DevNav } from "@/shared/components/DevNav";
 
 import { LoginPage } from "@/features/auth/pages/LoginPage";
 import { NotFoundPage } from "@/shared/pages/NotFoundPage";
@@ -206,7 +205,6 @@ export function AppRouter() {
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
-      <DevNav />
     </BrowserRouter>
   );
 }

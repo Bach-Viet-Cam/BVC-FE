@@ -1,9 +1,15 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* BVC brand fonts */
-  --font-bvc-sans: "Hanken Grotesk", "Manrope", ui-rounded, system-ui, sans-serif;
-  --font-bvc-mono: "IBM Plex Mono", ui-monospace, monospace;
+  /* BVC brand fonts: tiêu đề lớn dùng Hanken Grotesk, mọi chữ khác (kể cả số, tên file) dùng Nunito */
+  --font-bvc-display: "Hanken Grotesk", "Nunito", "Inter", system-ui, sans-serif;
+  --font-bvc-sans: "Nunito", "Inter", ui-rounded, system-ui, sans-serif;
+  /* Giữ tên token cũ cho số liệu / tên file nhưng không dùng font monospace nữa */
+  --font-bvc-mono: "Nunito", "Inter", ui-rounded, system-ui, sans-serif;
+  --font-mono: "Nunito", "Inter", ui-rounded, system-ui, sans-serif;
+  /* Font mặc định của Tailwind (thẻ html, code, pre, kbd...) cũng về Nunito */
+  --default-font-family: "Nunito", "Inter", ui-rounded, system-ui, sans-serif;
+  --default-mono-font-family: "Nunito", "Inter", ui-rounded, system-ui, sans-serif;
 
   /* BVC brand colors */
   --color-bvc-accent:        #2F7A62;
@@ -28,7 +34,7 @@
   --radius-bvc-lg: 17px;
   --radius-bvc-xl: 20px;
 
-  --font-sans: "Hanken Grotesk", "Manrope", ui-rounded, system-ui, sans-serif;
+  --font-sans: "Nunito", "Inter", ui-rounded, system-ui, sans-serif;
 
   --radius: 0.5rem;
   --radius-sm: 0.25rem;
@@ -179,6 +185,17 @@
   h6 {
     font-family: var(--font-sans);
     color: var(--on-surface);
+  }
+
+  h1,
+  h2 {
+    font-family: var(--font-bvc-display);
+  }
+
+  /* Trước đây số liệu dùng font monospace; Nunito dùng chữ số đều độ rộng để cột số vẫn thẳng */
+  .font-bvc-mono,
+  .font-mono {
+    font-variant-numeric: tabular-nums;
   }
 
   h1 {

@@ -16,7 +16,7 @@ function redirectTarget(state: unknown) {
   ) {
     return state.from;
   }
-  return "/dashboard";
+  return null;
 }
 
 export function useLogin() {
@@ -33,7 +33,7 @@ export function useLogin() {
       const { data } = await authApi.googleAuth({ credential });
       localStorage.setItem("accessToken", data.data.accessToken);
       setUser(data.data.user);
-      navigate(getRoleHome(data.data.user.role), { replace: true });
+      navigate(redirectTarget(location.state) ?? getRoleHome(data.data.user.role), { replace: true });
     } catch (err: unknown) {
       setError(getApiErrorMessage(err, "Đăng nhập bằng Google thất bại. Vui lòng thử lại."));
     } finally {

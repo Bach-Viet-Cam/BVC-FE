@@ -19,7 +19,7 @@ export function VisibilitySwitch({
   disabled,
   className,
 }: VisibilitySwitchProps) {
-  const lockedByAdmin = visibility === "HIDDEN_BY_ADMIN";
+  const lockedByAdmin = visibility === "ADMIN_HIDDEN";
 
   return (
     <span
@@ -27,7 +27,7 @@ export function VisibilitySwitch({
       title={lockedByAdmin ? LIBRARY_MESSAGES.hiddenByAdmin : undefined}
     >
       <Switch
-        checked={visibility === "VISIBLE"}
+        checked={visibility === "PUBLIC"}
         disabled={disabled || lockedByAdmin}
         onCheckedChange={(checked) => onRequestChange(checked)}
         aria-label={`Trạng thái hiển thị của ${itemName}`}

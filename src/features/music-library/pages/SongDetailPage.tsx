@@ -67,7 +67,8 @@ export function SongDetailPage() {
   }
 
   const groups = groupSheetsByInstrument(song.sheets).filter((group) => group.sheets.length > 0);
-  const activeGroup = groups.find((group) => group.instrument.id === selectedInstrumentId) ?? groups[0];
+  const preferredId = selectedInstrumentId || song.defaultInstrumentId;
+  const activeGroup = groups.find((group) => group.instrument.id === preferredId) ?? groups[0];
   const featured = activeGroup?.sheets[0];
   const others = activeGroup?.sheets.slice(1) ?? [];
 
@@ -137,16 +138,24 @@ export function SongDetailPage() {
                   }
                 />
               )}
-              <Link
-                to={`/ensemble/new?pieceId=${song.id}`}
-                className={actionButtonClass("primary", "lg", "bg-bvc-accent hover:bg-bvc-accent/90 hover:text-white")}
-              >
-                <Users className="size-[18px]" strokeWidth={1.8} aria-hidden />
-                Luyện hòa tấu
-              </Link>
-              <span className="hidden max-w-[260px] text-[13px] leading-snug text-bvc-muted md:inline">
-                Chơi cùng các bản mẫu của giảng viên, không cần ghép cặp.
-              </span>
+              {song.canPracticeEnsemble && (
+                <>
+                  <Link
+                    to={`/ensemble/new?pieceId=${song.id}`}
+                    className={actionButtonClass(
+                      "primary",
+                      "lg",
+                      "bg-bvc-accent hover:bg-bvc-accent/90 hover:text-white"
+                    )}
+                  >
+                    <Users className="size-[18px]" strokeWidth={1.8} aria-hidden />
+                    Luyện hòa tấu
+                  </Link>
+                  <span className="hidden max-w-[260px] text-[13px] leading-snug text-bvc-muted md:inline">
+                    Chơi cùng các bản mẫu của giảng viên, không cần ghép cặp.
+                  </span>
+                </>
+              )}
             </div>
           </div>
         </div>

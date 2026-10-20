@@ -15,7 +15,6 @@ interface SongCardProps {
 
 export function SongCard({ song, levelFilterHref, showSave, isSaving, onToggleSave }: SongCardProps) {
   const detailHref = `/library/${song.id}`;
-  const instrumentNames = song.instruments.map((instrument) => instrument.name).join(", ");
 
   return (
     <article className="flex min-w-0 flex-col gap-2.5">
@@ -42,9 +41,9 @@ export function SongCard({ song, levelFilterHref, showSave, isSaving, onToggleSa
         <Chip to={levelFilterHref} title={`Lọc theo ${song.level.name}`}>
           {song.level.name}
         </Chip>
-        <span className="inline-flex items-center gap-1.5 text-[13px] text-bvc-muted" title={instrumentNames}>
+        <span className="inline-flex items-center gap-1.5 text-[13px] text-bvc-muted">
           <Guitar className="size-3.5" strokeWidth={1.8} aria-hidden />
-          {song.instruments.length} nhạc cụ
+          {song.instrumentCount} nhạc cụ
         </span>
       </div>
     </article>

@@ -1,15 +1,15 @@
 import { Clock } from "lucide-react";
 import { Chip } from "@/shared/components/bvc/Chip";
-import type { MediaFile, SheetVersion } from "@/features/music-library/types/musicLibraryTypes";
+import type { SheetVersion } from "@/features/music-library/types/musicLibraryTypes";
 import { formatDuration } from "@/features/music-library/utils/mediaUtils";
 
 interface SheetBadgesProps {
   sheet: Pick<SheetVersion, "isMain" | "level">;
-  recording?: MediaFile;
+  durationSec?: number | null;
 }
 
 // Thời lượng của bản lấy từ bản thu mẫu
-export function SheetBadges({ sheet, recording }: SheetBadgesProps) {
+export function SheetBadges({ sheet, durationSec }: SheetBadgesProps) {
   return (
     <div className="flex flex-wrap items-center gap-2">
       {sheet.isMain && <Chip variant="ink">Bản chính · GV</Chip>}
@@ -19,7 +19,7 @@ export function SheetBadges({ sheet, recording }: SheetBadgesProps) {
         title="Thời lượng lấy từ bản thu mẫu"
       >
         <Clock className="size-3.5" strokeWidth={1.8} aria-hidden />
-        {formatDuration(recording?.durationSec)}
+        {formatDuration(durationSec)}
       </span>
     </div>
   );
