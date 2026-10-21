@@ -48,7 +48,7 @@ export function PlaybackBar({
   const VolumeIcon = silent ? VolumeX : volume < 0.5 ? Volume1 : Volume2;
 
   return (
-    <div className="flex min-w-0 flex-1 items-center gap-2">
+    <div className="flex min-w-0 flex-1 basis-80 items-center gap-2">
       <button
         type="button"
         aria-label={playing ? "Tạm dừng" : "Phát bản thu"}

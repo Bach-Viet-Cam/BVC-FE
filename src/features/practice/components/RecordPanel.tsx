@@ -71,8 +71,8 @@ export function RecordPanel({
 }: RecordPanelProps) {
   if (rec === "preview") {
     return (
-      <div className="mt-auto flex flex-col gap-3 md:mx-auto md:my-auto md:w-full md:max-w-[760px]">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center">
+      <div className="mt-auto flex flex-col gap-3 md:mx-auto md:my-auto md:w-full md:min-w-0 md:max-w-[760px] xl:max-w-[920px]">
+        <div className="flex flex-wrap items-center gap-3">
           <PlaybackBar
             peaks={previewPeaks}
             playing={playing}
@@ -87,7 +87,7 @@ export function RecordPanel({
             onToggleMute={onToggleMute}
             onRateChange={onRateChange}
           />
-          <div className="flex shrink-0 gap-2.5">
+          <div className="ml-auto flex shrink-0 gap-2.5">
             <button
               type="button"
               onClick={onRerecord}
@@ -137,7 +137,7 @@ export function RecordPanel({
   }
 
   return (
-    <div className="mt-auto flex flex-col gap-3 md:mx-auto md:my-auto md:w-full md:max-w-[760px]">
+    <div className="mt-auto flex flex-col gap-3 md:mx-auto md:my-auto md:w-full md:min-w-0 md:max-w-[760px] xl:max-w-[920px]">
       {micDenied && <NoticeBanner message="Cần cho phép truy cập micro để dùng tính năng này." />}
 
       <div className="flex items-center gap-3.5">
