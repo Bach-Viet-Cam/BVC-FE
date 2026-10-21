@@ -6,10 +6,7 @@ import {
   type UserListParams,
   type UserUpdateRequest,
 } from "@/features/platform/types/userTypes";
-import {
-  type StudentImportRequest,
-  type StudentImportResult,
-} from "@/features/platform/types/userImportTypes";
+import { type StudentImportRequest, type StudentImportResult } from "@/features/platform/types/userImportTypes";
 
 export const userApi = {
   list: (params: UserListParams) => axiosClient.get<ApiResponse<PaginatedData<UserItem>>>("/users", { params }),
@@ -17,5 +14,6 @@ export const userApi = {
   update: (id: string, body: UserUpdateRequest) => axiosClient.patch<ApiResponse<UserItem>>(`/users/${id}`, body),
   lock: (id: string) => axiosClient.post<ApiResponse<UserItem>>(`/users/${id}/lock`),
   unlock: (id: string) => axiosClient.post<ApiResponse<UserItem>>(`/users/${id}/unlock`),
-  importStudents: (body: StudentImportRequest) => axiosClient.post<ApiResponse<StudentImportResult>>("/users/import", body),
+  importStudents: (body: StudentImportRequest) =>
+    axiosClient.post<ApiResponse<StudentImportResult>>("/users/import", body),
 };

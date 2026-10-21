@@ -414,10 +414,7 @@ export function UserManagePage() {
                       const initials = getInitials(user.username);
 
                       return (
-                        <tr
-                          key={user.id}
-                          className="h-[60px] transition-colors hover:bg-bvc-surface/40 group"
-                        >
+                        <tr key={user.id} className="h-[60px] transition-colors hover:bg-bvc-surface/40 group">
                           <td className="px-5 py-3">
                             <div className="flex items-center gap-3">
                               <div className="flex size-9 shrink-0 items-center justify-center rounded-full border border-bvc-border bg-bvc-surface text-[12px] font-bold text-bvc-ink">
@@ -443,7 +440,11 @@ export function UserManagePage() {
                                 className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-bvc-muted hover:text-bvc-ink rounded cursor-pointer shrink-0"
                                 title="Sao chép email"
                               >
-                                {copiedId === user.id ? <Check size={13} className="text-bvc-ok" /> : <Copy size={13} />}
+                                {copiedId === user.id ? (
+                                  <Check size={13} className="text-bvc-ok" />
+                                ) : (
+                                  <Copy size={13} />
+                                )}
                               </button>
                             </div>
                           </td>
@@ -488,7 +489,10 @@ export function UserManagePage() {
                                 )}
                               />
                               <span
-                                className={cn("text-[13px] font-medium", isLocked ? "text-bvc-accent-text" : "text-bvc-ink")}
+                                className={cn(
+                                  "text-[13px] font-medium",
+                                  isLocked ? "text-bvc-accent-text" : "text-bvc-ink"
+                                )}
                               >
                                 {STATUS_LABELS[user.status]}
                               </span>

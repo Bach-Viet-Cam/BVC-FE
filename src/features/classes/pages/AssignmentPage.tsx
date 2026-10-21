@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { Clock } from "lucide-react";
 import { MobileHeader, TagBadge } from "@/shared/components/bvc";
+import { MySubmissionList } from "@/features/classes/components/MySubmissionList";
 import { useAssignmentDetail } from "@/features/classes/hooks/useAssignmentDetail";
 import {
   ASSIGNMENT_STATUS_META,
@@ -98,6 +99,7 @@ export function AssignmentPage() {
             </div>
           </div>
         )}
+        <MySubmissionList submissions={assignment.submissions} />
         <div className="h-4" />
       </div>
 

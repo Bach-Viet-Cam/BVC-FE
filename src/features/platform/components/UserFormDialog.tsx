@@ -144,9 +144,7 @@ function UserForm({ user, onSubmit, onClose }: UserFormProps) {
             className="rounded-[11px] border-bvc-border-strong text-[14px]"
             {...register("username")}
           />
-          {errors.username && (
-            <p className="text-[12px] text-bvc-accent-text font-medium">{errors.username.message}</p>
-          )}
+          {errors.username && <p className="text-[12px] text-bvc-accent-text font-medium">{errors.username.message}</p>}
         </div>
 
         {selectedRole === String(ROLES.STUDENT) && (

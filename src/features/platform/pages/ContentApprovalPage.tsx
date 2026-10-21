@@ -63,9 +63,7 @@ function TypeBadge({ type }: { type: string }) {
   }
   if (type === "Bản thu") {
     return (
-      <span className="rounded-[9px] bg-bvc-surface px-2 py-0.5 text-[12px] font-semibold text-bvc-muted">
-        {type}
-      </span>
+      <span className="rounded-[9px] bg-bvc-surface px-2 py-0.5 text-[12px] font-semibold text-bvc-muted">{type}</span>
     );
   }
   return (
@@ -120,9 +118,7 @@ export function ContentApprovalPage() {
                 />
                 Từ chối
               </span>
-              <span className="font-mono text-[29px] font-semibold leading-none text-bvc-ink">
-                5
-              </span>
+              <span className="font-mono text-[29px] font-semibold leading-none text-bvc-ink">5</span>
             </div>
           </div>
 
@@ -151,9 +147,7 @@ export function ContentApprovalPage() {
             </div>
 
             <div className="flex w-[380px] shrink-0 flex-col gap-[14px] overflow-y-auto rounded-[20px] border border-bvc-border p-[20px]">
-              <div className="text-[16px] font-extrabold tracking-[-0.025em] text-bvc-ink">
-                {selected.title}
-              </div>
+              <div className="text-[16px] font-extrabold tracking-[-0.025em] text-bvc-ink">{selected.title}</div>
 
               <div>
                 <span className="text-[12px] font-bold uppercase tracking-[0.1em] text-bvc-muted">
@@ -165,9 +159,7 @@ export function ContentApprovalPage() {
               </div>
 
               <div>
-                <span className="text-[12px] font-bold uppercase tracking-[0.1em] text-bvc-muted">
-                  Thông tin
-                </span>
+                <span className="text-[12px] font-bold uppercase tracking-[0.1em] text-bvc-muted">Thông tin</span>
                 <div className="mt-[8px] flex flex-col">
                   <div className="flex h-[36px] items-center justify-between border-b border-bvc-line text-[13px]">
                     <span className="text-bvc-muted">Loại</span>

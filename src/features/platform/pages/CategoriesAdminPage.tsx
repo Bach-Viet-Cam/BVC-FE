@@ -41,14 +41,8 @@ export function CategoriesAdminPage() {
   const [instrumentTarget, setInstrumentTarget] = useState<InstrumentItem | null>(null);
 
   const totalRoots = items.length;
-  const totalChildren = useMemo(
-    () => items.reduce((acc, cat) => acc + cat.children.length, 0),
-    [items]
-  );
-  const totalPieces = useMemo(
-    () => items.reduce((acc, cat) => acc + cat.pieceCount, 0),
-    [items]
-  );
+  const totalChildren = useMemo(() => items.reduce((acc, cat) => acc + cat.children.length, 0), [items]);
+  const totalPieces = useMemo(() => items.reduce((acc, cat) => acc + cat.pieceCount, 0), [items]);
   const activeInstrumentsCount = useMemo(
     () => instruments.items.filter((item) => item.isActive).length,
     [instruments.items]
@@ -182,9 +176,7 @@ export function CategoriesAdminPage() {
             </div>
           </div>
 
-          <p className="text-[12px] text-bvc-muted">
-            Cấu trúc phân loại 2 cấp phục vụ thư viện, tìm kiếm và bài tập
-          </p>
+          <p className="text-[12px] text-bvc-muted">Cấu trúc phân loại 2 cấp phục vụ thư viện, tìm kiếm và bài tập</p>
         </div>
 
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
@@ -195,9 +187,7 @@ export function CategoriesAdminPage() {
                   <FolderTree size={16} />
                 </div>
                 <div>
-                  <h2 className="text-[15px] font-extrabold tracking-[-0.02em] text-bvc-ink">
-                    Cây danh mục nội dung
-                  </h2>
+                  <h2 className="text-[15px] font-extrabold tracking-[-0.02em] text-bvc-ink">Cây danh mục nội dung</h2>
                 </div>
               </div>
 
@@ -281,9 +271,7 @@ export function CategoriesAdminPage() {
 
                               <Folder size={17} className="shrink-0 text-bvc-ink" />
 
-                              <span className="truncate text-[14px] font-bold text-bvc-ink">
-                                {category.name}
-                              </span>
+                              <span className="truncate text-[14px] font-bold text-bvc-ink">{category.name}</span>
 
                               <span className="font-mono text-[11.5px] font-medium text-bvc-muted bg-bvc-surface border border-bvc-border px-2 py-0.5 rounded-[6px]">
                                 {category.pieceCount} bài
@@ -397,9 +385,7 @@ export function CategoriesAdminPage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="text-[15px] font-extrabold tracking-[-0.02em] text-bvc-ink">
-                      Nhạc cụ
-                    </h2>
+                    <h2 className="text-[15px] font-extrabold tracking-[-0.02em] text-bvc-ink">Nhạc cụ</h2>
                     <span className="rounded-[6px] border border-bvc-border bg-bvc-surface px-1.5 py-0.5 text-[10.5px] font-bold text-bvc-muted uppercase">
                       Chỉ Admin
                     </span>
@@ -464,15 +450,11 @@ export function CategoriesAdminPage() {
                             <span className="font-mono text-[12px] font-semibold text-bvc-ink bg-bvc-surface border border-bvc-border px-2 py-0.5 rounded-[6px]">
                               {instrument.code}
                             </span>
-                            <span className="truncate text-[13.5px] font-bold text-bvc-ink">
-                              {instrument.name}
-                            </span>
+                            <span className="truncate text-[13.5px] font-bold text-bvc-ink">{instrument.name}</span>
                           </div>
 
                           {instrument.description && (
-                            <p className="truncate text-[12px] text-bvc-muted pl-0.5">
-                              {instrument.description}
-                            </p>
+                            <p className="truncate text-[12px] text-bvc-muted pl-0.5">{instrument.description}</p>
                           )}
                         </div>
 

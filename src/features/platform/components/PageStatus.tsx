@@ -8,9 +8,7 @@ interface PageStatusProps {
 export function PageStatus({ isLoading, error, onRetry, children }: PageStatusProps) {
   if (isLoading) {
     return (
-      <div className="flex flex-1 items-center justify-center text-[14px] text-bvc-muted">
-        Đang tải dữ liệu...
-      </div>
+      <div className="flex flex-1 items-center justify-center text-[14px] text-bvc-muted">Đang tải dữ liệu...</div>
     );
   }
   if (error) {

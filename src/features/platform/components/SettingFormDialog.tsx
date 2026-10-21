@@ -38,9 +38,7 @@ function SettingForm({ config, onSubmit, onClose }: SettingFormProps) {
     <form onSubmit={handleSubmit(submit)} className="flex flex-col gap-4.5 pt-1">
       <div className="flex flex-col gap-2 rounded-[14px] border border-bvc-border bg-bvc-surface/50 p-3.5">
         <div className="flex items-center justify-between gap-2">
-          <span className="font-mono text-[12px] font-semibold text-bvc-ink">
-            {config.key}
-          </span>
+          <span className="font-mono text-[12px] font-semibold text-bvc-ink">{config.key}</span>
           <span className="rounded-[7px] border border-bvc-border bg-white px-2 py-0.5 text-[11px] font-bold text-bvc-muted">
             {CONFIG_GROUP_LABELS[config.group]}
           </span>
@@ -76,7 +74,8 @@ function SettingForm({ config, onSubmit, onClose }: SettingFormProps) {
         )}
         {config.valueType === "JSON" && (
           <p className="text-[12px] text-bvc-muted">
-            Nhập các giá trị cách nhau bằng dấu phẩy, ví dụ: <code className="font-mono text-bvc-ink">mp3, wav, m4a</code>.
+            Nhập các giá trị cách nhau bằng dấu phẩy, ví dụ:{" "}
+            <code className="font-mono text-bvc-ink">mp3, wav, m4a</code>.
           </p>
         )}
         {errors.value && <p className="text-[12px] font-medium text-bvc-error">{errors.value.message}</p>}
