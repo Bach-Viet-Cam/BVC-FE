@@ -12,23 +12,27 @@
   --default-mono-font-family: "Nunito", "Inter", ui-rounded, system-ui, sans-serif;
 
   /* BVC brand colors */
-  --color-bvc-accent:        #2F7A62;
-  --color-bvc-accent-tint:   #FBF3DE;
-  --color-bvc-accent-text:   #8A6A12;
-  --color-bvc-ink:           #123F33;
-  --color-bvc-muted:         #5E6F66;
-  --color-bvc-faint:         #93A199;
-  --color-bvc-surface:       #EDF2EE;
-  --color-bvc-line:          #EDF2EE;
-  --color-bvc-border:        #E2EAE4;
-  --color-bvc-border-strong: #CFDCD3;
-  --color-bvc-bar:           #D7E2DA;
-  --color-bvc-bar-strong:    #9FB0A5;
-  --color-bvc-ok:            #2E7D4F;
-  --color-bvc-warn:          #D99B1E;
-  --color-bvc-error:         #F4622E;
-  --color-bvc-panel:         #F2F6F2;
-  --color-bvc-notice-border: #E6D29A;
+  --color-bvc-accent: #2f7a62;
+  --color-bvc-accent-tint: #fbf3de;
+  --color-bvc-accent-text: #8a6a12;
+  --color-bvc-ink: #123f33;
+  --color-bvc-muted: #5e6f66;
+  --color-bvc-faint: #93a199;
+  --color-bvc-surface: #edf2ee;
+  --color-bvc-line: #edf2ee;
+  --color-bvc-border: #e2eae4;
+  --color-bvc-border-strong: #cfdcd3;
+  --color-bvc-bar: #d7e2da;
+  --color-bvc-bar-strong: #9fb0a5;
+  --color-bvc-ok: #2e7d4f;
+  --color-bvc-warn: #d99b1e;
+  --color-bvc-error: #f4622e;
+  /* M03 mobile designs (UI/): status dots, soft panels, gold accents */
+  --color-bvc-dot-ok: #3a6b44;
+  --color-bvc-dot-warn: #c97b3c;
+  --color-bvc-soft: #f2f6f2;
+  --color-bvc-accent-border: #e6d29a;
+  --color-bvc-gold: #c8a63c;
 
   /* BVC border radii */
   --radius-bvc-sm: 11px;
@@ -265,5 +269,13 @@
       "wght" 400,
       "GRAD" 0,
       "opsz" 24;
+  }
+}
+
+/* Horizontal chip/tab rows scroll by swipe; hide the desktop scrollbar (M03 mobile designs). */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
   }
 }

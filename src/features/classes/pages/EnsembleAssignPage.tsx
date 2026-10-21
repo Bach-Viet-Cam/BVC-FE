@@ -4,8 +4,7 @@ import { ChevronLeft, GripVertical } from "lucide-react";
 
 const UNASSIGNED = ["Phạm Gia Hân", "Vũ Minh Đức", "Hoàng Thị Mai", "Trần Văn Long"];
 
-const INSTRUMENTS = ["Đàn tranh", "Đàn bầu", "Đàn nhị", "Tỳ bà", "Sáo trúc"] as const;
-type Instrument = (typeof INSTRUMENTS)[number];
+type Instrument = "Đàn tranh" | "Đàn bầu" | "Đàn nhị" | "Tỳ bà" | "Sáo trúc";
 
 interface Slot {
   instrument: Instrument;
@@ -74,9 +73,7 @@ export function EnsembleAssignPage() {
         </button>
 
         <div className="flex flex-col gap-[3px]">
-          <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-bvc-muted">
-            TRD301 · Fall 2026
-          </span>
+          <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-bvc-muted">TRD301 · Fall 2026</span>
           <span className="text-[24px] font-extrabold tracking-[-0.025em] text-bvc-ink">
             Phân công nhạc cụ &amp; Nhóm hòa tấu
           </span>
@@ -125,18 +122,13 @@ export function EnsembleAssignPage() {
         {/* Center panel — Groups */}
         <div className="flex flex-1 flex-col overflow-y-auto bg-bvc-surface p-[20px]">
           <div className="mb-[14px] flex items-baseline gap-[10px]">
-            <span className="text-[16px] font-extrabold tracking-[-0.025em] text-bvc-ink">
-              Nhóm hòa tấu
-            </span>
+            <span className="text-[16px] font-extrabold tracking-[-0.025em] text-bvc-ink">Nhóm hòa tấu</span>
             <span className="text-[11px] text-bvc-muted">3 nhóm</span>
           </div>
 
           <div className="flex flex-col gap-[16px]">
             {groups.map((group) => (
-              <div
-                key={group.name}
-                className="rounded-[20px] border border-bvc-border bg-white p-[16px]"
-              >
+              <div key={group.name} className="rounded-[20px] border border-bvc-border bg-white p-[16px]">
                 <span className="text-[14px] font-bold text-bvc-ink">{group.name}</span>
 
                 <div className="mt-2 grid grid-cols-2 gap-[8px]">
@@ -150,9 +142,7 @@ export function EnsembleAssignPage() {
                           {getInitials(slot.student)}
                         </span>
                         <div className="flex flex-col gap-[1px]">
-                          <span className="text-[12px] font-semibold text-bvc-muted">
-                            {slot.instrument}
-                          </span>
+                          <span className="text-[12px] font-semibold text-bvc-muted">{slot.instrument}</span>
                           <span
                             className={`text-[13px] font-semibold ${slot.warn ? "text-bvc-accent-text" : "text-bvc-ink"}`}
                           >
@@ -168,12 +158,8 @@ export function EnsembleAssignPage() {
                       >
                         <span className="size-[7px] shrink-0 rounded-full bg-bvc-accent" />
                         <div className="flex flex-col gap-[1px]">
-                          <span className="text-[12px] font-semibold text-bvc-muted">
-                            {slot.instrument}
-                          </span>
-                          <span className="text-[12px] font-semibold text-bvc-accent-text">
-                            thiếu bè
-                          </span>
+                          <span className="text-[12px] font-semibold text-bvc-muted">{slot.instrument}</span>
+                          <span className="text-[12px] font-semibold text-bvc-accent-text">thiếu bè</span>
                         </div>
                       </div>
                     )
@@ -187,9 +173,7 @@ export function EnsembleAssignPage() {
         {/* Right panel — Warnings */}
         <div className="flex w-[280px] shrink-0 flex-col border-l border-bvc-border-strong">
           <div className="shrink-0 border-b border-bvc-line px-[18px] py-[14px]">
-            <span className="text-[13px] font-bold uppercase tracking-[0.1em] text-bvc-muted">
-              Cảnh báo
-            </span>
+            <span className="text-[13px] font-bold uppercase tracking-[0.1em] text-bvc-muted">Cảnh báo</span>
           </div>
 
           <div className="flex flex-col gap-[10px] px-[18px] py-[14px]">
@@ -219,9 +203,7 @@ export function EnsembleAssignPage() {
           <div className="mx-[18px] h-px bg-bvc-border-strong" />
 
           <div className="px-[18px] py-[14px]">
-            <span className="text-[13px] font-bold uppercase tracking-[0.1em] text-bvc-muted">
-              Quy tắc
-            </span>
+            <span className="text-[13px] font-bold uppercase tracking-[0.1em] text-bvc-muted">Quy tắc</span>
             <ul className="mt-[10px] flex flex-col gap-[8px]">
               <li className="flex items-start gap-[8px] text-[13px] text-bvc-muted">
                 <span className="mt-[6px] size-[5px] shrink-0 rounded-full bg-bvc-muted" />
