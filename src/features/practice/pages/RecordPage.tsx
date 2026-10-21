@@ -16,14 +16,16 @@ import {
   COUNT_IN_BEATS,
   DEMO_AUTO_STOP_TAIL_S,
   MSG,
-  NOTES,
   SAMPLE,
   TEMPO_TOLERANCE_PERCENT,
 } from "@/features/practice/constants/practiceConstants";
 import { usePracticeDemo } from "@/features/practice/context/PracticeDemoContext";
 import { usePracticeAudio } from "@/features/practice/hooks/usePracticeAudio";
+import { useLiveTuner } from "@/features/practice/hooks/useLiveTuner";
+import { usePitchStream } from "@/features/practice/hooks/usePitchStream";
 import { useRecorder } from "@/features/practice/hooks/useRecorder";
-import { noteAt, simBpm, simCents } from "@/features/practice/utils/practiceSimulation";
+import { midiToNoteInfo, noteAtTime } from "@/features/practice/utils/noteMath";
+import { simBpm } from "@/features/practice/utils/practiceSimulation";
 import { buildDemoSession } from "@/features/practice/utils/practiceSession";
 import { fileErrorMessage, takeToRecordingFile, validateFile } from "@/features/practice/utils/validateRecording";
 import type { RecordingFile, SubmitMode } from "@/features/practice/types/practiceTypes";
@@ -102,13 +104,22 @@ export function RecordPage() {
     return () => clearInterval(timer);
   }, [filePlaying, file]);
 
-  const tunerShown = mode === "record" && !demo.noPitch;
+  const tunerShown = mode === "record" && session.hasPitch;
   const live = rec === "recording" && !micDenied;
   const liveBpm = live ? Math.round(simBpm(elapsed)) : null;
-  const cents = live ? simCents(elapsed) : 0;
-  const expectedNote = NOTES[noteAt(elapsed).name];
-  const detectedNote = live ? expectedNote : null;
-  const detectedHz = live && detectedNote ? detectedNote.f * Math.pow(2, cents / 1200) : null;
+
+  const tunerActive = tunerShown && tunerOpen && !micDenied && audio.ready;
+  const pitchStream = usePitchStream({
+    audio,
+    enabled: tunerActive, // bước 04 sẽ mở rộng điều kiện này
+    computePitch: session.hasPitch && tunerActive,
+    fminHz: session.fminHz,
+    fmaxHz: session.fmaxHz,
+  });
+  const tuner = useLiveTuner({ subscribe: pitchStream.subscribe, active: tunerActive });
+
+  const expectedMidi = noteAtTime(session.notes, rec === "recording" ? elapsed : 0).midi;
+  const expectedNote = useMemo(() => midiToNoteInfo(expectedMidi), [expectedMidi]);
 
   const bpmHint = useMemo(() => {
     if (rec === "countin") return "Đang đếm nhịp";
@@ -246,10 +257,10 @@ export function RecordPage() {
               <TunerCard
                 open={tunerOpen}
                 onToggle={() => setTunerOpen((value) => !value)}
-                live={live}
-                cents={cents}
-                detectedNote={detectedNote}
-                detectedHz={detectedHz}
+                live={tuner.live}
+                cents={tuner.cents}
+                detectedNote={tuner.detectedNote}
+                detectedHz={tuner.detectedHz}
                 expectedNote={expectedNote}
                 canOpenDetail={canOpenDetail}
                 onOpenTuner={() => openDetail("tuner")}

@@ -80,6 +80,7 @@ export function usePracticeAudio({ micWanted, fminHz }: UsePracticeAudioOptions)
         stream = await navigator.mediaDevices.getUserMedia({ audio: MIC_CONSTRAINTS });
         await ctx.audioWorklet.addModule(WORKLET_URL);
         if (cancelled) return;
+        if (ctx.state === "suspended") void ctx.resume().catch(() => undefined); // không await: có thể treo tới lần chạm đầu
         source = ctx.createMediaStreamSource(stream);
         node = new AudioWorkletNode(ctx, WORKLET_NAME, {
           numberOfInputs: 1,

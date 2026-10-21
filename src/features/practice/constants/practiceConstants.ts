@@ -109,3 +109,12 @@ export const MIC_CONSTRAINTS: MediaTrackConstraints = {
 };
 
 export const PLAYBACK_RATES = [0.5, 0.75, 1, 1.25, 1.5, 2];
+
+export const PITCH_MIN_CLARITY = 0.9;
+export const PITCH_MIN_VOLUME_DB = -50;
+export const PITCH_MEDIAN_SIZE = 5;
+export const PITCH_JUMP_CENTS = 50;
+export const PITCH_CONFIRM_FRAMES = 2;
+export const TUNER_HOLD_S = 0.25;
+export const TUNER_UI_TICK_MS = 150;
+export const TUNER_NOTE_HYSTERESIS_CENTS = 75;
