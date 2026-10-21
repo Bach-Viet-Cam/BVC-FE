@@ -56,7 +56,6 @@ import { ClassListPage } from "@/features/classes/pages/ClassListPage";
 import { ClassFormPage } from "@/features/classes/pages/ClassFormPage";
 import { EnsembleAssignPage } from "@/features/classes/pages/EnsembleAssignPage";
 import { RoadmapPage } from "@/features/classes/pages/RoadmapPage";
-import { TeacherAssignmentsPage } from "@/features/classes/pages/TeacherAssignmentsPage";
 import { ReviewPage } from "@/features/classes/pages/ReviewPage";
 import { StudentProgressPage } from "@/features/classes/pages/StudentProgressPage";
 import { AssignmentFormPage } from "@/features/classes/pages/AssignmentFormPage";
