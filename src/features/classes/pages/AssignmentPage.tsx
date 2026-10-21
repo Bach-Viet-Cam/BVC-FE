@@ -41,7 +41,7 @@ export function AssignmentPage() {
   }
 
   const status = ASSIGNMENT_STATUS_META[assignment.status];
-  const recordingTarget = `/practice/${assignment.pieceId ?? assignment.id}/recording`; // màn thu âm thuộc M01, dùng id bài nhạc nếu có
+  const recordingTarget = `/practice/${assignment.pieceId ?? assignment.id}/record`; // màn thu âm thuộc M01, dùng id bài nhạc nếu có
   const ensembleTarget = `/ensemble/new?pieceId=${assignment.pieceId}&assignmentId=${assignment.id}`;
 
   return (

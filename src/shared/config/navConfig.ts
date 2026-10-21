@@ -36,7 +36,7 @@ export interface StudentTab extends NavItem {
 
 export const STUDENT_TABS: StudentTab[] = [
   { label: "Hôm nay", to: "/home", icon: "home" },
-  { label: "Luyện tập", to: "/practice/ly-ngua-o", icon: "practice" },
+  { label: "Luyện tập", to: "/practice/ly-ngua-o/record", icon: "practice" },
   { label: "Thư viện", to: "/library", icon: "library" },
   { label: "Bài tập", to: "/assignments", icon: "assignments" },
 ];

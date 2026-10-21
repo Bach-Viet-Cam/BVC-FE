@@ -68,7 +68,7 @@ export function SheetPage() {
   const zoomBase = zoom ?? SHEET_ZOOM.initial;
 
   // Màn luyện tập chỉ dành cho sinh viên; khách đăng nhập xong quay lại đúng bản này
-  const practicePath = `/practice/${song.id}?sheetId=${sheet.id}`;
+  const practicePath = `/practice/${song.id}/record?sheetId=${sheet.id}`;
   const practiceClass = actionButtonClass(
     "primary",
     "md",

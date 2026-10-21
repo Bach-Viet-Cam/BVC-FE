@@ -1,0 +1,2958 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <title>Ghi âm và phân tích AI</title>
+    <script src="./vendor/react.js"></script>
+    <script src="./vendor/react-dom.js"></script>
+    <script src="./support.js"></script>
+  </head>
+  <body>
+    <x-dc>
+      <helmet>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=Be+Vietnam+Pro:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap"
+          rel="stylesheet"
+        />
+        <style>
+          body {
+            margin: 0;
+            font-family: "Hanken Grotesk", "Be Vietnam Pro", ui-rounded, system-ui, sans-serif;
+            background: #edf2ee;
+          }
+          a {
+            color: #8a6a12;
+            text-decoration: none;
+          }
+          a:hover {
+            color: #c8a63c;
+          }
+          button {
+            font-family: inherit;
+          }
+        </style>
+      </helmet>
+      <div
+        style="
+          width: 428px;
+          height: 926px;
+          box-sizing: border-box;
+          position: relative;
+          overflow: hidden;
+          background: #ffffff;
+          color: #123f33;
+          font-family: &quot;Hanken Grotesk&quot;, &quot;Be Vietnam Pro&quot;, ui-rounded, system-ui, sans-serif;
+        "
+      >
+        <!-- ================= Vào màn hình (M01-01) ================= -->
+        <sc-if value="{{ isEntry }}" hint-placeholder-val="{{ false }}">
+          <div style="position: absolute; left: 0; top: 0; width: 428px; height: 926px; overflow: hidden">
+            <dc-import name="Practice" hint-size="428px,926px"></dc-import>
+          </div>
+          <button
+            type="button"
+            aria-label="Bắt đầu thu âm"
+            onClick="{{ openUpload }}"
+            style="
+              position: absolute;
+              right: 14px;
+              bottom: 20px;
+              width: 84px;
+              height: 84px;
+              border-radius: 50%;
+              border: none;
+              background: transparent;
+              padding: 0;
+              z-index: 20;
+              cursor: pointer;
+            "
+          ></button>
+        </sc-if>
+
+        <sc-if value="{{ isResults }}" hint-placeholder-val="{{ false }}">
+          <div style="position: absolute; left: 0; top: 0; width: 428px; height: 926px; overflow: hidden">
+            <dc-import name="Analysis" hint-size="428px,926px"></dc-import>
+          </div>
+        </sc-if>
+
+        <!-- ================= Màn 1 · chính ================= -->
+        <sc-if value="{{ isMain }}" hint-placeholder-val="{{ true }}">
+          <div
+            style="
+              position: absolute;
+              left: 0;
+              top: 0;
+              width: 428px;
+              height: 926px;
+              display: flex;
+              flex-direction: column;
+              background: #ffffff;
+              overflow: hidden;
+            "
+          >
+            <div style="flex-shrink: 0; padding: 26px 14px 4px; display: flex; align-items: center; gap: 8px">
+              <button
+                type="button"
+                aria-label="Quay lại"
+                onClick="{{ backFromS1 }}"
+                style="
+                  width: 44px;
+                  height: 44px;
+                  flex-shrink: 0;
+                  border: none;
+                  background: transparent;
+                  border-radius: 14px;
+                  color: #123f33;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  cursor: pointer;
+                "
+              >
+                <svg
+                  width="21"
+                  height="21"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="m15 5-7 7 7 7"></path>
+                </svg>
+              </button>
+              <div
+                style="flex-grow: 1; min-width: 0; margin-right: 78px; display: flex; flex-direction: column; gap: 1px"
+              >
+                <div
+                  style="
+                    font-size: 18px;
+                    font-weight: 800;
+                    letter-spacing: -0.02em;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                  "
+                >
+                  {{ pieceName }}
+                </div>
+                <div style="font-size: 12px; color: #5e6f66">{{ classLine }}</div>
+              </div>
+            </div>
+            <div style="flex-shrink: 0; padding: 0 18px 10px; font-size: 13px; color: #5e6f66">
+              Hạn nộp {{ deadline }} · Còn {{ left }} lượt nộp
+            </div>
+
+            <!-- Hàng 1 · Nhịp -->
+            <div
+              style="
+                flex-shrink: 0;
+                margin: 0 14px;
+                border: 1px solid #e2eae4;
+                background: #ffffff;
+                border-radius: 18px;
+              "
+            >
+              <div style="display: flex; align-items: center; gap: 8px; padding: 0 6px 0 14px; min-height: 44px">
+                <span
+                  style="
+                    font-size: 11.5px;
+                    letter-spacing: 0.12em;
+                    text-transform: uppercase;
+                    color: #5e6f66;
+                    font-weight: 700;
+                  "
+                  >Nhịp</span
+                >
+                <span style="flex-grow: 1"></span>
+                <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: 12px; color: #5e6f66"
+                  >{{ tempoSummary }}</span
+                >
+                <button
+                  type="button"
+                  aria-label="Thu gọn hoặc mở rộng phần nhịp"
+                  aria-expanded="{{ tempoOpen }}"
+                  onClick="{{ toggleTempo }}"
+                  style="
+                    width: 40px;
+                    height: 40px;
+                    flex-shrink: 0;
+                    border: none;
+                    background: transparent;
+                    border-radius: 12px;
+                    color: #123f33;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                  "
+                >
+                  <svg
+                    style="{{ tempoChevStyle }}"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="m6 9 6 6 6-6"></path>
+                  </svg>
+                </button>
+              </div>
+              <sc-if value="{{ tempoOpen }}" hint-placeholder-val="{{ true }}">
+                <div style="padding: 0 14px 14px; display: flex; flex-direction: column; gap: 11px">
+                  <button type="button" aria-label="Mở metronome" onClick="{{ openMetro }}" style="{{ readBtnStyle }}">
+                    <span style="display: flex; flex-direction: column; gap: 2px; min-width: 92px"
+                      ><span
+                        style="
+                          font-size: 11px;
+                          letter-spacing: 0.1em;
+                          text-transform: uppercase;
+                          color: #93a399;
+                          font-weight: 700;
+                        "
+                        >Mục tiêu</span
+                      ><span style="display: flex; align-items: baseline; gap: 5px"
+                        ><span
+                          style="
+                            font-family: &quot;IBM Plex Mono&quot;, monospace;
+                            font-size: 30px;
+                            font-weight: 600;
+                            line-height: 1.1;
+                            color: #123f33;
+                          "
+                          >{{ targetBpm }}</span
+                        ><span style="font-size: 12px; color: #5e6f66">BPM</span></span
+                      ></span
+                    >
+                    <span style="width: 1px; align-self: stretch; background: #e2eae4"></span>
+                    <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px"
+                      ><span
+                        style="
+                          font-size: 11px;
+                          letter-spacing: 0.1em;
+                          text-transform: uppercase;
+                          color: #93a399;
+                          font-weight: 700;
+                        "
+                        >Đang đo</span
+                      ><span style="display: flex; align-items: baseline; gap: 8px"
+                        ><span style="{{ bpmStyle }}">{{ liveBpmText }}</span
+                        ><span style="{{ bpmHintStyle }}">{{ bpmHint }}</span></span
+                      ></span
+                    >
+                    <sc-if value="{{ canOpen }}" hint-placeholder-val="{{ true }}"
+                      ><span
+                        style="
+                          display: flex;
+                          align-items: center;
+                          gap: 2px;
+                          font-size: 12.5px;
+                          font-weight: 600;
+                          color: #5e6f66;
+                          flex-shrink: 0;
+                        "
+                        >Chỉnh<svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path d="m9 6 6 6-6 6"></path></svg></span
+                    ></sc-if>
+                  </button>
+                  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px">
+                    <sc-for list="{{ beatSegs }}" as="g" hint-placeholder-count="4"
+                      ><span style="{{ g.style }}"></span
+                    ></sc-for>
+                  </div>
+                  <button
+                    type="button"
+                    aria-pressed="{{ clickOn }}"
+                    onClick="{{ toggleClick }}"
+                    style="{{ clickBtnStyle }}"
+                  >
+                    <span>Bật/Tắt tiếng gõ nhịp</span
+                    ><span style="{{ clickTrack }}"><span style="{{ clickKnob }}"></span></span>
+                  </button>
+                  <sc-if value="{{ micDenied }}" hint-placeholder-val="{{ false }}"
+                    ><div
+                      style="
+                        background: #fbf3de;
+                        border: 1px solid #e6d29a;
+                        border-radius: 12px;
+                        padding: 10px 12px;
+                        font-size: 12.5px;
+                        line-height: 1.5;
+                        color: #8a6a12;
+                      "
+                    >
+                      {{ micMsg }}
+                    </div></sc-if
+                  >
+                </div>
+              </sc-if>
+            </div>
+
+            <!-- Hàng 2 · Tuner -->
+            <sc-if value="{{ showTunerCard }}" hint-placeholder-val="{{ true }}">
+              <div
+                style="
+                  flex-shrink: 0;
+                  margin: 10px 14px 0;
+                  border: 1px solid #e2eae4;
+                  background: #ffffff;
+                  border-radius: 18px;
+                "
+              >
+                <div style="display: flex; align-items: center; gap: 8px; padding: 0 6px 0 14px; min-height: 44px">
+                  <span
+                    style="
+                      font-size: 11.5px;
+                      letter-spacing: 0.12em;
+                      text-transform: uppercase;
+                      color: #5e6f66;
+                      font-weight: 700;
+                    "
+                    >Tuner</span
+                  >
+                  <span style="flex-grow: 1"></span>
+                  <sc-if value="{{ tunerOpen }}" hint-placeholder-val="{{ true }}"
+                    ><span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: 12px; color: #5e6f66"
+                      >{{ centsHead }}</span
+                    ></sc-if
+                  >
+                  <button
+                    type="button"
+                    aria-label="Thu gọn hoặc mở rộng phần tuner"
+                    aria-expanded="{{ tunerOpen }}"
+                    onClick="{{ toggleTuner }}"
+                    style="
+                      width: 40px;
+                      height: 40px;
+                      flex-shrink: 0;
+                      border: none;
+                      background: transparent;
+                      border-radius: 12px;
+                      color: #123f33;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      cursor: pointer;
+                    "
+                  >
+                    <svg
+                      style="{{ tunerChevStyle }}"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="m6 9 6 6 6-6"></path>
+                    </svg>
+                  </button>
+                </div>
+                <sc-if value="{{ tunerOpen }}" hint-placeholder-val="{{ true }}">
+                  <div style="padding: 0 14px 14px; display: flex; flex-direction: column; gap: 11px">
+                    <button
+                      type="button"
+                      aria-label="Mở tuner lên dây"
+                      onClick="{{ openTuner }}"
+                      style="{{ readBtnStyle }}"
+                    >
+                      <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px"
+                        ><span
+                          style="
+                            font-size: 11px;
+                            letter-spacing: 0.1em;
+                            text-transform: uppercase;
+                            color: #93a399;
+                            font-weight: 700;
+                          "
+                          >Đang đo</span
+                        ><span style="display: flex; align-items: baseline; gap: 10px"
+                          ><span style="{{ noteStyle }}">{{ detNote }}</span
+                          ><span style="display: flex; flex-direction: column; gap: 1px"
+                            ><span
+                              style="
+                                font-family: &quot;IBM Plex Mono&quot;, monospace;
+                                font-size: 12.5px;
+                                color: #5e6f66;
+                              "
+                              >{{ detSub }}</span
+                            ><span style="{{ centsWordStyle }}">{{ centsWord }}</span></span
+                          ></span
+                        ></span
+                      >
+                      <span
+                        style="
+                          display: flex;
+                          flex-direction: column;
+                          align-items: center;
+                          gap: 1px;
+                          flex-shrink: 0;
+                          min-width: 104px;
+                          box-sizing: border-box;
+                          padding: 9px 14px 10px;
+                          border-radius: 16px;
+                          background: #123f33;
+                          color: #ffffff;
+                        "
+                        ><span
+                          style="
+                            font-size: 10.5px;
+                            letter-spacing: 0.12em;
+                            text-transform: uppercase;
+                            font-weight: 700;
+                            color: #c3d2c8;
+                          "
+                          >Cần chơi</span
+                        ><span style="font-size: 32px; font-weight: 800; line-height: 1.1; letter-spacing: -0.03em"
+                          >{{ expVn }}</span
+                        ><span
+                          style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: 12.5px; color: #c3d2c8"
+                          >{{ expEn }}</span
+                        ></span
+                      >
+                      <sc-if value="{{ canOpen }}" hint-placeholder-val="{{ true }}"
+                        ><svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#5E6F66"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          style="flex-shrink: 0"
+                        >
+                          <path d="m9 6 6 6-6 6"></path></svg
+                      ></sc-if>
+                    </button>
+                    <div style="display: flex; flex-direction: column; gap: 5px">
+                      <div
+                        style="position: relative; height: 8px; border-radius: 4px; background: #e2eae4; margin: 3px 0"
+                      >
+                        <span
+                          style="
+                            position: absolute;
+                            left: 50%;
+                            top: -3px;
+                            width: 2px;
+                            height: 14px;
+                            background: #c3d2c8;
+                            margin-left: -1px;
+                          "
+                        ></span>
+                        <span style="{{ meterFillStyle }}"></span>
+                        <span style="{{ meterMarkStyle }}"></span>
+                      </div>
+                      <div
+                        style="
+                          display: flex;
+                          justify-content: space-between;
+                          font-family: &quot;IBM Plex Mono&quot;, monospace;
+                          font-size: 11px;
+                          color: #93a399;
+                        "
+                      >
+                        <span>−50¢</span><span>0</span><span>+50¢</span>
+                      </div>
+                    </div>
+                    <sc-if value="{{ micDenied }}" hint-placeholder-val="{{ false }}"
+                      ><div
+                        style="
+                          background: #fbf3de;
+                          border: 1px solid #e6d29a;
+                          border-radius: 12px;
+                          padding: 10px 12px;
+                          font-size: 12.5px;
+                          line-height: 1.5;
+                          color: #8a6a12;
+                        "
+                      >
+                        {{ micMsg }}
+                      </div></sc-if
+                    >
+                  </div>
+                </sc-if>
+              </div>
+            </sc-if>
+
+            <!-- Khu vực dưới · Ghi âm / Tải file lên -->
+            <div
+              style="
+                flex-grow: 1;
+                min-height: 0;
+                margin: 12px 14px 0;
+                padding-bottom: 22px;
+                display: flex;
+                flex-direction: column;
+                gap: 11px;
+              "
+            >
+              <div
+                style="
+                  flex-shrink: 0;
+                  display: flex;
+                  gap: 4px;
+                  padding: 3px;
+                  border: 1px solid #cfdcd3;
+                  border-radius: 14px;
+                  background: #f2f6f2;
+                "
+              >
+                <button
+                  type="button"
+                  aria-pressed="{{ isRecordMode }}"
+                  onClick="{{ setRecord }}"
+                  style="{{ recTabStyle }}"
+                >
+                  Ghi âm
+                </button>
+                <button
+                  type="button"
+                  aria-pressed="{{ isUploadMode }}"
+                  onClick="{{ setUpload }}"
+                  style="{{ upTabStyle }}"
+                >
+                  Tải file lên
+                </button>
+              </div>
+              <div style="flex-shrink: 0; font-size: 12px; line-height: 1.5; color: #5e6f66">
+                Định dạng MP3, WAV, M4A · tối đa 20 MB · thời lượng từ 00:10 đến 03:00
+              </div>
+              <sc-for list="{{ notices }}" as="n" hint-placeholder-count="0"
+                ><div
+                  style="
+                    flex-shrink: 0;
+                    background: #fbf3de;
+                    border: 1px solid #e6d29a;
+                    border-radius: 12px;
+                    padding: 10px 12px;
+                    font-size: 12.5px;
+                    line-height: 1.5;
+                    color: #8a6a12;
+                  "
+                >
+                  {{ n.text }}
+                </div></sc-for
+              >
+
+              <!-- Ghi âm -->
+              <sc-if value="{{ isRecordMode }}" hint-placeholder-val="{{ true }}">
+                <sc-if value="{{ micDenied }}" hint-placeholder-val="{{ false }}"
+                  ><div
+                    style="
+                      flex-shrink: 0;
+                      background: #fbf3de;
+                      border: 1px solid #e6d29a;
+                      border-radius: 12px;
+                      padding: 10px 12px;
+                      font-size: 12.5px;
+                      line-height: 1.5;
+                      color: #8a6a12;
+                    "
+                  >
+                    {{ micMsg }}
+                  </div></sc-if
+                >
+                <div style="margin-top: auto; display: flex; flex-direction: column; gap: 12px">
+                  <sc-if value="{{ recNotPreview }}" hint-placeholder-val="{{ true }}">
+                    <div style="display: flex; align-items: center; gap: 14px">
+                      <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 7px">
+                        <sc-if value="{{ recIdle }}" hint-placeholder-val="{{ true }}">
+                          <div style="display: flex; align-items: center; gap: 7px">
+                            <span style="{{ readyDotStyle }}"></span
+                            ><span style="{{ readyTextStyle }}">{{ readyText }}</span>
+                          </div>
+                          <div style="position: relative; height: 26px; display: flex; align-items: center">
+                            <span
+                              style="position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: #e2eae4"
+                            ></span
+                            ><span
+                              style="
+                                position: relative;
+                                flex-grow: 1;
+                                height: 100%;
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                              "
+                              ><sc-for list="{{ idleBars }}" as="b" hint-placeholder-count="40"
+                                ><span style="{{ b.style }}"></span></sc-for
+                            ></span>
+                          </div>
+                          <div style="font-size: 12.5px; line-height: 1.45; color: #5e6f66">
+                            Chạm nút ghi để bắt đầu. Có 4 tiếng đếm nhịp trước khi ghi, phần đếm không được ghi lại.
+                          </div>
+                        </sc-if>
+
+                        <sc-if value="{{ recCount }}" hint-placeholder-val="{{ false }}">
+                          <div style="display: flex; align-items: center; gap: 8px">
+                            <svg
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="#123F33"
+                              stroke-width="1.9"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            >
+                              <path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"></path>
+                              <path d="M15.5 9a4 4 0 0 1 0 6"></path>
+                              <path d="M18 6.5a7.5 7.5 0 0 1 0 11"></path></svg
+                            ><span style="font-size: 14px; font-weight: 700">Đếm nhịp · {{ targetBpm }} BPM</span>
+                          </div>
+                          <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px">
+                            <sc-for list="{{ countSegs }}" as="c" hint-placeholder-count="4"
+                              ><span style="{{ c.style }}">{{ c.n }}</span></sc-for
+                            >
+                          </div>
+                          <div style="font-size: 12.5px; line-height: 1.45; color: #5e6f66">
+                            Tiếng đếm nhịp không được ghi lại. Ghi âm bắt đầu khi đếm xong.
+                          </div>
+                        </sc-if>
+
+                        <sc-if value="{{ recRunning }}" hint-placeholder-val="{{ false }}">
+                          <div style="display: flex; align-items: center; justify-content: space-between">
+                            <span
+                              style="display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700"
+                              ><span style="width: 8px; height: 8px; border-radius: 50%; background: #c8a63c"></span
+                              >Đang ghi</span
+                            ><span
+                              style="
+                                font-family: &quot;IBM Plex Mono&quot;, monospace;
+                                font-size: 15px;
+                                font-weight: 600;
+                              "
+                              >{{ timerText }}</span
+                            >
+                          </div>
+                          <div style="height: 38px; display: flex; align-items: center; justify-content: space-between">
+                            <sc-for list="{{ liveBars }}" as="b" hint-placeholder-count="30"
+                              ><span style="{{ b.style }}"></span
+                            ></sc-for>
+                          </div>
+                          <div style="font-size: 12.5px; line-height: 1.45; color: #5e6f66">
+                            Chạm nút dừng khi chơi xong, hoặc ghi đến hết bài.
+                          </div>
+                        </sc-if>
+                      </div>
+
+                      <sc-if value="{{ recIdle }}" hint-placeholder-val="{{ true }}"
+                        ><button
+                          type="button"
+                          aria-label="Bắt đầu ghi âm"
+                          aria-disabled="{{ recLooksDisabled }}"
+                          onClick="{{ startRec }}"
+                          style="{{ recBtnStyle }}"
+                        >
+                          <svg
+                            width="30"
+                            height="30"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <rect x="9" y="3" width="6" height="11" rx="3"></rect>
+                            <path d="M5.5 11.5a6.5 6.5 0 0 0 13 0"></path>
+                            <path d="M12 18v3"></path>
+                          </svg></button
+                      ></sc-if>
+                      <sc-if value="{{ recCount }}" hint-placeholder-val="{{ false }}"
+                        ><div style="{{ countCircleStyle }}">{{ countNum }}</div></sc-if
+                      >
+                      <sc-if value="{{ recRunning }}" hint-placeholder-val="{{ false }}"
+                        ><button
+                          type="button"
+                          aria-label="Dừng ghi"
+                          onClick="{{ stopRec }}"
+                          style="
+                            width: 84px;
+                            height: 84px;
+                            flex-shrink: 0;
+                            border-radius: 50%;
+                            background: #123f33;
+                            border: 5px solid #e2eae4;
+                            color: #ffffff;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            cursor: pointer;
+                            padding: 0;
+                          "
+                        >
+                          <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+                            <rect x="6" y="6" width="12" height="12" rx="2.5"></rect>
+                          </svg></button
+                      ></sc-if>
+                    </div>
+                  </sc-if>
+
+                  <sc-if value="{{ recPreview }}" hint-placeholder-val="{{ false }}">
+                    <div style="display: flex; align-items: center; gap: 12px">
+                      <button
+                        type="button"
+                        aria-label="{{ playLabel }}"
+                        onClick="{{ togglePlay }}"
+                        style="
+                          width: 44px;
+                          height: 44px;
+                          flex-shrink: 0;
+                          border: none;
+                          background: #123f33;
+                          border-radius: 15px;
+                          color: #ffffff;
+                          display: flex;
+                          align-items: center;
+                          justify-content: center;
+                          cursor: pointer;
+                        "
+                      >
+                        <sc-if value="{{ playing }}" hint-placeholder-val="{{ false }}"
+                          ><svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor">
+                            <rect x="6.5" y="5" width="4" height="14" rx="1"></rect>
+                            <rect x="13.5" y="5" width="4" height="14" rx="1"></rect></svg></sc-if
+                        ><sc-if value="{{ notPlaying }}" hint-placeholder-val="{{ true }}"
+                          ><svg
+                            width="19"
+                            height="19"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            stroke="currentColor"
+                            stroke-width="1.7"
+                            stroke-linejoin="round"
+                          >
+                            <path d="M8 5.2v13.6L19 12z"></path></svg
+                        ></sc-if>
+                      </button>
+                      <div
+                        style="
+                          flex-grow: 1;
+                          height: 40px;
+                          display: flex;
+                          align-items: center;
+                          justify-content: space-between;
+                        "
+                      >
+                        <sc-for list="{{ previewBars }}" as="b" hint-placeholder-count="40"
+                          ><span style="{{ b.style }}"></span
+                        ></sc-for>
+                      </div>
+                      <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: 12px; color: #5e6f66"
+                        >{{ playText }}</span
+                      >
+                    </div>
+                    <sc-if value="{{ hasErr }}" hint-placeholder-val="{{ false }}"
+                      ><div
+                        style="
+                          background: #fbf3de;
+                          border: 1px solid #e6d29a;
+                          border-radius: 12px;
+                          padding: 10px 12px;
+                          font-size: 12.5px;
+                          line-height: 1.5;
+                          color: #8a6a12;
+                        "
+                      >
+                        {{ errText }}
+                      </div></sc-if
+                    >
+                    <sc-if value="{{ uploading }}" hint-placeholder-val="{{ false }}"
+                      ><div
+                        style="
+                          background: #fbf3de;
+                          border: 1px solid #e6d29a;
+                          border-radius: 12px;
+                          padding: 10px 12px;
+                          font-size: 12.5px;
+                          line-height: 1.5;
+                          color: #8a6a12;
+                        "
+                      >
+                        {{ weakMsg }}
+                      </div></sc-if
+                    >
+                    <div style="display: flex; gap: 10px">
+                      <button type="button" onClick="{{ rerecord }}" style="{{ rerecStyle }}">Ghi âm lại</button>
+                      <button type="button" disabled="{{ sendDisabled }}" onClick="{{ send }}" style="{{ sendStyle }}">
+                        {{ sendLabel }}
+                      </button>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-if>
+
+              <!-- Tải file lên -->
+              <sc-if value="{{ isUploadMode }}" hint-placeholder-val="{{ false }}">
+                <sc-if value="{{ noFile }}" hint-placeholder-val="{{ false }}">
+                  <button type="button" disabled="{{ blocked }}" onClick="{{ pickFile }}" style="{{ dropStyle }}">
+                    <svg
+                      width="34"
+                      height="34"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.7"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M12 16V4"></path>
+                      <path d="m7 8.5 5-5 5 5"></path>
+                      <path d="M4.5 15v3.5a1.5 1.5 0 0 0 1.5 1.5h12a1.5 1.5 0 0 0 1.5-1.5V15"></path>
+                    </svg>
+                    <span style="font-size: 15px; font-weight: 700">Chọn file ghi âm từ thiết bị</span>
+                    <span style="font-size: 12.5px; color: #5e6f66">MP3, WAV, M4A · tối đa 20 MB</span>
+                  </button>
+                </sc-if>
+                <sc-if value="{{ hasFile }}" hint-placeholder-val="{{ false }}">
+                  <div style="margin-top: auto; display: flex; flex-direction: column; gap: 12px">
+                    <div
+                      style="
+                        border: 1px solid #e2eae4;
+                        border-radius: 16px;
+                        padding: 12px 14px;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 10px;
+                        background: #f2f6f2;
+                      "
+                    >
+                      <div style="display: flex; align-items: center; gap: 12px">
+                        <button
+                          type="button"
+                          aria-label="{{ filePlayLabel }}"
+                          onClick="{{ toggleFilePlay }}"
+                          style="
+                            width: 44px;
+                            height: 44px;
+                            flex-shrink: 0;
+                            border: none;
+                            background: #123f33;
+                            border-radius: 15px;
+                            color: #ffffff;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            cursor: pointer;
+                          "
+                        >
+                          <sc-if value="{{ filePlaying }}" hint-placeholder-val="{{ false }}"
+                            ><svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor">
+                              <rect x="6.5" y="5" width="4" height="14" rx="1"></rect>
+                              <rect x="13.5" y="5" width="4" height="14" rx="1"></rect></svg></sc-if
+                          ><sc-if value="{{ fileNotPlaying }}" hint-placeholder-val="{{ true }}"
+                            ><svg
+                              width="19"
+                              height="19"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                              stroke="currentColor"
+                              stroke-width="1.7"
+                              stroke-linejoin="round"
+                            >
+                              <path d="M8 5.2v13.6L19 12z"></path></svg
+                          ></sc-if>
+                        </button>
+                        <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+                          <span style="font-size: 14px; font-weight: 700">{{ fileName }}</span
+                          ><span
+                            style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: 12.5px; color: #5e6f66"
+                            >{{ fileLine }}</span
+                          >
+                        </div>
+                      </div>
+                      <span style="display: block; height: 4px; border-radius: 2px; background: #e2eae4"
+                        ><span style="{{ fileBarStyle }}"></span
+                      ></span>
+                    </div>
+                    <sc-if value="{{ hasErr }}" hint-placeholder-val="{{ false }}"
+                      ><div
+                        style="
+                          background: #fbf3de;
+                          border: 1px solid #e6d29a;
+                          border-radius: 12px;
+                          padding: 10px 12px;
+                          font-size: 12.5px;
+                          line-height: 1.5;
+                          color: #8a6a12;
+                        "
+                      >
+                        {{ errText }}
+                      </div></sc-if
+                    >
+                    <sc-if value="{{ uploading }}" hint-placeholder-val="{{ false }}"
+                      ><div
+                        style="
+                          background: #fbf3de;
+                          border: 1px solid #e6d29a;
+                          border-radius: 12px;
+                          padding: 10px 12px;
+                          font-size: 12.5px;
+                          line-height: 1.5;
+                          color: #8a6a12;
+                        "
+                      >
+                        {{ weakMsg }}
+                      </div></sc-if
+                    >
+                    <div style="display: flex; gap: 10px">
+                      <button type="button" disabled="{{ blocked }}" onClick="{{ pickOther }}" style="{{ otherStyle }}">
+                        Chọn file khác
+                      </button>
+                      <button type="button" disabled="{{ sendDisabled }}" onClick="{{ send }}" style="{{ sendStyle }}">
+                        {{ sendLabel }}
+                      </button>
+                    </div>
+                  </div>
+                </sc-if>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ================= Chi tiết Tuner (M01-02) ================= -->
+        <sc-if value="{{ isTunerView }}" hint-placeholder-val="{{ false }}">
+          <div
+            style="
+              position: absolute;
+              left: 0;
+              top: 0;
+              width: 428px;
+              height: 926px;
+              display: flex;
+              flex-direction: column;
+              background: #ffffff;
+              overflow: hidden;
+            "
+          >
+            <div style="flex-shrink: 0; padding: 26px 14px 8px; display: flex; align-items: center; gap: 8px">
+              <button
+                type="button"
+                aria-label="Đóng tuner"
+                onClick="{{ closeDetail }}"
+                style="
+                  width: 44px;
+                  height: 44px;
+                  flex-shrink: 0;
+                  border: none;
+                  background: transparent;
+                  border-radius: 14px;
+                  color: #123f33;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  cursor: pointer;
+                "
+              >
+                <svg
+                  width="21"
+                  height="21"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M6 6l12 12M18 6 6 18"></path>
+                </svg>
+              </button>
+              <div
+                style="flex-grow: 1; min-width: 0; margin-right: 78px; display: flex; flex-direction: column; gap: 1px"
+              >
+                <div style="font-size: 18px; font-weight: 800; letter-spacing: -0.02em">Lên dây</div>
+                <div style="font-size: 12px; color: #5e6f66">{{ instrument }} · 4 dây · A4 440 Hz</div>
+              </div>
+            </div>
+
+            <div
+              style="
+                flex-shrink: 0;
+                padding: 14px 20px 6px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 16px;
+              "
+            >
+              <div style="display: flex; align-items: baseline; gap: 10px">
+                <span style="{{ tvNoteStyle }}">{{ tvNote }}</span>
+                <span style="display: flex; flex-direction: column; gap: 2px"
+                  ><span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: 16px; color: #5e6f66"
+                    >{{ tvEn }}</span
+                  ><span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: 14px; color: #5e6f66"
+                    >{{ tvHz }}</span
+                  ></span
+                >
+              </div>
+              <div style="width: 100%; display: flex; flex-direction: column; gap: 10px">
+                <div style="position: relative; height: 54px">
+                  <div
+                    style="
+                      position: absolute;
+                      left: 0;
+                      right: 0;
+                      top: 24px;
+                      height: 8px;
+                      border-radius: 4px;
+                      background: #e2eae4;
+                    "
+                  ></div>
+                  <div
+                    style="
+                      position: absolute;
+                      left: 50%;
+                      top: 14px;
+                      width: 2px;
+                      height: 28px;
+                      background: #c3d2c8;
+                      margin-left: -1px;
+                    "
+                  ></div>
+                  <div style="{{ tvFillStyle }}"></div>
+                  <div style="{{ tvMarkStyle }}"></div>
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    justify-content: space-between;
+                    font-family: &quot;IBM Plex Mono&quot;, monospace;
+                    font-size: 12px;
+                    color: #93a399;
+                  "
+                >
+                  <span>−50¢</span><span>0</span><span>+50¢</span>
+                </div>
+                <div
+                  style="
+                    align-self: center;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    background: #f2f6f2;
+                    border: 1px solid #cfdcd3;
+                    border-radius: 12px;
+                    padding: 8px 14px;
+                  "
+                >
+                  <span style="font-size: 14px; font-weight: 700; color: #123f33">{{ tvAdvice }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div
+              style="
+                flex-grow: 1;
+                min-height: 0;
+                padding: 12px 16px 0;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                overflow: hidden;
+              "
+            >
+              <div style="display: flex; align-items: baseline; justify-content: space-between">
+                <span style="font-size: 14px; font-weight: 700">Các dây cần kiểm tra</span
+                ><span style="font-size: 12.5px; color: #5e6f66">{{ tunedCount }} / 4 dây đã đúng</span>
+              </div>
+              <div
+                style="
+                  border: 1px solid #e2eae4;
+                  background: #ffffff;
+                  border-radius: 20px;
+                  padding: 6px 14px;
+                  display: flex;
+                  flex-direction: column;
+                "
+              >
+                <sc-for list="{{ strRows }}" as="r" hint-placeholder-count="4">
+                  <button type="button" onClick="{{ r.pick }}" style="{{ r.rowStyle }}">
+                    <span style="{{ r.codeStyle }}">{{ r.code }}</span>
+                    <span style="{{ r.nameStyle }}">{{ r.name }}</span>
+                    <span style="{{ r.statStyle }}">{{ r.stat }}</span>
+                    <sc-if value="{{ r.ok }}" hint-placeholder-val="{{ false }}"
+                      ><svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#3A6B44"
+                        stroke-width="2.2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M4.5 12.5 9.5 17.5 19.5 7"></path></svg
+                    ></sc-if>
+                  </button>
+                </sc-for>
+              </div>
+              <sc-if value="{{ micDenied }}" hint-placeholder-val="{{ false }}"
+                ><div
+                  style="
+                    background: #fbf3de;
+                    border: 1px solid #e6d29a;
+                    border-radius: 12px;
+                    padding: 10px 12px;
+                    font-size: 12.5px;
+                    line-height: 1.5;
+                    color: #8a6a12;
+                  "
+                >
+                  {{ micMsg }}
+                </div></sc-if
+              >
+              <div style="font-size: 12.5px; line-height: 1.5; color: #5e6f66">
+                Chạm vào một dây để kiểm tra. Màn hình này chỉ dùng khi chưa ghi âm.
+              </div>
+            </div>
+
+            <div
+              style="
+                flex-shrink: 0;
+                padding: 14px 16px 24px;
+                display: flex;
+                gap: 9px;
+                border-top: 1px solid #cfdcd3;
+                background: #ffffff;
+              "
+            >
+              <button
+                type="button"
+                onClick="{{ playRef }}"
+                style="
+                  flex-grow: 1;
+                  min-height: 50px;
+                  border: 1px solid #cfdcd3;
+                  background: #f2f6f2;
+                  color: #123f33;
+                  border-radius: 16px;
+                  font-size: 14px;
+                  font-weight: 600;
+                  cursor: pointer;
+                "
+              >
+                Phát nốt mẫu
+              </button>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ================= Chi tiết Metronome (M01-03) ================= -->
+        <sc-if value="{{ isMetroView }}" hint-placeholder-val="{{ false }}">
+          <div
+            style="
+              position: absolute;
+              left: 0;
+              top: 0;
+              width: 428px;
+              height: 926px;
+              display: flex;
+              flex-direction: column;
+              background: #ffffff;
+              overflow: hidden;
+            "
+          >
+            <div style="flex-shrink: 0; padding: 26px 14px 8px; display: flex; align-items: center; gap: 8px">
+              <button
+                type="button"
+                aria-label="Đóng metronome"
+                onClick="{{ closeDetail }}"
+                style="
+                  width: 44px;
+                  height: 44px;
+                  flex-shrink: 0;
+                  border: none;
+                  background: transparent;
+                  border-radius: 14px;
+                  color: #123f33;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  cursor: pointer;
+                "
+              >
+                <svg
+                  width="21"
+                  height="21"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M6 6l12 12M18 6 6 18"></path>
+                </svg>
+              </button>
+              <div
+                style="flex-grow: 1; min-width: 0; margin-right: 78px; display: flex; flex-direction: column; gap: 1px"
+              >
+                <div style="font-size: 18px; font-weight: 800; letter-spacing: -0.02em">Metronome</div>
+                <div style="font-size: 12px; color: #5e6f66">Lý ngựa ô · tốc độ yêu cầu {{ targetBpm }} BPM</div>
+              </div>
+            </div>
+
+            <div
+              style="
+                flex-grow: 1;
+                min-height: 0;
+                padding: 6px 20px 0;
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+                overflow: hidden;
+              "
+            >
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 10px">
+                <div style="display: flex; align-items: center; gap: 22px">
+                  <button
+                    type="button"
+                    aria-label="Giảm tốc độ"
+                    onClick="{{ bpmDown }}"
+                    style="
+                      width: 54px;
+                      height: 54px;
+                      border: 1px solid #cfdcd3;
+                      background: #ffffff;
+                      border-radius: 18px;
+                      color: #123f33;
+                      font-size: 26px;
+                      line-height: 1;
+                      cursor: pointer;
+                    "
+                  >
+                    −
+                  </button>
+                  <div style="display: flex; flex-direction: column; align-items: center">
+                    <span
+                      style="
+                        font-family: &quot;IBM Plex Mono&quot;, monospace;
+                        font-size: 64px;
+                        font-weight: 600;
+                        line-height: 1;
+                      "
+                      >{{ mBpm }}</span
+                    ><span
+                      style="
+                        font-size: 13px;
+                        letter-spacing: 0.16em;
+                        text-transform: uppercase;
+                        color: #5e6f66;
+                        font-weight: 700;
+                      "
+                      >BPM</span
+                    >
+                  </div>
+                  <button
+                    type="button"
+                    aria-label="Tăng tốc độ"
+                    onClick="{{ bpmUp }}"
+                    style="
+                      width: 54px;
+                      height: 54px;
+                      border: 1px solid #cfdcd3;
+                      background: #ffffff;
+                      border-radius: 18px;
+                      color: #123f33;
+                      font-size: 26px;
+                      line-height: 1;
+                      cursor: pointer;
+                    "
+                  >
+                    +
+                  </button>
+                </div>
+                <div style="width: 100%; display: flex; gap: 7px">
+                  <sc-for list="{{ presets }}" as="p" hint-placeholder-count="3"
+                    ><button type="button" onClick="{{ p.pick }}" style="{{ p.style }}">{{ p.label }}</button></sc-for
+                  >
+                </div>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <span style="font-size: 14px; font-weight: 700">Phách trong ô nhịp</span>
+                <div style="{{ beatGridStyle }}">
+                  <sc-for list="{{ mBeats }}" as="b" hint-placeholder-count="4"
+                    ><button type="button" onClick="{{ b.toggle }}" style="{{ b.style }}">{{ b.label }}</button></sc-for
+                  >
+                </div>
+                <p style="margin: 0; font-size: 12.5px; line-height: 1.5; color: #5e6f66">
+                  Chạm vào từng phách để đổi giữa mạnh, nhẹ và bỏ trống.
+                </p>
+              </div>
+
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+                <span style="font-size: 14px; color: #5e6f66">Loại nhịp</span>
+                <div
+                  style="
+                    display: flex;
+                    gap: 4px;
+                    padding: 3px;
+                    border: 1px solid #cfdcd3;
+                    border-radius: 13px;
+                    background: #f2f6f2;
+                  "
+                >
+                  <sc-for list="{{ sigOpts }}" as="o" hint-placeholder-count="4"
+                    ><button type="button" aria-pressed="{{ o.sel }}" onClick="{{ o.pick }}" style="{{ o.style }}">
+                      {{ o.label }}
+                    </button></sc-for
+                  >
+                </div>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <div style="display: flex; align-items: baseline; justify-content: space-between">
+                  <span style="font-size: 14px; font-weight: 700">Chia nhỏ phách</span
+                  ><span style="font-size: 12.5px; color: #5e6f66">{{ subName }}</span>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+                  <button
+                    type="button"
+                    aria-pressed="{{ subWhiteOn }}"
+                    onClick="{{ pickWhite }}"
+                    style="{{ subWhiteStyle }}"
+                  >
+                    <svg width="30" height="42" viewBox="0 0 30 44" fill="none">
+                      <ellipse
+                        cx="11"
+                        cy="35"
+                        rx="7.2"
+                        ry="5.2"
+                        transform="rotate(-22 11 35)"
+                        stroke="#123F33"
+                        stroke-width="2.2"
+                      ></ellipse>
+                      <path d="M17.6 33.5V6" stroke="#123F33" stroke-width="2.2" stroke-linecap="round"></path>
+                    </svg>
+                    <span style="font-size: 12.5px; font-weight: 700">Nốt trắng</span
+                    ><span style="font-size: 11.5px; color: #5e6f66">2 phách</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    aria-pressed="{{ subBlackOn }}"
+                    onClick="{{ pickBlack }}"
+                    style="{{ subBlackStyle }}"
+                  >
+                    <svg width="30" height="42" viewBox="0 0 30 44" fill="none">
+                      <ellipse cx="11" cy="35" rx="7.2" ry="5.2" transform="rotate(-22 11 35)" fill="#123F33"></ellipse>
+                      <path d="M17.6 33.5V6" stroke="#123F33" stroke-width="2.2" stroke-linecap="round"></path>
+                    </svg>
+                    <span style="font-size: 12.5px; font-weight: 700">Nốt đen</span
+                    ><span style="font-size: 11.5px; color: #5e6f66">1 phách</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    aria-pressed="{{ subHalfOn }}"
+                    onClick="{{ pickHalf }}"
+                    style="{{ subHalfStyle }}"
+                  >
+                    <svg width="44" height="42" viewBox="0 0 44 44" fill="none">
+                      <ellipse cx="9" cy="35" rx="6.6" ry="4.8" transform="rotate(-22 9 35)" fill="#123F33"></ellipse>
+                      <ellipse cx="33" cy="35" rx="6.6" ry="4.8" transform="rotate(-22 33 35)" fill="#123F33"></ellipse>
+                      <path
+                        d="M15.2 33.5V7M39.2 33.5V7"
+                        stroke="#123F33"
+                        stroke-width="2.2"
+                        stroke-linecap="round"
+                      ></path>
+                      <rect x="14.1" y="5.5" width="26.2" height="5" fill="#123F33"></rect>
+                    </svg>
+                    <span style="font-size: 12.5px; font-weight: 700">Móc đơn</span
+                    ><span style="font-size: 11.5px; color: #5e6f66">1/2 phách</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    aria-pressed="{{ subQuarterOn }}"
+                    onClick="{{ pickQuarter }}"
+                    style="{{ subQuarterStyle }}"
+                  >
+                    <svg width="62" height="42" viewBox="0 0 84 44" fill="none">
+                      <ellipse cx="9" cy="35" rx="6.6" ry="4.8" transform="rotate(-22 9 35)" fill="#123F33"></ellipse>
+                      <ellipse cx="29" cy="35" rx="6.6" ry="4.8" transform="rotate(-22 29 35)" fill="#123F33"></ellipse>
+                      <ellipse cx="49" cy="35" rx="6.6" ry="4.8" transform="rotate(-22 49 35)" fill="#123F33"></ellipse>
+                      <ellipse cx="69" cy="35" rx="6.6" ry="4.8" transform="rotate(-22 69 35)" fill="#123F33"></ellipse>
+                      <path
+                        d="M15.2 33.5V7M35.2 33.5V7M55.2 33.5V7M75.2 33.5V7"
+                        stroke="#123F33"
+                        stroke-width="2.2"
+                        stroke-linecap="round"
+                      ></path>
+                      <rect x="14.1" y="5.5" width="62.2" height="4.6" fill="#123F33"></rect>
+                      <rect x="14.1" y="13.5" width="62.2" height="4.6" fill="#123F33"></rect>
+                    </svg>
+                    <span style="font-size: 12.5px; font-weight: 700">Móc kép</span
+                    ><span style="font-size: 11.5px; color: #5e6f66">1/4 phách</span>
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                aria-pressed="{{ mVib }}"
+                onClick="{{ toggleVib }}"
+                style="
+                  min-height: 44px;
+                  border: none;
+                  background: transparent;
+                  padding: 0;
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  gap: 12px;
+                  font-size: 14px;
+                  font-family: inherit;
+                  color: #123f33;
+                  cursor: pointer;
+                "
+              >
+                <span>Rung nhẹ theo phách mạnh</span
+                ><span style="{{ vibTrack }}"><span style="{{ vibKnob }}"></span></span>
+              </button>
+
+              <div style="font-size: 12.5px; line-height: 1.5; color: #5e6f66">
+                Chỉ để luyện thử. Tốc độ ở đây không làm đổi tốc độ yêu cầu của bài tập.
+              </div>
+            </div>
+
+            <div
+              style="
+                flex-shrink: 0;
+                padding: 14px 20px 26px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                border-top: 1px solid #cfdcd3;
+                background: #ffffff;
+              "
+            >
+              <button
+                type="button"
+                onClick="{{ tapTempo }}"
+                style="
+                  flex-grow: 1;
+                  min-height: 54px;
+                  border: 1px solid #cfdcd3;
+                  background: #f2f6f2;
+                  color: #123f33;
+                  border-radius: 16px;
+                  font-size: 15px;
+                  font-weight: 600;
+                  cursor: pointer;
+                "
+              >
+                Gõ theo nhịp
+              </button>
+              <button
+                type="button"
+                aria-label="{{ mPlayLabel }}"
+                aria-pressed="{{ mPlay }}"
+                onClick="{{ toggleMetro }}"
+                style="width:72px;height:72px;flex-shrink:0;border:none;border-radius:50%;background:{{ accent }};color:#FFFFFF;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;"
+              >
+                <sc-if value="{{ mPlay }}" hint-placeholder-val="{{ false }}"
+                  ><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="6" y="5" width="4.2" height="14" rx="1.2"></rect>
+                    <rect x="13.8" y="5" width="4.2" height="14" rx="1.2"></rect></svg></sc-if
+                ><sc-if value="{{ mNotPlay }}" hint-placeholder-val="{{ true }}"
+                  ><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5.2v13.6L19 12z"></path></svg
+                ></sc-if>
+              </button>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ================= Màn 2 · Tiến trình xử lý ================= -->
+        <sc-if value="{{ isS2 }}" hint-placeholder-val="{{ false }}">
+          <div
+            style="
+              position: absolute;
+              left: 0;
+              top: 0;
+              width: 428px;
+              height: 926px;
+              display: flex;
+              flex-direction: column;
+              background: #ffffff;
+              overflow: hidden;
+            "
+          >
+            <div style="flex-shrink: 0; padding: 26px 14px 4px; display: flex; align-items: center; gap: 8px">
+              <button
+                type="button"
+                aria-label="Quay lại"
+                onClick="{{ backFromS2 }}"
+                style="
+                  width: 44px;
+                  height: 44px;
+                  flex-shrink: 0;
+                  border: none;
+                  background: transparent;
+                  border-radius: 14px;
+                  color: #123f33;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  cursor: pointer;
+                "
+              >
+                <svg
+                  width="21"
+                  height="21"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="m15 5-7 7 7 7"></path>
+                </svg>
+              </button>
+              <div
+                style="flex-grow: 1; min-width: 0; margin-right: 78px; display: flex; flex-direction: column; gap: 1px"
+              >
+                <div
+                  style="
+                    font-size: 18px;
+                    font-weight: 800;
+                    letter-spacing: -0.02em;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                  "
+                >
+                  {{ pieceName }}
+                </div>
+                <div style="font-size: 12px; color: #5e6f66">{{ classLine }}</div>
+              </div>
+            </div>
+            <div
+              style="
+                flex-grow: 1;
+                min-height: 0;
+                padding: 14px 18px 0;
+                display: flex;
+                flex-direction: column;
+                gap: 14px;
+                overflow: hidden;
+              "
+            >
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px">
+                <span style="{{ chipStyle }}"><span style="{{ chipDot }}"></span>{{ statusLabel }}</span>
+                <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: 12px; color: #5e6f66"
+                  >{{ subFileLine }}</span
+                >
+              </div>
+              <div
+                style="
+                  border: 1px solid #e2eae4;
+                  border-radius: 18px;
+                  padding: 18px 16px 0;
+                  display: flex;
+                  flex-direction: column;
+                "
+              >
+                <sc-for list="{{ stages }}" as="st" hint-placeholder-count="4">
+                  <div style="display: flex; gap: 14px; align-items: stretch">
+                    <div style="display: flex; flex-direction: column; align-items: center">
+                      <span style="{{ st.dotStyle }}"
+                        ><sc-if value="{{ st.isDone }}" hint-placeholder-val="{{ false }}"
+                          ><svg
+                            width="15"
+                            height="15"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.6"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <path d="M4.5 12.5 9.5 17.5 19.5 7"></path></svg></sc-if
+                        ><sc-if value="{{ st.isActive }}" hint-placeholder-val="{{ false }}"
+                          ><span style="{{ st.innerStyle }}"></span></sc-if
+                        ><sc-if value="{{ st.isFail }}" hint-placeholder-val="{{ false }}"
+                          ><svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.6"
+                            stroke-linecap="round"
+                          >
+                            <path d="M6 6l12 12M18 6 6 18"></path></svg></sc-if
+                      ></span>
+                      <sc-if value="{{ st.hasLine }}" hint-placeholder-val="{{ false }}"
+                        ><span style="{{ st.lineStyle }}"></span
+                      ></sc-if>
+                    </div>
+                    <div style="padding: 2px 0 18px; display: flex; flex-direction: column; gap: 3px">
+                      <span style="{{ st.labelStyle }}">{{ st.label }}</span>
+                      <sc-if value="{{ st.hasText }}" hint-placeholder-val="{{ false }}"
+                        ><span style="font-size: 13px; line-height: 1.5; color: #5e6f66">{{ st.text }}</span></sc-if
+                      >
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+
+              <sc-if value="{{ sMsgBusy }}" hint-placeholder-val="{{ false }}"
+                ><div style="font-size: 12.5px; line-height: 1.55; color: #5e6f66">
+                  Bạn có thể rời màn hình này. Hệ thống vẫn xử lý và sẽ báo khi có kết quả.
+                </div></sc-if
+              >
+              <sc-if value="{{ sMsgDone }}" hint-placeholder-val="{{ false }}"
+                ><div
+                  style="
+                    border: 1px solid #e2eae4;
+                    background: #f2f6f2;
+                    border-radius: 16px;
+                    padding: 14px 16px;
+                    font-size: 14px;
+                    line-height: 1.55;
+                  "
+                >
+                  Hoàn tất. Đang mở kết quả phân tích của bạn.
+                </div></sc-if
+              >
+              <sc-if value="{{ sMsgRej }}" hint-placeholder-val="{{ false }}">
+                <div
+                  style="
+                    background: #fbf3de;
+                    border: 1px solid #e6d29a;
+                    color: #8a6a12;
+                    font-size: 13.5px;
+                    line-height: 1.5;
+                    padding: 14px 16px;
+                    border-radius: 16px;
+                  "
+                >
+                  Bản thu không đạt chất lượng: {{ reason }}. Lượt này không bị tính vào số lần nộp. Bạn có thể ghi âm
+                  hoặc tải file khác.
+                </div>
+                <button
+                  type="button"
+                  onClick="{{ redoAfterReject }}"
+                  style="
+                    min-height: 52px;
+                    width: 100%;
+                    border: none;
+                    border-radius: 15px;
+                    background: #123f33;
+                    color: #ffffff;
+                    font-size: 15px;
+                    font-weight: 600;
+                    font-family: inherit;
+                    cursor: pointer;
+                  "
+                >
+                  Ghi âm lại
+                </button>
+              </sc-if>
+              <sc-if value="{{ sMsgErr }}" hint-placeholder-val="{{ false }}">
+                <div
+                  style="
+                    background: #fbf3de;
+                    border: 1px solid #e6d29a;
+                    color: #8a6a12;
+                    font-size: 13.5px;
+                    line-height: 1.5;
+                    padding: 14px 16px;
+                    border-radius: 16px;
+                  "
+                >
+                  Xử lý bản thu thất bại. File của bạn vẫn được giữ lại. Lượt này không bị tính vào số lần nộp.
+                </div>
+                <sc-if value="{{ retryWait }}" hint-placeholder-val="{{ false }}"
+                  ><div style="font-size: 13px; color: #5e6f66">Bạn có thể thử lại sau {{ retrySec }} giây.</div></sc-if
+                >
+                <div style="font-size: 12.5px; color: #5e6f66">Đã thử lại {{ retriesUsed }} / 3 lần</div>
+                <button type="button" disabled="{{ retryWait }}" onClick="{{ retry }}" style="{{ retryStyle }}">
+                  Thử lại
+                </button>
+              </sc-if>
+              <sc-if value="{{ sMsgExh }}" hint-placeholder-val="{{ false }}">
+                <div
+                  style="
+                    background: #fbf3de;
+                    border: 1px solid #e6d29a;
+                    color: #8a6a12;
+                    font-size: 13.5px;
+                    line-height: 1.55;
+                    padding: 14px 16px;
+                    border-radius: 16px;
+                  "
+                >
+                  Hệ thống vẫn chưa xử lý được sau 3 lần thử lại. File phân tích của bạn đã bị xóa khỏi máy chủ. Bạn có
+                  thể tải bản thu về và nộp lại sau; bản nộp mới sẽ tính vào số lần nộp.
+                </div>
+                <button
+                  type="button"
+                  onClick="{{ downloadFile }}"
+                  style="
+                    min-height: 52px;
+                    width: 100%;
+                    border: none;
+                    border-radius: 15px;
+                    background: #123f33;
+                    color: #ffffff;
+                    font-size: 15px;
+                    font-weight: 600;
+                    font-family: inherit;
+                    cursor: pointer;
+                  "
+                >
+                  Tải file về
+                </button>
+              </sc-if>
+            </div>
+            <div style="flex-shrink: 0; height: 30px"></div>
+          </div>
+        </sc-if>
+
+        <!-- ================= Lớp phủ ================= -->
+        <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+          <div style="position: absolute; left: 24px; right: 24px; bottom: 120px; z-index: 60; pointer-events: none">
+            <div
+              style="
+                background: #123f33;
+                color: #ffffff;
+                border-radius: 14px;
+                padding: 12px 16px;
+                font-size: 13.5px;
+                line-height: 1.45;
+                text-align: center;
+              "
+            >
+              {{ toastText }}
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ banner }}" hint-placeholder-val="{{ false }}">
+          <button
+            type="button"
+            onClick="{{ openResults }}"
+            style="
+              position: absolute;
+              left: 12px;
+              right: 12px;
+              top: 12px;
+              z-index: 100;
+              border: none;
+              border-radius: 16px;
+              background: #123f33;
+              color: #ffffff;
+              padding: 14px 16px;
+              font-size: 13.5px;
+              font-weight: 600;
+              line-height: 1.45;
+              text-align: left;
+              font-family: inherit;
+              cursor: pointer;
+            "
+          >
+            Bản thu của bạn đã được phân tích xong. Nhấn để xem kết quả.
+          </button>
+        </sc-if>
+
+        <button
+          type="button"
+          aria-label="Mở bảng Demo"
+          onClick="{{ openDemo }}"
+          style="
+            position: absolute;
+            right: 14px;
+            top: 32px;
+            z-index: 30;
+            min-height: 36px;
+            padding: 0 16px;
+            border-radius: 18px;
+            border: 1px solid #c8a63c;
+            background: #fbf3de;
+            color: #8a6a12;
+            font-size: 13.5px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+          "
+        >
+          Demo
+        </button>
+
+        <sc-if value="{{ demoOpen }}" hint-placeholder-val="{{ false }}">
+          <button
+            type="button"
+            aria-label="Đóng bảng Demo"
+            onClick="{{ closeDemo }}"
+            style="
+              position: absolute;
+              left: 0;
+              top: 0;
+              width: 428px;
+              height: 926px;
+              border: none;
+              padding: 0;
+              background: rgba(18, 63, 51, 0.38);
+              z-index: 70;
+              cursor: pointer;
+            "
+          ></button>
+          <div
+            style="
+              position: absolute;
+              left: 0;
+              top: 70px;
+              width: 428px;
+              height: 856px;
+              box-sizing: border-box;
+              background: #ffffff;
+              border-radius: 24px 24px 0 0;
+              z-index: 80;
+              display: flex;
+              flex-direction: column;
+              overflow: hidden;
+            "
+          >
+            <div
+              style="
+                flex-shrink: 0;
+                padding: 16px 16px 10px 20px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                border-bottom: 1px solid #e2eae4;
+              "
+            >
+              <span style="flex-grow: 1; font-size: 18px; font-weight: 800; letter-spacing: -0.02em">Demo</span>
+              <button
+                type="button"
+                onClick="{{ resetDemo }}"
+                style="
+                  min-height: 40px;
+                  border: 1px solid #cfdcd3;
+                  background: #ffffff;
+                  color: #123f33;
+                  border-radius: 12px;
+                  padding: 0 14px;
+                  font-size: 13.5px;
+                  font-weight: 600;
+                  font-family: inherit;
+                  cursor: pointer;
+                "
+              >
+                Đặt lại
+              </button>
+              <button
+                type="button"
+                aria-label="Đóng"
+                onClick="{{ closeDemo }}"
+                style="
+                  width: 44px;
+                  height: 44px;
+                  flex-shrink: 0;
+                  border: none;
+                  background: transparent;
+                  border-radius: 14px;
+                  color: #123f33;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  cursor: pointer;
+                "
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.9"
+                  stroke-linecap="round"
+                >
+                  <path d="M6 6l12 12M18 6 6 18"></path>
+                </svg>
+              </button>
+            </div>
+            <div style="flex-grow: 1; overflow: hidden; padding: 2px 20px 12px; display: flex; flex-direction: column">
+              <sc-for list="{{ demoA }}" as="d" hint-placeholder-count="4">
+                <button
+                  type="button"
+                  aria-pressed="{{ d.on }}"
+                  onClick="{{ d.toggle }}"
+                  style="
+                    width: 100%;
+                    min-height: 48px;
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    border: none;
+                    border-bottom: 1px solid #edf2ee;
+                    background: transparent;
+                    padding: 0;
+                    text-align: left;
+                    cursor: pointer;
+                    font-family: inherit;
+                    color: #123f33;
+                  "
+                >
+                  <span style="flex-grow: 1; font-size: 14px">{{ d.label }}</span
+                  ><span style="{{ d.trackStyle }}"><span style="{{ d.knobStyle }}"></span></span>
+                </button>
+              </sc-for>
+              <div
+                style="
+                  padding: 10px 0 12px;
+                  border-bottom: 1px solid #edf2ee;
+                  display: flex;
+                  flex-direction: column;
+                  gap: 8px;
+                "
+              >
+                <span style="font-size: 14px">File không hợp lệ</span>
+                <div
+                  style="
+                    display: flex;
+                    gap: 4px;
+                    padding: 3px;
+                    border: 1px solid #cfdcd3;
+                    border-radius: 13px;
+                    background: #f2f6f2;
+                  "
+                >
+                  <sc-for list="{{ invalidOpts }}" as="o" hint-placeholder-count="4"
+                    ><button type="button" aria-pressed="{{ o.sel }}" onClick="{{ o.pick }}" style="{{ o.style }}">
+                      {{ o.label }}
+                    </button></sc-for
+                  >
+                </div>
+              </div>
+              <sc-for list="{{ demoB }}" as="d" hint-placeholder-count="4">
+                <button
+                  type="button"
+                  aria-pressed="{{ d.on }}"
+                  onClick="{{ d.toggle }}"
+                  style="
+                    width: 100%;
+                    min-height: 48px;
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    border: none;
+                    border-bottom: 1px solid #edf2ee;
+                    background: transparent;
+                    padding: 0;
+                    text-align: left;
+                    cursor: pointer;
+                    font-family: inherit;
+                    color: #123f33;
+                  "
+                >
+                  <span style="flex-grow: 1; font-size: 14px">{{ d.label }}</span
+                  ><span style="{{ d.trackStyle }}"><span style="{{ d.knobStyle }}"></span></span>
+                </button>
+              </sc-for>
+              <div
+                style="
+                  padding: 10px 0 12px;
+                  border-bottom: 1px solid #edf2ee;
+                  display: flex;
+                  flex-direction: column;
+                  gap: 8px;
+                "
+              >
+                <span style="font-size: 14px">AI lỗi hoặc chạy quá 1 phút</span>
+                <div
+                  style="
+                    display: flex;
+                    gap: 4px;
+                    padding: 3px;
+                    border: 1px solid #cfdcd3;
+                    border-radius: 13px;
+                    background: #f2f6f2;
+                  "
+                >
+                  <sc-for list="{{ aiOpts }}" as="o" hint-placeholder-count="3"
+                    ><button type="button" aria-pressed="{{ o.sel }}" onClick="{{ o.pick }}" style="{{ o.style }}">
+                      {{ o.label }}
+                    </button></sc-for
+                  >
+                </div>
+              </div>
+              <div style="padding: 10px 0 12px; display: flex; flex-direction: column; gap: 8px">
+                <span style="font-size: 14px">Bước bị lỗi</span>
+                <div
+                  style="
+                    display: flex;
+                    gap: 4px;
+                    padding: 3px;
+                    border: 1px solid #cfdcd3;
+                    border-radius: 13px;
+                    background: #f2f6f2;
+                  "
+                >
+                  <sc-for list="{{ jobOpts }}" as="o" hint-placeholder-count="3"
+                    ><button type="button" aria-pressed="{{ o.sel }}" onClick="{{ o.pick }}" style="{{ o.style }}">
+                      {{ o.label }}
+                    </button></sc-for
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ popupMic }}" hint-placeholder-val="{{ false }}">
+          <div
+            style="
+              position: absolute;
+              left: 0;
+              top: 0;
+              width: 428px;
+              height: 926px;
+              background: rgba(18, 63, 51, 0.45);
+              z-index: 110;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            "
+          >
+            <div
+              role="dialog"
+              aria-modal="true"
+              style="
+                width: 340px;
+                box-sizing: border-box;
+                background: #ffffff;
+                border-radius: 22px;
+                padding: 22px 20px 18px;
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+              "
+            >
+              <span style="font-size: 14.5px; line-height: 1.6">{{ micPopupText }}</span>
+              <button
+                type="button"
+                onClick="{{ closeMic }}"
+                style="
+                  min-height: 50px;
+                  width: 100%;
+                  border: none;
+                  border-radius: 15px;
+                  background: #123f33;
+                  color: #ffffff;
+                  font-size: 15px;
+                  font-weight: 600;
+                  font-family: inherit;
+                  cursor: pointer;
+                "
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </x-dc>
+    <script
+      type="text/x-dc"
+      data-dc-script
+      data-props='{"accent":{"editor":"color","default":"#2F7A62","options":["#2F7A62","#123F33","#3A6B44","#C8A63C"],"section":"Chủ đề"},"$preview":{"width":428,"height":926}}'
+    >
+      // ===== Hằng số cấu hình =====
+      const TUNER_TOLERANCE_CENTS = 10;
+      const TEMPO_TOLERANCE_PERCENT = 5;
+      const COUNT_IN_BEATS = 4;
+      const STAGE_SECONDS = 2.5;
+      const RETRY_DELAY_FIRST_S = 5;
+      const RETRY_DELAY_LATER_S = 10;
+      const MAX_RETRIES = 3;
+      const FILE_FORMATS = ['mp3', 'wav', 'm4a'];
+      const FILE_MAX_MB = 20;
+      const FILE_MIN_S = 10;
+      const FILE_MAX_S = 180;
+
+      // ===== Dữ liệu mô phỏng (một chỗ duy nhất) =====
+      const SAMPLE = {
+        piece: 'Lý ngựa ô - Đàn Nhị',
+        className: 'Lớp Violin K18A',
+        instrument: 'Violin',
+        lesson: 'Bài 3',
+        deadline: '28/10/2026',
+        targetBpm: 96,
+        pieceLen: 120,
+        submissionsLeft: 3,
+        files: [
+          { name: 'ban-thu-bai-1.m4a', fmt: 'm4a', mb: 3.2, dur: 118 },
+          { name: 'ban-thu-bai-2.mp3', fmt: 'mp3', mb: 4.1, dur: 127 }
+        ]
+      };
+
+      // ===== Thông báo (mã chỉ nằm trong comment) =====
+      const MSG = {
+        expired: 'Bạn không thể nộp bài vì đã quá hạn hoặc đã dùng hết số lần nộp.', // MSG-16
+        mic: 'Cần cho phép truy cập micro để dùng tính năng này.', // MSG-10
+        micPopup: 'Cần cho phép truy cập micro. Vui lòng bật quyền micro trong cài đặt trình duyệt rồi thử lại.', // MSG-10
+        format: 'Định dạng file không được hỗ trợ. Vui lòng chọn file có định dạng MP3, WAV, M4A.', // MSG-13
+        size: 'File vượt quá dung lượng tối đa 20 MB.', // MSG-14
+        duration: 'Thời lượng bản thu phải nằm trong khoảng từ 00:10 đến 03:00.', // MSG-15
+        weak: 'Kết nối mạng yếu, quá trình tải lên có thể chậm hoặc thất bại.', // MSG-17
+        busy: 'Bản nộp trước đang được xử lý. Vui lòng đợi hoàn tất rồi nộp bản mới.', // GBR-49
+        sent: 'Đã gửi bản thu. Hệ thống đang xử lý.', // MSG-18
+        autoStop: 'Bản thu đã tự động dừng ở cuối bài.', // MSG-44
+        retrying: 'Đang xử lý lại bản thu...', // MSG-24
+        download: 'Đã tải bản thu về máy.',
+        refNote: 'Đang phát nốt mẫu...'
+      };
+
+      // ===== Nốt nhạc =====
+      const NOTES = {
+        'Sol4': { vn: 'Sol', en: 'G4', f: 392.00 },
+        'La4': { vn: 'La', en: 'A4', f: 440.00 },
+        'Si4': { vn: 'Si', en: 'B4', f: 493.88 },
+        'Đô5': { vn: 'Đô', en: 'C5', f: 523.25 },
+        'Rê5': { vn: 'Rê', en: 'D5', f: 587.33 },
+        'Mi5': { vn: 'Mi', en: 'E5', f: 659.25 }
+      };
+      // Các dây cần kiểm tra của nhạc cụ trong bài tập (violin)
+      const STRINGS = [
+        { code: 'Dây 4', vn: 'Sol', en: 'G3', f: 196.00, off: -6 },
+        { code: 'Dây 3', vn: 'Rê', en: 'D4', f: 293.66, off: -18 },
+        { code: 'Dây 2', vn: 'La', en: 'A4', f: 440.00, off: 16 },
+        { code: 'Dây 1', vn: 'Mi', en: 'E5', f: 659.25, off: -24 }
+      ];
+      const SIGS = [
+        { label: '2/4', beats: 2 },
+        { label: '3/4', beats: 3 },
+        { label: '4/4', beats: 4 },
+        { label: '6/8', beats: 6 }
+      ];
+      const SUBS = {
+        white: 'Nốt trắng · 2 phách',
+        black: 'Nốt đen · 1 phách',
+        half: 'Móc đơn · 1/2 phách',
+        quarter: 'Móc kép · 1/4 phách'
+      };
+
+      // ===== Bản đồ nốt: phủ toàn bài ở BPM mục tiêu =====
+      function buildNoteMap(bpm, len) {
+        const beat = 60 / bpm;
+        const bars = [
+          [['Sol4', 1], ['La4', 1], ['Si4', 1], ['Rê5', 1]],
+          [['Mi5', 1], ['Rê5', 1], ['Si4', 1], ['Sol4', 1]],
+          [['La4', 1], ['Si4', 1], ['Đô5', 1], ['Si4', 1]],
+          [['Sol4', 2], ['Rê5', 2]]
+        ];
+        const notes = [];
+        let t = 0;
+        let bar = 0;
+        while (t < len) {
+          const pat = bars[bar % bars.length];
+          for (let i = 0; i < pat.length; i++) {
+            if (t >= len) break;
+            notes.push({ name: pat[i][0], start: t, dur: pat[i][1] * beat });
+            t += pat[i][1] * beat;
+          }
+          bar++;
+        }
+        return notes;
+      }
+      const NOTE_MAP = buildNoteMap(SAMPLE.targetBpm, SAMPLE.pieceLen);
+      function noteAt(t) {
+        for (let i = NOTE_MAP.length - 1; i >= 0; i--) {
+          if (t >= NOTE_MAP[i].start) return NOTE_MAP[i];
+        }
+        return NOTE_MAP[0];
+      }
+
+      // ===== Số liệu đo mô phỏng (chỉ để hiển thị, không lưu) =====
+      function simCents(t) {
+        let c = 3.2 * Math.sin(t * 1.7) + 2.2 * Math.sin(t * 4.3 + 1);
+        const k = Math.floor(t / 11);
+        const ph = t - k * 11;
+        if (ph > 8.4 && ph < 9.8) c += (k % 2 === 0 ? 26 : -24) * Math.sin(Math.PI * (ph - 8.4) / 1.4);
+        return Math.max(-45, Math.min(45, c));
+      }
+      function simBpm(t) {
+        let b = SAMPLE.targetBpm + 1.8 * Math.sin(t * 0.9) + 1.2 * Math.sin(t * 2.3 + 2);
+        const k = Math.floor(t / 17);
+        const ph = t - k * 17;
+        if (ph > 12 && ph < 14.5) b += (k % 2 === 0 ? 7 : -8) * Math.sin(Math.PI * (ph - 12) / 2.5);
+        return b;
+      }
+      function tuneCents(s, now) {
+        return STRINGS[s.tuneSel].off * Math.exp(-(now - s.tuneStart) / 4000) + 1.4 * Math.sin(now / 260);
+      }
+      function staticBars(n, seed) {
+        const out = [];
+        for (let i = 0; i < n; i++) {
+          out.push(Math.min(1, 0.28 + 0.6 * Math.abs(Math.sin(i * 0.7 + seed) * Math.cos(i * 0.23 + seed * 0.5))));
+        }
+        return out;
+      }
+      function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+      function fmtTime(sec) {
+        const s = Math.max(0, Math.floor(sec));
+        return pad2(Math.floor(s / 60)) + ':' + pad2(s % 60);
+      }
+      function mbText(mb) { return (Math.round(mb * 10) / 10).toFixed(1).replace('.', ',') + ' MB'; }
+      function signed(n) { const r = Math.round(n); return (r > 0 ? '+' : (r < 0 ? '−' : '')) + Math.abs(r); }
+      function btnStyle(kind, disabled) {
+        const base = 'min-height:50px;border-radius:15px;font-size:15px;font-weight:600;font-family:inherit;display:flex;align-items:center;justify-content:center;padding:0 16px;';
+        if (disabled) return base + 'background:#EDF2EE;color:#93A399;border:1px solid #E2EAE4;cursor:not-allowed;';
+        if (kind === 'primary') return base + 'background:#123F33;color:#FFFFFF;border:none;cursor:pointer;';
+        return base + 'background:#FFFFFF;color:#123F33;border:1px solid #CFDCD3;cursor:pointer;';
+      }
+      function switchStyles(on) {
+        return {
+          track: 'position:relative;display:block;width:44px;height:26px;flex-shrink:0;border-radius:13px;background:' + (on ? '#2F7A62' : '#CFDCD3') + ';',
+          knob: 'position:absolute;top:3px;left:' + (on ? 21 : 3) + 'px;width:20px;height:20px;border-radius:50%;background:#FFFFFF;'
+        };
+      }
+      function validateFile(f) {
+        if (FILE_FORMATS.indexOf(f.fmt) < 0) return 'format';
+        if (f.mb > FILE_MAX_MB) return 'size';
+        if (f.dur < FILE_MIN_S || f.dur > FILE_MAX_S) return 'duration';
+        return '';
+      }
+
+      class Component extends DCLogic {
+        constructor(props) {
+          super(props);
+          this.state = this.freshState();
+          this.timer = null;
+        }
+
+        freshDemo() {
+          return { expired: false, micDenied: false, otherProc: false, noPitch: false, invalid: 'none',
+                   weakNet: false, qcFail: false, leaveProc: false, autoStop: false, aiMode: 'none', failJob: 1 };
+        }
+        // Mỗi lần mở màn ghi âm: hai panel mở rộng, tiếng gõ nhịp tắt, không giữ bản thu cũ
+        freshS1() {
+          return { mode: 'record', view: 'main', tempoOpen: true, tunerOpen: true, clickOn: false,
+                   rec: 'idle', countStart: 0, recStart: 0, recOffset: 0, takeLen: 0, playing: false, playPos: 0,
+                   file: null, fileIdx: 0, filePlaying: false, filePos: 0,
+                   tuneSel: 1, tuneStart: Date.now(), tuned: [true, false, false, false], tuneDoneAt: 0,
+                   mBpm: SAMPLE.targetBpm, mSig: 2, mAcc: ['strong', 'soft', 'soft', 'soft', 'soft', 'soft'], mSub: 'black',
+                   mPlay: false, mStart: 0, mVib: true, taps: [] };
+        }
+        freshState() {
+          return Object.assign({ screen: 's1', demo: this.freshDemo(), demoOpen: false, toast: null, banner: false, popupMic: false,
+            left: SAMPLE.submissionsLeft, sub: null, pendingSub: null, uploading: false, uploadUntil: 0, lastTick: Date.now(), s2Enter: 0 }, this.freshS1());
+        }
+
+        componentDidMount() { this.timer = setInterval(() => { this.tick(); }, 60); }
+        componentWillUnmount() { if (this.timer) clearInterval(this.timer); }
+
+        // ---------- vòng lặp mô phỏng ----------
+        tick() {
+          const now = Date.now();
+          const s = this.state;
+          const dt = Math.min(0.25, (now - s.lastTick) / 1000);
+          const patch = { lastTick: now };
+          if (s.toast && now > s.toast.until) patch.toast = null;
+
+          if (s.screen === 's1') {
+            if (s.rec === 'countin') {
+              const beatMs = 60000 / SAMPLE.targetBpm;
+              if (now - s.countStart >= COUNT_IN_BEATS * beatMs) {
+                patch.rec = 'recording';
+                patch.recStart = now;
+                patch.recOffset = s.demo.autoStop ? SAMPLE.pieceLen - 8 : 0;
+              }
+            }
+            if (s.rec === 'recording') {
+              const el = s.recOffset + (now - s.recStart) / 1000;
+              if (el >= SAMPLE.pieceLen) {
+                patch.rec = 'preview';
+                patch.takeLen = SAMPLE.pieceLen;
+                patch.toast = { text: MSG.autoStop, until: now + 3200 };
+              }
+            }
+            if (s.playing) {
+              const p = s.playPos + dt;
+              if (p >= s.takeLen) { patch.playing = false; patch.playPos = 0; } else { patch.playPos = p; }
+            }
+            if (s.filePlaying && s.file) {
+              const p2 = s.filePos + dt;
+              if (p2 >= s.file.dur) { patch.filePlaying = false; patch.filePos = 0; } else { patch.filePos = p2; }
+            }
+            if (s.view === 'tuner' && !s.demo.micDenied) {
+              const c = tuneCents(s, now);
+              if (Math.abs(c) <= TUNER_TOLERANCE_CENTS && !s.tuned[s.tuneSel]) {
+                const tn = s.tuned.slice();
+                tn[s.tuneSel] = true;
+                patch.tuned = tn;
+                patch.tuneDoneAt = now;
+              }
+            }
+            if (s.uploading && s.pendingSub && now >= s.uploadUntil) {
+              this.commit(s.pendingSub, now);
+              return;
+            }
+          }
+
+          this.stepProcessing(s, now, patch);
+
+          if (s.screen === 's2' && s.demo.leaveProc && s.sub && s.sub.status === 'Đang xử lý' && now - s.s2Enter > 1000) {
+            patch.screen = 'entry';
+          }
+          this.setState(patch);
+        }
+
+        // Xử lý nền: chạy ở mọi màn hình. Bốn bước theo thứ tự (0..3), cập nhật khi mỗi bước bắt đầu.
+        stepProcessing(s, now, patch) {
+          const sub = s.sub;
+          if (!sub) return;
+          if (sub.status === 'Đang xử lý') {
+            if ((now - sub.stageStart) / 1000 >= STAGE_SECONDS) {
+              if (sub.stage === 0) {
+                if (s.demo.qcFail) {
+                  patch.sub = Object.assign({}, sub, { status: 'Từ chối', reason: 'Âm lượng quá nhỏ' }); // GBR-12
+                } else {
+                  patch.sub = Object.assign({}, sub, { stage: 1, stageStart: now });
+                }
+              } else {
+                const ai = s.demo.aiMode;
+                const failHere = ai !== 'none' && sub.stage === s.demo.failJob && (ai === 'always' || sub.fails === 0);
+                if (failHere) {
+                  // GBR-65: một bước lỗi hoặc chạy quá 1 phút. GBR-59: lần đầu chờ 5 giây, các lần sau 10 giây
+                  const delay = sub.fails === 0 ? RETRY_DELAY_FIRST_S : RETRY_DELAY_LATER_S;
+                  patch.sub = Object.assign({}, sub, { status: 'Lỗi xử lý', fails: sub.fails + 1, retryAt: now + delay * 1000,
+                    exhausted: sub.retriesUsed >= MAX_RETRIES });
+                } else if (sub.stage < 3) {
+                  patch.sub = Object.assign({}, sub, { stage: sub.stage + 1, stageStart: now });
+                } else {
+                  patch.sub = Object.assign({}, sub, { stage: 4, status: 'Hoàn tất', doneAt: now, notified: false });
+                  patch.left = Math.max(0, s.left - 1);
+                }
+              }
+            }
+          } else if (sub.status === 'Hoàn tất') {
+            if (s.screen === 's2') {
+              if (now - sub.doneAt >= 1500) { patch.screen = 'results'; patch.banner = false; } // GBR-52
+            } else if (s.screen !== 'results' && !sub.notified) {
+              patch.sub = Object.assign({}, sub, { notified: true });
+              patch.banner = true; // MSG-43
+            }
+          }
+        }
+
+        // ---------- điều hướng ----------
+        backFromS1() {
+          if (this.state.view !== 'main') { this.closeDetail(); return; }
+          this.setState(Object.assign({ screen: 'entry' }, this.freshS1())); // GBR-51: bỏ bản đang ghi hoặc đang nghe thử, không hỏi
+        }
+        backFromS2() { this.setState({ screen: 'entry' }); }
+        openResults() { this.setState({ screen: 'results', banner: false }); }
+        redoAfterReject() { this.setState(Object.assign({ screen: 's1', sub: null }, this.freshS1())); }
+        openUpload() {
+          const s = this.state;
+          if (s.demo.expired || s.left <= 0) { // GBR-25: không mở màn hình tải lên
+            this.setState({ toast: { text: MSG.expired, until: Date.now() + 3600 } });
+            return;
+          }
+          this.setState(Object.assign({ screen: 's1' }, this.freshS1()));
+        }
+        commit(sub, now) {
+          this.setState(Object.assign({ sub: sub, screen: 's2', s2Enter: now, uploading: false, pendingSub: null, banner: false,
+            toast: { text: MSG.sent, until: now + 2800 } }, this.freshS1()));
+        }
+
+        // ---------- Màn ghi âm ----------
+        isBlocked(s) {
+          const d = s.demo;
+          return !!(d.expired || s.left <= 0 || d.otherProc || (s.sub && s.sub.status === 'Đang xử lý'));
+        }
+        canOpenDetail(s) { return s.mode === 'record' && (s.rec === 'idle' || s.rec === 'preview'); }
+        toggleTempo() { this.setState({ tempoOpen: !this.state.tempoOpen }); }
+        toggleTuner() { this.setState({ tunerOpen: !this.state.tunerOpen }); }
+        toggleClick() { this.setState({ clickOn: !this.state.clickOn }); }
+        setMode(m) {
+          const s = this.state;
+          if (s.rec === 'countin' || s.rec === 'recording') return;
+          this.setState({ mode: m, playing: false, filePlaying: false });
+        }
+        openTuner() {
+          const s = this.state;
+          if (!this.canOpenDetail(s)) return;
+          this.setState({ view: 'tuner', playing: false, tuneStart: Date.now() });
+        }
+        openMetro() {
+          const s = this.state;
+          if (!this.canOpenDetail(s)) return;
+          this.setState({ view: 'metro', playing: false });
+        }
+        closeDetail() { this.setState({ view: 'main', mPlay: false }); }
+        startRec() {
+          const s = this.state;
+          if (this.isBlocked(s) || s.rec !== 'idle') return;
+          if (s.demo.micDenied) { this.setState({ popupMic: true }); return; } // MSG-10
+          this.setState({ rec: 'countin', countStart: Date.now(), takeLen: 0, playing: false, playPos: 0 });
+        }
+        stopRec() {
+          const s = this.state;
+          if (s.rec !== 'recording') return;
+          const el = Math.min(SAMPLE.pieceLen, s.recOffset + (Date.now() - s.recStart) / 1000);
+          this.setState({ rec: 'preview', takeLen: el, playing: false, playPos: 0 });
+        }
+        rerecord() { this.setState({ rec: 'idle', takeLen: 0, playing: false, playPos: 0 }); } // GBR-51
+        togglePlay() { this.setState({ playing: !this.state.playing }); }
+        makeFile(i) {
+          const f = Object.assign({}, SAMPLE.files[i]);
+          const forced = this.state.demo.invalid;
+          if (forced === 'format') f.fmt = 'ogg';
+          if (forced === 'size') f.mb = 24.6;
+          if (forced === 'duration') f.dur = 5;
+          return f;
+        }
+        pickFile() {
+          if (this.isBlocked(this.state)) return;
+          this.setState({ file: this.makeFile(0), fileIdx: 0, filePlaying: false, filePos: 0 });
+        }
+        pickOther() {
+          const s = this.state;
+          if (this.isBlocked(s)) return;
+          const i = (s.fileIdx + 1) % SAMPLE.files.length;
+          this.setState({ file: this.makeFile(i), fileIdx: i, filePlaying: false, filePos: 0 });
+        }
+        toggleFilePlay() { this.setState({ filePlaying: !this.state.filePlaying }); }
+        candidateError(s) {
+          if (s.mode === 'record') {
+            if (s.rec !== 'preview') return '';
+            if (s.demo.invalid !== 'none') return s.demo.invalid;
+            return validateFile({ fmt: 'wav', mb: Math.max(0.2, Math.round(s.takeLen) * 0.1), dur: s.takeLen });
+          }
+          return s.file ? validateFile(s.file) : '';
+        }
+        send() {
+          const s = this.state;
+          if (this.isBlocked(s) || s.uploading) return;
+          if (this.candidateError(s)) return;
+          const now = Date.now();
+          let file = null;
+          if (s.mode === 'record') {
+            if (s.rec !== 'preview') return;
+            const dur = Math.round(s.takeLen);
+            file = { name: 'ban-thu-vua-ghi.wav', fmt: 'wav', mb: Math.max(0.2, dur * 0.1), dur: dur, source: 'record' };
+          } else {
+            if (!s.file) return;
+            file = Object.assign({}, s.file, { source: 'upload' });
+          }
+          const sub = { id: now, file: file, status: 'Đang xử lý', stage: 0, stageStart: now, fails: 0, retriesUsed: 0, exhausted: false, retryAt: 0, reason: '', doneAt: 0, notified: false };
+          if (s.demo.weakNet) {
+            this.setState({ uploading: true, uploadUntil: now + 2600, pendingSub: sub });
+          } else {
+            this.commit(sub, now);
+          }
+        }
+
+        // ---------- Tuner chi tiết ----------
+        pickString(i) {
+          const s = this.state;
+          const tn = s.tuned.slice();
+          tn[i] = false;
+          this.setState({ tuneSel: i, tuneStart: Date.now(), tuned: tn, tuneDoneAt: 0 });
+        }
+        playRef() {
+          const st = STRINGS[this.state.tuneSel];
+          this.setState({ toast: { text: MSG.refNote + ' ' + st.vn + ' (' + st.en + ')', until: Date.now() + 2200 } });
+        }
+
+        // ---------- Metronome chi tiết ----------
+        setBpm(v) { this.setState({ mBpm: Math.max(40, Math.min(208, Math.round(v))) }); }
+        setSig(i) {
+          this.setState({ mSig: i, mAcc: ['strong', 'soft', 'soft', 'soft', 'soft', 'soft'] });
+        }
+        cycleBeat(i) {
+          const a = this.state.mAcc.slice();
+          a[i] = a[i] === 'strong' ? 'soft' : (a[i] === 'soft' ? 'off' : 'strong');
+          this.setState({ mAcc: a });
+        }
+        setSub(k) { this.setState({ mSub: k }); }
+        toggleVib() { this.setState({ mVib: !this.state.mVib }); }
+        toggleMetro() {
+          const s = this.state;
+          this.setState({ mPlay: !s.mPlay, mStart: Date.now() });
+        }
+        tapTempo() {
+          const s = this.state;
+          const now = Date.now();
+          let t = s.taps.filter((x) => now - x < 2500);
+          t.push(now);
+          if (t.length > 5) t = t.slice(t.length - 5);
+          const patch = { taps: t };
+          if (t.length >= 2) {
+            const avg = (t[t.length - 1] - t[0]) / (t.length - 1);
+            patch.mBpm = Math.max(40, Math.min(208, Math.round(60000 / avg)));
+          }
+          this.setState(patch);
+        }
+
+        // ---------- Màn 2 ----------
+        retry() {
+          const s = this.state;
+          const sub = s.sub;
+          const now = Date.now();
+          if (!sub || sub.status !== 'Lỗi xử lý' || sub.exhausted || now < sub.retryAt) return;
+          // GBR-63: chạy lại từ bước bị lỗi
+          this.setState({ sub: Object.assign({}, sub, { status: 'Đang xử lý', stageStart: now, retriesUsed: sub.retriesUsed + 1 }), toast: { text: MSG.retrying, until: now + 2500 } });
+        }
+        downloadFile() { this.setState({ toast: { text: MSG.download, until: Date.now() + 2600 } }); }
+
+        // ---------- Demo ----------
+        openDemo() { this.setState({ demoOpen: true }); }
+        closeDemo() { this.setState({ demoOpen: false }); }
+        resetDemo() { this.setState(Object.assign(this.freshState(), { demoOpen: true })); }
+        toggleDemo(key) {
+          const s = this.state;
+          const d = Object.assign({}, s.demo);
+          d[key] = !d[key];
+          const patch = { demo: d };
+          if (key === 'expired' && d.expired && s.screen === 's1') {
+            Object.assign(patch, { screen: 'entry', demoOpen: false, toast: { text: MSG.expired, until: Date.now() + 3600 } }, this.freshS1());
+          }
+          this.setState(patch);
+        }
+        setDemoVal(key, v) { this.setState({ demo: Object.assign({}, this.state.demo, { [key]: v }) }); }
+        closeMic() { this.setState({ popupMic: false }); }
+
+        renderVals() {
+          const s = this.state;
+          const d = s.demo;
+          const now = Date.now();
+          const acc = (this.props && this.props.accent) || '#2F7A62';
+          const bpm = SAMPLE.targetBpm;
+          const beatMs = 60000 / bpm;
+          const mono = "font-family:'IBM Plex Mono',monospace;";
+          const OK = '#3A6B44';
+          const WARN = '#C97B3C';
+          const IDLE = '#93A399';
+
+          const busy = !!(s.sub && s.sub.status === 'Đang xử lý');
+          const blocked = !!(d.expired || s.left <= 0 || d.otherProc || busy);
+          const notices = [];
+          if (d.expired || s.left <= 0) notices.push({ text: MSG.expired });
+          if (d.otherProc || busy) notices.push({ text: MSG.busy });
+
+          const isRecordMode = s.mode === 'record';
+          const canOpen = this.canOpenDetail(s);
+          const recActive = s.rec === 'countin' || s.rec === 'recording';
+
+          // ---- thời gian ghi và số đo mô phỏng ----
+          const recEl = s.rec === 'recording' ? Math.min(SAMPLE.pieceLen, s.recOffset + (now - s.recStart) / 1000) : 0;
+          const live = s.rec === 'recording' && !d.micDenied;
+          const exp = NOTES[noteAt(s.rec === 'recording' ? recEl : 0).name];
+
+          // ---- hàng Nhịp ----
+          const liveBpm = live ? Math.round(simBpm(recEl)) : null;
+          const bpmOk = live && Math.abs(liveBpm - bpm) / bpm * 100 <= TEMPO_TOLERANCE_PERCENT;
+          let bpmHint = '';
+          if (live) bpmHint = bpmOk ? 'Đúng nhịp' : (liveBpm > bpm ? 'Hơi nhanh' : 'Hơi chậm');
+          else if (s.rec === 'countin') bpmHint = 'Đang đếm nhịp';
+          else if (!d.micDenied) bpmHint = 'Đang lắng nghe';
+          const bpmCol = live ? (bpmOk ? OK : WARN) : IDLE;
+          const bpmStyle = mono + 'font-size:30px;font-weight:600;line-height:1.1;color:' + bpmCol + ';';
+          const bpmHintStyle = 'font-size:12.5px;font-weight:600;color:' + (live ? bpmCol : '#5E6F66') + ';';
+
+          // 4 ô phách: chạy khi đếm nhịp, khi ghi, hoặc khi bật tiếng gõ nhịp
+          let beatIdx = -1;
+          if (s.rec === 'countin') beatIdx = Math.min(COUNT_IN_BEATS - 1, Math.floor((now - s.countStart) / beatMs));
+          else if (s.rec === 'recording') beatIdx = Math.floor((recEl * 1000) / beatMs) % 4;
+          else if (s.clickOn) beatIdx = Math.floor(now / beatMs) % 4;
+          const beatSegs = [];
+          for (let i = 0; i < 4; i++) {
+            beatSegs.push({ style: 'height:6px;border-radius:3px;background:' + (i === beatIdx ? acc : '#E2EAE4') + ';' });
+          }
+          const clickSw = switchStyles(s.clickOn);
+          const clickBtnStyle = 'min-height:44px;border-radius:14px;padding:0 14px;font-size:13.5px;font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;font-family:inherit;color:#123F33;' +
+            (s.clickOn ? 'background:#F2F6F2;border:1px solid #123F33;' : 'background:#FFFFFF;border:1px solid #CFDCD3;');
+          const readBtnStyle = 'width:100%;border:none;background:transparent;padding:0;text-align:left;font-family:inherit;color:#123F33;display:flex;align-items:center;gap:14px;cursor:' + (canOpen ? 'pointer' : 'default') + ';';
+
+          // ---- hàng Tuner (đang lắng nghe khi chưa ghi) ----
+          let detNote = '--';
+          let detSub = d.micDenied ? 'Chưa có micro' : 'Đang lắng nghe';
+          let cents = 0;
+          let inTune = false;
+          let centsWord = '';
+          if (live) {
+            cents = simCents(recEl);
+            inTune = Math.abs(cents) <= TUNER_TOLERANCE_CENTS;
+            detNote = exp.vn;
+            detSub = exp.en + ' · ' + (exp.f * Math.pow(2, cents / 1200)).toFixed(1) + ' Hz';
+            centsWord = inTune ? 'Chuẩn' : (cents > 0 ? 'Hơi cao' : 'Hơi thấp');
+          }
+          const tcol = live ? (inTune ? OK : WARN) : IDLE;
+          const pos = 50 + Math.max(-50, Math.min(50, cents));
+          const meterFillStyle = 'position:absolute;top:0;height:8px;border-radius:4px;background:' + (live ? tcol : 'transparent') + ';' +
+            (pos < 50 ? 'left:' + pos.toFixed(1) + '%;right:50%;' : 'left:50%;right:' + (100 - pos).toFixed(1) + '%;');
+          const meterMarkStyle = 'position:absolute;top:-4px;width:4px;height:16px;border-radius:2px;margin-left:-2px;background:' + (live ? tcol : '#C3D2C8') + ';left:' + pos.toFixed(1) + '%;';
+
+          // ---- khu vực ghi âm ----
+          const tabOn = 'flex:1;min-height:42px;border:none;border-radius:11px;background:#123F33;color:#FFFFFF;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;';
+          const tabOff = 'flex:1;min-height:42px;border:none;border-radius:11px;background:transparent;color:#5E6F66;font-size:14px;cursor:pointer;font-family:inherit;';
+          const recLooksDisabled = blocked || d.micDenied;
+          const recBtnStyle = 'width:84px;height:84px;flex-shrink:0;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;color:#FFFFFF;' +
+            (recLooksDisabled ? 'background:#96AC9F;border:5px solid #EDF2EE;cursor:not-allowed;' : 'background:' + acc + ';border:5px solid #FBF3DE;cursor:pointer;');
+          const idleBarsRaw = staticBars(44, 2.1);
+          const idleBars = idleBarsRaw.map((h) => ({ style: 'display:block;width:2px;border-radius:1px;background:#C3D2C8;height:' + Math.round(h * 70) + '%;' }));
+          const countSegs = [];
+          const cNow = s.rec === 'countin' ? Math.min(COUNT_IN_BEATS - 1, Math.floor((now - s.countStart) / beatMs)) : -1;
+          for (let i = 0; i < COUNT_IN_BEATS; i++) {
+            countSegs.push({ n: '' + (i + 1), style: 'display:flex;align-items:center;justify-content:center;height:34px;border-radius:10px;font-family:\'IBM Plex Mono\',monospace;font-size:15px;font-weight:600;' +
+              (i <= cNow ? 'background:' + acc + ';color:#FFFFFF;' : 'background:#F2F6F2;color:#93A399;border:1px solid #E2EAE4;box-sizing:border-box;') });
+          }
+          const countNum = Math.max(1, Math.min(COUNT_IN_BEATS, cNow + 1));
+          const countCircleStyle = 'width:84px;height:84px;flex-shrink:0;border-radius:50%;background:' + acc + ';border:5px solid #FBF3DE;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-family:\'IBM Plex Mono\',monospace;font-size:38px;font-weight:700;box-sizing:border-box;';
+
+          const liveBars = [];
+          for (let p = 0; p < 30; p++) {
+            const tt = recEl - (29 - p) * 0.11;
+            const h = 0.18 + 0.7 * Math.abs(Math.sin(tt * 5.1) * Math.cos(tt * 1.3 + 0.7));
+            liveBars.push({ style: 'display:block;width:4px;border-radius:2px;background:' + acc + ';height:' + Math.round(h * 100) + '%;' });
+          }
+          const base = staticBars(40, 1.3);
+          const playPct = s.takeLen > 0 ? s.playPos / s.takeLen : 0;
+          const previewBars = base.map((h, i) => ({ style: 'display:block;width:3px;border-radius:2px;background:' + (i / 40 < playPct ? acc : '#C3D2C8') + ';height:' + Math.round(h * 100) + '%;' }));
+
+          const file = s.file;
+          const filePct = file ? Math.min(100, (s.filePos / file.dur) * 100) : 0;
+          const errKind = this.candidateError(s);
+          const errText = errKind === 'format' ? MSG.format : (errKind === 'size' ? MSG.size : (errKind === 'duration' ? MSG.duration : ''));
+          const sendDisabled = blocked || s.uploading || errKind !== '';
+
+          // ---- Tuner chi tiết ----
+          const st = STRINGS[s.tuneSel];
+          const tvCents = d.micDenied ? 0 : tuneCents(s, now);
+          const tvIn = !d.micDenied && Math.abs(tvCents) <= TUNER_TOLERANCE_CENTS;
+          const tvCol = d.micDenied ? IDLE : (tvIn ? OK : WARN);
+          const tvPos = 50 + Math.max(-50, Math.min(50, tvCents));
+          const tvFillStyle = 'position:absolute;top:20px;height:16px;border-radius:8px;background:' + (d.micDenied ? 'transparent' : tvCol) + ';' +
+            (tvPos < 50 ? 'left:' + tvPos.toFixed(1) + '%;right:50%;' : 'left:50%;right:' + (100 - tvPos).toFixed(1) + '%;');
+          const tvMarkStyle = 'position:absolute;top:6px;width:6px;height:44px;border-radius:3px;margin-left:-3px;background:' + (d.micDenied ? '#C3D2C8' : '#5E6F66') + ';left:' + tvPos.toFixed(1) + '%;';
+          let tvAdvice = 'Chạm một dây rồi gảy hoặc kéo dây';
+          if (!d.micDenied) tvAdvice = tvIn ? 'Chuẩn — giữ nguyên dây này' : (tvCents < 0 ? 'Thấp ' + Math.round(Math.abs(tvCents)) + '¢ — căng thêm chút nữa' : 'Cao ' + Math.round(tvCents) + '¢ — chùng bớt một chút');
+          const tvHz = d.micDenied ? '--' : (st.f * Math.pow(2, tvCents / 1200)).toFixed(1) + ' Hz';
+          const tunedCount = s.tuned.filter((x) => x).length;
+          const strRows = STRINGS.map((r, i) => {
+            const sel = i === s.tuneSel;
+            const ok = !!s.tuned[i];
+            let stat = 'Chưa đo';
+            let statStyle = 'font-size:13px;color:#5E6F66;';
+            if (ok) { stat = 'Đúng'; statStyle = 'font-size:13px;color:' + OK + ';'; }
+            else if (sel && !d.micDenied) { stat = signed(tvCents) + '¢'; statStyle = mono + 'font-size:13px;font-weight:700;color:' + (tvIn ? OK : '#8A6A12') + ';'; }
+            return {
+              code: r.code, name: r.vn + ' — ' + r.en, stat: stat, ok: ok,
+              pick: () => this.pickString(i),
+              rowStyle: 'width:100%;min-height:48px;display:flex;align-items:center;gap:12px;border:none;border-bottom:' + (i < STRINGS.length - 1 ? '1px solid #EDF2EE' : 'none') + ';font-family:inherit;color:#123F33;text-align:left;cursor:pointer;' +
+                (sel ? 'background:#F2F6F2;margin:0 -14px;padding:0 14px;width:calc(100% + 28px);' : 'background:transparent;padding:0;'),
+              codeStyle: mono + 'font-size:12.5px;width:44px;color:' + (sel ? '#5E6F66' : '#93A399') + ';',
+              nameStyle: 'flex-grow:1;font-size:14px;font-weight:' + (sel ? 700 : 600) + ';',
+              statStyle: statStyle
+            };
+          });
+
+          // ---- Metronome chi tiết ----
+          const sig = SIGS[s.mSig];
+          const nB = sig.beats;
+          const mBeatMs = 60000 / s.mBpm;
+          const mCur = s.mPlay ? Math.floor((now - s.mStart) / mBeatMs) % nB : -1;
+          const mBeats = [];
+          for (let i = 0; i < nB; i++) {
+            const a = s.mAcc[i];
+            const lit = i === mCur;
+            let sty = 'height:62px;border-radius:16px;font-size:14px;font-family:inherit;cursor:pointer;' + (lit ? 'box-shadow:0 0 0 3px ' + acc + ';' : '');
+            if (a === 'strong') sty += 'border:none;background:#123F33;color:#FFFFFF;font-weight:700;';
+            else if (a === 'soft') sty += 'border:1px solid #CFDCD3;background:#FFFFFF;color:#123F33;';
+            else sty += 'border:1px dashed #CFDCD3;background:#F2F6F2;color:#93A399;';
+            mBeats.push({ label: a === 'strong' ? 'Mạnh' : (a === 'soft' ? 'Nhẹ' : 'Bỏ'), style: sty, toggle: () => this.cycleBeat(i) });
+          }
+          const beatGridStyle = 'display:grid;grid-template-columns:repeat(' + nB + ',minmax(0,1fr));gap:8px;';
+          const segOn = 'flex:1;min-height:40px;border:none;border-radius:10px;background:#123F33;color:#FFFFFF;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;';
+          const segOff = 'flex:1;min-height:40px;border:none;border-radius:10px;background:transparent;color:#5E6F66;font-size:13px;font-family:inherit;cursor:pointer;';
+          const sigOpts = SIGS.map((o, i) => ({ label: o.label, sel: i === s.mSig, pick: () => this.setSig(i),
+            style: (i === s.mSig ? segOn : segOff) + 'min-width:46px;font-family:\'IBM Plex Mono\',monospace;' }));
+          const presetDefs = [['Chậm 70%', 0.7], ['Vừa 85%', 0.85], ['Chuẩn 100%', 1]];
+          const presets = presetDefs.map((p) => {
+            const v = Math.round(bpm * p[1]);
+            const on = s.mBpm === v;
+            return { label: p[0], pick: () => this.setBpm(v),
+              style: 'flex:1;min-height:36px;border-radius:12px;font-size:13px;font-family:inherit;cursor:pointer;' + (on ? 'border:1px solid ' + acc + ';background:#FBF3DE;color:#8A6A12;font-weight:700;' : 'border:1px solid #CFDCD3;background:#FFFFFF;color:#123F33;font-weight:500;') };
+          });
+          const subCard = (k) => 'min-height:96px;border-radius:16px;padding:8px 4px 10px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;font-family:inherit;color:#123F33;cursor:pointer;box-sizing:border-box;' +
+            (s.mSub === k ? 'border:2px solid #123F33;background:#F2F6F2;' : 'border:1px solid #CFDCD3;background:#FFFFFF;');
+          const vibSw = switchStyles(s.mVib);
+
+          // ---- Màn 2 ----
+          const sub = s.sub;
+          const stages = [];
+          let statusLabel = '';
+          let chipStyle = '';
+          let chipDot = '';
+          let reason = '';
+          let retrySec = 0;
+          let subFileLine = '';
+          if (sub) {
+            statusLabel = sub.status;
+            reason = sub.reason;
+            retrySec = Math.max(0, Math.ceil((sub.retryAt - now) / 1000));
+            subFileLine = (sub.file.source === 'record' ? 'Bản thu' : sub.file.name) + ' · ' + mbText(sub.file.mb) + ' · ' + fmtTime(sub.file.dur);
+            const labels = ['Kiểm tra chất lượng', 'Phân tích audio', 'So sánh với bản mẫu', 'Tổng hợp kết quả'];
+            const texts = ['Đang kiểm tra chất lượng', 'Đang phân tích audio của bạn', 'Đang so sánh với bản mẫu của giảng viên', 'Đang tổng hợp lại kết quả']; // JOB-01..04
+            const dotBase = 'width:26px;height:26px;border-radius:50%;box-sizing:border-box;display:flex;align-items:center;justify-content:center;flex-shrink:0;';
+            for (let i = 0; i < 4; i++) {
+              let stt = 'pending';
+              if (sub.status === 'Hoàn tất') stt = 'done';
+              else if (sub.status === 'Từ chối') stt = i === 0 ? 'fail' : 'pending';
+              else if (sub.status === 'Lỗi xử lý') stt = i < sub.stage ? 'done' : (i === sub.stage ? 'fail' : 'pending');
+              else stt = i < sub.stage ? 'done' : (i === sub.stage ? 'active' : 'pending');
+              let dotStyle = dotBase + 'border:2px solid #CFDCD3;background:#FFFFFF;';
+              let labelStyle = 'font-size:15px;font-weight:500;color:#93A399;';
+              if (stt === 'done') { dotStyle = dotBase + 'background:#123F33;color:#FFFFFF;'; labelStyle = 'font-size:15px;font-weight:600;color:#123F33;'; }
+              if (stt === 'active') { dotStyle = dotBase + 'border:2px solid #123F33;background:#FFFFFF;'; labelStyle = 'font-size:15px;font-weight:700;color:#123F33;'; }
+              if (stt === 'fail') { dotStyle = dotBase + 'background:#C97B3C;color:#FFFFFF;'; labelStyle = 'font-size:15px;font-weight:700;color:#8A6A12;'; }
+              const pulse2 = 0.5 + 0.5 * Math.sin(now / 250);
+              stages.push({
+                label: labels[i], dotStyle: dotStyle, labelStyle: labelStyle,
+                isDone: stt === 'done', isActive: stt === 'active', isFail: stt === 'fail',
+                innerStyle: 'display:block;width:8px;height:8px;border-radius:50%;background:#123F33;opacity:' + (0.4 + 0.6 * pulse2).toFixed(2) + ';',
+                hasLine: i < 3,
+                lineStyle: 'display:block;width:2px;flex-grow:1;min-height:24px;background:' + (stt === 'done' ? '#123F33' : '#E2EAE4') + ';',
+                hasText: stt === 'active', text: texts[i]
+              });
+            }
+            if (sub.status === 'Từ chối' || sub.status === 'Lỗi xử lý') { chipStyle = 'display:inline-flex;align-items:center;gap:8px;border-radius:10px;padding:7px 12px;font-size:13.5px;font-weight:700;background:#FBF3DE;color:#8A6A12;'; chipDot = 'display:block;width:7px;height:7px;border-radius:50%;background:#C8A63C;'; }
+            else if (sub.status === 'Hoàn tất') { chipStyle = 'display:inline-flex;align-items:center;gap:8px;border-radius:10px;padding:7px 12px;font-size:13.5px;font-weight:700;background:#F2F6F2;color:#123F33;'; chipDot = 'display:block;width:7px;height:7px;border-radius:50%;background:#3A6B44;'; }
+            else { chipStyle = 'display:inline-flex;align-items:center;gap:8px;border-radius:10px;padding:7px 12px;font-size:13.5px;font-weight:700;background:#F2F6F2;color:#123F33;'; chipDot = 'display:block;width:7px;height:7px;border-radius:50%;background:' + acc + ';'; }
+          }
+          const exhausted = !!(sub && sub.status === 'Lỗi xử lý' && sub.exhausted);
+
+          // ---- Demo ----
+          const mk = (key, label) => {
+            const sw = switchStyles(!!d[key]);
+            return { label: label, on: !!d[key], toggle: () => this.toggleDemo(key), trackStyle: sw.track, knobStyle: sw.knob };
+          };
+          const dSegOn = 'flex:1;min-height:40px;border:none;border-radius:10px;background:#123F33;color:#FFFFFF;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;';
+          const dSegOff = 'flex:1;min-height:40px;border:none;border-radius:10px;background:transparent;color:#5E6F66;font-size:13px;font-family:inherit;cursor:pointer;';
+          const mkSeg = (key, v, label) => ({ label: label, sel: d[key] === v, pick: () => this.setDemoVal(key, v), style: d[key] === v ? dSegOn : dSegOff });
+
+          return {
+            accent: acc,
+            isEntry: s.screen === 'entry',
+            isResults: s.screen === 'results',
+            isMain: s.screen === 's1' && s.view === 'main',
+            isTunerView: s.screen === 's1' && s.view === 'tuner',
+            isMetroView: s.screen === 's1' && s.view === 'metro',
+            isS2: s.screen === 's2',
+
+            pieceName: SAMPLE.piece,
+            classLine: SAMPLE.className + ' · ' + SAMPLE.instrument + ' · ' + SAMPLE.lesson,
+            instrument: SAMPLE.instrument,
+            deadline: SAMPLE.deadline,
+            left: s.left,
+            targetBpm: bpm,
+
+            openUpload: () => this.openUpload(),
+            backFromS1: () => this.backFromS1(),
+            backFromS2: () => this.backFromS2(),
+            openResults: () => this.openResults(),
+            redoAfterReject: () => this.redoAfterReject(),
+            closeDetail: () => this.closeDetail(),
+
+            // hàng Nhịp
+            tempoSummary: '4/4 · ' + bpm + ' BPM',
+            tempoOpen: s.tempoOpen,
+            tempoChevStyle: 'transform:rotate(' + (s.tempoOpen ? 180 : 0) + 'deg);',
+            toggleTempo: () => this.toggleTempo(),
+            canOpen: canOpen,
+            readBtnStyle: readBtnStyle,
+            openMetro: () => this.openMetro(),
+            bpmStyle: bpmStyle,
+            bpmHintStyle: bpmHintStyle,
+            bpmHint: bpmHint,
+            liveBpmText: live ? '' + liveBpm : '--',
+            beatSegs: beatSegs,
+            clickOn: s.clickOn,
+            clickBtnStyle: clickBtnStyle,
+            clickTrack: clickSw.track,
+            clickKnob: clickSw.knob,
+            toggleClick: () => this.toggleClick(),
+            micDenied: d.micDenied,
+            micMsg: MSG.mic,
+            micPopupText: MSG.micPopup,
+            popupMic: s.popupMic,
+            closeMic: () => this.closeMic(),
+
+            // hàng Tuner
+            showTunerCard: isRecordMode && !d.noPitch,
+            tunerOpen: s.tunerOpen,
+            tunerChevStyle: 'transform:rotate(' + (s.tunerOpen ? 180 : 0) + 'deg);',
+            toggleTuner: () => this.toggleTuner(),
+            openTuner: () => this.openTuner(),
+            centsHead: live ? signed(cents) + ' cent' : '-- cent',
+            detNote: detNote,
+            noteStyle: 'font-size:40px;font-weight:800;line-height:1;letter-spacing:-0.03em;color:' + (live ? tcol : IDLE) + ';',
+            detSub: detSub,
+            centsWord: centsWord,
+            centsWordStyle: 'font-size:12.5px;font-weight:700;color:' + tcol + ';',
+            meterFillStyle: meterFillStyle,
+            meterMarkStyle: meterMarkStyle,
+            expVn: exp.vn,
+            expEn: exp.en,
+
+            // khu vực dưới
+            isRecordMode: isRecordMode,
+            isUploadMode: !isRecordMode,
+            setRecord: () => this.setMode('record'),
+            setUpload: () => this.setMode('upload'),
+            recTabStyle: (isRecordMode ? tabOn : tabOff) + (recActive ? 'opacity:0.6;' : ''),
+            upTabStyle: (isRecordMode ? tabOff : tabOn) + (recActive ? 'opacity:0.6;' : ''),
+            notices: notices,
+            blocked: blocked,
+
+            recIdle: s.rec === 'idle',
+            recCount: s.rec === 'countin',
+            recRunning: s.rec === 'recording',
+            recPreview: s.rec === 'preview',
+            recNotPreview: s.rec !== 'preview',
+            readyDotStyle: 'display:block;width:8px;height:8px;border-radius:50%;flex-shrink:0;background:' + (recLooksDisabled ? '#C8A63C' : OK) + ';',
+            readyTextStyle: 'font-size:13.5px;font-weight:700;color:' + (recLooksDisabled ? '#8A6A12' : OK) + ';',
+            readyText: d.micDenied ? 'Chưa thể ghi âm' : (blocked ? 'Tạm thời chưa ghi âm được' : 'Sẵn sàng ghi âm'),
+            idleBars: idleBars,
+            recLooksDisabled: recLooksDisabled,
+            recBtnStyle: recBtnStyle,
+            startRec: () => this.startRec(),
+            stopRec: () => this.stopRec(),
+            rerecord: () => this.rerecord(),
+            rerecStyle: btnStyle('secondary', false) + 'flex:1;',
+            sendStyle: btnStyle('primary', sendDisabled) + 'flex:1;',
+            sendDisabled: sendDisabled,
+            sendLabel: s.uploading ? 'Đang tải lên...' : 'Gửi',
+            send: () => this.send(),
+            countSegs: countSegs,
+            countNum: countNum,
+            countCircleStyle: countCircleStyle,
+            timerText: fmtTime(recEl) + ' / ' + fmtTime(SAMPLE.pieceLen),
+            liveBars: liveBars,
+            previewBars: previewBars,
+            playing: s.playing,
+            notPlaying: !s.playing,
+            playLabel: s.playing ? 'Tạm dừng' : 'Phát bản thu',
+            togglePlay: () => this.togglePlay(),
+            playText: fmtTime(s.playPos) + ' / ' + fmtTime(s.takeLen),
+
+            noFile: !file,
+            hasFile: !!file,
+            dropStyle: 'flex-grow:1;margin-bottom:0;border:1.5px dashed #CFDCD3;background:#F2F6F2;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-family:inherit;color:#123F33;' + (blocked ? 'opacity:0.5;cursor:not-allowed;' : 'cursor:pointer;'),
+            otherStyle: btnStyle('secondary', blocked) + 'flex:1;',
+            pickFile: () => this.pickFile(),
+            pickOther: () => this.pickOther(),
+            fileName: file ? file.name : '',
+            fileLine: file ? mbText(file.mb) + ' · ' + fmtTime(file.dur) : '',
+            fileBarStyle: 'display:block;height:4px;border-radius:2px;background:' + acc + ';width:' + filePct.toFixed(1) + '%;',
+            filePlaying: s.filePlaying,
+            fileNotPlaying: !s.filePlaying,
+            filePlayLabel: s.filePlaying ? 'Tạm dừng' : 'Phát file',
+            toggleFilePlay: () => this.toggleFilePlay(),
+
+            hasErr: errText !== '',
+            errText: errText,
+            uploading: s.uploading,
+            weakMsg: MSG.weak,
+
+            // Tuner chi tiết
+            tvNote: d.micDenied ? '--' : st.vn,
+            tvNoteStyle: 'font-size:76px;font-weight:800;line-height:1;letter-spacing:-0.04em;color:' + (d.micDenied ? IDLE : '#123F33') + ';',
+            tvEn: st.en,
+            tvHz: tvHz,
+            tvFillStyle: tvFillStyle,
+            tvMarkStyle: tvMarkStyle,
+            tvAdvice: tvAdvice,
+            tunedCount: tunedCount,
+            strRows: strRows,
+            playRef: () => this.playRef(),
+
+            // Metronome chi tiết
+            mBpm: s.mBpm,
+            bpmDown: () => this.setBpm(s.mBpm - 1),
+            bpmUp: () => this.setBpm(s.mBpm + 1),
+            presets: presets,
+            mBeats: mBeats,
+            beatGridStyle: beatGridStyle,
+            sigOpts: sigOpts,
+            subName: SUBS[s.mSub],
+            subWhiteOn: s.mSub === 'white', subBlackOn: s.mSub === 'black', subHalfOn: s.mSub === 'half', subQuarterOn: s.mSub === 'quarter',
+            subWhiteStyle: subCard('white'), subBlackStyle: subCard('black'), subHalfStyle: subCard('half'), subQuarterStyle: subCard('quarter'),
+            pickWhite: () => this.setSub('white'), pickBlack: () => this.setSub('black'), pickHalf: () => this.setSub('half'), pickQuarter: () => this.setSub('quarter'),
+            mVib: s.mVib,
+            vibTrack: vibSw.track,
+            vibKnob: vibSw.knob,
+            toggleVib: () => this.toggleVib(),
+            mPlay: s.mPlay,
+            mNotPlay: !s.mPlay,
+            mPlayLabel: s.mPlay ? 'Dừng metronome' : 'Bắt đầu đếm nhịp',
+            toggleMetro: () => this.toggleMetro(),
+            tapTempo: () => this.tapTempo(),
+
+            // Màn 2
+            stages: stages,
+            statusLabel: statusLabel,
+            chipStyle: chipStyle,
+            chipDot: chipDot,
+            subFileLine: subFileLine,
+            sMsgBusy: !!(sub && sub.status === 'Đang xử lý'),
+            sMsgDone: !!(sub && sub.status === 'Hoàn tất'),
+            sMsgRej: !!(sub && sub.status === 'Từ chối'),
+            sMsgErr: !!(sub && sub.status === 'Lỗi xử lý' && !exhausted),
+            sMsgExh: exhausted,
+            reason: reason,
+            retrySec: retrySec,
+            retryWait: retrySec > 0,
+            retriesUsed: sub ? sub.retriesUsed : 0,
+            retryStyle: btnStyle('primary', retrySec > 0) + 'width:100%;min-height:52px;',
+            retry: () => this.retry(),
+            downloadFile: () => this.downloadFile(),
+
+            hasToast: !!s.toast,
+            toastText: s.toast ? s.toast.text : '',
+            banner: s.banner,
+
+            demoOpen: s.demoOpen,
+            openDemo: () => this.openDemo(),
+            closeDemo: () => this.closeDemo(),
+            resetDemo: () => this.resetDemo(),
+            demoA: [mk('expired', 'Quá hạn / hết lượt nộp'), mk('micDenied', 'Từ chối quyền micro'), mk('otherProc', 'Đang có bản nộp khác xử lý'), mk('noPitch', 'Nhạc cụ không có cao độ')],
+            invalidOpts: [mkSeg('invalid', 'none', 'Không'), mkSeg('invalid', 'format', 'Định dạng'), mkSeg('invalid', 'size', 'Dung lượng'), mkSeg('invalid', 'duration', 'Thời lượng')],
+            demoB: [mk('weakNet', 'Mạng yếu khi tải lên'), mk('qcFail', 'Kiểm tra chất lượng thất bại'), mk('autoStop', 'Tự dừng ở cuối bài'), mk('leaveProc', 'Rời màn hình xử lý')],
+            aiOpts: [mkSeg('aiMode', 'none', 'Không'), mkSeg('aiMode', 'once', 'Lỗi 1 lần'), mkSeg('aiMode', 'always', 'Lỗi liên tục')],
+            jobOpts: [mkSeg('failJob', 1, 'Phân tích'), mkSeg('failJob', 2, 'So sánh'), mkSeg('failJob', 3, 'Tổng hợp')]
+          };
+        }
+      }
+    </script>
+  </body>
+</html>
