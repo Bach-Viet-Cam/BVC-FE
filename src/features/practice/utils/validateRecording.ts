@@ -1,3 +1,4 @@
+import type { CapturedTake } from "@/features/practice/types/practiceAudioTypes";
 import {
   FILE_FORMATS,
   FILE_MAX_MB,
@@ -19,4 +20,14 @@ export function fileErrorMessage(kind: FileErrorKind): string {
   if (kind === "size") return MSG.size;
   if (kind === "duration") return MSG.duration;
   return "";
+}
+
+export function takeToRecordingFile(take: CapturedTake): RecordingFile {
+  return {
+    name: take.file.name,
+    fmt: "wav",
+    mb: take.file.size / (1024 * 1024),
+    dur: take.durationSec,
+    source: "record",
+  };
 }

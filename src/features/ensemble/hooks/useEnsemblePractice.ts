@@ -6,7 +6,7 @@ import {
   type PracticeStatus,
   type TrackSetting,
 } from "@/features/ensemble/types/ensembleTypes";
-import { playClick } from "@/features/ensemble/utils/clickSound";
+import { playClick } from "@/shared/utils/clickSound";
 import { getEffectiveVolume } from "@/features/ensemble/utils/mixerMath";
 import { encodeWav } from "@/features/ensemble/utils/wavEncoder";
 import { toast } from "@/shared/components/ui/toast";

@@ -14,15 +14,18 @@ import { DemoPanel } from "@/features/practice/components/DemoPanel";
 import { PracticeFrame } from "@/features/practice/components/PracticeFrame";
 import {
   COUNT_IN_BEATS,
+  DEMO_AUTO_STOP_TAIL_S,
   MSG,
   NOTES,
   SAMPLE,
   TEMPO_TOLERANCE_PERCENT,
 } from "@/features/practice/constants/practiceConstants";
 import { usePracticeDemo } from "@/features/practice/context/PracticeDemoContext";
+import { usePracticeAudio } from "@/features/practice/hooks/usePracticeAudio";
 import { useRecorder } from "@/features/practice/hooks/useRecorder";
 import { noteAt, simBpm, simCents } from "@/features/practice/utils/practiceSimulation";
-import { fileErrorMessage, validateFile } from "@/features/practice/utils/validateRecording";
+import { buildDemoSession } from "@/features/practice/utils/practiceSession";
+import { fileErrorMessage, takeToRecordingFile, validateFile } from "@/features/practice/utils/validateRecording";
 import type { RecordingFile, SubmitMode } from "@/features/practice/types/practiceTypes";
 import { BvcDialogPopup } from "@/shared/components/bvc/BvcDialogPopup";
 import { Dialog } from "@/shared/components/ui/dialog";
@@ -57,12 +60,19 @@ export function RecordPage() {
   const [filePos, setFilePos] = useState(0);
   const [clickBeat, setClickBeat] = useState(0);
 
+  const session = useMemo(() => buildDemoSession(demo.noPitch), [demo.noPitch]);
+  const audio = usePracticeAudio({ micWanted: mode === "record", fminHz: session.fminHz });
+  const micDenied = demo.micDenied || audio.micState === "denied";
+  const timelineOffsetSec = demo.autoStop ? Math.max(0, session.pieceLenSec - DEMO_AUTO_STOP_TAIL_S) : 0;
+
   const recorder = useRecorder({
-    autoStop: demo.autoStop,
+    audio,
+    session,
+    timelineOffsetSec,
     onAutoStop: () => toast.info(MSG.autoStop), // MSG-44
   });
 
-  const { rec, elapsed, countBeat, takeLen } = recorder;
+  const { rec, elapsed, countBeat } = recorder;
   const recActive = rec === "countin" || rec === "recording";
   const canOpenDetail = mode === "record" && (rec === "idle" || rec === "preview");
 
@@ -93,7 +103,7 @@ export function RecordPage() {
   }, [filePlaying, file]);
 
   const tunerShown = mode === "record" && !demo.noPitch;
-  const live = rec === "recording" && !demo.micDenied;
+  const live = rec === "recording" && !micDenied;
   const liveBpm = live ? Math.round(simBpm(elapsed)) : null;
   const cents = live ? simCents(elapsed) : 0;
   const expectedNote = NOTES[noteAt(elapsed).name];
@@ -102,11 +112,11 @@ export function RecordPage() {
 
   const bpmHint = useMemo(() => {
     if (rec === "countin") return "Đang đếm nhịp";
-    if (!live || liveBpm === null) return demo.micDenied ? "" : "Đang lắng nghe";
+    if (!live || liveBpm === null) return micDenied ? "" : "Đang lắng nghe";
     const diff = ((liveBpm - SAMPLE.targetBpm) / SAMPLE.targetBpm) * 100;
     if (Math.abs(diff) <= TEMPO_TOLERANCE_PERCENT) return "Đúng nhịp";
     return diff > 0 ? "Hơi nhanh" : "Hơi chậm";
-  }, [rec, live, liveBpm, demo.micDenied]);
+  }, [rec, live, liveBpm, micDenied]);
 
   const hintTone = bpmHint === "Đúng nhịp" ? "ok" : bpmHint === "Hơi nhanh" || bpmHint === "Hơi chậm" ? "warn" : "idle";
 
@@ -121,17 +131,12 @@ export function RecordPage() {
   // Bản thu mô phỏng: dung lượng suy ra từ thời lượng
   const errorKind = useMemo(() => {
     if (mode === "record") {
-      if (rec !== "preview") return "";
+      if (rec !== "preview" || !recorder.take) return "";
       if (demo.invalid !== "none") return demo.invalid;
-      return validateFile({
-        name: "ban-thu-vua-ghi.wav",
-        fmt: "wav",
-        mb: Math.max(0.2, Math.round(takeLen) * 0.1),
-        dur: takeLen,
-      });
+      return validateFile(takeToRecordingFile(recorder.take));
     }
     return file ? validateFile(file) : "";
-  }, [mode, rec, demo.invalid, takeLen, file]);
+  }, [mode, rec, demo.invalid, recorder.take, file]);
 
   function makeFile(index: number): RecordingFile {
     const next = { ...SAMPLE.files[index] };
@@ -144,9 +149,9 @@ export function RecordPage() {
   function handleSend() {
     if (blocked || uploading || errorKind) return;
     if (mode === "record") {
-      if (rec !== "preview") return;
-      const dur = Math.round(takeLen);
-      submit({ name: "ban-thu-vua-ghi.wav", fmt: "wav", mb: Math.max(0.2, dur * 0.1), dur, source: "record" });
+      if (rec !== "preview" || !recorder.take) return;
+      // TODO(BE): upload recorder.take.file trước khi navigate khi có API nộp bài
+      submit(takeToRecordingFile(recorder.take));
     } else {
       if (!file) return;
       submit({ ...file, source: "upload" });
@@ -156,11 +161,23 @@ export function RecordPage() {
 
   function handleStart() {
     if (blocked || rec !== "idle") return;
-    if (demo.micDenied) {
+    if (micDenied) {
+      audio.retryMic(); // D9: thử xin lại lặng lẽ
       setMicPopup(true); // MSG-10
       return;
     }
-    recorder.start();
+    if (!audio.ready) return; // micro đang mở
+    void recorder.start();
+  }
+
+  function handleDownload() {
+    const take = recorder.take;
+    if (!take) return;
+    const link = document.createElement("a");
+    link.href = take.url;
+    link.download = take.file.name;
+    link.click();
+    toast.success(MSG.download);
   }
 
   // Điện thoại: trang riêng. Laptop: ngăn kéo, không rời màn ghi âm
@@ -207,19 +224,21 @@ export function RecordPage() {
       <div className="contents md:flex md:min-h-0 md:flex-1 md:flex-col md:gap-5 md:overflow-y-auto md:px-8 md:pt-6 md:pb-7">
         <div className={cn("contents md:grid md:gap-5", tunerShown ? "md:grid-cols-2" : "md:grid-cols-1")}>
           <div className="mx-3.5 md:mx-0">
-            <TempoCard
-              open={tempoOpen}
-              onToggle={() => setTempoOpen((value) => !value)}
-              liveBpm={liveBpm}
-              bpmHint={bpmHint}
-              hintTone={hintTone}
-              litBeat={litBeat}
-              clickOn={clickOn}
-              onToggleClick={() => setClickOn((value) => !value)}
-              canOpenDetail={canOpenDetail}
-              onOpenMetronome={() => openDetail("metronome")}
-              micDenied={demo.micDenied}
-            />
+            {mode === "record" && (
+              <TempoCard
+                open={tempoOpen}
+                onToggle={() => setTempoOpen((value) => !value)}
+                liveBpm={liveBpm}
+                bpmHint={bpmHint}
+                hintTone={hintTone}
+                litBeat={litBeat}
+                clickOn={clickOn}
+                onToggleClick={() => setClickOn((value) => !value)}
+                canOpenDetail={canOpenDetail}
+                onOpenMetronome={() => openDetail("metronome")}
+                micDenied={micDenied}
+              />
+            )}
           </div>
 
           {tunerShown && (
@@ -234,7 +253,7 @@ export function RecordPage() {
                 expectedNote={expectedNote}
                 canOpenDetail={canOpenDetail}
                 onOpenTuner={() => openDetail("tuner")}
-                micDenied={demo.micDenied}
+                micDenied={micDenied}
               />
             </div>
           )}
@@ -277,11 +296,13 @@ export function RecordPage() {
                 rec={rec}
                 elapsed={elapsed}
                 countBeat={countBeat}
-                takeLen={takeLen}
+                takeLen={recorder.takeLen}
+                analyser={audio.analyser}
+                previewPeaks={recorder.take?.peaks ?? []}
                 playing={recorder.playing}
                 playPos={recorder.playPos}
                 blocked={blocked}
-                micDenied={demo.micDenied}
+                micDenied={micDenied}
                 uploading={uploading}
                 errorText={fileErrorMessage(errorKind)}
                 weakMessage={MSG.weak}
@@ -290,7 +311,15 @@ export function RecordPage() {
                 onStart={handleStart}
                 onStop={recorder.stop}
                 onTogglePlay={recorder.togglePlay}
+                onSeek={recorder.seek}
+                volume={recorder.volume}
+                muted={recorder.muted}
+                rate={recorder.rate}
+                onVolumeChange={recorder.setVolume}
+                onToggleMute={recorder.toggleMute}
+                onRateChange={recorder.setRate}
                 onRerecord={recorder.reset}
+                onDownload={handleDownload}
                 onSend={handleSend}
               />
             ) : (

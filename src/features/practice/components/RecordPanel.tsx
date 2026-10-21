@@ -1,22 +1,20 @@
-import { Volume2 } from "lucide-react";
-import { Pause, Play } from "lucide-react";
+import { Download, Trash2, Volume2 } from "lucide-react";
 import { COUNT_IN_BEATS, SAMPLE } from "@/features/practice/constants/practiceConstants";
 import { NoticeBanner } from "@/features/practice/components/NoticeBanner";
+import { PlaybackBar } from "@/features/practice/components/PlaybackBar";
+import { LiveWaveform } from "@/features/practice/components/LiveWaveform";
 import { RecordButton } from "@/features/practice/components/RecordButton";
 import { fmtTime } from "@/features/practice/utils/practiceFormat";
-import { staticBars } from "@/features/practice/utils/practiceSimulation";
 import type { RecordState } from "@/features/practice/types/practiceTypes";
-import { Waveform } from "@/shared/components/bvc/Waveform";
 import { cn } from "@/shared/utils/cn";
-
-const IDLE_BARS = staticBars(44, 2.1).map((h) => ({ h: h * 70 }));
-const PREVIEW_BARS = staticBars(40, 1.3);
 
 interface RecordPanelProps {
   rec: RecordState;
   elapsed: number;
   countBeat: number;
   takeLen: number;
+  previewPeaks: number[];
+  analyser: AnalyserNode | null;
   playing: boolean;
   playPos: number;
   blocked: boolean;
@@ -29,7 +27,15 @@ interface RecordPanelProps {
   onStart: () => void;
   onStop: () => void;
   onTogglePlay: () => void;
+  onSeek: (sec: number) => void;
+  volume: number;
+  muted: boolean;
+  rate: number;
+  onVolumeChange: (volume: number) => void;
+  onToggleMute: () => void;
+  onRateChange: (rate: number) => void;
   onRerecord: () => void;
+  onDownload: () => void;
   onSend: () => void;
 }
 
@@ -38,6 +44,8 @@ export function RecordPanel({
   elapsed,
   countBeat,
   takeLen,
+  previewPeaks,
+  analyser,
   playing,
   playPos,
   blocked,
@@ -50,66 +58,80 @@ export function RecordPanel({
   onStart,
   onStop,
   onTogglePlay,
+  onSeek,
+  volume,
+  muted,
+  rate,
+  onVolumeChange,
+  onToggleMute,
+  onRateChange,
   onRerecord,
+  onDownload,
   onSend,
 }: RecordPanelProps) {
   if (rec === "preview") {
-    const playedRatio = takeLen > 0 ? playPos / takeLen : 0;
     return (
       <div className="mt-auto flex flex-col gap-3 md:mx-auto md:my-auto md:w-full md:max-w-[760px]">
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center">
+          <PlaybackBar
+            peaks={previewPeaks}
+            playing={playing}
+            playPos={playPos}
+            takeLen={takeLen}
+            volume={volume}
+            muted={muted}
+            rate={rate}
+            onTogglePlay={onTogglePlay}
+            onSeek={onSeek}
+            onVolumeChange={onVolumeChange}
+            onToggleMute={onToggleMute}
+            onRateChange={onRateChange}
+          />
+          <div className="flex shrink-0 gap-2.5">
+            <button
+              type="button"
+              onClick={onRerecord}
+              className="flex min-h-[50px] flex-1 cursor-pointer items-center justify-center rounded-[15px] border border-bvc-border-strong bg-white px-5 text-[15px] font-semibold whitespace-nowrap text-bvc-ink"
+            >
+              Ghi âm lại
+            </button>
+            <button
+              type="button"
+              disabled={sendDisabled}
+              onClick={onSend}
+              className={cn(
+                "flex min-h-[50px] flex-1 items-center justify-center rounded-[15px] px-6 text-[15px] font-semibold",
+                sendDisabled
+                  ? "cursor-not-allowed border border-bvc-border bg-bvc-surface text-bvc-faint"
+                  : "cursor-pointer bg-bvc-ink text-white"
+              )}
+            >
+              {sendLabel}
+            </button>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-5">
           <button
             type="button"
-            aria-label={playing ? "Tạm dừng" : "Phát bản thu"}
-            onClick={onTogglePlay}
-            className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-[15px] bg-bvc-ink text-white"
+            onClick={onDownload}
+            className="flex cursor-pointer items-center gap-2 text-[13.5px] font-semibold text-bvc-accent-text"
           >
-            {playing ? (
-              <Pause size={19} fill="currentColor" strokeWidth={0} />
-            ) : (
-              <Play size={19} fill="currentColor" strokeWidth={0} />
-            )}
+            <Download size={18} strokeWidth={1.9} />
+            Tải xuống
           </button>
-          <div className="flex-1">
-            <Waveform
-              height={40}
-              bars={PREVIEW_BARS.map((h, i) => ({
-                h: h * 100,
-                color:
-                  i / PREVIEW_BARS.length <= playedRatio ? "var(--color-bvc-accent)" : "var(--color-bvc-bar-strong)",
-              }))}
-            />
-          </div>
-          <span className="shrink-0 text-xs text-bvc-muted">
-            {fmtTime(playPos)} / {fmtTime(takeLen)}
-          </span>
+          <button
+            type="button"
+            onClick={onRerecord}
+            className="flex cursor-pointer items-center gap-2 text-[13.5px] font-semibold text-bvc-error"
+          >
+            <Trash2 size={18} strokeWidth={1.9} />
+            Xóa bản thu
+          </button>
         </div>
 
         {errorText && <NoticeBanner message={errorText} />}
         {uploading && <NoticeBanner message={weakMessage} />}
-
-        <div className="flex gap-2.5">
-          <button
-            type="button"
-            onClick={onRerecord}
-            className="flex min-h-[50px] flex-1 cursor-pointer items-center justify-center rounded-[15px] border border-bvc-border-strong bg-white text-[15px] font-semibold text-bvc-ink"
-          >
-            Ghi âm lại
-          </button>
-          <button
-            type="button"
-            disabled={sendDisabled}
-            onClick={onSend}
-            className={cn(
-              "flex min-h-[50px] flex-1 items-center justify-center rounded-[15px] text-[15px] font-semibold",
-              sendDisabled
-                ? "cursor-not-allowed border border-bvc-border bg-bvc-surface text-bvc-faint"
-                : "cursor-pointer bg-bvc-ink text-white"
-            )}
-          >
-            {sendLabel}
-          </button>
-        </div>
       </div>
     );
   }
@@ -135,7 +157,7 @@ export function RecordPanel({
                   {micDenied ? "Chưa thể ghi âm" : blocked ? "Tạm thời chưa ghi âm được" : "Sẵn sàng ghi âm"}
                 </span>
               </div>
-              <Waveform bars={IDLE_BARS} height={26} />
+              <LiveWaveform analyser={analyser} active={false} height={96} />
               <p className="text-[12.5px] leading-[1.45] text-bvc-muted">
                 Chạm nút ghi để bắt đầu. Có 4 tiếng đếm nhịp trước khi ghi, phần đếm không được ghi lại.
               </p>
@@ -178,13 +200,7 @@ export function RecordPanel({
                   {fmtTime(elapsed)} / {fmtTime(SAMPLE.pieceLen)}
                 </span>
               </div>
-              <Waveform
-                height={38}
-                bars={staticBars(30, elapsed).map((h) => ({
-                  h: h * 100,
-                  color: "var(--color-bvc-accent)",
-                }))}
-              />
+              <LiveWaveform analyser={analyser} active height={96} />
               <p className="text-[12.5px] leading-[1.45] text-bvc-muted">
                 Chạm nút dừng khi chơi xong, hoặc ghi đến hết bài.
               </p>

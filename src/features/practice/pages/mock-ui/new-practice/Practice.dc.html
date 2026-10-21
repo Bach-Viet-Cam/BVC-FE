@@ -1,133 +1,513 @@
 <!doctype html>
 <html lang="vi">
-<head>
-<meta charset="utf-8">
-<title>Phòng luyện — Sheet, tuner, metronome</title>
-<script src="./vendor/react.js"></script>
-<script src="./vendor/react-dom.js"></script>
-<script src="./support.js"></script>
-</head>
-<body>
-<x-dc>
-<helmet>
-<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=Be+Vietnam+Pro:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
-<style>
-body{margin:0;font-family:'Hanken Grotesk','Be Vietnam Pro',ui-rounded,system-ui,sans-serif;background:#EDF2EE}
-a{color:#8A6A12;text-decoration:none}a:hover{color:#C8A63C}
-button{font-family:inherit}
-</style>
-</helmet>
-<div style="width: 428px; height: 926px; box-sizing: border-box; background: #FFFFFF; color: #123F33; display: flex; flex-direction: column; overflow: hidden;">
+  <head>
+    <meta charset="utf-8" />
+    <title>Phòng luyện — Sheet, tuner, metronome</title>
+    <script src="./vendor/react.js"></script>
+    <script src="./vendor/react-dom.js"></script>
+    <script src="./support.js"></script>
+  </head>
+  <body>
+    <x-dc>
+      <helmet>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=Be+Vietnam+Pro:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap"
+          rel="stylesheet"
+        />
+        <style>
+          body {
+            margin: 0;
+            font-family: "Hanken Grotesk", "Be Vietnam Pro", ui-rounded, system-ui, sans-serif;
+            background: #edf2ee;
+          }
+          a {
+            color: #8a6a12;
+            text-decoration: none;
+          }
+          a:hover {
+            color: #c8a63c;
+          }
+          button {
+            font-family: inherit;
+          }
+        </style>
+      </helmet>
+      <div
+        style="
+          width: 428px;
+          height: 926px;
+          box-sizing: border-box;
+          background: #ffffff;
+          color: #123f33;
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+        "
+      >
+        <div style="flex-shrink: 0; padding: 26px 14px 10px; display: flex; align-items: center; gap: 8px">
+          <a
+            href="Main.dc.html"
+            aria-label="Quay lại"
+            style="
+              width: 44px;
+              height: 44px;
+              flex-shrink: 0;
+              border-radius: 14px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: #123f33;
+            "
+          >
+            <svg
+              width="21"
+              height="21"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="m15 5-7 7 7 7"></path>
+            </svg>
+          </a>
+          <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0">
+            <div style="font-size: 18px; font-weight: 800; letter-spacing: -0.02em">Lý ngựa ô</div>
+            <div style="font-size: 12px; color: #5e6f66">Đàn tranh · Trung cấp · trang 2/3</div>
+          </div>
+          <button
+            type="button"
+            aria-label="Tùy chọn bài"
+            style="
+              width: 44px;
+              height: 44px;
+              border: 1px solid #cfdcd3;
+              background: #ffffff;
+              border-radius: 14px;
+              color: #123f33;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              cursor: pointer;
+            "
+          >
+            <svg
+              width="19"
+              height="19"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
+              <path d="M12 6h.01M12 12h.01M12 18h.01"></path>
+            </svg>
+          </button>
+        </div>
 
-  <div style="flex-shrink: 0; padding: 26px 14px 10px; display: flex; align-items: center; gap: 8px;">
-    <a href="Main.dc.html" aria-label="Quay lại" style="width: 44px; height: 44px; flex-shrink: 0; border-radius: 14px; display: flex; align-items: center; justify-content: center; color: #123F33;">
-      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"></path></svg>
-    </a>
-    <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0;">
-      <div style="font-size: 18px; font-weight: 800; letter-spacing: -0.02em;">Lý ngựa ô</div>
-      <div style="font-size: 12px; color: #5E6F66;">Đàn tranh · Trung cấp · trang 2/3</div>
-    </div>
-    <button type="button" aria-label="Tùy chọn bài" style="width: 44px; height: 44px; border: 1px solid #CFDCD3; background: #FFFFFF; border-radius: 14px; color: #123F33; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 6h.01M12 12h.01M12 18h.01"></path></svg>
-    </button>
-  </div>
+        <div
+          style="
+            flex-grow: 1;
+            margin: 0 14px;
+            border: 1px solid #cfdcd3;
+            border-radius: 20px;
+            background: #ffffff;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+          "
+        >
+          <div
+            style="flex-grow: 1; padding: 18px 16px; display: flex; flex-direction: column; gap: 13px; color: #123f33"
+          >
+            <div style="font-size: 14px; font-weight: 700; letter-spacing: -0.01em">
+              Bản nhạc PDF · Lý ngựa ô (đàn tranh)
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 11px">
+              <div style="height: 1px; background: #c3d2c8"></div>
+              <div style="height: 1px; background: #c3d2c8"></div>
+              <div style="height: 1px; background: #c3d2c8"></div>
+              <div style="height: 1px; background: #c3d2c8"></div>
+              <div style="height: 1px; background: #c3d2c8"></div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 11px">
+              <div style="height: 1px; background: #c3d2c8"></div>
+              <div style="height: 1px; background: #c3d2c8"></div>
+              <div style="height: 1px; background: #c3d2c8"></div>
+              <div style="height: 1px; background: #c3d2c8"></div>
+              <div style="height: 1px; background: #c3d2c8"></div>
+            </div>
+            <div
+              style="
+                display: flex;
+                align-items: flex-start;
+                gap: 10px;
+                background: #f2f6f2;
+                border: 1px solid #cfdcd3;
+                border-radius: 14px;
+                padding: 11px 12px;
+              "
+            >
+              <svg
+                width="17"
+                height="17"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#5E6F66"
+                stroke-width="1.7"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                style="flex-shrink: 0; margin-top: 1px"
+              >
+                <path d="M16.5 3.5 20.5 7.5 8 20H4v-4z"></path>
+              </svg>
+              <div style="display: flex; flex-direction: column; gap: 3px">
+                <div style="font-size: 13px; font-weight: 700; color: #123f33">Ghi chú của cô Hương · ô nhịp 18</div>
+                <div style="font-size: 13.5px; line-height: 1.45; color: #123f33">
+                  Đoạn này giảm tốc, nhấn mạnh nốt đầu phách. Luyện riêng 18–24 trước khi ghép cả bài.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            style="
+              flex-shrink: 0;
+              border-top: 1px solid #e2eae4;
+              padding: 9px 14px;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              background: #f2f6f2;
+            "
+          >
+            <button
+              type="button"
+              style="
+                min-height: 34px;
+                border: 1px solid #cfdcd3;
+                background: #ffffff;
+                border-radius: 11px;
+                padding: 0 12px;
+                font-size: 13px;
+                font-weight: 600;
+                color: #123f33;
+                cursor: pointer;
+              "
+            >
+              Ghi chú của tôi
+            </button>
+            <div style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: 13px; color: #5e6f66">
+              Bar 17 — 32
+            </div>
+            <button
+              type="button"
+              style="
+                min-height: 34px;
+                border: 1px solid #cfdcd3;
+                background: #ffffff;
+                border-radius: 11px;
+                padding: 0 12px;
+                font-size: 13px;
+                font-weight: 600;
+                color: #123f33;
+                cursor: pointer;
+              "
+            >
+              Đánh dấu
+            </button>
+          </div>
+        </div>
 
-  <div style="flex-grow: 1; margin: 0 14px; border: 1px solid #CFDCD3; border-radius: 20px; background: #FFFFFF; position: relative; overflow: hidden; display: flex; flex-direction: column;">
-    <div style="flex-grow: 1; padding: 18px 16px; display: flex; flex-direction: column; gap: 13px; color: #123F33;">
-      <div style="font-size: 14px; font-weight: 700; letter-spacing: -0.01em;">Bản nhạc PDF · Lý ngựa ô (đàn tranh)</div>
-      <div style="display: flex; flex-direction: column; gap: 11px;">
-        <div style="height: 1px; background: #C3D2C8;"></div>
-        <div style="height: 1px; background: #C3D2C8;"></div>
-        <div style="height: 1px; background: #C3D2C8;"></div>
-        <div style="height: 1px; background: #C3D2C8;"></div>
-        <div style="height: 1px; background: #C3D2C8;"></div>
-      </div>
-      <div style="display: flex; flex-direction: column; gap: 11px;">
-        <div style="height: 1px; background: #C3D2C8;"></div>
-        <div style="height: 1px; background: #C3D2C8;"></div>
-        <div style="height: 1px; background: #C3D2C8;"></div>
-        <div style="height: 1px; background: #C3D2C8;"></div>
-        <div style="height: 1px; background: #C3D2C8;"></div>
-      </div>
-      <div style="display: flex; align-items: flex-start; gap: 10px; background: #F2F6F2; border: 1px solid #CFDCD3; border-radius: 14px; padding: 11px 12px;">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5E6F66" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px;"><path d="M16.5 3.5 20.5 7.5 8 20H4v-4z"></path></svg>
-        <div style="display: flex; flex-direction: column; gap: 3px;">
-          <div style="font-size: 13px; font-weight: 700; color: #123F33;">Ghi chú của cô Hương · ô nhịp 18</div>
-          <div style="font-size: 13.5px; line-height: 1.45; color: #123F33;">Đoạn này giảm tốc, nhấn mạnh nốt đầu phách. Luyện riêng 18–24 trước khi ghép cả bài.</div>
+        <div style="flex-shrink: 0; margin: 12px 14px 0; display: flex; gap: 10px">
+          <div
+            style="
+              flex-grow: 1;
+              border: 1px solid #e2eae4;
+              background: #ffffff;
+              border-radius: 18px;
+              padding: 12px 13px;
+              display: flex;
+              flex-direction: column;
+              gap: 9px;
+            "
+          >
+            <div style="display: flex; align-items: baseline; justify-content: space-between">
+              <span
+                style="
+                  font-size: 11.5px;
+                  letter-spacing: 0.12em;
+                  text-transform: uppercase;
+                  color: #5e6f66;
+                  font-weight: 700;
+                "
+                >Tuner</span
+              >
+              <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: 12px; color: #5e6f66"
+                >−12¢ hơi thấp</span
+              >
+            </div>
+            <div style="display: flex; align-items: baseline; gap: 6px">
+              <span style="font-size: 32px; font-weight: 800; line-height: 1; letter-spacing: -0.03em">Rê</span>
+              <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: 14px; color: #5e6f66"
+                >D4 · 291.2 Hz</span
+              >
+            </div>
+            <div style="position: relative; height: 8px; border-radius: 4px; background: #e2eae4">
+              <span
+                style="position: absolute; left: 50%; top: -3px; width: 2px; height: 14px; background: #c3d2c8"
+              ></span>
+              <span
+                style="
+                  position: absolute;
+                  left: 34%;
+                  top: -4px;
+                  width: 4px;
+                  height: 16px;
+                  border-radius: 2px;
+                  background: #c97b3c;
+                "
+              ></span>
+            </div>
+          </div>
+
+          <div
+            style="
+              width: 138px;
+              flex-shrink: 0;
+              border: 1px solid #e2eae4;
+              background: #ffffff;
+              border-radius: 18px;
+              padding: 12px 13px;
+              display: flex;
+              flex-direction: column;
+              gap: 9px;
+            "
+          >
+            <div style="display: flex; align-items: baseline; justify-content: space-between">
+              <span
+                style="
+                  font-size: 11.5px;
+                  letter-spacing: 0.12em;
+                  text-transform: uppercase;
+                  color: #5e6f66;
+                  font-weight: 700;
+                "
+                >Nhịp</span
+              >
+              <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: 12px; color: #5e6f66"
+                >4/4</span
+              >
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px">
+              <button
+                type="button"
+                aria-label="Giảm BPM"
+                style="
+                  width: 30px;
+                  height: 30px;
+                  border: 1px solid #cfdcd3;
+                  background: #f2f6f2;
+                  border-radius: 10px;
+                  color: #123f33;
+                  font-size: 18px;
+                  line-height: 1;
+                  cursor: pointer;
+                "
+              >
+                −
+              </button>
+              <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: 24px; font-weight: 600"
+                >72</span
+              >
+              <button
+                type="button"
+                aria-label="Tăng BPM"
+                style="
+                  width: 30px;
+                  height: 30px;
+                  border: 1px solid #cfdcd3;
+                  background: #f2f6f2;
+                  border-radius: 10px;
+                  color: #123f33;
+                  font-size: 18px;
+                  line-height: 1;
+                  cursor: pointer;
+                "
+              >
+                +
+              </button>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px">
+              <span style="height: 6px; border-radius: 3px; background: {{accent}};"></span>
+              <span style="height: 6px; border-radius: 3px; background: #e2eae4"></span>
+              <span style="height: 6px; border-radius: 3px; background: #e2eae4"></span>
+              <span style="height: 6px; border-radius: 3px; background: #e2eae4"></span>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex-shrink: 0; margin: 12px 0 0; padding: 0 14px; display: flex; gap: 7px; overflow: hidden">
+          <button
+            type="button"
+            style="min-height: 36px; flex-shrink: 0; border: 1px solid {{accent}}; background: #FBF3DE; color: #8A6A12; border-radius: 12px; padding: 0 13px; font-size: 13.5px; font-weight: 700; cursor: pointer;"
+          >
+            Toàn bài
+          </button>
+          <a
+            href="Section.dc.html"
+            style="
+              min-height: 36px;
+              flex-shrink: 0;
+              border: 1px solid #cfdcd3;
+              background: #ffffff;
+              color: #123f33;
+              border-radius: 12px;
+              padding: 0 13px;
+              font-size: 13.5px;
+              font-weight: 500;
+              display: flex;
+              align-items: center;
+            "
+            >Luyện đoạn</a
+          >
+          <button
+            type="button"
+            style="
+              min-height: 36px;
+              flex-shrink: 0;
+              border: 1px solid #cfdcd3;
+              background: #ffffff;
+              color: #123f33;
+              border-radius: 12px;
+              padding: 0 13px;
+              font-size: 13.5px;
+              font-weight: 500;
+              cursor: pointer;
+            "
+          >
+            Chậm 70%
+          </button>
+          <button
+            type="button"
+            style="
+              min-height: 36px;
+              flex-shrink: 0;
+              border: 1px solid #cfdcd3;
+              background: #ffffff;
+              color: #123f33;
+              border-radius: 12px;
+              padding: 0 13px;
+              font-size: 13.5px;
+              font-weight: 500;
+              cursor: pointer;
+            "
+          >
+            Từng nốt
+          </button>
+        </div>
+
+        <div style="flex-shrink: 0; padding: 14px 14px 20px; display: flex; align-items: center; gap: 14px">
+          <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 6px; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 7px">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: #3a6b44; flex-shrink: 0"></span>
+              <span style="font-size: 13.5px; font-weight: 700; color: #3a6b44">Chất lượng thu: tốt</span>
+            </div>
+            <div style="position: relative; height: 26px; display: flex; align-items: center">
+              <span style="position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: #e2eae4"></span
+              ><span
+                style="
+                  position: relative;
+                  flex-grow: 1;
+                  height: 100%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                "
+                ><span style="width: 2px; height: 30%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 32%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 37%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 65%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 64%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 73%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 70%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 61%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 66%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 63%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 78%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 80%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 88%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 70%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 55%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 47%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 53%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 34%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 41%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 35%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 30%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 53%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 41%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 68%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 68%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 47%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 65%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 75%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 61%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 86%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 64%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 89%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 72%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 70%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 37%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 45%; background: #c3d2c8; border-radius: 1px"></span
+                ><span style="width: 2px; height: 50%; background: #96ac9f; border-radius: 1px"></span
+                ><span style="width: 2px; height: 44%; background: #96ac9f; border-radius: 1px"></span
+                ><span style="width: 2px; height: 29%; background: #96ac9f; border-radius: 1px"></span
+                ><span style="width: 2px; height: 44%; background: #96ac9f; border-radius: 1px"></span
+                ><span style="width: 2px; height: 51%; background: #96ac9f; border-radius: 1px"></span
+                ><span style="width: 2px; height: 43%; background: #96ac9f; border-radius: 1px"></span
+                ><span style="width: 2px; height: 39%; background: #96ac9f; border-radius: 1px"></span
+                ><span style="width: 2px; height: 57%; background: #96ac9f; border-radius: 1px"></span
+                ><span style="width: 2px; height: 59%; background: #96ac9f; border-radius: 1px"></span
+                ><span style="width: 2px; height: 77%; background: #96ac9f; border-radius: 1px"></span
+              ></span>
+            </div>
+            <div style="font-size: 12.5px; color: #5e6f66">Mic tai nghe · 44.1 kHz · không có clipping</div>
+          </div>
+          <a
+            href="RecordFlow.dc.html"
+            aria-label="Bắt đầu thu âm"
+            style="width: 84px; height: 84px; flex-shrink: 0; border-radius: 50%; background: {{accent}}; border: 5px solid #FBF3DE; display: flex; align-items: center; justify-content: center; color: #FFFFFF;"
+          >
+            <svg
+              width="30"
+              height="30"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="9" y="3" width="6" height="11" rx="3"></rect>
+              <path d="M5.5 11.5a6.5 6.5 0 0 0 13 0"></path>
+              <path d="M12 18v3"></path>
+            </svg>
+          </a>
         </div>
       </div>
-    </div>
-    <div style="flex-shrink: 0; border-top: 1px solid #E2EAE4; padding: 9px 14px; display: flex; align-items: center; justify-content: space-between; background: #F2F6F2;">
-      <button type="button" style="min-height: 34px; border: 1px solid #CFDCD3; background: #FFFFFF; border-radius: 11px; padding: 0 12px; font-size: 13px; font-weight: 600; color: #123F33; cursor: pointer;">Ghi chú của tôi</button>
-      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #5E6F66;">Bar 17 — 32</div>
-      <button type="button" style="min-height: 34px; border: 1px solid #CFDCD3; background: #FFFFFF; border-radius: 11px; padding: 0 12px; font-size: 13px; font-weight: 600; color: #123F33; cursor: pointer;">Đánh dấu</button>
-    </div>
-  </div>
-
-  <div style="flex-shrink: 0; margin: 12px 14px 0; display: flex; gap: 10px;">
-    <div style="flex-grow: 1; border: 1px solid #E2EAE4; background: #FFFFFF; border-radius: 18px; padding: 12px 13px; display: flex; flex-direction: column; gap: 9px;">
-      <div style="display: flex; align-items: baseline; justify-content: space-between;">
-        <span style="font-size: 11.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #5E6F66; font-weight: 700;">Tuner</span>
-        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #5E6F66;">−12¢ hơi thấp</span>
-      </div>
-      <div style="display: flex; align-items: baseline; gap: 6px;">
-        <span style="font-size: 32px; font-weight: 800; line-height: 1; letter-spacing: -0.03em;">Rê</span>
-        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: #5E6F66;">D4 · 291.2 Hz</span>
-      </div>
-      <div style="position: relative; height: 8px; border-radius: 4px; background: #E2EAE4;">
-        <span style="position: absolute; left: 50%; top: -3px; width: 2px; height: 14px; background: #C3D2C8;"></span>
-        <span style="position: absolute; left: 34%; top: -4px; width: 4px; height: 16px; border-radius: 2px; background: #C97B3C;"></span>
-      </div>
-    </div>
-
-    <div style="width: 138px; flex-shrink: 0; border: 1px solid #E2EAE4; background: #FFFFFF; border-radius: 18px; padding: 12px 13px; display: flex; flex-direction: column; gap: 9px;">
-      <div style="display: flex; align-items: baseline; justify-content: space-between;">
-        <span style="font-size: 11.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #5E6F66; font-weight: 700;">Nhịp</span>
-        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #5E6F66;">4/4</span>
-      </div>
-      <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
-        <button type="button" aria-label="Giảm BPM" style="width: 30px; height: 30px; border: 1px solid #CFDCD3; background: #F2F6F2; border-radius: 10px; color: #123F33; font-size: 18px; line-height: 1; cursor: pointer;">−</button>
-        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 600;">72</span>
-        <button type="button" aria-label="Tăng BPM" style="width: 30px; height: 30px; border: 1px solid #CFDCD3; background: #F2F6F2; border-radius: 10px; color: #123F33; font-size: 18px; line-height: 1; cursor: pointer;">+</button>
-      </div>
-      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px;">
-        <span style="height: 6px; border-radius: 3px; background: {{accent}};"></span>
-        <span style="height: 6px; border-radius: 3px; background: #E2EAE4;"></span>
-        <span style="height: 6px; border-radius: 3px; background: #E2EAE4;"></span>
-        <span style="height: 6px; border-radius: 3px; background: #E2EAE4;"></span>
-      </div>
-    </div>
-  </div>
-
-  <div style="flex-shrink: 0; margin: 12px 0 0; padding: 0 14px; display: flex; gap: 7px; overflow: hidden;">
-    <button type="button" style="min-height: 36px; flex-shrink: 0; border: 1px solid {{accent}}; background: #FBF3DE; color: #8A6A12; border-radius: 12px; padding: 0 13px; font-size: 13.5px; font-weight: 700; cursor: pointer;">Toàn bài</button>
-    <a href="Section.dc.html" style="min-height: 36px; flex-shrink: 0; border: 1px solid #CFDCD3; background: #FFFFFF; color: #123F33; border-radius: 12px; padding: 0 13px; font-size: 13.5px; font-weight: 500; display: flex; align-items: center;">Luyện đoạn</a>
-    <button type="button" style="min-height: 36px; flex-shrink: 0; border: 1px solid #CFDCD3; background: #FFFFFF; color: #123F33; border-radius: 12px; padding: 0 13px; font-size: 13.5px; font-weight: 500; cursor: pointer;">Chậm 70%</button>
-    <button type="button" style="min-height: 36px; flex-shrink: 0; border: 1px solid #CFDCD3; background: #FFFFFF; color: #123F33; border-radius: 12px; padding: 0 13px; font-size: 13.5px; font-weight: 500; cursor: pointer;">Từng nốt</button>
-  </div>
-
-  <div style="flex-shrink: 0; padding: 14px 14px 20px; display: flex; align-items: center; gap: 14px;">
-    <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 6px; min-width: 0;">
-      <div style="display: flex; align-items: center; gap: 7px;">
-        <span style="width: 8px; height: 8px; border-radius: 50%; background: #3A6B44; flex-shrink: 0;"></span>
-        <span style="font-size: 13.5px; font-weight: 700; color: #3A6B44;">Chất lượng thu: tốt</span>
-      </div>
-      <div style="position: relative; height: 26px; display: flex; align-items: center;"><span style="position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: #E2EAE4;"></span><span style="position: relative; flex-grow: 1; height: 100%; display: flex; align-items: center; justify-content: space-between;"><span style="width: 2px; height: 30%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 32%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 37%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 65%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 64%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 73%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 70%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 61%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 66%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 63%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 78%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 80%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 88%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 70%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 55%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 47%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 53%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 34%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 41%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 35%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 30%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 53%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 41%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 68%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 68%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 47%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 65%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 75%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 61%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 86%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 64%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 89%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 72%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 70%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 37%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 45%; background: #C3D2C8; border-radius: 1px;"></span><span style="width: 2px; height: 50%; background: #96AC9F; border-radius: 1px;"></span><span style="width: 2px; height: 44%; background: #96AC9F; border-radius: 1px;"></span><span style="width: 2px; height: 29%; background: #96AC9F; border-radius: 1px;"></span><span style="width: 2px; height: 44%; background: #96AC9F; border-radius: 1px;"></span><span style="width: 2px; height: 51%; background: #96AC9F; border-radius: 1px;"></span><span style="width: 2px; height: 43%; background: #96AC9F; border-radius: 1px;"></span><span style="width: 2px; height: 39%; background: #96AC9F; border-radius: 1px;"></span><span style="width: 2px; height: 57%; background: #96AC9F; border-radius: 1px;"></span><span style="width: 2px; height: 59%; background: #96AC9F; border-radius: 1px;"></span><span style="width: 2px; height: 77%; background: #96AC9F; border-radius: 1px;"></span></span></div>
-      <div style="font-size: 12.5px; color: #5E6F66;">Mic tai nghe · 44.1 kHz · không có clipping</div>
-    </div>
-    <a href="RecordFlow.dc.html" aria-label="Bắt đầu thu âm" style="width: 84px; height: 84px; flex-shrink: 0; border-radius: 50%; background: {{accent}}; border: 5px solid #FBF3DE; display: flex; align-items: center; justify-content: center; color: #FFFFFF;">
-      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0"></path><path d="M12 18v3"></path></svg>
-    </a>
-  </div>
-
-</div>
-</x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#2F7A62","options":["#2F7A62","#123F33","#3A6B44","#C8A63C"],"section":"Chủ đề"},"$preview":{"width":428,"height":926}}'>
-class Component extends DCLogic {
-  renderVals() {
-    return { accent: this.props.accent ?? '#2F7A62' };
-  }
-}
-</script>
-</body>
+    </x-dc>
+    <script
+      type="text/x-dc"
+      data-dc-script
+      data-props='{"accent":{"editor":"color","default":"#2F7A62","options":["#2F7A62","#123F33","#3A6B44","#C8A63C"],"section":"Chủ đề"},"$preview":{"width":428,"height":926}}'
+    >
+      class Component extends DCLogic {
+        renderVals() {
+          return { accent: this.props.accent ?? '#2F7A62' };
+        }
+      }
+    </script>
+  </body>
 </html>

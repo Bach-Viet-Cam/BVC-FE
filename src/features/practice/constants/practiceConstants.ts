@@ -94,3 +94,18 @@ export const STAGE_ACTIVE_LABELS = [
 ];
 
 export const REJECT_REASON = "Âm lượng quá nhỏ"; // GBR-12
+
+export const AUDIO_HOP_SIZE = 512;
+export const COUNT_IN_LEAD_S = 0.15; // khoảng đệm trước phách đếm đầu tiên
+export const RECORDING_FILE_NAME = "ban-thu-vua-ghi.wav";
+export const PREVIEW_BAR_COUNT = 80;
+export const DEMO_AUTO_STOP_TAIL_S = 12;
+export const MAX_WAV_SAMPLE_RATE = 48000;
+export const MIC_CONSTRAINTS: MediaTrackConstraints = {
+  echoCancellation: false,
+  noiseSuppression: false,
+  autoGainControl: false,
+  channelCount: 1,
+};
+
+export const PLAYBACK_RATES = [0.5, 0.75, 1, 1.25, 1.5, 2];
