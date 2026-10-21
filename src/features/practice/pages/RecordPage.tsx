@@ -22,11 +22,12 @@ import {
 import { usePracticeDemo } from "@/features/practice/context/PracticeDemoContext";
 import { usePracticeAudio } from "@/features/practice/hooks/usePracticeAudio";
 import { useClickTrack } from "@/features/practice/hooks/useClickTrack";
+import { useLiveTempo } from "@/features/practice/hooks/useLiveTempo";
 import { useLiveTuner } from "@/features/practice/hooks/useLiveTuner";
 import { usePitchStream } from "@/features/practice/hooks/usePitchStream";
 import { useRecorder } from "@/features/practice/hooks/useRecorder";
 import { midiToNoteInfo, noteAtTime } from "@/features/practice/utils/noteMath";
-import { simBpm } from "@/features/practice/utils/practiceSimulation";
+import { noteGridBeats } from "@/features/practice/utils/tempoEstimator";
 import { buildDemoSession } from "@/features/practice/utils/practiceSession";
 import { fileErrorMessage, takeToRecordingFile, validateFile } from "@/features/practice/utils/validateRecording";
 import type { RecordingFile, SubmitMode } from "@/features/practice/types/practiceTypes";
@@ -104,18 +105,32 @@ export function RecordPage() {
 
   const tunerShown = mode === "record" && session.hasPitch;
   const live = rec === "recording" && !micDenied;
-  const liveBpm = live ? Math.round(simBpm(elapsed)) : null;
 
   // Ngăn kéo lên dây tự đo bằng micro này, nên thẻ tuner nhường để không tính pitch hai lần
   const tunerActive = tunerShown && tunerOpen && !micDenied && audio.ready && drawer !== "tuner";
+  const tempoActive = mode === "record" && rec === "recording" && !micDenied && audio.ready;
   const pitchStream = usePitchStream({
     audio,
-    enabled: tunerActive, // bước 04 sẽ mở rộng điều kiện này
-    computePitch: session.hasPitch && tunerActive,
+    enabled: tunerActive || tempoActive,
+    computePitch: session.hasPitch && (tunerActive || tempoActive),
     fminHz: session.fminHz,
     fmaxHz: session.fmaxHz,
   });
   const tuner = useLiveTuner({ subscribe: pitchStream.subscribe, active: tunerActive });
+
+  const gridBeats = useMemo(() => noteGridBeats(session), [session]);
+  const tempo = useLiveTempo({
+    ctx: audio.ctx,
+    subscribe: pitchStream.subscribe,
+    active: tempoActive,
+    recordStartTime: recorder.recordStartTime,
+    targetBpm: session.targetBpm,
+    gridBeats,
+    hasPitch: session.hasPitch,
+    clickOn,
+    getClickTimes: click.getClickTimes,
+  });
+  const liveBpm = live ? tempo.liveBpm : null;
 
   const expectedMidi = noteAtTime(session.notes, rec === "recording" ? elapsed : 0).midi;
   const expectedNote = useMemo(() => midiToNoteInfo(expectedMidi), [expectedMidi]);
