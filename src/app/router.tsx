@@ -1,7 +1,16 @@
 import { AudioAnalysisTestPage } from "@/features/practice/pages/AudioAnalysisTestPage";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
+// Mobile — practice (M01 Smart Practice Studio)
+import { PracticeDemoProvider } from "@/features/practice/context/PracticeDemoContext";
+import { RecordPage } from "@/features/practice/pages/RecordPage";
+import { TunerPage } from "@/features/practice/pages/TunerPage";
+import { MetronomePage } from "@/features/practice/pages/MetronomePage";
+import { ProcessingPage } from "@/features/practice/pages/ProcessingPage";
+import { ResultsPage } from "@/features/practice/pages/ResultsPage";
+
 import { LoginPage } from "@/features/auth/pages/LoginPage";
+import { ScrollToTop } from "@/shared/components/ScrollToTop";
 import { NotFoundPage } from "@/shared/pages/NotFoundPage";
 import { ForbiddenPage } from "@/shared/pages/ForbiddenPage";
 import { DashboardPage } from "@/shared/pages/DashboardPage";
@@ -103,7 +112,7 @@ export function AppRouter() {
         </Route>
 
         {/* Sinh viên — màn hình mobile */}
-        {/* <Route element={<ProtectedRoute allowedRoles={[ROLES.STUDENT]} />}> */}
+        <Route element={<ProtectedRoute allowedRoles={[ROLES.STUDENT]} />}>
           <Route path="/home" element={<HomePage />} />
 
           <Route element={<MobileLayout />}>
@@ -114,7 +123,14 @@ export function AppRouter() {
             <Route path="/community/bonus/:bonusId" element={<BonusDetailPage />} />
           </Route>
 
-          {/* practice routes — will be re-added with new Smart Practice Studio pages */}
+          {/* M01 — tiến trình xử lý chạy nền nên các màn luyện tập dùng chung một provider */}
+          <Route element={<PracticeDemoProvider />}>
+            <Route path="/practice/:songId/record" element={<RecordPage />} />
+            <Route path="/practice/:songId/tuner" element={<TunerPage />} />
+            <Route path="/practice/:songId/metronome" element={<MetronomePage />} />
+            <Route path="/practice/:songId/processing" element={<ProcessingPage />} />
+            <Route path="/practice/:songId/results" element={<ResultsPage />} />
+          </Route>
 
           {/* Library */}
           <Route path="/library/upload" element={<SongUploadPage />} />
@@ -128,7 +144,7 @@ export function AppRouter() {
           <Route path="/community/leaderboard" element={<LeaderboardPage />} />
           <Route path="/community/challenges" element={<ChallengesPage />} />
           <Route path="/community/challenges/:challengeId" element={<ChallengeDetailPage />} />
-        {/* </Route> */}
+        </Route>
 
         {/* Giảng viên — màn hình desktop */}
         <Route element={<ProtectedRoute allowedRoles={[ROLES.TEACHER]} />}>
