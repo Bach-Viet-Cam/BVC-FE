@@ -97,6 +97,7 @@ import { ChallengeDetailPage } from "@/features/community/pages/ChallengeDetailP
 import { BonusFormPage } from "@/features/community/pages/BonusFormPage";
 import { VerifiedContentPage } from "@/features/community/pages/VerifiedContentPage";
 import { ChallengeFormPage } from "@/features/community/pages/ChallengeFormPage";
+import { AssignmentListPage } from "@/features/classes/pages/AssignmentListPage";
 
 export function AppRouter() {
   return (
@@ -171,7 +172,7 @@ export function AppRouter() {
             <Route path="/teacher/classes" element={<ClassListPage />} />
             <Route path="/teacher/roadmap" element={<RoadmapPage />} />
             <Route path="/teacher/progress" element={<StudentProgressPage />} />
-            <Route path="/teacher/assignments" element={<TeacherAssignmentsPage />} />
+            <Route path="/teacher/assignments" element={<AssignmentListPage />} />
             <Route path="/categories" element={<CategoriesPage />} />
           </Route>
           {/* M03 classes & members */}
