@@ -53,7 +53,7 @@ src/
 └── index.css
 
 public/
-└── (Không còn thư mục locales — text hiển thị hardcode tiếng Việt trực tiếp trong UI.)
+└── (Không còn thư mục locales - text hiển thị hardcode tiếng Việt trực tiếp trong UI.)
 ```
 
 **Rule quyết định vị trí file:**
@@ -66,7 +66,7 @@ public/
 
 ## 3. Import Rules
 
-### ✅ Luôn dùng alias `@/` — KHÔNG dùng relative path lên thư mục cha
+### ✅ Luôn dùng alias `@/` - KHÔNG dùng relative path lên thư mục cha
 
 ```ts
 // ✅ Đúng
@@ -98,7 +98,7 @@ import { LoginForm } from "@/features/auth/components/LoginForm";
 ## 4. TypeScript
 
 - Luôn dùng `interface` cho object shapes, `type` cho unions/intersections
-- Không dùng `any` — dùng `unknown` nếu chưa biết type
+- Không dùng `any` - dùng `unknown` nếu chưa biết type
 - Không dùng `as` ép kiểu trừ khi thực sự cần (ghi comment lý do)
 - Props của component phải có interface riêng, đặt ngay trên component
 
@@ -138,14 +138,14 @@ export default function LoginForm() { ... }
 
 - Tên file = tên component (PascalCase): `LoginForm.tsx`
 - Hooks: camelCase bắt đầu bằng `use`: `useLogin.ts`
-- Không để logic trong JSX — tách ra hooks hoặc utils
-- Không dùng `<div>` cho interactive elements — dùng `<button>`, `<a>`, v.v.
+- Không để logic trong JSX - tách ra hooks hoặc utils
+- Không dùng `<div>` cho interactive elements - dùng `<button>`, `<a>`, v.v.
 
 ---
 
-## 6. Styling — Tailwind CSS v4
+## 6. Styling - Tailwind CSS v4
 
-- **Không** dùng `tailwind.config.js` hay `postcss.config.js` — Tailwind v4 dùng Vite plugin
+- **Không** dùng `tailwind.config.js` hay `postcss.config.js` - Tailwind v4 dùng Vite plugin
 - Import trong `index.css` (chỉ dòng này, không thêm `tw-animate-css` hay package css khác):
 
 ```css
@@ -178,33 +178,33 @@ className={cn("base-class", isActive && "active-class", className)}
 Stack cố định: `react-hook-form` + `zod` + `@hookform/resolvers`
 
 ```ts
-// utils/validateXxx.ts — định nghĩa schema + infer type tại đây
+// utils/validateXxx.ts - định nghĩa schema + infer type tại đây
 export const loginSchema = z.object({ ... });
 export type LoginFormValues = z.infer<typeof loginSchema>;
 
-// component — chỉ dùng schema, không validate thủ công
+// component - chỉ dùng schema, không validate thủ công
 const { register, handleSubmit, formState: { errors } } = useForm<LoginFormValues>({
   resolver: zodResolver(loginSchema),
 });
 ```
 
 - Schema đặt trong `features/{feature}/utils/validate{Name}.ts`
-- Không dùng `useState` để manage form state — để react-hook-form lo
+- Không dùng `useState` để manage form state - để react-hook-form lo
 
 ---
 
 ## 8. API Layer
 
 ```ts
-// shared/api/axiosClient.ts — dùng chung, đã có interceptors
-// features/{feature}/api/{feature}Api.ts — gọi axiosClient
+// shared/api/axiosClient.ts - dùng chung, đã có interceptors
+// features/{feature}/api/{feature}Api.ts - gọi axiosClient
 
 export const authApi = {
   login: (data: LoginRequest) => axiosClient.post<AuthResponse>("/auth/login", data),
 };
 ```
 
-- Không gọi `axios` trực tiếp — luôn dùng `axiosClient`
+- Không gọi `axios` trực tiếp - luôn dùng `axiosClient`
 - Response type luôn được generic: `axiosClient.get<MyType>("/path")`
 - Xử lý error trong hook, không trong api file
 
@@ -212,26 +212,27 @@ export const authApi = {
 
 ## 9. State Management
 
-- Không dùng Redux — state cục bộ dùng `useState`/`useReducer`, state dùng chung dùng React Context trong `shared/context/` hoặc `features/{feature}/context/`
+- Không dùng Redux - state cục bộ dùng `useState`/`useReducer`, state dùng chung dùng React Context trong `shared/context/` hoặc `features/{feature}/context/`
 - Không import gì từ `react-redux` / `@reduxjs/toolkit` (đã gỡ khỏi dự án)
 
 ---
 
 ## 10. Ngôn ngữ hiển thị
 
-- i18n đã gỡ khỏi dự án — text hiển thị hardcode **tiếng Việt** trực tiếp trong JSX, không dùng `t()` hay namespace
+- i18n đã gỡ khỏi dự án - text hiển thị hardcode **tiếng Việt** trực tiếp trong JSX, không dùng `t()` hay namespace
+- **Chỉ dùng dấu gạch ngang `-`**, **KHÔNG** dùng dấu `—` (em dash) ở bất kỳ đâu: text UI, comment, test, docs, commit message
 
 ---
 
 ## 11. File Utilities
 
-- **Excel** — dùng helpers từ `@/shared/utils/fileUtils`:
+- **Excel** - dùng helpers từ `@/shared/utils/fileUtils`:
 
 ```ts
 import { readExcelFile, exportToExcel } from "@/shared/utils/fileUtils";
 ```
 
-- **Không** import `xlsx` trực tiếp trong components — luôn qua utils
+- **Không** import `xlsx` trực tiếp trong components - luôn qua utils
 
 ---
 

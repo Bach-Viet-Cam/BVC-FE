@@ -31,7 +31,8 @@ export function CategoryDeleteDialog({ target, onClose, onConfirm }: CategoryDel
               Xóa danh mục “{target?.name}”?
             </DialogTitle>
             <DialogDescription className="mt-1.5 text-[13px] leading-relaxed text-bvc-muted">
-              Chỉ có thể xóa khi danh mục không còn danh mục con trực thuộc và không gắn với bài nhạc nào. Thao tác này không thể hoàn tác.
+              Chỉ có thể xóa khi danh mục không còn danh mục con trực thuộc và không gắn với bài nhạc nào. Thao tác này
+              không thể hoàn tác.
             </DialogDescription>
           </div>
         </div>

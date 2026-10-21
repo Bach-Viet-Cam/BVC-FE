@@ -107,8 +107,8 @@ export function ProfilePage() {
                 id="tone"
                 className="h-[40px] rounded-[12px] border border-bvc-border-strong bg-white px-[10px] font-bvc-mono text-[14px] text-bvc-ink"
               >
-                <option>Đô — A4 440 Hz</option>
-                <option>Rê — A4 440 Hz</option>
+                <option>Đô - A4 440 Hz</option>
+                <option>Rê - A4 440 Hz</option>
               </select>
             </div>
           </div>

@@ -47,16 +47,7 @@ const DIFFICULTY_LEVELS: DifficultyLevel[] = [
   { name: "Hòa tấu", count: 18 },
 ];
 
-const POPULAR_TAGS = [
-  "dân ca",
-  "nam bộ",
-  "bắc bộ",
-  "quan họ",
-  "nhạc lễ",
-  "đàn tranh",
-  "hòa tấu",
-  "cổ điển",
-];
+const POPULAR_TAGS = ["dân ca", "nam bộ", "bắc bộ", "quan họ", "nhạc lễ", "đàn tranh", "hòa tấu", "cổ điển"];
 
 export function CategoriesPage() {
   return (
@@ -80,9 +71,7 @@ export function CategoriesPage() {
             <div className="overflow-hidden rounded-[20px] border border-bvc-border bg-white">
               <div className="flex items-center gap-[10px] border-b border-bvc-border px-[18px] py-[14px]">
                 <span className="text-[15px] font-bold text-bvc-ink">Nhạc cụ</span>
-                <span className="rounded-[8px] bg-bvc-surface px-2 py-1 text-[12px] text-bvc-muted">
-                  7 nhạc cụ
-                </span>
+                <span className="rounded-[8px] bg-bvc-surface px-2 py-1 text-[12px] text-bvc-muted">7 nhạc cụ</span>
               </div>
 
               {INSTRUMENTS.map((inst, idx) => (
@@ -100,10 +89,7 @@ export function CategoriesPage() {
                   </span>
                   <span className="flex-1 font-medium text-bvc-ink">{inst.name}</span>
                   <span className="font-bvc-mono text-[13px] text-bvc-muted">{inst.count} bài nhạc</span>
-                  <button
-                    type="button"
-                    className="cursor-pointer text-[13px] font-semibold text-bvc-accent-text"
-                  >
+                  <button type="button" className="cursor-pointer text-[13px] font-semibold text-bvc-accent-text">
                     Sửa
                   </button>
                 </div>
@@ -113,9 +99,7 @@ export function CategoriesPage() {
             <div className="overflow-hidden rounded-[20px] border border-bvc-border bg-white">
               <div className="flex items-center gap-[10px] border-b border-bvc-border px-[18px] py-[14px]">
                 <span className="text-[15px] font-bold text-bvc-ink">Thể loại</span>
-                <span className="rounded-[8px] bg-bvc-surface px-2 py-1 text-[12px] text-bvc-muted">
-                  8 thể loại
-                </span>
+                <span className="rounded-[8px] bg-bvc-surface px-2 py-1 text-[12px] text-bvc-muted">8 thể loại</span>
               </div>
 
               {GENRES.map((genre, idx) => (
@@ -133,10 +117,7 @@ export function CategoriesPage() {
                   </span>
                   <span className="flex-1 font-medium text-bvc-ink">{genre.name}</span>
                   <span className="font-bvc-mono text-[13px] text-bvc-muted">{genre.count} bài</span>
-                  <button
-                    type="button"
-                    className="cursor-pointer text-[13px] font-semibold text-bvc-accent-text"
-                  >
+                  <button type="button" className="cursor-pointer text-[13px] font-semibold text-bvc-accent-text">
                     Sửa
                   </button>
                 </div>

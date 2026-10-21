@@ -15,7 +15,7 @@ interface Assignment {
 
 const ASSIGNMENTS: Assignment[] = [
   {
-    title: "Recording hòa tấu — Trống cơm",
+    title: "Recording hòa tấu - Trống cơm",
     type: "Recording",
     course: "TRD301",
     deadline: "26/09",
@@ -155,7 +155,7 @@ export function TeacherAssignmentsPage() {
                 <span
                   className={`font-mono ${a.pending > 0 ? "font-bold text-bvc-accent-text" : "text-bvc-muted"}`}
                 >
-                  {a.pending > 0 ? a.pending : "—"}
+                  {a.pending > 0 ? a.pending : "-"}
                 </span>
 
                 <span>

@@ -153,7 +153,7 @@ export function ClassFormPage() {
 
             {/* Warning row */}
             <div className="rounded-[10px] bg-bvc-accent-tint px-3 py-2 text-[12px] text-bvc-accent-text">
-              Dòng 4: Thiếu email — bỏ qua
+              Dòng 4: Thiếu email - bỏ qua
             </div>
           </div>
 

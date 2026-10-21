@@ -19,7 +19,7 @@ function buildAssignment(overrides: Partial<AssignmentDetail> = {}): AssignmentD
     classStatus: "ACTIVE",
     status: "PUBLISHED",
     version: 2,
-    title: "Độc tấu — Lý ngựa ô",
+    title: "Độc tấu - Lý ngựa ô",
     description: "Tập chậm",
     kind: "SOLO",
     piece: { id: "p1", title: "Lý ngựa ô", defaultBpm: 96, isAvailable: false },
@@ -107,7 +107,7 @@ describe("Teacher assignment detail", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "Đóng" }));
     const dialog = await screen.findByRole("dialog");
-    expect(within(dialog).getByText("Đóng bài tập Độc tấu — Lý ngựa ô?")).toBeInTheDocument();
+    expect(within(dialog).getByText("Đóng bài tập Độc tấu - Lý ngựa ô?")).toBeInTheDocument();
     expect(within(dialog).getByText("Sinh viên sẽ không thể nộp bài nữa.")).toBeInTheDocument();
     expect(assignmentsApi.changeStatus).not.toHaveBeenCalled();
   });

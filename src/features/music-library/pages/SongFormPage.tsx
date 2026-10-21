@@ -15,7 +15,7 @@ export function SongFormPage() {
   const editor = useSongEditor(songId);
   const { options, isLoading: isCategoriesLoading, error: categoriesError } = useMusicCategories("lecturer");
 
-  const title = editor.isEditing ? `Sửa bài hát${editor.song ? ` — ${editor.song.title}` : ""}` : "Thêm bài hát";
+  const title = editor.isEditing ? `Sửa bài hát${editor.song ? ` - ${editor.song.title}` : ""}` : "Thêm bài hát";
   const loadError = editor.loadError ?? categoriesError;
   const isReady = !editor.isLoading && !isCategoriesLoading && !loadError;
 

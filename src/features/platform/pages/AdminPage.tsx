@@ -84,7 +84,7 @@ function OverviewContent({ overview, onOpenConfig }: { overview: AdminOverview; 
               >
                 <span>{user.username}</span>
                 <span className="truncate text-bvc-muted">{user.email}</span>
-                <span className="text-bvc-muted">{USER_ROLE_LABELS[user.role] ?? "—"}</span>
+                <span className="text-bvc-muted">{USER_ROLE_LABELS[user.role] ?? "-"}</span>
                 <span className="flex items-center gap-[6px] text-[13.5px]">
                   <span className={`size-[8px] shrink-0 rounded-full ${USER_STATUS_DOT[user.status]}`} />
                   {getStatusLabel(user.status)}

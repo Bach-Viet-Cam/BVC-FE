@@ -250,13 +250,9 @@ function InstrumentsTab() {
                       </span>
                     </td>
 
-                    <td className="px-5 py-3.5 font-bold text-bvc-ink text-[13.5px]">
-                      {instrument.name}
-                    </td>
+                    <td className="px-5 py-3.5 font-bold text-bvc-ink text-[13.5px]">{instrument.name}</td>
 
-                    <td className="px-5 py-3.5 text-bvc-muted">
-                      {instrument.description || "—"}
-                    </td>
+                    <td className="px-5 py-3.5 text-bvc-muted">{instrument.description || "-"}</td>
 
                     <td className="px-5 py-3.5">
                       <span className="inline-flex items-center gap-2">
@@ -265,7 +261,9 @@ function InstrumentsTab() {
                             instrument.isActive ? "bg-bvc-ok" : "bg-bvc-bar-strong"
                           }`}
                         />
-                        <span className={`text-[13px] ${instrument.isActive ? "font-semibold text-bvc-ink" : "text-bvc-muted"}`}>
+                        <span
+                          className={`text-[13px] ${instrument.isActive ? "font-semibold text-bvc-ink" : "text-bvc-muted"}`}
+                        >
                           {instrument.isActive ? "Đang hoạt động" : "Ngừng hoạt động"}
                         </span>
                       </span>
@@ -517,9 +515,7 @@ function SettingsTab() {
                                 {val}
                               </span>
                             ))}
-                            {jsonItems.length === 0 && (
-                              <span className="text-[12px] text-bvc-muted italic">Trống</span>
-                            )}
+                            {jsonItems.length === 0 && <span className="text-[12px] text-bvc-muted italic">Trống</span>}
                           </div>
                         )}
 
@@ -539,23 +535,18 @@ function SettingsTab() {
                             <span className="font-mono text-[13.5px] font-bold text-bvc-ink">
                               {Math.round(Number(config.value) * 100)}%
                             </span>
-                            <span className="font-mono text-[11px] text-bvc-muted">
-                              ({config.value})
-                            </span>
+                            <span className="font-mono text-[11px] text-bvc-muted">({config.value})</span>
                           </div>
                         )}
 
-                        {!isJson &&
-                          config.valueType !== "BOOLEAN" &&
-                          !isBytes &&
-                          !isAccuracy && (
-                            <span className="font-mono text-[13px] font-bold text-bvc-ink">
-                              {config.value}
-                              {config.key.includes("ATTEMPTS") ? " lần" : ""}
-                              {config.key.includes("DAYS") ? " ngày" : ""}
-                              {config.key.includes("DURATION") ? " giây" : ""}
-                            </span>
-                          )}
+                        {!isJson && config.valueType !== "BOOLEAN" && !isBytes && !isAccuracy && (
+                          <span className="font-mono text-[13px] font-bold text-bvc-ink">
+                            {config.value}
+                            {config.key.includes("ATTEMPTS") ? " lần" : ""}
+                            {config.key.includes("DAYS") ? " ngày" : ""}
+                            {config.key.includes("DURATION") ? " giây" : ""}
+                          </span>
+                        )}
                       </td>
 
                       <td className="px-5 py-3.5 text-right">
@@ -600,10 +591,7 @@ export function SystemConfigPage() {
 
   return (
     <main className="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#FAF9F7]">
-      <DesktopPageHeader
-        breadcrumb="Quản trị"
-        title="Cấu hình hệ thống"
-      />
+      <DesktopPageHeader breadcrumb="Quản trị" title="Cấu hình hệ thống" />
 
       <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-6 md:px-8">
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-[16px] border border-bvc-border bg-white px-5 py-3">

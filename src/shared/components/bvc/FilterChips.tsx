@@ -13,10 +13,7 @@ interface FilterChipsProps {
 
 export function FilterChips({ chips, active, onChange }: FilterChipsProps) {
   return (
-    <div
-      className="flex gap-[7px] overflow-x-auto px-[14px] pb-[2px]"
-      style={{ scrollbarWidth: "none" }}
-    >
+    <div className="flex gap-[7px] overflow-x-auto px-[14px] pb-[2px]" style={{ scrollbarWidth: "none" }}>
       {chips.map(({ value, label }) => {
         const isActive = active === value;
         return (

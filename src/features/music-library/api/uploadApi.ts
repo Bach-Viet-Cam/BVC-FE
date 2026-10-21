@@ -12,11 +12,10 @@ export const uploadApi = {
   confirm: (fileId: string) => axiosClient.post<ApiResponse<StoredFile>>(`/uploads/${fileId}/confirm`),
 };
 
-// uploadUrl là URL ký sẵn (S3 hoặc storage local), không đi qua axiosClient
-// vì interceptor sẽ gắn Bearer token khiến S3 từ chối chữ ký
+// uploadUrl là API của BE (không ký sẵn), cần Bearer token nên đi qua axiosClient.
+// timeout 0: file video lớn có thể mất hơn 10 giây mặc định
 async function putToStorage({ uploadUrl, method, headers }: PresignResult, file: File) {
-  const response = await fetch(uploadUrl, { method, headers, body: file });
-  if (!response.ok) throw new Error("Tải file lên thất bại. Vui lòng thử lại.");
+  await axiosClient.request({ url: uploadUrl, method, headers, data: file, timeout: 0 });
 }
 
 // presign → PUT file → confirm; trả file đã được server kiểm tra

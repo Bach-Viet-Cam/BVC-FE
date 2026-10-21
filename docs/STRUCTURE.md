@@ -1,8 +1,8 @@
-# STRUCTURE.md — bản đồ code bvc-fe
+# STRUCTURE.md - bản đồ code bvc-fe
 
 Đọc file này khi: dựng feature mới (đặt file đúng chỗ + nối đúng mạch), thêm primitive/ui token/route mới,
 debug một màn hình (lần theo mạch kết nối ở §3). Quy tắc viết code (import, TypeScript, form, API,
-đặt tên) thuộc về `RULES.md` — file này không nhắc lại, chỉ nói file nằm đâu và nối với nhau thế nào.
+đặt tên) thuộc về `RULES.md` - file này không nhắc lại, chỉ nói file nằm đâu và nối với nhau thế nào.
 
 ## 1. Cây thư mục (trạng thái hiện tại)
 
@@ -18,7 +18,7 @@ src/
 │   └── providers/
 │       └── AppProviders.tsx    # bọc AuthProvider (mở rộng thêm provider ở đây)
 ├── features/
-│   ├── auth/                   # đã code xong — mẫu chuẩn để copy shape
+│   ├── auth/                   # đã code xong - mẫu chuẩn để copy shape
 │   │   ├── pages/              # LoginPage, RegisterPage (route-level)
 │   │   ├── components/         # LoginForm, RegisterForm (JSX thuần)
 │   │   ├── hooks/              # useLogin, useRegister (loading/error + điều hướng)
@@ -46,7 +46,7 @@ src/
 ## 2. Boot flow (thứ tự chạy)
 
 1. `main.tsx` → `createRoot.render(<App/>)`.
-2. `App.tsx`: `AppProviders` (hiện chỉ `AuthProvider`, đọc `user` từ `localStorage` rồi mới render tiếp —
+2. `App.tsx`: `AppProviders` (hiện chỉ `AuthProvider`, đọc `user` từ `localStorage` rồi mới render tiếp -
    `ProtectedRoute` chờ `isLoading` xong mới quyết định) → `AppRouter` → `Toaster` (toast toàn app).
 3. `router.tsx`: `/`, `/login` → `LoginPage` (public); `/register`, `/403` (public);
    `*` → `NotFoundPage`; `/dashboard` (và mọi route feature sau này) nằm trong
@@ -70,7 +70,7 @@ useLogin → authApi.login → axiosClient` (`features/auth/`).
   (trong `<AppLayout>` nếu cần login, bọc `allowedRoles` nếu theo role) → thêm item vào
   `NAV_ITEMS` trong `AppSidebar.tsx` với `roles` tương ứng.
 - **Toast:** gọi `toast.success/error/info(title, description)` từ `ui/toast.tsx` ở bất kỳ đâu
-  (không cần props drilling — `<Toaster/>` đã mount ở `App`).
+  (không cần props drilling - `<Toaster/>` đã mount ở `App`).
 
 ## 4. Khung file chuẩn (thứ tự trong file)
 
@@ -81,7 +81,7 @@ interface Props đặt ngay trên component → export function Tên (named expo
 
 Primitive `ui/` mới = wrapper mỏng trên Base UI: ` Root/Trigger/Portal/Popup` giữ nguyên,
 class Tailwind + `cn()` phủ ngoài, `className` của caller luôn nối cuối (mẫu: `ui/button.tsx`,
-`ui/toast.tsx`). Không tạo primitive mới khi `ui/` đã có — tái dùng.
+`ui/toast.tsx`). Không tạo primitive mới khi `ui/` đã có - tái dùng.
 
 ## 5. Tailwind: chỉ dùng biến định nghĩa
 
@@ -101,7 +101,7 @@ Bảng token hiện tại (`index.css:71-133`):
 
 Base layer đã set sẵn: `body` nền/chữ + `h1–h3` cỡ 48/36/24px, `a` xanh + hover, nút con trỏ pointer,
 `.material-symbols-outlined`. Thêm token màu mới = thêm cặp `--color-*` trong `@theme` +
-hex trong `:root`. Cấm token `--spacing-*` custom — lý do ở RULES.md §6.
+hex trong `:root`. Cấm token `--spacing-*` custom - lý do ở RULES.md §6.
 
 ## 6. Config & scripts (tra cứu, không học thuộc)
 

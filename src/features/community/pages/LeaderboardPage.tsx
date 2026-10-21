@@ -156,7 +156,7 @@ export function LeaderboardPage() {
             </div>
           ))}
 
-          {/* My row — pinned */}
+          {/* My row - pinned */}
           <div className="mx-[14px] mt-[8px] flex h-[52px] items-center gap-3 rounded-[14px] bg-bvc-accent-tint px-[14px]">
             {/* Rank */}
             <span className="w-[28px] shrink-0 font-mono text-[13px] font-bold text-bvc-ink">

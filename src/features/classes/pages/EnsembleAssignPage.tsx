@@ -94,7 +94,7 @@ export function EnsembleAssignPage() {
 
       {/* Body */}
       <div className="flex flex-1 gap-0 overflow-hidden">
-        {/* Left panel — Unassigned */}
+        {/* Left panel - Unassigned */}
         <div className="flex w-[260px] shrink-0 flex-col overflow-hidden border-r border-bvc-border-strong">
           <div className="flex shrink-0 items-center gap-2 border-b border-bvc-line px-[18px] py-[14px]">
             <span className="text-[13px] font-bold text-bvc-ink">Chưa phân công</span>
@@ -119,7 +119,7 @@ export function EnsembleAssignPage() {
           </div>
         </div>
 
-        {/* Center panel — Groups */}
+        {/* Center panel - Groups */}
         <div className="flex flex-1 flex-col overflow-y-auto bg-bvc-surface p-[20px]">
           <div className="mb-[14px] flex items-baseline gap-[10px]">
             <span className="text-[16px] font-extrabold tracking-[-0.025em] text-bvc-ink">Nhóm hòa tấu</span>
@@ -170,7 +170,7 @@ export function EnsembleAssignPage() {
           </div>
         </div>
 
-        {/* Right panel — Warnings */}
+        {/* Right panel - Warnings */}
         <div className="flex w-[280px] shrink-0 flex-col border-l border-bvc-border-strong">
           <div className="shrink-0 border-b border-bvc-line px-[18px] py-[14px]">
             <span className="text-[13px] font-bold uppercase tracking-[0.1em] text-bvc-muted">Cảnh báo</span>

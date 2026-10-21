@@ -15,7 +15,7 @@ const statusLabels: Record<AudioEvaluationStatus, string> = {
   completed: "Phân tích hoàn tất",
   failed: "Phân tích thất bại",
   publish_failed: "Gửi yêu cầu thất bại",
-  publish_unknown: "Chưa xác định trạng thái gửi — đang kiểm tra lại",
+  publish_unknown: "Chưa xác định trạng thái gửi - đang kiểm tra lại",
 };
 
 export function AudioAnalysisTestPage() {

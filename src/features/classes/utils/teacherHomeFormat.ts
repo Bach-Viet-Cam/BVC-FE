@@ -23,7 +23,7 @@ export function countAttention(classes: HomeClass[]): number {
 }
 
 export function formatWeekLabel(week: string): string {
-  return week === "—" ? "Chưa bắt đầu" : `Tuần ${week}`;
+  return week === "-" ? "Chưa bắt đầu" : `Tuần ${week}`;
 }
 
 // "Cần xử lý hôm nay": one row per class with students to watch, plus unpublished drafts.
@@ -33,7 +33,7 @@ export function buildHomeTasks(classes: HomeClass[], draftCount: number): HomeTa
     .map<HomeTask>((cls) => ({
       id: `class-${cls.id}`,
       tone: "warn",
-      message: `${cls.atRisk + cls.behind} sinh viên cần chú ý — ${cls.name}`,
+      message: `${cls.atRisk + cls.behind} sinh viên cần chú ý - ${cls.name}`,
       actionLabel: "Xem lớp",
       path: `/teacher/classes/${cls.id}`,
     }));

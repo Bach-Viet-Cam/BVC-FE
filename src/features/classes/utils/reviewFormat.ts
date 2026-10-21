@@ -16,5 +16,5 @@ export function formatQueueSubtitle(student: AssignmentStudent): string {
 }
 
 export function formatQueueScore(student: AssignmentStudent): string {
-  return student.bestAccuracy === null ? "—" : formatPercent(student.bestAccuracy);
+  return student.bestAccuracy === null ? "-" : formatPercent(student.bestAccuracy);
 }

@@ -15,7 +15,7 @@ vi.mock("react-router-dom", async (importOriginal) => ({
 
 const CLASS_FA26 = {
   id: "c1",
-  name: "TRD301 — Nhạc cụ truyền thống",
+  name: "TRD301 - Nhạc cụ truyền thống",
   cohort: "FA26",
   status: "ACTIVE",
   instrument: { id: "i1", name: "Đàn tranh" },
@@ -26,7 +26,7 @@ const CLASS_FA26 = {
 const CLASS_SP26 = {
   ...CLASS_FA26,
   id: "c2",
-  name: "TRD101 — Nhập môn",
+  name: "TRD101 - Nhập môn",
   cohort: "SP26",
   status: "ENDED",
   memberCount: 5,
@@ -58,8 +58,8 @@ describe("ClassListPage", () => {
   it("lists the classes returned by the API with stats computed from them", async () => {
     mockClasses([CLASS_FA26, CLASS_SP26]);
     renderPage();
-    expect(await screen.findByText("TRD301 — Nhạc cụ truyền thống")).toBeInTheDocument();
-    expect(screen.getByText("TRD101 — Nhập môn")).toBeInTheDocument();
+    expect(await screen.findByText("TRD301 - Nhạc cụ truyền thống")).toBeInTheDocument();
+    expect(screen.getByText("TRD101 - Nhập môn")).toBeInTheDocument();
     expect(within(screen.getByText("Tổng lớp").parentElement as HTMLElement).getByText("2")).toBeInTheDocument();
     expect(within(screen.getByText("Sinh viên").parentElement as HTMLElement).getByText("25")).toBeInTheDocument();
     expect(classesApi.listClasses).toHaveBeenCalledWith(expect.objectContaining({ status: "ALL" }));
@@ -68,9 +68,9 @@ describe("ClassListPage", () => {
   it("filters by cohort chip and opens a class by its id", async () => {
     mockClasses([CLASS_FA26, CLASS_SP26]);
     renderPage();
-    await screen.findByText("TRD301 — Nhạc cụ truyền thống");
+    await screen.findByText("TRD301 - Nhạc cụ truyền thống");
     await userEvent.click(screen.getByRole("button", { name: "SP26" }));
-    expect(screen.queryByText("TRD301 — Nhạc cụ truyền thống")).not.toBeInTheDocument();
+    expect(screen.queryByText("TRD301 - Nhạc cụ truyền thống")).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Xem lớp" }));
     expect(navigate).toHaveBeenCalledWith("/teacher/classes/c2");
   });
@@ -87,6 +87,6 @@ describe("ClassListPage", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent("Tải dữ liệu thất bại");
     mockClasses([CLASS_FA26]);
     await userEvent.click(screen.getByRole("button", { name: "Thử lại" }));
-    expect(await screen.findByText("TRD301 — Nhạc cụ truyền thống")).toBeInTheDocument();
+    expect(await screen.findByText("TRD301 - Nhạc cụ truyền thống")).toBeInTheDocument();
   });
 });

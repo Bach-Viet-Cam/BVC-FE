@@ -17,7 +17,7 @@ interface PastChallenge {
 
 const ACTIVE_CHALLENGE = {
   id: "c1",
-  title: "Lý ngựa ô — Thử thách tuần 39",
+  title: "Lý ngựa ô - Thử thách tuần 39",
   bpm: 120,
   scoreTarget: "85%+",
   countdown: "Còn 3 ngày 14 giờ",
@@ -28,21 +28,21 @@ const ACTIVE_CHALLENGE = {
 const PAST_CHALLENGES: PastChallenge[] = [
   {
     id: "c2",
-    title: "Trống cơm — Tuần 38",
+    title: "Trống cơm - Tuần 38",
     winner: "Phương Linh",
     score: "97%",
     date: "14/09",
   },
   {
     id: "c3",
-    title: "Scale La thứ — Tuần 37",
+    title: "Scale La thứ - Tuần 37",
     winner: "Minh Anh",
     score: "95%",
     date: "07/09",
   },
   {
     id: "c4",
-    title: "Lý con sáo — Tuần 36",
+    title: "Lý con sáo - Tuần 36",
     winner: "Hoàng Tùng",
     score: "93%",
     date: "31/08",

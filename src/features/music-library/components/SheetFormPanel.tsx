@@ -222,7 +222,7 @@ export function SheetFormPanel({
             {...register("name")}
             id="sheet-name"
             maxLength={100}
-            placeholder={`${instrumentName} — ${isMain ? "bản chính" : "bản cơ bản"}`}
+            placeholder={`${instrumentName} - ${isMain ? "bản chính" : "bản cơ bản"}`}
             className={fieldClass(Boolean(errors.name), "h-[46px]")}
           />
         </FormField>

@@ -179,7 +179,7 @@ export function SheetPage() {
         >
           <SheetCanvas
             file={sheet.sheetFile}
-            heading={`${song.title} — ${sheet.instrument.name.toLowerCase()}`}
+            heading={`${song.title} - ${sheet.instrument.name.toLowerCase()}`}
             page={currentPage}
             zoom={zoom}
           />

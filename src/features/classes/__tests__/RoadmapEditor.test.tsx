@@ -7,7 +7,7 @@ import { type RoadmapVersion } from "@/features/classes/types/roadmapTypes";
 vi.mock("@/features/classes/api/roadmapsApi", () => ({
   roadmapsApi: {
     listFingerExercises: vi.fn().mockResolvedValue({
-      data: { data: [{ id: "p3", title: "Luyện ngón — Láy", defaultBpm: null }], message: "", success: true },
+      data: { data: [{ id: "p3", title: "Luyện ngón - Láy", defaultBpm: null }], message: "", success: true },
     }),
   },
 }));
@@ -95,9 +95,9 @@ describe("RoadmapEditor", () => {
   it("adds exercises from the picker", async () => {
     renderEditor();
     await userEvent.click(within(week(2)).getByRole("button", { name: "Thêm bài luyện ngón" }));
-    await userEvent.click(await screen.findByRole("checkbox", { name: "Luyện ngón — Láy" }));
+    await userEvent.click(await screen.findByRole("checkbox", { name: "Luyện ngón - Láy" }));
     await userEvent.click(screen.getByRole("button", { name: "Thêm" }));
-    expect(exerciseTitles(2)).toEqual(["Luyện ngón — Láy"]);
+    expect(exerciseTitles(2)).toEqual(["Luyện ngón - Láy"]);
   });
 
   it("shows the unavailable warning and MSG-48 for an unavailable exercise", async () => {

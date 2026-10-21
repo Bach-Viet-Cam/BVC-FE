@@ -89,7 +89,7 @@ export function BonusFormPage() {
             </select>
           </div>
 
-          {/* Loại bonus — chip group */}
+          {/* Loại bonus - chip group */}
           <div className="flex flex-col gap-[8px]">
             <label className="text-[13px] font-semibold text-bvc-muted">
               Loại bonus
@@ -149,7 +149,7 @@ export function BonusFormPage() {
             </div>
           </div>
 
-          {/* Đối tượng — chip group */}
+          {/* Đối tượng - chip group */}
           <div className="flex flex-col gap-[8px]">
             <label className="text-[13px] font-semibold text-bvc-muted">
               Đối tượng

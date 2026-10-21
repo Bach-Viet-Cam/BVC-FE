@@ -48,7 +48,7 @@ export function SheetManagePage() {
         <FocusHeader
           backTo={song && !song.canEdit ? `/library/${song.id}` : "/songs"}
           backLabel={song && !song.canEdit ? "Quay lại trang bài hát" : "Quay lại thư viện bài hát của tôi"}
-          title={song ? `Bản nhạc — ${song.title}` : "Bản nhạc"}
+          title={song ? `Bản nhạc - ${song.title}` : "Bản nhạc"}
           subtitle={
             song &&
             `${sheets.length} bản · ${groups.length} nhạc cụ · mỗi nhạc cụ 1 bản chính`

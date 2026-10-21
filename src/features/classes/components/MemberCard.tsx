@@ -16,7 +16,7 @@ export function MemberCard({ member, canRemove, onRemove }: MemberCardProps) {
         <span className="flex min-w-0 flex-col gap-[2px]">
           <span className="text-[15px] font-bold">{member.fullName}</span>
           <span className="break-all text-[12px] text-bvc-muted">
-            <span className="font-bvc-mono">{member.studentCode ?? "—"}</span> · {member.email}
+            <span className="font-bvc-mono">{member.studentCode ?? "-"}</span> · {member.email}
           </span>
         </span>
         <StatusLabel

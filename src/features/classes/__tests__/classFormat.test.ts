@@ -20,7 +20,7 @@ describe("classFormat", () => {
     expect(formatCurrentWeek("2026-09-30", "ACTIVE", "2026-09-30")).toBe("1/6");
     expect(formatCurrentWeek("2026-09-30", "ACTIVE", "2026-10-21")).toBe("4/6");
     expect(formatCurrentWeek("2026-09-30", "ACTIVE", "2026-12-31")).toBe("6/6");
-    expect(formatCurrentWeek("2026-11-01", "ACTIVE", "2026-10-21")).toBe("—");
+    expect(formatCurrentWeek("2026-11-01", "ACTIVE", "2026-10-21")).toBe("-");
     expect(formatCurrentWeek("2026-09-30", "ENDED", "2026-10-02")).toBe("6/6");
   });
 

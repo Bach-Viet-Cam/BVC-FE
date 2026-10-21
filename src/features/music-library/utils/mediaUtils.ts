@@ -25,7 +25,7 @@ export async function readPageCount(file: File): Promise<number> {
 }
 
 export function formatDuration(totalSec?: number | null) {
-  if (totalSec === undefined || totalSec === null) return "—";
+  if (totalSec === undefined || totalSec === null) return "-";
   const minutes = Math.floor(totalSec / 60);
   const seconds = Math.floor(totalSec % 60);
   return `${minutes}:${seconds.toString().padStart(2, "0")}`;

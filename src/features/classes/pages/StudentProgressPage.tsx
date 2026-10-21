@@ -130,7 +130,7 @@ export function StudentProgressPage() {
                 key={item.userId}
                 className={`grid min-h-[52px] ${COLUMNS} items-center gap-[14px] border-b border-bvc-line px-[20px] py-[8px] text-[13px] last:border-0`}
               >
-                <span className="font-mono text-bvc-muted">{item.studentCode ?? "—"}</span>
+                <span className="font-mono text-bvc-muted">{item.studentCode ?? "-"}</span>
                 <span className="truncate font-semibold text-bvc-ink">{item.username}</span>
                 <span className="font-mono text-bvc-muted">{item.submissionCount}</span>
                 <span className="flex items-center gap-[10px]">

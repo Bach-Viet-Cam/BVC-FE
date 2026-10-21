@@ -11,7 +11,11 @@ import {
   NOTIFICATION_TYPE_OPTIONS,
 } from "@/features/platform/constants/notificationConstants";
 import { useNotifications } from "@/features/platform/hooks/useNotifications";
-import { type NotificationItem, type NotificationStatus, type NotificationType } from "@/features/platform/types/notificationTypes";
+import {
+  type NotificationItem,
+  type NotificationStatus,
+  type NotificationType,
+} from "@/features/platform/types/notificationTypes";
 import { formatNotificationTime } from "@/features/platform/utils/validateNotification";
 
 function StatusBadge({ status }: { status: NotificationStatus }) {
@@ -24,7 +28,11 @@ function StatusBadge({ status }: { status: NotificationStatus }) {
     );
   }
   if (status === "SCHEDULED") {
-    return <span className="rounded-[9px] border border-bvc-border bg-bvc-surface px-2 py-0.5 text-[12px] text-bvc-muted">Hẹn giờ</span>;
+    return (
+      <span className="rounded-[9px] border border-bvc-border bg-bvc-surface px-2 py-0.5 text-[12px] text-bvc-muted">
+        Hẹn giờ
+      </span>
+    );
   }
   return <span className="rounded-[9px] border border-bvc-border px-2 py-0.5 text-[12px] text-bvc-faint">Nháp</span>;
 }
@@ -76,7 +84,9 @@ export function NotificationsManagePage() {
                 type="button"
                 onClick={() => setStatus(chip.value)}
                 className={`cursor-pointer rounded-[11px] px-3 py-1.5 text-[13px] ${
-                  status === chip.value ? "bg-bvc-ink font-bold text-white" : "border border-bvc-border-strong text-bvc-muted"
+                  status === chip.value
+                    ? "bg-bvc-ink font-bold text-white"
+                    : "border border-bvc-border-strong text-bvc-muted"
                 }`}
               >
                 {chip.label}
@@ -109,7 +119,9 @@ export function NotificationsManagePage() {
               </button>
             ))}
             {total > items.length && (
-              <p className="text-[12px] text-bvc-muted">Hiển thị {items.length}/{total} thông báo mới nhất.</p>
+              <p className="text-[12px] text-bvc-muted">
+                Hiển thị {items.length}/{total} thông báo mới nhất.
+              </p>
             )}
           </PageStatus>
         </div>

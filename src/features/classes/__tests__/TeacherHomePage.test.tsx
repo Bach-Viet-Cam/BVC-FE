@@ -19,7 +19,7 @@ vi.mock("react-router-dom", async (importOriginal) => ({
 
 const ACTIVE_CLASS = {
   id: "c1",
-  name: "TRD301 — Nhạc cụ truyền thống",
+  name: "TRD301 - Nhạc cụ truyền thống",
   cohort: "FA26",
   status: "ACTIVE",
   instrument: { id: "i1", name: "Đàn tranh" },
@@ -62,7 +62,7 @@ describe("TeacherHomePage", () => {
   it("shows the real stats, class card and today's tasks", async () => {
     mockApis();
     renderPage();
-    const card = (await screen.findByText("TRD301 — Nhạc cụ truyền thống")).closest("button") as HTMLElement;
+    const card = (await screen.findByText("TRD301 - Nhạc cụ truyền thống")).closest("button") as HTMLElement;
     expect(within(card).getByText("Chưa bắt đầu · 20 sinh viên")).toBeInTheDocument();
     expect(
       within(
@@ -71,7 +71,7 @@ describe("TeacherHomePage", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("Bài tập đang mở").nextElementSibling).toHaveTextContent("4");
     expect(screen.getByText("Sinh viên cần chú ý").nextElementSibling).toHaveTextContent("5");
-    expect(screen.getByText("5 sinh viên cần chú ý — TRD301 — Nhạc cụ truyền thống")).toBeInTheDocument();
+    expect(screen.getByText("5 sinh viên cần chú ý - TRD301 - Nhạc cụ truyền thống")).toBeInTheDocument();
     expect(screen.getByText("2 bài tập nháp chưa đăng")).toBeInTheDocument();
     expect(progressApi.getProgress).toHaveBeenCalledWith("c1", expect.anything());
   });
@@ -79,7 +79,7 @@ describe("TeacherHomePage", () => {
   it("opens the class and the task targets by their real routes", async () => {
     mockApis();
     renderPage();
-    await userEvent.click((await screen.findByText("TRD301 — Nhạc cụ truyền thống")).closest("button") as HTMLElement);
+    await userEvent.click((await screen.findByText("TRD301 - Nhạc cụ truyền thống")).closest("button") as HTMLElement);
     expect(navigate).toHaveBeenCalledWith("/teacher/classes/c1");
     await userEvent.click(screen.getByRole("button", { name: "Xem bài tập" }));
     expect(navigate).toHaveBeenCalledWith("/teacher/assignments");
@@ -98,6 +98,6 @@ describe("TeacherHomePage", () => {
     renderPage();
     expect(await screen.findByRole("alert")).toHaveTextContent("Tải dữ liệu thất bại");
     await userEvent.click(screen.getByRole("button", { name: "Thử lại" }));
-    expect(await screen.findByText("TRD301 — Nhạc cụ truyền thống")).toBeInTheDocument();
+    expect(await screen.findByText("TRD301 - Nhạc cụ truyền thống")).toBeInTheDocument();
   });
 });
