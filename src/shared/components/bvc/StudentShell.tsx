@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { Bell, Bookmark, LibraryBig } from "lucide-react";
+import { Bookmark, LibraryBig } from "lucide-react";
 import { useAuth } from "@/shared/context/AuthContext";
 import { useViewerRole } from "@/shared/hooks/useViewerRole";
+import { NotificationBell } from "@/shared/components/bvc/NotificationBell";
 import { UserAvatar } from "@/shared/components/bvc/UserAvatar";
 import { actionButtonClass } from "@/shared/components/bvc/actionButtonStyles";
 import { getRoleHome } from "@/shared/utils/roleHome";
@@ -81,9 +82,7 @@ export function StudentShell({ children, className }: StudentShellProps) {
           </Link>
         ) : (
           <div className="flex items-center gap-2.5">
-            <Link to="/notifications" aria-label="Thông báo" className={iconLinkClass}>
-              <Bell className="size-[19px]" strokeWidth={1.6} />
-            </Link>
+            <NotificationBell className={iconLinkClass} iconClassName="size-[19px]" />
             {role === "student" && (
               <Link to="/saved" aria-label="Nội dung đã lưu" className={iconLinkClass}>
                 <Bookmark className="size-[19px]" strokeWidth={1.6} />

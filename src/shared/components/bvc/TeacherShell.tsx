@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { Bell } from "lucide-react";
+import { NotificationBell } from "@/shared/components/bvc/NotificationBell";
 import { useAuth } from "@/shared/context/AuthContext";
 import { TEACHER_NAV } from "@/shared/config/navConfig";
 import { UserAvatar } from "@/shared/components/bvc/UserAvatar";
@@ -25,9 +25,7 @@ export function TeacherShell({ children, className }: TeacherShellProps) {
       <aside className="hidden w-[236px] shrink-0 flex-col gap-[26px] border-r border-bvc-border bg-bvc-surface px-4 py-6 lg:flex">
         <div className="flex items-center justify-between gap-2 pl-1.5">
           <span className="text-[17px] font-extrabold tracking-[-0.02em]">Bách Việt Cầm</span>
-          <Link to="/notifications" aria-label="Thông báo" className={bellClass}>
-            <Bell className="size-[18px]" strokeWidth={1.6} />
-          </Link>
+          <NotificationBell className={bellClass} iconClassName="size-[18px]" />
         </div>
         <nav aria-label="Điều hướng giảng viên" className="flex flex-col gap-[3px]">
           {TEACHER_NAV.map((item) => (
@@ -72,9 +70,7 @@ export function TeacherShell({ children, className }: TeacherShellProps) {
       <header className="shrink-0 border-b border-bvc-border lg:hidden">
         <div className="flex items-center gap-2.5 px-[18px] pt-[22px]">
           <span className="flex-1 text-[19px] font-extrabold tracking-[-0.02em]">Bách Việt Cầm</span>
-          <Link to="/notifications" aria-label="Thông báo" className={bellClass}>
-            <Bell className="size-[18px]" strokeWidth={1.6} />
-          </Link>
+          <NotificationBell className={bellClass} iconClassName="size-[18px]" />
           <Link to="/profile" aria-label={`Hồ sơ ${displayName}`}>
             <UserAvatar name={displayName} size="sm" />
           </Link>

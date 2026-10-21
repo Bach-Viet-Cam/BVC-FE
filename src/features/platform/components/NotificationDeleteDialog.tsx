@@ -28,8 +28,12 @@ export function NotificationDeleteDialog({ target, onClose, onConfirm }: Notific
           Chỉ xóa được thông báo nháp hoặc đang hẹn giờ. Thao tác này không thể hoàn tác.
         </DialogDescription>
         <div className="mt-4 flex justify-end gap-2">
-          <Button type="button" variant="secondary" onClick={onClose}>Hủy</Button>
-          <Button type="button" variant="danger" isLoading={isDeleting} onClick={confirm}>Xóa</Button>
+          <Button type="button" variant="secondary" onClick={onClose}>
+            Hủy
+          </Button>
+          <Button type="button" variant="danger" isLoading={isDeleting} onClick={confirm}>
+            Xóa
+          </Button>
         </div>
       </DialogPopup>
     </Dialog>

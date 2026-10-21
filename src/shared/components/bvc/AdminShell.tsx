@@ -1,5 +1,5 @@
-import { Bell } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import { NotificationBell } from "@/shared/components/bvc/NotificationBell";
 import { cn } from "@/shared/utils/cn";
 
 interface AdminShellProps {
@@ -27,14 +27,10 @@ export function AdminShell({ title, subtitle, actions, children }: AdminShellPro
       <aside className="flex w-[236px] shrink-0 flex-col gap-[26px] border-r border-bvc-border bg-bvc-soft px-[16px] py-[24px]">
         <div className="flex items-center justify-between pl-[6px]">
           <span className="text-[17px] font-extrabold">Bách Việt Cầm</span>
-          <button
-            type="button"
-            disabled
-            aria-label="Thông báo"
-            className="flex size-[40px] shrink-0 items-center justify-center rounded-[14px] border border-bvc-border bg-white text-bvc-ink disabled:cursor-not-allowed"
-          >
-            <Bell size={18} strokeWidth={1.6} />
-          </button>
+          <NotificationBell
+            className="flex size-[40px] shrink-0 items-center justify-center rounded-[14px] border border-bvc-border bg-white text-bvc-ink"
+            iconClassName="size-[18px]"
+          />
         </div>
         <nav aria-label="Điều hướng quản trị" className="flex flex-col gap-[3px]">
           {ADMIN_NAV.map((item) => (

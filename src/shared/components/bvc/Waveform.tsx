@@ -9,11 +9,7 @@ interface WaveformProps {
   defaultColor?: string;
 }
 
-export function Waveform({
-  bars,
-  height = 26,
-  defaultColor = "var(--color-bvc-bar)",
-}: WaveformProps) {
+export function Waveform({ bars, height = 26, defaultColor = "var(--color-bvc-bar)" }: WaveformProps) {
   return (
     <div className="relative flex items-center" style={{ height }}>
       <span className="absolute inset-x-0 top-1/2 h-px bg-bvc-border" />

@@ -66,12 +66,8 @@ export function StudentReviewPage() {
         </button>
 
         <div className="flex flex-col gap-[3px]">
-          <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-bvc-muted">
-            TRD301 · Tuần 3
-          </span>
-          <span className="text-[24px] font-extrabold tracking-[-0.025em] text-bvc-ink">
-            Review sinh viên
-          </span>
+          <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-bvc-muted">TRD301 · Tuần 3</span>
+          <span className="text-[24px] font-extrabold tracking-[-0.025em] text-bvc-ink">Review sinh viên</span>
         </div>
       </header>
 
@@ -112,9 +108,7 @@ export function StudentReviewPage() {
 
           {/* Practice history */}
           <div className="mt-[22px]">
-            <span className="text-[13px] font-bold uppercase tracking-[0.1em] text-bvc-muted">
-              Lịch sử luyện tập
-            </span>
+            <span className="text-[13px] font-bold uppercase tracking-[0.1em] text-bvc-muted">Lịch sử luyện tập</span>
             <div className="mt-[10px] flex items-end gap-[5px]">
               {PRACTICE_BARS.map((h, i) => (
                 <div
@@ -163,15 +157,10 @@ export function StudentReviewPage() {
                 <div key={score.label} className="flex flex-1 flex-col gap-[4px]">
                   <div className="flex items-center justify-between">
                     <span className="text-[12px] text-bvc-muted">{score.label}</span>
-                    <span className="font-mono text-[12px] font-semibold text-bvc-ink">
-                      {score.value}%
-                    </span>
+                    <span className="font-mono text-[12px] font-semibold text-bvc-ink">{score.value}%</span>
                   </div>
                   <div className="h-[6px] overflow-hidden rounded-full bg-bvc-bar">
-                    <div
-                      className="h-full rounded-full bg-bvc-ink"
-                      style={{ width: `${score.value}%` }}
-                    />
+                    <div className="h-full rounded-full bg-bvc-ink" style={{ width: `${score.value}%` }} />
                   </div>
                 </div>
               ))}
@@ -180,9 +169,7 @@ export function StudentReviewPage() {
 
           {/* Teacher comment */}
           <div className="mt-[22px] flex flex-col gap-[10px]">
-            <span className="text-[13px] font-bold uppercase tracking-[0.1em] text-bvc-muted">
-              Nhận xét giảng viên
-            </span>
+            <span className="text-[13px] font-bold uppercase tracking-[0.1em] text-bvc-muted">Nhận xét giảng viên</span>
             <textarea
               rows={3}
               placeholder="Nhận xét cho tuần này..."

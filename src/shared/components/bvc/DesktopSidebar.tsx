@@ -27,7 +27,16 @@ export function DesktopSidebar({ items, user, showLogo = true, onLogout }: Deskt
       {showLogo && (
         <div className="flex items-center gap-[10px] px-[6px]">
           <span className="flex size-[34px] items-center justify-center rounded-[12px] bg-bvc-accent text-white">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              width="19"
+              height="19"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.9"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <circle cx="7" cy="16.5" r="3" />
               <circle cx="17.5" cy="14" r="3" />
               <path d="M10 16.5V6l10.5-2.5V14" />
@@ -46,9 +55,7 @@ export function DesktopSidebar({ items, user, showLogo = true, onLogout }: Deskt
             className={({ isActive }) =>
               cn(
                 "flex min-h-[44px] items-center justify-between gap-[11px] rounded-[13px] px-[12px] text-[14px]",
-                isActive
-                  ? "bg-bvc-accent-tint font-bold text-bvc-accent-text"
-                  : "text-bvc-muted hover:bg-bvc-border"
+                isActive ? "bg-bvc-accent-tint font-bold text-bvc-accent-text" : "text-bvc-muted hover:bg-bvc-border"
               )
             }
           >

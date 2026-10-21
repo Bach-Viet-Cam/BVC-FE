@@ -29,7 +29,11 @@ export function useNotifications() {
   );
 
   const save = useCallback(
-    async (id: string | null, values: NotificationFormValues, action: NotificationAction): Promise<NotificationItem | null> => {
+    async (
+      id: string | null,
+      values: NotificationFormValues,
+      action: NotificationAction
+    ): Promise<NotificationItem | null> => {
       const payload = {
         title: values.title,
         body: values.body,

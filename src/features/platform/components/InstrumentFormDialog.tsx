@@ -45,7 +45,10 @@ function InstrumentForm({ instrument, onSubmit, onClose }: InstrumentFormProps) 
         {instrument ? (
           <p className="text-[12px] text-bvc-muted">Mã định danh kỹ thuật không thể thay đổi sau khi tạo.</p>
         ) : (
-          <p className="text-[12px] text-bvc-muted">Chỉ gồm chữ cái viết thường và dấu gạch nối, ví dụ: <code className="font-mono text-bvc-ink">dan-nguyet</code>.</p>
+          <p className="text-[12px] text-bvc-muted">
+            Chỉ gồm chữ cái viết thường và dấu gạch nối, ví dụ:{" "}
+            <code className="font-mono text-bvc-ink">dan-nguyet</code>.
+          </p>
         )}
         {errors.code && <p className="text-[12px] font-medium text-bvc-error">{errors.code.message}</p>}
       </div>

@@ -1,5 +1,5 @@
-import { Bell } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import { NotificationBell } from "@/shared/components/bvc/NotificationBell";
 import { useAuth } from "@/shared/context/AuthContext";
 import { cn } from "@/shared/utils/cn";
 
@@ -33,14 +33,10 @@ export function MobileAppShell() {
     <>
       <header className="flex shrink-0 items-center gap-[10px] px-[18px] pt-[26px]">
         <span className="grow text-[21px] font-extrabold tracking-[-0.02em]">Bách Việt Cầm</span>
-        <button
-          type="button"
-          disabled
-          aria-label="Thông báo"
-          className="flex size-[44px] shrink-0 items-center justify-center rounded-[13px] border border-bvc-border text-bvc-ink disabled:cursor-not-allowed"
-        >
-          <Bell size={19} strokeWidth={1.6} />
-        </button>
+        <NotificationBell
+          className="flex size-[44px] shrink-0 items-center justify-center rounded-[13px] border border-bvc-border text-bvc-ink"
+          iconClassName="size-[19px]"
+        />
         <span
           aria-label={`Hồ sơ ${displayName}`}
           className="flex size-[44px] shrink-0 items-center justify-center rounded-full bg-bvc-accent-tint text-[13px] font-bold text-bvc-accent-text"

@@ -67,27 +67,54 @@ export function NotificationForm({ item, defaultType, onSave, onDelete }: Notifi
 
       {isSent && item?.sentAt && (
         <div className="rounded-[14px] bg-bvc-surface p-[12px_14px] text-[13px] text-bvc-muted">
-          Đã gửi lúc {formatNotificationTime(item.sentAt)} cho {item.recipientCount} người nhận. Thông báo đã gửi không thể sửa hoặc xóa.
+          Đã gửi lúc {formatNotificationTime(item.sentAt)} cho {item.recipientCount} người nhận. Thông báo đã gửi không
+          thể sửa hoặc xóa.
         </div>
       )}
 
       <div className="flex flex-col gap-[5px]">
-        <label className={LABEL_CLASS} htmlFor="notification-title">Tiêu đề</label>
-        <input id="notification-title" type="text" placeholder="Nhập tiêu đề thông báo..." disabled={isSent} className={`h-[46px] ${FIELD_CLASS}`} {...register("title")} />
+        <label className={LABEL_CLASS} htmlFor="notification-title">
+          Tiêu đề
+        </label>
+        <input
+          id="notification-title"
+          type="text"
+          placeholder="Nhập tiêu đề thông báo..."
+          disabled={isSent}
+          className={`h-[46px] ${FIELD_CLASS}`}
+          {...register("title")}
+        />
         {errors.title && <p className={ERROR_CLASS}>{errors.title.message}</p>}
       </div>
 
       <div className="flex flex-col gap-[5px]">
-        <label className={LABEL_CLASS} htmlFor="notification-body">Nội dung</label>
-        <textarea id="notification-body" placeholder="Nhập nội dung thông báo..." disabled={isSent} className={`min-h-[80px] py-3 ${FIELD_CLASS}`} {...register("body")} />
+        <label className={LABEL_CLASS} htmlFor="notification-body">
+          Nội dung
+        </label>
+        <textarea
+          id="notification-body"
+          placeholder="Nhập nội dung thông báo..."
+          disabled={isSent}
+          className={`min-h-[80px] py-3 ${FIELD_CLASS}`}
+          {...register("body")}
+        />
         {errors.body && <p className={ERROR_CLASS}>{errors.body.message}</p>}
       </div>
 
       <div className="flex flex-col gap-[5px]">
-        <label className={LABEL_CLASS} htmlFor="notification-target">Đối tượng</label>
-        <select id="notification-target" disabled={isSent} className={`h-[46px] cursor-pointer ${FIELD_CLASS}`} {...register("target")}>
+        <label className={LABEL_CLASS} htmlFor="notification-target">
+          Đối tượng
+        </label>
+        <select
+          id="notification-target"
+          disabled={isSent}
+          className={`h-[46px] cursor-pointer ${FIELD_CLASS}`}
+          {...register("target")}
+        >
           {NOTIFICATION_TARGET_OPTIONS.map((option) => (
-            <option key={option.value} value={option.value}>{option.label}</option>
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
           ))}
         </select>
       </div>
@@ -102,7 +129,9 @@ export function NotificationForm({ item, defaultType, onSave, onDelete }: Notifi
               disabled={isSent}
               onClick={() => setValue("type", option.value, { shouldDirty: true })}
               className={`cursor-pointer rounded-[11px] px-3 py-1.5 text-[13px] disabled:cursor-not-allowed ${
-                activeType === option.value ? "bg-bvc-ink font-bold text-white" : "border border-bvc-border-strong text-bvc-muted"
+                activeType === option.value
+                  ? "bg-bvc-ink font-bold text-white"
+                  : "border border-bvc-border-strong text-bvc-muted"
               }`}
             >
               {option.label}
@@ -112,8 +141,16 @@ export function NotificationForm({ item, defaultType, onSave, onDelete }: Notifi
       </div>
 
       <div className="flex flex-col gap-[5px]">
-        <label className={LABEL_CLASS} htmlFor="notification-schedule">Hẹn giờ gửi</label>
-        <input id="notification-schedule" type="datetime-local" disabled={isSent} className={`h-[46px] ${FIELD_CLASS}`} {...register("scheduledAt")} />
+        <label className={LABEL_CLASS} htmlFor="notification-schedule">
+          Hẹn giờ gửi
+        </label>
+        <input
+          id="notification-schedule"
+          type="datetime-local"
+          disabled={isSent}
+          className={`h-[46px] ${FIELD_CLASS}`}
+          {...register("scheduledAt")}
+        />
         {errors.scheduledAt && <p className={ERROR_CLASS}>{errors.scheduledAt.message}</p>}
         {!isSent && <p className="text-[12px] text-bvc-faint">Để trống để gửi ngay khi bấm “Gửi ngay”.</p>}
       </div>
@@ -139,7 +176,11 @@ export function NotificationForm({ item, defaultType, onSave, onDelete }: Notifi
             </button>
           </div>
           {item && (
-            <button type="button" onClick={() => onDelete(item)} className="cursor-pointer text-[13px] font-semibold text-bvc-accent-text">
+            <button
+              type="button"
+              onClick={() => onDelete(item)}
+              className="cursor-pointer text-[13px] font-semibold text-bvc-accent-text"
+            >
               Xóa thông báo
             </button>
           )}
