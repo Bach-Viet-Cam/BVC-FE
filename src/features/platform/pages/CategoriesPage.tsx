@@ -1,12 +1,4 @@
-import { DesktopSidebar, DesktopPageHeader } from "@/shared/components/bvc";
-
-const NAV_ITEMS = [
-  { label: "Lớp học", to: "/teacher" },
-  { label: "Bài tập", to: "/teacher/assignments" },
-  { label: "Duyệt bài nộp", to: "/teacher/review" },
-  { label: "Thư viện bài nhạc", to: "/songs" },
-  { label: "Phân loại nội dung", to: "/categories" },
-];
+import { DesktopPageHeader } from "@/shared/components/bvc";
 
 interface InstrumentItem {
   name: string;
@@ -68,16 +60,10 @@ const POPULAR_TAGS = [
 
 export function CategoriesPage() {
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-white">
-      <DesktopSidebar
-        items={NAV_ITEMS}
-        user={{ initials: "NH", name: "Nguyễn Thu Hương", role: "Giảng viên" }}
-        showLogo={false}
-      />
-
+    <>
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <DesktopPageHeader
-          breadcrumb="M02 · Thư viện học liệu"
+          breadcrumb="Thư viện học liệu"
           title="Phân loại nội dung"
           actions={
             <button
@@ -89,11 +75,8 @@ export function CategoriesPage() {
           }
         />
 
-        {/* Main content */}
         <div className="flex flex-1 gap-[20px] overflow-hidden p-[20px_32px]">
-          {/* Left — Nhạc cụ + Thể loại */}
           <div className="flex flex-1 flex-col gap-[16px] overflow-y-auto">
-            {/* Nhạc cụ */}
             <div className="overflow-hidden rounded-[20px] border border-bvc-border bg-white">
               <div className="flex items-center gap-[10px] border-b border-bvc-border px-[18px] py-[14px]">
                 <span className="text-[15px] font-bold text-bvc-ink">Nhạc cụ</span>
@@ -127,7 +110,6 @@ export function CategoriesPage() {
               ))}
             </div>
 
-            {/* Thể loại */}
             <div className="overflow-hidden rounded-[20px] border border-bvc-border bg-white">
               <div className="flex items-center gap-[10px] border-b border-bvc-border px-[18px] py-[14px]">
                 <span className="text-[15px] font-bold text-bvc-ink">Thể loại</span>
@@ -162,9 +144,7 @@ export function CategoriesPage() {
             </div>
           </div>
 
-          {/* Right sidebar */}
           <aside className="flex w-[340px] shrink-0 flex-col overflow-y-auto">
-            {/* Mức độ khó */}
             <div className="flex flex-col gap-[10px] rounded-[20px] border border-bvc-border bg-white p-[16px]">
               <span className="text-[15px] font-bold text-bvc-ink">Mức độ khó</span>
               <div className="flex flex-col gap-[8px]">
@@ -180,7 +160,6 @@ export function CategoriesPage() {
               </div>
             </div>
 
-            {/* Thẻ phổ biến */}
             <div className="mt-4 flex flex-col gap-[10px] rounded-[20px] border border-bvc-border bg-white p-[16px]">
               <span className="text-[15px] font-bold text-bvc-ink">Thẻ phổ biến</span>
               <div className="flex flex-wrap gap-[8px]">
@@ -197,6 +176,6 @@ export function CategoriesPage() {
           </aside>
         </div>
       </main>
-    </div>
+    </>
   );
 }

@@ -9,7 +9,7 @@ export function Switch({ className, ...props }: SwitchProps) {
     <BaseSwitch.Root
       {...props}
       className={cn(
-        "relative h-6 w-11 shrink-0 rounded-full bg-surface-container transition-colors",
+        "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full bg-surface-container transition-colors",
         "hover:bg-outline-variant focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
         "data-checked:bg-primary",
         "data-disabled:cursor-not-allowed data-disabled:opacity-50",

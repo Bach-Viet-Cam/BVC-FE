@@ -13,7 +13,7 @@ export function DesktopPageHeader({ breadcrumb, title, actions }: DesktopPageHea
             {breadcrumb}
           </div>
         )}
-        <div className="text-[29px] font-extrabold tracking-[-0.025em]">{title}</div>
+        <div className="font-bvc-display text-[29px] font-extrabold tracking-[-0.025em]">{title}</div>
       </div>
       {actions && <div className="flex gap-[10px]">{actions}</div>}
     </header>

@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import { ActionButton } from "@/features/classes/components/ActionButton";
 import { StatusLabel } from "@/features/classes/components/StatusLabel";
-import { type AssignmentBase, type AssignmentStatus } from "@/features/classes/types/assignmentTypes";
-import { ASSIGNMENT_KIND_LABELS, ASSIGNMENT_STATUS_LABELS } from "@/features/classes/utils/assignmentFormat";
+import { type AssignmentBase, type AssignmentStatus } from "@/features/classes/types/teacherAssignmentTypes";
+import { ASSIGNMENT_KIND_LABELS, ASSIGNMENT_STATUS_LABELS } from "@/features/classes/utils/teacherAssignmentFormat";
 
 export type AssignmentPanelAction = "publish" | "close" | "reopen" | "delete";
 

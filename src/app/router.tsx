@@ -1,14 +1,16 @@
+import { AudioAnalysisTestPage } from "@/features/practice/pages/AudioAnalysisTestPage";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { DevNav } from "@/shared/components/DevNav";
 
 import { LoginPage } from "@/features/auth/pages/LoginPage";
-import { RegisterPage } from "@/features/auth/pages/RegisterPage";
-import { ForgotPage } from "@/features/auth/pages/ForgotPage";
 import { NotFoundPage } from "@/shared/pages/NotFoundPage";
 import { ForbiddenPage } from "@/shared/pages/ForbiddenPage";
 import { DashboardPage } from "@/shared/pages/DashboardPage";
 import { ProtectedRoute } from "@/shared/components/ProtectedRoute";
+import { ScrollToTop } from "@/shared/components/ScrollToTop";
 import { AppLayout } from "@/shared/components/AppLayout";
+import { DesktopLayout } from "@/shared/components/DesktopLayout";
+import { MobileLayout } from "@/shared/components/MobileLayout";
+import { ROLES } from "@/shared/constants/roles";
 
 // Mobile — practice
 import { PracticePage } from "@/features/practice/pages/PracticePage";
@@ -52,19 +54,19 @@ import { TeacherPage } from "@/features/classes/pages/TeacherPage";
 import { TeacherHomePage } from "@/features/classes/pages/TeacherHomePage";
 import { ClassListPage } from "@/features/classes/pages/ClassListPage";
 import { ClassFormPage } from "@/features/classes/pages/ClassFormPage";
+import { EnsembleAssignPage } from "@/features/classes/pages/EnsembleAssignPage";
+import { RoadmapPage } from "@/features/classes/pages/RoadmapPage";
+import { TeacherAssignmentsPage } from "@/features/classes/pages/TeacherAssignmentsPage";
+import { ReviewPage } from "@/features/classes/pages/ReviewPage";
+import { StudentProgressPage } from "@/features/classes/pages/StudentProgressPage";
+import { AssignmentFormPage } from "@/features/classes/pages/AssignmentFormPage";
 import { ClassDetailPage } from "@/features/classes/pages/ClassDetailPage";
 import { AddStudentPage } from "@/features/classes/pages/AddStudentPage";
 import { ImportStudentsPage } from "@/features/classes/pages/ImportStudentsPage";
 import { AdminRoadmapPage } from "@/features/classes/pages/AdminRoadmapPage";
-import { GradingSettingsPage } from "@/features/platform/pages/GradingSettingsPage";
-import { AssignmentListPage } from "@/features/classes/pages/AssignmentListPage";
 import { TeacherAssignmentDetailPage } from "@/features/classes/pages/TeacherAssignmentDetailPage";
 import { StudentSubmissionsPage } from "@/features/classes/pages/StudentSubmissionsPage";
-import { ROLES } from "@/shared/constants/roles";
-import { EnsembleAssignPage } from "@/features/classes/pages/EnsembleAssignPage";
-import { RoadmapPage } from "@/features/classes/pages/RoadmapPage";
-import { ReviewPage } from "@/features/classes/pages/ReviewPage";
-import { AssignmentFormPage } from "@/features/classes/pages/AssignmentFormPage";
+import { GradingSettingsPage } from "@/features/platform/pages/GradingSettingsPage";
 
 // Desktop — library management
 import { SongManagePage } from "@/features/music-library/pages/SongManagePage";
@@ -99,22 +101,41 @@ import { ChallengeFormPage } from "@/features/community/pages/ChallengeFormPage"
 export function AppRouter() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         {/* Public */}
         <Route path="/" element={<LoginPage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/forgot" element={<ForgotPage />} />
         <Route path="/403" element={<ForbiddenPage />} />
 
+        {/* M02 — thư viện mở cho cả khách; khách bấm Lưu thì được mời đăng nhập */}
+        <Route path="/library" element={<LibraryPage />} />
+        <Route path="/library/:songId" element={<SongDetailPage />} />
+        <Route path="/library/:songId/sheets/:sheetId" element={<SheetPage />} />
+
+        {/* Mọi người dùng đã đăng nhập */}
         <Route element={<ProtectedRoute />}>
-          {/* ── Mobile screens — full-screen, no AppLayout sidebar ─────── */}
-
-          {/* Home & profile */}
-          <Route path="/home" element={<HomePage />} />
+          <Route path="/dev/audio-analysis" element={<AudioAnalysisTestPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/help" element={<HelpCenterPage />} />
+          <Route element={<AppLayout />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+          </Route>
+        </Route>
 
-          {/* Practice */}
+        {/* Sinh viên — màn hình mobile */}
+        <Route element={<ProtectedRoute allowedRoles={[ROLES.STUDENT]} />}>
+          <Route path="/home" element={<HomePage />} />
+
+          <Route element={<MobileLayout />}>
+            <Route path="/assignments" element={<MyAssignmentsPage />} />
+            <Route path="/assignment/:assignmentId" element={<AssignmentPage />} />
+            <Route path="/ensemble/new" element={<EnsemblePage />} />
+            <Route path="/community/bonus" element={<BonusListPage />} />
+            <Route path="/community/bonus/:bonusId" element={<BonusDetailPage />} />
+          </Route>
+
           <Route path="/practice/:songId" element={<PracticePage />} />
           <Route path="/practice/:songId/tuner" element={<TunerPage />} />
           <Route path="/practice/:songId/metronome" element={<MetronomePage />} />
@@ -129,88 +150,81 @@ export function AppRouter() {
           <Route path="/practice/:songId/song-analysis" element={<SongAnalysisPage />} />
 
           {/* Library */}
-          <Route path="/library" element={<LibraryPage />} />
           <Route path="/library/upload" element={<SongUploadPage />} />
-          <Route path="/library/:songId" element={<SongDetailPage />} />
-          <Route path="/library/:songId/sheet" element={<SheetPage />} />
           <Route path="/saved" element={<SavedPage />} />
 
-          {/* Classes */}
-          <Route path="/assignments" element={<MyAssignmentsPage />} />
-          <Route path="/assignment/:assignmentId" element={<AssignmentPage />} />
-
-          {/* Ensemble & rental */}
-          <Route path="/ensemble/:sessionId" element={<EnsemblePage />} />
           <Route path="/ensemble/:sessionId/playback" element={<EnsemblePlaybackPage />} />
           <Route path="/rental" element={<RentalPage />} />
           <Route path="/rental/marketplace" element={<RentalMarketplacePage />} />
-          <Route path="/notifications" element={<NotificationsPage />} />
-          <Route path="/help" element={<HelpCenterPage />} />
 
-          {/* Community — mobile */}
-          <Route path="/community/bonus" element={<BonusListPage />} />
-          <Route path="/community/bonus/:bonusId" element={<BonusDetailPage />} />
           <Route path="/community/bonus/:bonusId/submit" element={<BonusSubmitPage />} />
           <Route path="/community/leaderboard" element={<LeaderboardPage />} />
           <Route path="/community/challenges" element={<ChallengesPage />} />
           <Route path="/community/challenges/:challengeId" element={<ChallengeDetailPage />} />
+        </Route>
 
-          {/* ── Desktop screens — self-contained with DesktopSidebar ───── */}
-
-          {/* Teacher / classes */}
-          <Route path="/teacher" element={<TeacherPage />} />
-          <Route path="/teacher/home" element={<TeacherHomePage />} />
-          {/* M03 classes & members — mobile-first screens from UI/, wired to the API */}
-          <Route element={<ProtectedRoute allowedRoles={[ROLES.TEACHER]} />}>
+        {/* Giảng viên — màn hình desktop */}
+        <Route element={<ProtectedRoute allowedRoles={[ROLES.TEACHER]} />}>
+          <Route element={<DesktopLayout />}>
+            <Route path="/teacher" element={<TeacherPage />} />
+            <Route path="/teacher/home" element={<TeacherHomePage />} />
             <Route path="/teacher/classes" element={<ClassListPage />} />
-            <Route path="/teacher/classes/new" element={<ClassFormPage />} />
-            <Route path="/teacher/classes/:classId" element={<ClassDetailPage />} />
-            <Route path="/teacher/classes/:classId/edit" element={<ClassFormPage />} />
-            <Route path="/teacher/classes/:classId/members/new" element={<AddStudentPage />} />
-            <Route path="/teacher/classes/:classId/import" element={<ImportStudentsPage />} />
-            <Route path="/teacher/assignments" element={<AssignmentListPage />} />
-            <Route path="/teacher/assignments/new" element={<AssignmentFormPage />} />
-            <Route path="/teacher/assignments/:assignmentId/edit" element={<AssignmentFormPage />} />
-            <Route path="/teacher/assignments/:assignmentId" element={<TeacherAssignmentDetailPage />} />
-            <Route path="/teacher/assignments/:assignmentId/students/:studentId" element={<StudentSubmissionsPage />} />
+            <Route path="/teacher/roadmap" element={<RoadmapPage />} />
+            <Route path="/teacher/progress" element={<StudentProgressPage />} />
+            <Route path="/teacher/assignments" element={<TeacherAssignmentsPage />} />
+            <Route path="/categories" element={<CategoriesPage />} />
           </Route>
-          {/* M03 roadmap management — System Admin, desktop layout from UI/Giám sát hệ thống-html */}
-          <Route element={<ProtectedRoute allowedRoles={[ROLES.SYSTEM_ADMIN]} />}>
-            <Route path="/admin/roadmaps" element={<AdminRoadmapPage />} />
-            <Route path="/admin/grading-settings" element={<GradingSettingsPage />} />
-          </Route>
+          {/* M03 classes & members */}
+          <Route path="/teacher/classes/new" element={<ClassFormPage />} />
+          <Route path="/teacher/classes/:classId" element={<ClassDetailPage />} />
+          <Route path="/teacher/classes/:classId/edit" element={<ClassFormPage />} />
+          <Route path="/teacher/classes/:classId/members/new" element={<AddStudentPage />} />
+          <Route path="/teacher/classes/:classId/import" element={<ImportStudentsPage />} />
+          <Route path="/teacher/assignments/:assignmentId/edit" element={<AssignmentFormPage />} />
+          <Route path="/teacher/assignments/:assignmentId" element={<TeacherAssignmentDetailPage />} />
+          <Route path="/teacher/assignments/:assignmentId/students/:studentId" element={<StudentSubmissionsPage />} />
           <Route path="/teacher/classes/:classId/assign" element={<EnsembleAssignPage />} />
-          <Route path="/teacher/roadmap" element={<RoadmapPage />} />
           <Route path="/teacher/review" element={<ReviewPage />} />
+          <Route path="/teacher/assignments/new" element={<AssignmentFormPage />} />
           <Route path="/teacher/student-review" element={<StudentReviewPage />} />
+
+          {/* M02 — quản lý bài hát (trang tự bọc TeacherShell) */}
           <Route path="/songs" element={<SongManagePage />} />
           <Route path="/songs/new" element={<SongFormPage />} />
           <Route path="/songs/:songId/edit" element={<SongFormPage />} />
-          <Route path="/songs/sheets" element={<SheetManagePage />} />
-          <Route path="/categories" element={<CategoriesPage />} />
-          <Route path="/admin" element={<AdminPage />} />
-          <Route path="/admin/users" element={<UserManagePage />} />
-          <Route path="/admin/config" element={<SystemConfigPage />} />
-          <Route path="/admin/categories" element={<CategoriesAdminPage />} />
-          <Route path="/admin/monitoring" element={<MonitoringPage />} />
-          <Route path="/admin/notifications" element={<NotificationsManagePage />} />
-          <Route path="/rental/provider" element={<RentalProviderPage />} />
-          <Route path="/community/approval" element={<ContentApprovalPage />} />
+          <Route path="/songs/:songId/sheets" element={<SheetManagePage />} />
 
           {/* Community — desktop */}
           <Route path="/community/bonus/new" element={<BonusFormPage />} />
-          <Route path="/community/verified" element={<VerifiedContentPage />} />
           <Route path="/community/challenges/new" element={<ChallengeFormPage />} />
+        </Route>
 
-          {/* ── Dashboard (AppLayout shell) ──────────────────────────── */}
-          <Route element={<AppLayout />}>
-            <Route path="/dashboard" element={<DashboardPage />} />
+        {/* Quản trị viên — màn hình desktop */}
+        <Route element={<ProtectedRoute allowedRoles={[ROLES.SYSTEM_ADMIN]} />}>
+          <Route element={<DesktopLayout />}>
+            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/admin/users" element={<UserManagePage />} />
+            <Route path="/admin/config" element={<SystemConfigPage />} />
+            <Route path="/admin/categories" element={<CategoriesAdminPage />} />
+            <Route path="/admin/monitoring" element={<MonitoringPage />} />
+            <Route path="/admin/notifications" element={<NotificationsManagePage />} />
+            <Route path="/community/approval" element={<ContentApprovalPage />} />
+          </Route>
+          <Route path="/rental/provider" element={<RentalProviderPage />} />
+          {/* M03 roadmap & grading — System Admin */}
+          <Route path="/admin/roadmaps" element={<AdminRoadmapPage />} />
+          <Route path="/admin/grading-settings" element={<GradingSettingsPage />} />
+        </Route>
+
+        {/* Giảng viên và quản trị viên */}
+        <Route element={<ProtectedRoute allowedRoles={[ROLES.TEACHER, ROLES.SYSTEM_ADMIN]} />}>
+          <Route element={<DesktopLayout />}>
+            <Route path="/community/verified" element={<VerifiedContentPage />} />
           </Route>
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
-      <DevNav />
     </BrowserRouter>
   );
 }

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { StatusLabel } from "@/features/classes/components/StatusLabel";
-import { type AssignmentStudent, type StudentAssignmentStatus } from "@/features/classes/types/assignmentTypes";
-import { STUDENT_STATUS_LABELS, formatStudentSummary } from "@/features/classes/utils/assignmentFormat";
+import { type AssignmentStudent, type StudentAssignmentStatus } from "@/features/classes/types/teacherAssignmentTypes";
+import { STUDENT_STATUS_LABELS, formatStudentSummary } from "@/features/classes/utils/teacherAssignmentFormat";
 
 interface AssignmentStudentRowProps {
   assignmentId: string;

@@ -1,11 +1,11 @@
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { AssignmentForm } from "@/features/classes/components/AssignmentForm";
 import { ListState } from "@/features/classes/components/ListState";
-import { useAssignmentDetail } from "@/features/classes/hooks/useAssignmentDetail";
+import { useTeacherAssignmentDetail } from "@/features/classes/hooks/useTeacherAssignmentDetail";
 import { useLecturerClasses } from "@/features/classes/hooks/useLecturerClasses";
 import { useSaveAssignment } from "@/features/classes/hooks/useSaveAssignment";
 import { type ApiFieldError } from "@/features/classes/types/classTypes";
-import { type AssignmentContentPayload } from "@/features/classes/types/assignmentTypes";
+import { type AssignmentContentPayload } from "@/features/classes/types/teacherAssignmentTypes";
 import { EMPTY_ASSIGNMENT_FORM, toAssignmentFormValues } from "@/features/classes/utils/validateAssignment";
 import { MobileHeader } from "@/shared/components/bvc/MobileHeader";
 import { MobileScreen } from "@/shared/components/bvc/MobileScreen";
@@ -16,7 +16,7 @@ export function AssignmentFormPage() {
   const { assignmentId } = useParams<{ assignmentId: string }>();
   const [searchParams] = useSearchParams();
   const isEdit = Boolean(assignmentId);
-  const { assignment, isLoading, error, reload } = useAssignmentDetail(assignmentId);
+  const { assignment, isLoading, error, reload } = useTeacherAssignmentDetail(assignmentId);
   const { classes, isLoading: isClassesLoading } = useLecturerClasses();
   const { saveAssignment, isSaving } = useSaveAssignment(assignmentId);
   const presetClassId = searchParams.get("classId") ?? "";

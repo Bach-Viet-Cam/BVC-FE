@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AssignmentInfoPanel } from "@/features/classes/components/AssignmentInfoPanel";
 import { TeacherAssignmentDetailPage } from "@/features/classes/pages/TeacherAssignmentDetailPage";
 import { assignmentsApi } from "@/features/classes/api/assignmentsApi";
-import { type AssignmentDetail, type AssignmentStatus } from "@/features/classes/types/assignmentTypes";
+import { type AssignmentDetail, type AssignmentStatus } from "@/features/classes/types/teacherAssignmentTypes";
 
 vi.mock("@/features/classes/api/assignmentsApi", () => ({
   assignmentsApi: { getAssignment: vi.fn(), changeStatus: vi.fn(), deleteAssignment: vi.fn() },

@@ -6,7 +6,7 @@ import {
   SUBMISSION_STATUS_LABELS,
   formatVietnamDateTime,
   formatStudentSummary,
-} from "@/features/classes/utils/assignmentFormat";
+} from "@/features/classes/utils/teacherAssignmentFormat";
 
 describe("assignmentFormat", () => {
   it("has Vietnamese labels", () => {

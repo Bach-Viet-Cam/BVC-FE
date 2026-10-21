@@ -5,7 +5,7 @@ import { AssignmentStudentRow } from "@/features/classes/components/AssignmentSt
 import { ConfirmDialog } from "@/features/classes/components/ConfirmDialog";
 import { ListState } from "@/features/classes/components/ListState";
 import { useAssignmentActions } from "@/features/classes/hooks/useAssignmentActions";
-import { useAssignmentDetail } from "@/features/classes/hooks/useAssignmentDetail";
+import { useTeacherAssignmentDetail } from "@/features/classes/hooks/useTeacherAssignmentDetail";
 import { MobileHeader } from "@/shared/components/bvc/MobileHeader";
 import { MobileScreen } from "@/shared/components/bvc/MobileScreen";
 import { toast } from "@/shared/components/ui/toast";
@@ -14,7 +14,7 @@ export function TeacherAssignmentDetailPage() {
   const navigate = useNavigate();
   const { assignmentId = "" } = useParams<{ assignmentId: string }>();
   const [pendingAction, setPendingAction] = useState<"close" | "delete" | null>(null);
-  const { assignment, isLoading, error, reload } = useAssignmentDetail(assignmentId);
+  const { assignment, isLoading, error, reload } = useTeacherAssignmentDetail(assignmentId);
   const { changeStatus, deleteAssignment, isWorking } = useAssignmentActions(assignmentId);
 
   const report = (outcome: { message: string } | { error: string }): boolean => {

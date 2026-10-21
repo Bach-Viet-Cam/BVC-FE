@@ -1,6 +1,6 @@
 import { assignmentsApi } from "@/features/classes/api/assignmentsApi";
 import { useApiQuery } from "@/features/classes/hooks/useApiQuery";
-import { type AssignmentListParams } from "@/features/classes/types/assignmentTypes";
+import { type AssignmentListParams } from "@/features/classes/types/teacherAssignmentTypes";
 
 export function useAssignmentList(params: AssignmentListParams) {
   const query = { ...params, limit: 100 };

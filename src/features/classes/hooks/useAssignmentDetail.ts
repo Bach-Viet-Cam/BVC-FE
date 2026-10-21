@@ -1,16 +1,14 @@
-import { assignmentsApi } from "@/features/classes/api/assignmentsApi";
-import { useApiQuery } from "@/features/classes/hooks/useApiQuery";
-import { parseApiError } from "@/features/classes/utils/mapApiErrors";
+import { assignmentApi } from "@/features/classes/api/assignmentApi";
+import { type AssignmentDetail } from "@/features/classes/types/assignmentTypes";
+import { useAsyncData } from "@/shared/hooks/useAsyncData";
 
-export function useAssignmentDetail(assignmentId: string | undefined) {
-  const { data, error, isLoading, reload } = useApiQuery(
-    assignmentId ? `assignment:${assignmentId}` : null,
-    async () => (await assignmentsApi.getAssignment(assignmentId as string)).data.data
+const LOAD_ERROR = "Không thể mở bài tập vì bài tập không còn khả dụng.";
+
+export function useAssignmentDetail(assignmentId: string) {
+  const { data, error, isLoading } = useAsyncData<AssignmentDetail>(
+    () => assignmentApi.get(assignmentId).then(({ data: body }) => body.data),
+    assignmentId,
+    LOAD_ERROR
   );
-  return {
-    assignment: data,
-    isLoading,
-    error: error ? parseApiError(error, "Tải dữ liệu thất bại. Vui lòng thử lại.").message : null,
-    reload,
-  };
+  return { assignment: data, error, isLoading };
 }

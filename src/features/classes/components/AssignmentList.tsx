@@ -7,8 +7,8 @@ import { ListState } from "@/features/classes/components/ListState";
 import { SearchInput } from "@/features/classes/components/SearchInput";
 import { useAssignmentList } from "@/features/classes/hooks/useAssignmentList";
 import { useLecturerClasses } from "@/features/classes/hooks/useLecturerClasses";
-import { type AssignmentKind, type AssignmentStatus } from "@/features/classes/types/assignmentTypes";
-import { ASSIGNMENT_KIND_LABELS, ASSIGNMENT_STATUS_LABELS } from "@/features/classes/utils/assignmentFormat";
+import { type AssignmentKind, type AssignmentStatus } from "@/features/classes/types/teacherAssignmentTypes";
+import { ASSIGNMENT_KIND_LABELS, ASSIGNMENT_STATUS_LABELS } from "@/features/classes/utils/teacherAssignmentFormat";
 import { useDebouncedValue } from "@/shared/hooks/useDebouncedValue";
 
 interface AssignmentListProps {

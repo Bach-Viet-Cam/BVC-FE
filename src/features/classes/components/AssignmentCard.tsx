@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { StatusLabel } from "@/features/classes/components/StatusLabel";
-import { type AssignmentListItem, type AssignmentStatus } from "@/features/classes/types/assignmentTypes";
-import { ASSIGNMENT_KIND_LABELS, ASSIGNMENT_STATUS_LABELS } from "@/features/classes/utils/assignmentFormat";
+import { type AssignmentListItem, type AssignmentStatus } from "@/features/classes/types/teacherAssignmentTypes";
+import { ASSIGNMENT_KIND_LABELS, ASSIGNMENT_STATUS_LABELS } from "@/features/classes/utils/teacherAssignmentFormat";
 
 interface AssignmentCardProps {
   assignment: AssignmentListItem;

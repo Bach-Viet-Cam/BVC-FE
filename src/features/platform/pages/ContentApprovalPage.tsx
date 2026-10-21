@@ -1,14 +1,5 @@
 import { useState } from "react";
-import { DesktopSidebar, DesktopPageHeader, StatCard } from "@/shared/components/bvc";
-
-const NAV_ITEMS = [
-  { label: "Tổng quan", to: "/admin" },
-  { label: "Người dùng", to: "/admin/users" },
-  { label: "Nội dung đã xác minh", to: "/community/verified" },
-  { label: "Duyệt nội dung", to: "/community/approval" },
-  { label: "Quản lý bài nhạc", to: "/songs" },
-  { label: "Cấu hình", to: "/admin/config" },
-];
+import { DesktopPageHeader, StatCard } from "@/shared/components/bvc";
 
 interface ContentItem {
   id: string;
@@ -90,15 +81,10 @@ export function ContentApprovalPage() {
   const selected = ITEMS.find((it) => it.id === selectedId) ?? ITEMS[0];
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-white">
-      <DesktopSidebar
-        items={NAV_ITEMS}
-        user={{ initials: "AD", name: "Admin BVC", role: "Quản trị viên" }}
-      />
-
+    <>
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <DesktopPageHeader
-          breadcrumb="M06 · Quản trị"
+          breadcrumb="Quản trị"
           title="Duyệt nội dung cộng đồng"
           actions={
             <>
@@ -123,7 +109,6 @@ export function ContentApprovalPage() {
         />
 
         <div className="flex flex-1 flex-col gap-[18px] overflow-hidden p-[22px_32px_26px]">
-          {/* Stat cards */}
           <div className="grid grid-cols-3 gap-[12px]">
             <StatCard label="Chờ duyệt" value="12" variant="accent" />
             <StatCard label="Đã duyệt tháng này" value="34" />
@@ -141,9 +126,7 @@ export function ContentApprovalPage() {
             </div>
           </div>
 
-          {/* Two-column layout */}
           <div className="flex flex-1 gap-[20px] overflow-hidden">
-            {/* Left — item list */}
             <div className="flex flex-1 flex-col overflow-y-auto">
               {ITEMS.map((item) => (
                 <button
@@ -167,14 +150,11 @@ export function ContentApprovalPage() {
               ))}
             </div>
 
-            {/* Right — detail panel */}
             <div className="flex w-[380px] shrink-0 flex-col gap-[14px] overflow-y-auto rounded-[20px] border border-bvc-border p-[20px]">
-              {/* Title */}
               <div className="text-[16px] font-extrabold tracking-[-0.025em] text-bvc-ink">
                 {selected.title}
               </div>
 
-              {/* Preview */}
               <div>
                 <span className="text-[12px] font-bold uppercase tracking-[0.1em] text-bvc-muted">
                   Nội dung đính kèm
@@ -184,7 +164,6 @@ export function ContentApprovalPage() {
                 </div>
               </div>
 
-              {/* Info rows */}
               <div>
                 <span className="text-[12px] font-bold uppercase tracking-[0.1em] text-bvc-muted">
                   Thông tin
@@ -209,7 +188,6 @@ export function ContentApprovalPage() {
                 </div>
               </div>
 
-              {/* Actions */}
               <div className="mt-auto flex flex-col gap-[10px]">
                 <textarea
                   placeholder="Lý do từ chối (tùy chọn)..."
@@ -234,6 +212,6 @@ export function ContentApprovalPage() {
           </div>
         </div>
       </main>
-    </div>
+    </>
   );
 }
