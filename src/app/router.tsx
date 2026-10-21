@@ -60,6 +60,13 @@ import { TeacherAssignmentsPage } from "@/features/classes/pages/TeacherAssignme
 import { ReviewPage } from "@/features/classes/pages/ReviewPage";
 import { StudentProgressPage } from "@/features/classes/pages/StudentProgressPage";
 import { AssignmentFormPage } from "@/features/classes/pages/AssignmentFormPage";
+import { ClassDetailPage } from "@/features/classes/pages/ClassDetailPage";
+import { AddStudentPage } from "@/features/classes/pages/AddStudentPage";
+import { ImportStudentsPage } from "@/features/classes/pages/ImportStudentsPage";
+import { AdminRoadmapPage } from "@/features/classes/pages/AdminRoadmapPage";
+import { TeacherAssignmentDetailPage } from "@/features/classes/pages/TeacherAssignmentDetailPage";
+import { StudentSubmissionsPage } from "@/features/classes/pages/StudentSubmissionsPage";
+import { GradingSettingsPage } from "@/features/platform/pages/GradingSettingsPage";
 
 // Desktop — library management
 import { SongManagePage } from "@/features/music-library/pages/SongManagePage";
@@ -90,6 +97,7 @@ import { ChallengeDetailPage } from "@/features/community/pages/ChallengeDetailP
 import { BonusFormPage } from "@/features/community/pages/BonusFormPage";
 import { VerifiedContentPage } from "@/features/community/pages/VerifiedContentPage";
 import { ChallengeFormPage } from "@/features/community/pages/ChallengeFormPage";
+import { AssignmentListPage } from "@/features/classes/pages/AssignmentListPage";
 
 export function AppRouter() {
   return (
@@ -164,10 +172,18 @@ export function AppRouter() {
             <Route path="/teacher/classes" element={<ClassListPage />} />
             <Route path="/teacher/roadmap" element={<RoadmapPage />} />
             <Route path="/teacher/progress" element={<StudentProgressPage />} />
-            <Route path="/teacher/assignments" element={<TeacherAssignmentsPage />} />
+            <Route path="/teacher/assignments" element={<AssignmentListPage />} />
             <Route path="/categories" element={<CategoriesPage />} />
           </Route>
+          {/* M03 classes & members */}
           <Route path="/teacher/classes/new" element={<ClassFormPage />} />
+          <Route path="/teacher/classes/:classId" element={<ClassDetailPage />} />
+          <Route path="/teacher/classes/:classId/edit" element={<ClassFormPage />} />
+          <Route path="/teacher/classes/:classId/members/new" element={<AddStudentPage />} />
+          <Route path="/teacher/classes/:classId/import" element={<ImportStudentsPage />} />
+          <Route path="/teacher/assignments/:assignmentId/edit" element={<AssignmentFormPage />} />
+          <Route path="/teacher/assignments/:assignmentId" element={<TeacherAssignmentDetailPage />} />
+          <Route path="/teacher/assignments/:assignmentId/students/:studentId" element={<StudentSubmissionsPage />} />
           <Route path="/teacher/classes/:classId/assign" element={<EnsembleAssignPage />} />
           <Route path="/teacher/review" element={<ReviewPage />} />
           <Route path="/teacher/assignments/new" element={<AssignmentFormPage />} />
@@ -196,6 +212,9 @@ export function AppRouter() {
             <Route path="/community/approval" element={<ContentApprovalPage />} />
           </Route>
           <Route path="/rental/provider" element={<RentalProviderPage />} />
+          {/* M03 roadmap & grading — System Admin */}
+          <Route path="/admin/roadmaps" element={<AdminRoadmapPage />} />
+          <Route path="/admin/grading-settings" element={<GradingSettingsPage />} />
         </Route>
 
         {/* Giảng viên và quản trị viên */}

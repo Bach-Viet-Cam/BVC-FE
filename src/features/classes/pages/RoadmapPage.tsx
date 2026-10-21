@@ -1,151 +1,172 @@
-import { DesktopPageHeader } from "@/shared/components/bvc";
+import { useState } from "react";
 import { Check, Music } from "lucide-react";
+import { ListState } from "@/features/classes/components/ListState";
+import { useClassList } from "@/features/classes/hooks/useClassList";
+import { useClassRoadmap } from "@/features/classes/hooks/useClassRoadmap";
+import { type RoadmapWeekStatus } from "@/features/classes/types/roadmapTypes";
+import { WEEK_STATUS_LABELS, buildExerciseRows, formatWeekRange } from "@/features/classes/utils/roadmapFormat";
+import { DesktopPageHeader } from "@/shared/components/bvc";
 
-interface WeekItem {
-  num: number;
-  title: string;
-  content: string;
-  assignment: string;
-  done?: boolean;
-  current?: boolean;
-  upcoming?: boolean;
-}
+const WEEK_CARD_CLASSES: Record<RoadmapWeekStatus, string> = {
+  CURRENT: "border-bvc-accent bg-bvc-accent-tint",
+  PAST: "border-bvc-border bg-bvc-surface",
+  UPCOMING: "border-bvc-border bg-white",
+};
 
-const WEEKS: WeekItem[] = [
-  { num: 1, title: "Làm quen nhạc cụ", content: "Tư thế, cách cầm, vị trí ngón cơ bản", assignment: "Scale Đô trưởng", done: true },
-  { num: 2, title: "Kỹ thuật cơ bản", content: "Luyện ngón, bài tập nhịp 4/4", assignment: "Bèo dạt mây trôi", done: true },
-  { num: 3, title: "Tác phẩm 1", content: "Lý ngựa ô — bè chính + kiểm tra", assignment: "Recording Lý ngựa ô", done: true },
-  { num: 4, title: "Hòa tấu", content: "Ghép bè, nghe nhau, đồng bộ tempo", assignment: "Recording Trống cơm", current: true },
-  { num: 5, title: "Ghép nhóm", content: "Full ensemble 2 bè trở lên", assignment: "Ensemble performance", upcoming: true },
-  { num: 6, title: "Final Performance", content: "Trình diễn cuối kỳ, tổng kết", assignment: "Final recording", upcoming: true },
-];
+const STATUS_DOT_CLASSES: Record<RoadmapWeekStatus, string> = {
+  PAST: "bg-bvc-ok",
+  CURRENT: "bg-bvc-warn",
+  UPCOMING: "bg-bvc-bar-strong",
+};
 
-const ASSIGNMENT_TABLE = [
-  { week: 1, assignment: "Scale Đô trưởng", type: "Luyện ngón", status: "done" },
-  { week: 2, assignment: "Bèo dạt mây trôi", type: "Recording", status: "done" },
-  { week: 3, assignment: "Recording Lý ngựa ô", type: "Recording", status: "done" },
-  { week: 4, assignment: "Recording Trống cơm", type: "Recording", status: "active" },
-  { week: 5, assignment: "Ensemble performance", type: "Hòa tấu", status: "upcoming" },
-  { week: 6, assignment: "Final recording", type: "Recording", status: "upcoming" },
-];
+const NO_CLASS_MESSAGE = "Bạn chưa có lớp nào.";
+const FINISHED_NO_ROADMAP_MESSAGE = "Lớp đã kết thúc và không có lộ trình.";
+const NO_ROADMAP_MESSAGE = "Lớp chưa có lộ trình. Lộ trình sẽ được gắn khi quản trị viên tạo lộ trình cho nhạc cụ này.";
 
-function weekCardClass(w: WeekItem): string {
-  if (w.current) return "border-bvc-accent bg-bvc-accent-tint";
-  if (w.done) return "border-bvc-border bg-bvc-surface";
-  return "border-bvc-border bg-white";
-}
-
+// Read-only roadmap of a class; the lecturer edits nothing here (roadmaps are managed by the admin).
 export function RoadmapPage() {
+  const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
+  const classList = useClassList({ status: "ALL" });
+  const classes = classList.result?.items ?? [];
+  const selectedClass =
+    classes.find((cls) => cls.id === selectedClassId) ??
+    classes.find((cls) => cls.status === "ACTIVE") ??
+    classes[0] ??
+    null;
+  const {
+    classRoadmap,
+    isLoading: isRoadmapLoading,
+    error: roadmapError,
+    reload: reloadRoadmap,
+  } = useClassRoadmap(selectedClass?.id ?? null);
+
+  const roadmap = classRoadmap?.roadmap ?? null;
+  const exerciseRows = roadmap ? buildExerciseRows(roadmap.weeks) : [];
+  const emptyMessage = !selectedClass
+    ? NO_CLASS_MESSAGE
+    : selectedClass.status === "ENDED"
+      ? FINISHED_NO_ROADMAP_MESSAGE
+      : NO_ROADMAP_MESSAGE;
+
   return (
     <>
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <DesktopPageHeader
-          breadcrumb="TRD301 · Fall 2026"
+          breadcrumb={selectedClass ? `${selectedClass.name} · ${selectedClass.cohort}` : "Lộ trình học tập"}
           title="Lộ trình học tập 6 tuần"
           actions={
-            <>
-              <select className="h-[44px] rounded-[14px] border border-bvc-border-strong bg-white px-4 text-[14px] text-bvc-ink focus:outline-none">
-                <option>Fall 2026</option>
-                <option>Spring 2026</option>
-                <option>Fall 2025</option>
-              </select>
-              <button
-                type="button"
-                className="flex min-h-[44px] cursor-pointer items-center rounded-[14px] bg-bvc-ink px-[18px] text-[14px] font-bold text-white"
-              >
-                Lưu thay đổi
-              </button>
-            </>
+            <select
+              aria-label="Chọn lớp"
+              value={selectedClass?.id ?? ""}
+              onChange={(event) => setSelectedClassId(event.target.value)}
+              disabled={classes.length === 0}
+              className="h-[44px] max-w-[320px] rounded-[14px] border border-bvc-border-strong bg-white px-4 text-[14px] text-bvc-ink focus:outline-none"
+            >
+              {classes.map((cls) => (
+                <option key={cls.id} value={cls.id}>
+                  {cls.name} · {cls.cohort}
+                </option>
+              ))}
+            </select>
           }
         />
 
         <div className="flex flex-1 flex-col gap-[18px] overflow-y-auto p-[22px_32px_26px]">
-          <div className="grid grid-cols-6 gap-[14px]">
-            {WEEKS.map((w) => (
-              <div
-                key={w.num}
-                className={`flex flex-col gap-[10px] rounded-[20px] border p-[14px] ${weekCardClass(w)}`}
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-bvc-muted">
-                    Tuần {w.num}
-                  </span>
-                  {w.done && (
-                    <span className="size-[18px] shrink-0 rounded-full bg-bvc-ok flex items-center justify-center">
-                      <Check size={11} color="white" />
-                    </span>
-                  )}
-                  {w.current && (
-                    <span className="size-[7px] rounded-full bg-bvc-accent" />
-                  )}
+          <ListState
+            isLoading={classList.isLoading || isRoadmapLoading}
+            error={classList.error ?? roadmapError}
+            isEmpty={!roadmap}
+            emptyMessage={emptyMessage}
+            onRetry={() => {
+              classList.reload();
+              reloadRoadmap();
+            }}
+            skeletonCount={4}
+          >
+            {roadmap && (
+              <>
+                <div className="grid grid-cols-6 gap-[14px]">
+                  {roadmap.weeks.map((week) => (
+                    <div
+                      key={week.weekNumber}
+                      aria-current={week.status === "CURRENT" ? "true" : undefined}
+                      className={`flex flex-col gap-[10px] rounded-[20px] border p-[14px] ${WEEK_CARD_CLASSES[week.status]}`}
+                    >
+                      <div className="mb-1 flex items-center justify-between">
+                        <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-bvc-muted">
+                          Tuần {week.weekNumber}
+                        </span>
+                        {week.status === "PAST" && (
+                          <span className="flex size-[18px] shrink-0 items-center justify-center rounded-full bg-bvc-ok">
+                            <Check size={11} color="white" />
+                          </span>
+                        )}
+                        {week.status === "CURRENT" && <span className="size-[7px] rounded-full bg-bvc-accent" />}
+                      </div>
+
+                      <div
+                        className={`text-[13px] font-bold ${week.status === "CURRENT" ? "text-bvc-accent-text" : "text-bvc-ink"}`}
+                      >
+                        {week.title}
+                      </div>
+                      <span className="font-mono text-[11.5px] text-bvc-muted">{formatWeekRange(week)}</span>
+
+                      <p className="whitespace-pre-line text-[12px] leading-[1.5] text-bvc-muted">{week.content}</p>
+
+                      {week.exercises.map((exercise) => (
+                        <div key={exercise.pieceId} className="flex items-center gap-[6px]">
+                          <Music size={14} className="shrink-0 text-bvc-muted" />
+                          <span className="text-[12px] font-semibold text-bvc-ink">{exercise.title}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
                 </div>
 
-                <div
-                  className={`border-b border-transparent text-[13px] font-bold text-bvc-ink hover:border-bvc-border-strong ${w.current ? "text-bvc-accent-text" : ""}`}
-                >
-                  {w.title}
+                <div className="flex flex-col overflow-hidden rounded-[20px] border border-bvc-border bg-white">
+                  <div className="border-b border-bvc-border px-[20px] py-[14px]">
+                    <span className="text-[15px] font-extrabold tracking-[-0.025em]">Bài luyện ngón theo tuần</span>
+                    <span className="ml-[10px] text-[12.5px] text-bvc-muted">Phiên bản v{roadmap.version}</span>
+                  </div>
+
+                  <div className="grid h-[40px] grid-cols-[0.5fr_2fr_1fr_1fr] items-center gap-[14px] border-b border-bvc-border bg-bvc-surface px-[20px] text-[12px] font-bold uppercase tracking-[0.08em] text-bvc-muted">
+                    <span>Tuần</span>
+                    <span>Bài luyện ngón</span>
+                    <span>Loại</span>
+                    <span>Trạng thái</span>
+                  </div>
+
+                  {exerciseRows.length === 0 ? (
+                    <p className="flex min-h-[44px] items-center px-[20px] text-[13px] text-bvc-muted">
+                      Lộ trình chưa gắn bài luyện ngón nào.
+                    </p>
+                  ) : (
+                    exerciseRows.map((row) => (
+                      <div
+                        key={row.key}
+                        className="grid h-[44px] grid-cols-[0.5fr_2fr_1fr_1fr] items-center gap-[14px] border-b border-bvc-line px-[20px] text-[13px] last:border-0"
+                      >
+                        <span className="font-mono text-bvc-muted">{row.weekNumber}</span>
+                        <span className="text-bvc-ink">
+                          {row.title}
+                          {!row.isAvailable && (
+                            <span className="ml-[8px] rounded-[8px] bg-bvc-accent-tint px-[8px] py-[2px] text-[11.5px] text-bvc-accent-text">
+                              Không còn khả dụng
+                            </span>
+                          )}
+                        </span>
+                        <span className="text-bvc-muted">Luyện ngón</span>
+                        <span className="flex items-center gap-[6px] text-bvc-ink">
+                          <span className={`size-[7px] shrink-0 rounded-full ${STATUS_DOT_CLASSES[row.status]}`} />
+                          {WEEK_STATUS_LABELS[row.status]}
+                        </span>
+                      </div>
+                    ))
+                  )}
                 </div>
-
-                <p className="text-[12px] leading-[1.5] text-bvc-muted">{w.content}</p>
-
-                <div className="flex items-center gap-[6px]">
-                  <Music size={14} className="shrink-0 text-bvc-muted" />
-                  <span className="text-[12px] font-semibold text-bvc-ink">{w.assignment}</span>
-                </div>
-
-                <button
-                  type="button"
-                  className="mt-auto cursor-pointer pt-2 text-left text-[12px] font-semibold text-bvc-accent-text"
-                >
-                  Chỉnh sửa
-                </button>
-              </div>
-            ))}
-          </div>
-
-          <div className="flex flex-col rounded-[20px] border border-bvc-border bg-white overflow-hidden">
-            <div className="border-b border-bvc-border px-[20px] py-[14px]">
-              <span className="text-[15px] font-extrabold tracking-[-0.025em]">Bài tập gắn kèm theo tuần</span>
-            </div>
-
-            <div className="grid grid-cols-[0.5fr_2fr_1fr_1fr] items-center gap-[14px] border-b border-bvc-border bg-bvc-surface px-[20px] text-[12px] font-bold uppercase tracking-[0.08em] text-bvc-muted h-[40px]">
-              <span>Tuần</span>
-              <span>Bài tập</span>
-              <span>Loại</span>
-              <span>Trạng thái</span>
-            </div>
-
-            {ASSIGNMENT_TABLE.map((row) => (
-              <div
-                key={row.week}
-                className="grid grid-cols-[0.5fr_2fr_1fr_1fr] items-center gap-[14px] border-b border-bvc-line px-[20px] last:border-0 h-[44px] text-[13px]"
-              >
-                <span className="font-mono text-bvc-muted">{row.week}</span>
-                <span className="text-bvc-ink">{row.assignment}</span>
-                <span className="text-bvc-muted">{row.type}</span>
-                <span className="flex items-center gap-[6px] text-bvc-ink">
-                  {row.status === "done" && (
-                    <>
-                      <span className="size-[7px] shrink-0 rounded-full bg-bvc-ok" />
-                      Hoàn thành
-                    </>
-                  )}
-                  {row.status === "active" && (
-                    <>
-                      <span className="size-[7px] shrink-0 rounded-full bg-bvc-warn" />
-                      Đang mở
-                    </>
-                  )}
-                  {row.status === "upcoming" && (
-                    <>
-                      <span className="size-[7px] shrink-0 rounded-full bg-bvc-bar-strong" />
-                      Sắp tới
-                    </>
-                  )}
-                </span>
-              </div>
-            ))}
-          </div>
+              </>
+            )}
+          </ListState>
         </div>
       </main>
     </>
