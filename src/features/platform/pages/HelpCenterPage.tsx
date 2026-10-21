@@ -74,7 +74,7 @@ export function HelpCenterPage() {
                 {/* Follow-up bubble */}
                 <div className="ml-[36px] bg-bvc-surface rounded-[16px] px-[14px] py-[10px] text-[13px] text-bvc-muted whitespace-pre-line">
                   {
-                    "1. File quá lớn (> 50 MB)\n2. Định dạng không được hỗ trợ\n3. Hàng đợi AI đang bận — thử lại sau 5 phút"
+                    "1. File quá lớn (> 50 MB)\n2. Định dạng không được hỗ trợ\n3. Hàng đợi AI đang bận - thử lại sau 5 phút"
                   }
                 </div>
 

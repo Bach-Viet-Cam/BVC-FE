@@ -3,11 +3,11 @@ import { DesktopPageHeader, StatCard } from "@/shared/components/bvc";
 const INSTRUMENTS = [
   { name: "Đàn tranh 16 dây", condition: "Tốt", price: "350.000₫", status: "Đang thuê", tenant: "Trần Minh Anh" },
   { name: "Đàn tranh 17 dây", condition: "Tốt", price: "420.000₫", status: "Đang thuê", tenant: "Lê Quốc Bảo" },
-  { name: "Đàn bầu gỗ trắc", condition: "Khá tốt", price: "280.000₫", status: "Còn trống", tenant: "—" },
+  { name: "Đàn bầu gỗ trắc", condition: "Khá tốt", price: "280.000₫", status: "Còn trống", tenant: "-" },
   { name: "Đàn nhị cao cấp", condition: "Tốt", price: "200.000₫", status: "Đang thuê", tenant: "Phạm Gia Hân" },
-  { name: "Sáo trúc bạch dương", condition: "Mới", price: "120.000₫", status: "Còn trống", tenant: "—" },
+  { name: "Sáo trúc bạch dương", condition: "Mới", price: "120.000₫", status: "Còn trống", tenant: "-" },
   { name: "Đàn tỳ bà", condition: "Tốt", price: "380.000₫", status: "Đang thuê", tenant: "Nguyễn Gia Khánh" },
-  { name: "Đàn tranh 19 dây", condition: "Khá tốt", price: "460.000₫", status: "Còn trống", tenant: "—" },
+  { name: "Đàn tranh 19 dây", condition: "Khá tốt", price: "460.000₫", status: "Còn trống", tenant: "-" },
   { name: "Đàn bầu điện", condition: "Mới", price: "320.000₫", status: "Đang thuê", tenant: "Trần Bảo Châu" },
 ];
 

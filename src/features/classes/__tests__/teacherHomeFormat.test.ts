@@ -26,7 +26,7 @@ describe("teacherHomeFormat", () => {
 
   it("labels the week or says the class has not started", () => {
     expect(formatWeekLabel("4/6")).toBe("Tuần 4/6");
-    expect(formatWeekLabel("—")).toBe("Chưa bắt đầu");
+    expect(formatWeekLabel("-")).toBe("Chưa bắt đầu");
   });
 
   it("builds a task per class with students to watch, then the drafts task", () => {
@@ -34,7 +34,7 @@ describe("teacherHomeFormat", () => {
       {
         id: "class-a",
         tone: "warn",
-        message: "5 sinh viên cần chú ý — TRD301",
+        message: "5 sinh viên cần chú ý - TRD301",
         actionLabel: "Xem lớp",
         path: "/teacher/classes/a",
       },

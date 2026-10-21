@@ -74,7 +74,7 @@ export function ErrorDetailPage() {
 
         <div className="flex-1 overflow-y-auto pb-[24px]">
 
-          {/* Card 1 — Sample */}
+          {/* Card 1 - Sample */}
           <div className="relative mx-[14px] overflow-hidden rounded-[20px] border border-bvc-border p-[14px]">
             <div className="mb-[10px] flex items-center justify-between">
               <span className="text-[14px] font-bold text-bvc-ink">Bản mẫu</span>
@@ -96,7 +96,7 @@ export function ErrorDetailPage() {
             </div>
           </div>
 
-          {/* Card 2 — User recording */}
+          {/* Card 2 - User recording */}
           <div className="mx-[14px] mt-[10px] rounded-[20px] border border-bvc-border p-[14px]">
             <div className="mb-[10px] flex items-center justify-between">
               <span className="text-[14px] font-bold text-bvc-accent-text">
@@ -158,7 +158,7 @@ export function ErrorDetailPage() {
             </p>
             <p className="text-[13px] leading-relaxed text-bvc-muted">
               Luyện riêng Bar 18–24 ở tốc độ 50 BPM. Tập chú ý vào nốt đầu mỗi
-              phách — đây là điểm nhấn chính. Tăng dần lên 70, 80, rồi 84 BPM
+              phách - đây là điểm nhấn chính. Tăng dần lên 70, 80, rồi 84 BPM
               khi cảm thấy tự tin.
             </p>
           </div>

@@ -10,7 +10,7 @@ vi.mock("@/features/classes/api/assignmentsApi", () => ({
       data: {
         data: [
           { id: "p1", title: "Lý ngựa ô", kind: "SONG", defaultBpm: 96 },
-          { id: "p2", title: "Luyện ngón — Vê", kind: "FINGER_EXERCISE", defaultBpm: null },
+          { id: "p2", title: "Luyện ngón - Vê", kind: "FINGER_EXERCISE", defaultBpm: null },
         ],
       },
     }),

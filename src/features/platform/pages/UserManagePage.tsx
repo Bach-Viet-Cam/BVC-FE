@@ -476,7 +476,7 @@ export function UserManagePage() {
                                 {user.studentCode}
                               </span>
                             ) : (
-                              <span className="text-bvc-faint text-[13px]">—</span>
+                              <span className="text-bvc-faint text-[13px]">-</span>
                             )}
                           </td>
 

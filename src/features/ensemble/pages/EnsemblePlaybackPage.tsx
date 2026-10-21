@@ -38,7 +38,7 @@ export function EnsemblePlaybackPage() {
   return (
     <div className="flex min-h-dvh justify-center bg-bvc-surface">
       <div className="flex h-dvh w-full max-w-[428px] flex-col overflow-hidden bg-white">
-        <MobileHeader title="Ghép bè — Nhóm 3" variant="back" />
+        <MobileHeader title="Ghép bè - Nhóm 3" variant="back" />
 
         {/* Scrollable body */}
         <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
@@ -160,7 +160,7 @@ export function EnsemblePlaybackPage() {
                 )}
               </div>
 
-              {/* Mute button — only for submitted tracks */}
+              {/* Mute button - only for submitted tracks */}
               {track.submitted ? (
                 <button
                   type="button"

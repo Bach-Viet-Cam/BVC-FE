@@ -38,17 +38,17 @@ export function AnalysisPage() {
         {/* Scrollable body */}
         <div className="flex-1 overflow-y-auto">
 
-          {/* Section 1 — Score ring */}
+          {/* Section 1 - Score ring */}
           <div className="flex flex-col items-center py-[24px]">
             <ScoreRing
               score={82}
               size={140}
               label="Tổng thể"
-              sublabel="Tốt — tiếp tục giữ!"
+              sublabel="Tốt - tiếp tục giữ!"
             />
           </div>
 
-          {/* Section 2 — Detailed score bars */}
+          {/* Section 2 - Detailed score bars */}
           <div className="mx-[14px] rounded-[20px] border border-bvc-border p-[16px]">
             <p className="mb-[14px] text-[15px] font-bold text-bvc-ink">
               Phân tích chi tiết
@@ -61,7 +61,7 @@ export function AnalysisPage() {
             </div>
           </div>
 
-          {/* Section 3 — Issues */}
+          {/* Section 3 - Issues */}
           <div className="mx-[14px] mt-[12px] rounded-[20px] border border-bvc-border p-[16px]">
             <p className="mb-[14px] text-[15px] font-bold text-bvc-ink">
               Cần cải thiện
@@ -80,7 +80,7 @@ export function AnalysisPage() {
             </div>
           </div>
 
-          {/* Section 4 — Next steps */}
+          {/* Section 4 - Next steps */}
           <div className="mx-[14px] mt-[12px] rounded-[20px] border border-bvc-border p-[16px]">
             <p className="mb-[12px] text-[15px] font-bold text-bvc-ink">
               Bài học tiếp theo

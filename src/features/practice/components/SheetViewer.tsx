@@ -36,7 +36,7 @@ export function SheetViewer({
           Bản nhạc PDF · {song.title} ({song.instrument})
         </div>
 
-        {/* Staff line groups — placeholder for PDF render */}
+        {/* Staff line groups - placeholder for PDF render */}
         <StaffGroup />
         <StaffGroup />
 
@@ -80,7 +80,7 @@ export function SheetViewer({
         </button>
 
         <span className="font-bvc-mono text-[13px] text-bvc-muted">
-          Bar {barRange.start} — {barRange.end}
+          Bar {barRange.start} - {barRange.end}
         </span>
 
         <button

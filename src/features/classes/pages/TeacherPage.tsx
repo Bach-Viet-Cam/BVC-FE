@@ -49,7 +49,7 @@ export function TeacherPage() {
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <DesktopPageHeader
           breadcrumb="Học kỳ Fall 2026 · Tuần 4 / 6"
-          title="TRD301 — Nhạc cụ truyền thống"
+          title="TRD301 - Nhạc cụ truyền thống"
           actions={
             <>
               <button

@@ -27,7 +27,7 @@ const ITEM = {
   className: "TRD301",
   status: "PUBLISHED",
   version: 2,
-  title: "Độc tấu — Lý ngựa ô",
+  title: "Độc tấu - Lý ngựa ô",
   kind: "SOLO",
   submittedCount: 3,
   memberCount: 20,
@@ -53,7 +53,7 @@ describe("AssignmentList", () => {
   it("renders a card with title, kind, class, status and submitted count", async () => {
     mockItems([ITEM]);
     renderList({ canCreate: true });
-    const card = (await screen.findByText("Độc tấu — Lý ngựa ô")).closest("a") as HTMLElement;
+    const card = (await screen.findByText("Độc tấu - Lý ngựa ô")).closest("a") as HTMLElement;
     expect(card).toHaveAttribute("href", "/teacher/assignments/a1");
     expect(within(card).getByText("Độc tấu")).toBeInTheDocument();
     expect(within(card).getByText("Đã đăng")).toBeInTheDocument();
@@ -80,7 +80,7 @@ describe("AssignmentList", () => {
   it("is scoped to a class in the class tab and can hide the create button", async () => {
     mockItems([ITEM]);
     renderList({ classId: "c1", canCreate: false });
-    await screen.findByText("Độc tấu — Lý ngựa ô");
+    await screen.findByText("Độc tấu - Lý ngựa ô");
     expect(assignmentsApi.listAssignments).toHaveBeenCalledWith(expect.objectContaining({ classId: "c1" }));
     expect(screen.queryByLabelText("Lớp")).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /Tạo bài tập/ })).not.toBeInTheDocument();

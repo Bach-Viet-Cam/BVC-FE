@@ -89,7 +89,7 @@ export function RentalMarketplacePage() {
       <div className="flex h-dvh w-full max-w-[428px] flex-col overflow-hidden bg-white">
         <MobileHeader title="Thuê nhạc cụ" />
 
-        {/* Filter row — instrument */}
+        {/* Filter row - instrument */}
         <div className="px-[14px] pt-3 pb-2">
           <div className="overflow-x-auto flex gap-2 pb-1" style={{ scrollbarWidth: "none" }}>
             {INSTRUMENT_FILTERS.map((f) => {

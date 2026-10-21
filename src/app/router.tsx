@@ -12,7 +12,7 @@ import { DesktopLayout } from "@/shared/components/DesktopLayout";
 import { MobileLayout } from "@/shared/components/MobileLayout";
 import { ROLES } from "@/shared/constants/roles";
 
-// Mobile — practice
+// Mobile - practice
 import { PracticePage } from "@/features/practice/pages/PracticePage";
 import { TunerPage } from "@/features/practice/pages/TunerPage";
 import { MetronomePage } from "@/features/practice/pages/MetronomePage";
@@ -26,22 +26,22 @@ import { QualityCheckPage } from "@/features/practice/pages/QualityCheckPage";
 import { ModesPage } from "@/features/practice/pages/ModesPage";
 import { SongAnalysisPage } from "@/features/music-library/pages/SongAnalysisPage";
 
-// Mobile — home
+// Mobile - home
 import { HomePage } from "@/features/home/pages/HomePage";
 import { ProfilePage } from "@/features/home/pages/ProfilePage";
 
-// Mobile — library
+// Mobile - library
 import { LibraryPage } from "@/features/music-library/pages/LibraryPage";
 import { SongDetailPage } from "@/features/music-library/pages/SongDetailPage";
 import { SheetPage } from "@/features/music-library/pages/SheetPage";
 import { SavedPage } from "@/features/music-library/pages/SavedPage";
 import { SongUploadPage } from "@/features/music-library/pages/SongUploadPage";
 
-// Mobile — classes
+// Mobile - classes
 import { AssignmentPage } from "@/features/classes/pages/AssignmentPage";
 import { MyAssignmentsPage } from "@/features/classes/pages/MyAssignmentsPage";
 
-// Mobile — ensemble & rental
+// Mobile - ensemble & rental
 import { EnsemblePage } from "@/features/ensemble/pages/EnsemblePage";
 import { EnsemblePlaybackPage } from "@/features/ensemble/pages/EnsemblePlaybackPage";
 import { RentalPage } from "@/features/platform/pages/RentalPage";
@@ -49,7 +49,7 @@ import { NotificationsPage } from "@/features/platform/pages/NotificationsPage";
 import { HelpCenterPage } from "@/features/platform/pages/HelpCenterPage";
 import { RentalMarketplacePage } from "@/features/platform/pages/RentalMarketplacePage";
 
-// Desktop — teacher / classes
+// Desktop - teacher / classes
 import { TeacherPage } from "@/features/classes/pages/TeacherPage";
 import { TeacherHomePage } from "@/features/classes/pages/TeacherHomePage";
 import { ClassListPage } from "@/features/classes/pages/ClassListPage";
@@ -67,12 +67,12 @@ import { TeacherAssignmentDetailPage } from "@/features/classes/pages/TeacherAss
 import { StudentSubmissionsPage } from "@/features/classes/pages/StudentSubmissionsPage";
 import { GradingSettingsPage } from "@/features/platform/pages/GradingSettingsPage";
 
-// Desktop — library management
+// Desktop - library management
 import { SongManagePage } from "@/features/music-library/pages/SongManagePage";
 import { SongFormPage } from "@/features/music-library/pages/SongFormPage";
 import { SheetManagePage } from "@/features/music-library/pages/SheetManagePage";
 
-// Desktop — platform
+// Desktop - platform
 import { AdminPage } from "@/features/platform/pages/AdminPage";
 import { CategoriesPage } from "@/features/platform/pages/CategoriesPage";
 import { RentalProviderPage } from "@/features/platform/pages/RentalProviderPage";
@@ -84,7 +84,7 @@ import { CategoriesAdminPage } from "@/features/platform/pages/CategoriesAdminPa
 import { MonitoringPage } from "@/features/platform/pages/MonitoringPage";
 import { NotificationsManagePage } from "@/features/platform/pages/NotificationsManagePage";
 
-// Community — mobile
+// Community - mobile
 import { BonusListPage } from "@/features/community/pages/BonusListPage";
 import { BonusDetailPage } from "@/features/community/pages/BonusDetailPage";
 import { BonusSubmitPage } from "@/features/community/pages/BonusSubmitPage";
@@ -92,7 +92,7 @@ import { LeaderboardPage } from "@/features/community/pages/LeaderboardPage";
 import { ChallengesPage } from "@/features/community/pages/ChallengesPage";
 import { ChallengeDetailPage } from "@/features/community/pages/ChallengeDetailPage";
 
-// Community — desktop
+// Community - desktop
 import { BonusFormPage } from "@/features/community/pages/BonusFormPage";
 import { VerifiedContentPage } from "@/features/community/pages/VerifiedContentPage";
 import { ChallengeFormPage } from "@/features/community/pages/ChallengeFormPage";
@@ -108,7 +108,7 @@ export function AppRouter() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/403" element={<ForbiddenPage />} />
 
-        {/* M02 — thư viện mở cho cả khách; khách bấm Lưu thì được mời đăng nhập */}
+        {/* M02 - thư viện mở cho cả khách; khách bấm Lưu thì được mời đăng nhập */}
         <Route path="/library" element={<LibraryPage />} />
         <Route path="/library/:songId" element={<SongDetailPage />} />
         <Route path="/library/:songId/sheets/:sheetId" element={<SheetPage />} />
@@ -124,7 +124,7 @@ export function AppRouter() {
           </Route>
         </Route>
 
-        {/* Sinh viên — màn hình mobile */}
+        {/* Sinh viên - màn hình mobile */}
         <Route element={<ProtectedRoute allowedRoles={[ROLES.STUDENT]} />}>
           <Route path="/home" element={<HomePage />} />
 
@@ -163,7 +163,7 @@ export function AppRouter() {
           <Route path="/community/challenges/:challengeId" element={<ChallengeDetailPage />} />
         </Route>
 
-        {/* Giảng viên — màn hình desktop */}
+        {/* Giảng viên - màn hình desktop */}
         <Route element={<ProtectedRoute allowedRoles={[ROLES.TEACHER]} />}>
           <Route element={<DesktopLayout />}>
             <Route path="/teacher" element={<TeacherPage />} />
@@ -188,18 +188,18 @@ export function AppRouter() {
           <Route path="/teacher/assignments/new" element={<AssignmentFormPage />} />
           <Route path="/teacher/student-review" element={<StudentReviewPage />} />
 
-          {/* M02 — quản lý bài hát (trang tự bọc TeacherShell) */}
+          {/* M02 - quản lý bài hát (trang tự bọc TeacherShell) */}
           <Route path="/songs" element={<SongManagePage />} />
           <Route path="/songs/new" element={<SongFormPage />} />
           <Route path="/songs/:songId/edit" element={<SongFormPage />} />
           <Route path="/songs/:songId/sheets" element={<SheetManagePage />} />
 
-          {/* Community — desktop */}
+          {/* Community - desktop */}
           <Route path="/community/bonus/new" element={<BonusFormPage />} />
           <Route path="/community/challenges/new" element={<ChallengeFormPage />} />
         </Route>
 
-        {/* Quản trị viên — màn hình desktop */}
+        {/* Quản trị viên - màn hình desktop */}
         <Route element={<ProtectedRoute allowedRoles={[ROLES.SYSTEM_ADMIN]} />}>
           <Route element={<DesktopLayout />}>
             <Route path="/admin" element={<AdminPage />} />
@@ -211,7 +211,7 @@ export function AppRouter() {
             <Route path="/community/approval" element={<ContentApprovalPage />} />
           </Route>
           <Route path="/rental/provider" element={<RentalProviderPage />} />
-          {/* M03 roadmap & grading — System Admin */}
+          {/* M03 roadmap & grading - System Admin */}
           <Route path="/admin/roadmaps" element={<AdminRoadmapPage />} />
           <Route path="/admin/grading-settings" element={<GradingSettingsPage />} />
         </Route>

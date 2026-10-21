@@ -54,7 +54,7 @@ type SortDirection = "asc" | "desc";
 const INITIAL_ITEMS: VerifiedItem[] = [
   {
     id: "v-01",
-    name: "Lý ngựa ô — bè đàn tranh (bản 3)",
+    name: "Lý ngựa ô - bè đàn tranh (bản 3)",
     type: "Bản thu",
     contributor: "Phương Linh",
     contributorRole: "Sinh viên",
@@ -69,7 +69,7 @@ const INITIAL_ITEMS: VerifiedItem[] = [
   },
   {
     id: "v-02",
-    name: "Trống cơm — full score tổng phổ",
+    name: "Trống cơm - full score tổng phổ",
     type: "Bản nhạc",
     contributor: "GV. Nguyễn Thu Hương",
     contributorRole: "Giảng viên",
@@ -84,7 +84,7 @@ const INITIAL_ITEMS: VerifiedItem[] = [
   },
   {
     id: "v-03",
-    name: "Bèo dạt mây trôi — arrangement jazz",
+    name: "Bèo dạt mây trôi - arrangement jazz",
     type: "Arrangement",
     contributor: "Minh Anh",
     contributorRole: "Sinh viên",
@@ -114,7 +114,7 @@ const INITIAL_ITEMS: VerifiedItem[] = [
   },
   {
     id: "v-05",
-    name: "Lưu thủy kim tiền — version chuẩn hội diễn",
+    name: "Lưu thủy kim tiền - version chuẩn hội diễn",
     type: "Bản nhạc",
     contributor: "GV. Trần Văn Hưng",
     contributorRole: "Giảng viên",
@@ -129,7 +129,7 @@ const INITIAL_ITEMS: VerifiedItem[] = [
   },
   {
     id: "v-06",
-    name: "Hát ru Nam Bộ — arrangement cổ điển",
+    name: "Hát ru Nam Bộ - arrangement cổ điển",
     type: "Arrangement",
     contributor: "Gia Hân",
     contributorRole: "Sinh viên",
@@ -144,7 +144,7 @@ const INITIAL_ITEMS: VerifiedItem[] = [
   },
   {
     id: "v-07",
-    name: "Cò Lả — bè sáo trúc luyện hơi",
+    name: "Cò Lả - bè sáo trúc luyện hơi",
     type: "Bản thu",
     contributor: "Văn Toàn",
     contributorRole: "Sinh viên",
@@ -159,7 +159,7 @@ const INITIAL_ITEMS: VerifiedItem[] = [
   },
   {
     id: "v-08",
-    name: "Qua cầu gió bay — tổng phổ hòa tấu dân tộc",
+    name: "Qua cầu gió bay - tổng phổ hòa tấu dân tộc",
     type: "Bản nhạc",
     contributor: "Hội Đồng Khảo Thí",
     contributorRole: "Giảng viên",

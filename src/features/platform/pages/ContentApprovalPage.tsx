@@ -16,7 +16,7 @@ const ITEMS: ContentItem[] = [
     type: "Arrangement",
     contributor: "Minh Anh",
     date: "24/09",
-    title: "Lý ngựa ô — arrangement jazz phong cách hiện đại",
+    title: "Lý ngựa ô - arrangement jazz phong cách hiện đại",
     desc: "Sắp xếp lại theo nhịp swing, thêm phần intro piano 8 bar.",
   },
   {
@@ -24,7 +24,7 @@ const ITEMS: ContentItem[] = [
     type: "Bản thu",
     contributor: "Phương Linh",
     date: "23/09",
-    title: "Trống cơm — recording bè đàn tranh nâng cao",
+    title: "Trống cơm - recording bè đàn tranh nâng cao",
     desc: "Tempo 112 BPM, độ chính xác 94%, full 3 phút.",
   },
   {
@@ -32,7 +32,7 @@ const ITEMS: ContentItem[] = [
     type: "Bản nhạc",
     contributor: "Quốc Bảo",
     date: "22/09",
-    title: "Bèo dạt mây trôi — sheet simplified",
+    title: "Bèo dạt mây trôi - sheet simplified",
     desc: "Phiên bản đơn giản hóa cho người mới học, 2 trang A4.",
   },
   {
@@ -40,7 +40,7 @@ const ITEMS: ContentItem[] = [
     type: "Arrangement",
     contributor: "Gia Hân",
     date: "21/09",
-    title: "Hát ru — arrangement acoustic guitar + đàn tranh",
+    title: "Hát ru - arrangement acoustic guitar + đàn tranh",
     desc: "Kết hợp ghi-ta và đàn tranh, key C, tempo 72.",
   },
   {
@@ -48,7 +48,7 @@ const ITEMS: ContentItem[] = [
     type: "Bản thu",
     contributor: "Hoàng Tùng",
     date: "20/09",
-    title: "Se chỉ luồn kim — recording học kỳ 2",
+    title: "Se chỉ luồn kim - recording học kỳ 2",
     desc: "Lần thu thứ 3, điểm AI: 88%.",
   },
 ];
@@ -175,7 +175,7 @@ export function ContentApprovalPage() {
                   </div>
                   <div className="flex h-[36px] items-center justify-between text-[13px]">
                     <span className="text-bvc-muted">Lần dùng trước</span>
-                    <span className="font-mono text-bvc-muted">—</span>
+                    <span className="font-mono text-bvc-muted">-</span>
                   </div>
                 </div>
               </div>

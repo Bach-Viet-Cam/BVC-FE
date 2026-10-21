@@ -1,4 +1,4 @@
-# DESIGN.md — Hệ thống thiết kế Bách Việt Cầm
+# DESIGN.md - Hệ thống thiết kế Bách Việt Cầm
 
 > "Trắng, đen, và một màu cam." Giao diện gần như không màu. Cam chỉ xuất hiện ở thứ người dùng cần nhìn ngay: chỉ số chính, mục đang chọn, đoạn đang sai. Nút hành động dùng màu mực đen.
 
@@ -8,7 +8,7 @@
 
 - **Monochrome + 1 accent.** Sáu giá trị màu, không thêm màu mới.
 - **Cam là tín hiệu.** #F4622E chỉ xuất hiện ở: nút thu âm, cột biểu đồ đang xét, mục/đoạn đang chọn/sai. Ở mọi chỗ khác, dùng màu mực hoặc xám.
-- **Không đổ bóng.** Tách lớp bằng viền và nền — không dùng `box-shadow` hay `drop-shadow` ở bất kỳ đâu.
+- **Không đổ bóng.** Tách lớp bằng viền và nền - không dùng `box-shadow` hay `drop-shadow` ở bất kỳ đâu.
 - **Số đo dùng mono.** Mọi giá trị đo lường (BPM, %, ms, Hz, dung lượng) dùng IBM Plex Mono để các cột thẳng hàng.
 - **Vùng chạm tối thiểu 44 px.** Nút thu âm 84 px vì người dùng bấm khi tay còn cầm nhạc cụ.
 
@@ -27,7 +27,7 @@ Tokens định nghĩa trong `src/index.css` → `@theme inline` block. Tailwind 
 | `bvc-accent-text` | `#C4431A` | `text-bvc-accent-text` | Chữ cam trên nền trắng (tương phản 5.0:1) |
 | `bvc-ink` | `#1A1714` | `bg-bvc-ink` / `text-bvc-ink` | Chữ chính, nút hành động chính, tab đang chọn |
 | `bvc-muted` | `#6E6A64` | `text-bvc-muted` | Chữ phụ, nhãn tĩnh (tương phản 5.2:1) |
-| `bvc-faint` | `#A09B94` | `text-bvc-faint` | Placeholder, hint — chỉ cỡ chữ ≥ 17 px |
+| `bvc-faint` | `#A09B94` | `text-bvc-faint` | Placeholder, hint - chỉ cỡ chữ ≥ 17 px |
 
 ### 2.2 Màu nền & viền
 
@@ -40,11 +40,11 @@ Tokens định nghĩa trong `src/index.css` → `@theme inline` block. Tailwind 
 | `bvc-bar` | `#D8D5D0` | `bg-bvc-bar` | Cột biểu đồ rỗng, waveform bản mẫu |
 | `bvc-bar-strong` | `#A8A49E` | `bg-bvc-bar-strong` | Waveform bản thu sinh viên |
 
-### 2.3 Màu trạng thái (status dots — 7 px, không dùng ở đâu khác)
+### 2.3 Màu trạng thái (status dots - 7 px, không dùng ở đâu khác)
 
 | Token | Hex | Tailwind utility | Ngữ nghĩa |
 |---|---|---|---|
-| `bvc-ok` | `#2E7D4F` | `bg-bvc-ok` | Đạt yêu cầu — chỉ dùng cho chấm 7 px và xu hướng dương |
+| `bvc-ok` | `#2E7D4F` | `bg-bvc-ok` | Đạt yêu cầu - chỉ dùng cho chấm 7 px và xu hướng dương |
 | `bvc-warn` | `#D99B1E` | `bg-bvc-warn` | Cần chú ý |
 | `bvc-error` | `#F4622E` | `bg-bvc-error` (= `bvc-accent`) | Sai nhiều |
 
@@ -128,7 +128,7 @@ Trong Tailwind: `rounded-[11px]`, `rounded-[14px]`, `rounded-[17px]`, `rounded-[
 
 - Nền trắng, viền `border-bvc-border-strong`, chữ `text-bvc-ink`
 
-### 5.3 Nút thu âm (Record — chỉ màn Practice)
+### 5.3 Nút thu âm (Record - chỉ màn Practice)
 
 ```tsx
 // Nút lớn (84 px)
@@ -160,7 +160,7 @@ Trong Tailwind: `rounded-[11px]`, `rounded-[14px]`, `rounded-[17px]`, `rounded-[
 ### 6.1 Tab chip (trong khay điều hướng)
 
 ```tsx
-// Active tab — tô mực
+// Active tab - tô mực
 <span className="text-[13px] font-bold bg-bvc-ink text-white rounded-[9px] px-[11px] py-[6px]">
   Hôm nay
 </span>
@@ -335,7 +335,7 @@ Mọi biểu diễn âm thanh là vạch mảnh, không phải cột to.
 </div>
 ```
 
-### 11.2 Card nổi bật (Continue card — màn Home)
+### 11.2 Card nổi bật (Continue card - màn Home)
 
 ```tsx
 <div className="border border-[#F9D2C2] bg-bvc-accent-tint rounded-[22px] p-4">
@@ -380,7 +380,7 @@ Hoặc dùng component `MobileFrame` từ `src/shared/components/bvc/MobileFrame
 
 ## 13. Điều hướng Mobile
 
-### 13.1 Top bar (màn chính — Home, Library, Assignments, Ensemble)
+### 13.1 Top bar (màn chính - Home, Library, Assignments, Ensemble)
 
 **KHÔNG có bottom tab bar.** Điều hướng nằm trên đầu.
 
@@ -416,7 +416,7 @@ Hoặc dùng component `MobileFrame` từ `src/shared/components/bvc/MobileFrame
 
 Tab list: **Hôm nay · Luyện tập · Thư viện · Bài tập · Hòa tấu**
 
-### 13.2 Header màn sâu (màn con — có nút quay lại)
+### 13.2 Header màn sâu (màn con - có nút quay lại)
 
 ```tsx
 // MobileHeader component
@@ -437,7 +437,7 @@ Màn PracticePage bỏ hẳn top bar và tab row để nhường chỗ cho bản
 
 ## 14. Bố cục Desktop (1440×960)
 
-Desktop pages là **self-contained** — có `DesktopSidebar` riêng, **không** bọc trong `AppLayout`.
+Desktop pages là **self-contained** - có `DesktopSidebar` riêng, **không** bọc trong `AppLayout`.
 
 ```tsx
 <div className="flex h-screen w-full overflow-hidden bg-white">
@@ -600,8 +600,8 @@ Import từ barrel: `import { MobileFrame, MobileHeader, StatusDot, ... } from "
 
 | Mã | Tên | File HTML gốc | Route | Khung |
 |---|---|---|---|---|
-| System | Hệ thống thiết kế | System.html | — | 1200×1060 |
-| Flow | Luồng & module map | Flow.html | — | 1200×820 |
+| System | Hệ thống thiết kế | System.html | - | 1200×1060 |
+| Flow | Luồng & module map | Flow.html | - | 1200×820 |
 | M00-01 | Đăng nhập | Login.html | `/login` | 428×926 |
 | M00-02 | Quên mật khẩu | Forgot.html | `/forgot` | 428×926 |
 | M00-03 | Trang chủ sinh viên | Main.html | `/home` | 428×926 |

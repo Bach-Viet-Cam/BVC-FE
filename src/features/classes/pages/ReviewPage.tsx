@@ -75,7 +75,7 @@ export function ReviewPage() {
           </div>
           <div className="truncate text-[24px] font-extrabold tracking-[-0.025em]">
             {selectedStudent && selectedAssignment
-              ? `${selectedStudent.fullName} — ${selectedAssignment.title}`
+              ? `${selectedStudent.fullName} - ${selectedAssignment.title}`
               : "Chọn bài nộp để nhận xét"}
           </div>
         </div>

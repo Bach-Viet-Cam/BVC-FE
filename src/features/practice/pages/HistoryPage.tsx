@@ -128,7 +128,7 @@ export function HistoryPage() {
                 </span>
               </div>
 
-              {/* Row 2 — mini score bars */}
+              {/* Row 2 - mini score bars */}
               <div className="mt-[8px] flex flex-col gap-[6px]">
                 <ScoreBar label="Cao độ" score={item.pitch} />
                 <ScoreBar label="Nhịp" score={item.rhythm} />

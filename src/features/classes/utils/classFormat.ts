@@ -37,11 +37,11 @@ export function calculateEndDate(startDate: string): string {
 
 const CLASS_WEEKS = CLASS_DURATION_DAYS / 7;
 
-// "4/6" for a running class, "6/6" once finished, "—" before the start date.
+// "4/6" for a running class, "6/6" once finished, "-" before the start date.
 export function formatCurrentWeek(startDate: string, status: ClassStatus, today: string = todayInVietnam()): string {
   if (status === "ENDED") return `${CLASS_WEEKS}/${CLASS_WEEKS}`;
   const elapsedDays = (Date.parse(`${today}T00:00:00.000Z`) - Date.parse(`${startDate}T00:00:00.000Z`)) / DAY_MS;
-  if (Number.isNaN(elapsedDays) || elapsedDays < 0) return "—";
+  if (Number.isNaN(elapsedDays) || elapsedDays < 0) return "-";
   return `${Math.min(Math.floor(elapsedDays / 7) + 1, CLASS_WEEKS)}/${CLASS_WEEKS}`;
 }
 

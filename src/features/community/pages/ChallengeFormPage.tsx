@@ -128,7 +128,7 @@ export function ChallengeFormPage() {
             </div>
           </div>
 
-          {/* Đối tượng — chip group */}
+          {/* Đối tượng - chip group */}
           <div className="flex flex-col gap-[8px]">
             <label className="text-[13px] font-semibold text-bvc-muted">
               Đối tượng
@@ -154,7 +154,7 @@ export function ChallengeFormPage() {
             </div>
           </div>
 
-          {/* Tiêu chí xếp hạng — chip group */}
+          {/* Tiêu chí xếp hạng - chip group */}
           <div className="flex flex-col gap-[8px]">
             <label className="text-[13px] font-semibold text-bvc-muted">
               Tiêu chí xếp hạng
@@ -212,7 +212,7 @@ export function ChallengeFormPage() {
               <div className="mt-[8px] flex items-center gap-[10px] text-[12px] text-bvc-muted">
                 <span className="font-mono">120 BPM</span>
                 <span>·</span>
-                <span>Hạn: —</span>
+                <span>Hạn: -</span>
                 <span>·</span>
                 <span>0 người</span>
               </div>

@@ -44,7 +44,7 @@ export function AssignmentInfoPanel({ assignment, isWorking = false, onAction }:
         <div className="flex flex-col gap-[2px]">
           <span className="text-[12px] text-bvc-muted">BPM</span>
           <span className="font-bvc-mono text-[14.5px] font-semibold">
-            {assignment.effectiveBpm ? `${assignment.effectiveBpm} BPM` : "—"}
+            {assignment.effectiveBpm ? `${assignment.effectiveBpm} BPM` : "-"}
           </span>
         </div>
         <div className="col-span-2 flex flex-col gap-[2px]">

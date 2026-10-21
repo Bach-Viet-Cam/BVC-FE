@@ -67,9 +67,9 @@ export function PracticePage() {
   }
 
   return (
-    /* Outer centering wrapper — bg shows on desktop */
+    /* Outer centering wrapper - bg shows on desktop */
     <div className="flex min-h-dvh justify-center bg-bvc-surface">
-      {/* Mobile frame — full viewport height, no scroll */}
+      {/* Mobile frame - full viewport height, no scroll */}
       <div className="flex h-dvh w-full max-w-[428px] flex-col overflow-hidden bg-white">
 
         {/* ── 1. Header ─────────────────────────────────────────────────── */}

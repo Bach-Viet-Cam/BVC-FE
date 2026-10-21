@@ -86,7 +86,7 @@ const submissionsOf = (studentId: string) => ({
   ],
 });
 
-function mockApis(assignmentItems = [ASSIGNMENT_ITEM("a1", "Độc tấu — Lý ngựa ô", "PUBLISHED", 2)], classes = [CLASS]) {
+function mockApis(assignmentItems = [ASSIGNMENT_ITEM("a1", "Độc tấu - Lý ngựa ô", "PUBLISHED", 2)], classes = [CLASS]) {
   vi.mocked(classesApi.listClasses).mockResolvedValue({
     data: {
       data: {
@@ -123,7 +123,7 @@ describe("ReviewPage", () => {
     mockApis();
     renderPage();
     expect(await screen.findByText("Hàng đợi nhận xét · 1 / 2")).toBeInTheDocument();
-    expect(screen.getByText("Cao Minh Quân — Độc tấu — Lý ngựa ô")).toBeInTheDocument();
+    expect(screen.getByText("Cao Minh Quân - Độc tấu - Lý ngựa ô")).toBeInTheDocument();
     expect(screen.queryByText("Chưa Nộp")).not.toBeInTheDocument();
     expect(assignmentsApi.getStudentSubmissions).toHaveBeenCalledWith("a1", "s2");
     expect(await screen.findByLabelText("Nhận xét")).toBeInTheDocument();
@@ -152,8 +152,8 @@ describe("ReviewPage", () => {
 
   it("leaves out drafts and loads the picked assignment", async () => {
     mockApis([
-      ASSIGNMENT_ITEM("a1", "Độc tấu — Lý ngựa ô", "PUBLISHED", 2),
-      ASSIGNMENT_ITEM("a2", "Bonus — Ngẫu hứng", "CLOSED", 1),
+      ASSIGNMENT_ITEM("a1", "Độc tấu - Lý ngựa ô", "PUBLISHED", 2),
+      ASSIGNMENT_ITEM("a2", "Bonus - Ngẫu hứng", "CLOSED", 1),
       ASSIGNMENT_ITEM("a3", "Bài nháp", "DRAFT", 0),
     ]);
     renderPage();

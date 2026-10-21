@@ -252,7 +252,7 @@ function InstrumentsTab() {
 
                     <td className="px-5 py-3.5 font-bold text-bvc-ink text-[13.5px]">{instrument.name}</td>
 
-                    <td className="px-5 py-3.5 text-bvc-muted">{instrument.description || "—"}</td>
+                    <td className="px-5 py-3.5 text-bvc-muted">{instrument.description || "-"}</td>
 
                     <td className="px-5 py-3.5">
                       <span className="inline-flex items-center gap-2">

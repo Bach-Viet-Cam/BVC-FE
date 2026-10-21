@@ -26,6 +26,6 @@ describe("reviewFormat", () => {
   it("shows the attempt count with the last submission time, and the best score", () => {
     expect(formatQueueSubtitle(student({ submissionCount: 3 }))).toBe("3 lần nộp · 16/10 09:30");
     expect(formatQueueScore(student({ bestAccuracy: 88.5 }))).toBe("88.5%");
-    expect(formatQueueScore(student({ bestAccuracy: null }))).toBe("—");
+    expect(formatQueueScore(student({ bestAccuracy: null }))).toBe("-");
   });
 });

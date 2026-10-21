@@ -42,7 +42,7 @@ export function QualityCheckPage() {
 
           {/* Detail cards */}
           <div className="mt-[16px] w-full space-y-3 px-[14px]">
-            {/* Card 1 — Device + waveform */}
+            {/* Card 1 - Device + waveform */}
             <div className="rounded-[18px] bg-bvc-surface p-[14px]">
               <div className="mb-[10px] flex items-center justify-between">
                 <span className="text-[14px] font-bold text-bvc-ink">
@@ -55,7 +55,7 @@ export function QualityCheckPage() {
               <Waveform bars={MIC_PREVIEW_BARS} height={32} />
             </div>
 
-            {/* Card 2 — 3 quality items */}
+            {/* Card 2 - 3 quality items */}
             <div className="rounded-[18px] bg-bvc-surface p-[14px]">
               <div className="flex items-center justify-around">
                 <div className="flex flex-col items-center gap-[4px]">

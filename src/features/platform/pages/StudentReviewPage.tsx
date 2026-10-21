@@ -35,7 +35,7 @@ const PAST_COMMENTS = [
   },
   {
     date: "01/09",
-    bar: "—",
+    bar: "-",
     comment: "Tiến bộ tốt ở kỹ thuật ngón. Tiếp tục duy trì.",
   },
 ];
@@ -73,7 +73,7 @@ export function StudentReviewPage() {
 
       {/* Body */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Left panel — Student list */}
+        {/* Left panel - Student list */}
         <div className="flex w-[240px] shrink-0 flex-col overflow-hidden border-r border-bvc-border-strong">
           <div className="shrink-0 border-b border-bvc-line px-[16px] py-[13px]">
             <span className="text-[13px] font-bold text-bvc-ink">Sinh viên</span>
@@ -100,10 +100,10 @@ export function StudentReviewPage() {
           ))}
         </div>
 
-        {/* Center panel — Detail */}
+        {/* Center panel - Detail */}
         <div className="flex flex-1 flex-col overflow-y-auto p-[24px_28px]">
           <h2 className="text-[20px] font-extrabold tracking-[-0.025em] text-bvc-ink">
-            Lê {selected.name} — TRD301 · Đàn bầu
+            Lê {selected.name} - TRD301 · Đàn bầu
           </h2>
 
           {/* Practice history */}
@@ -192,7 +192,7 @@ export function StudentReviewPage() {
           </div>
         </div>
 
-        {/* Right panel — Past comments */}
+        {/* Right panel - Past comments */}
         <div className="flex w-[260px] shrink-0 flex-col border-l border-bvc-border-strong p-[18px]">
           <span className="mb-3 text-[13px] font-bold text-bvc-ink">Nhận xét trước</span>
 
