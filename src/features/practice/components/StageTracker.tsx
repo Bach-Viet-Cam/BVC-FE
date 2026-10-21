@@ -16,7 +16,7 @@ function stateOf(index: number, stage: number, failed: boolean): StageState {
 
 export function StageTracker({ stage, failed }: StageTrackerProps) {
   return (
-    <ol className="flex flex-col rounded-[18px] border border-bvc-border bg-white p-3.5">
+    <ol className="flex flex-col rounded-[18px] border border-bvc-border bg-white p-3.5 md:rounded-[22px] md:px-7 md:pt-6 md:pb-2">
       {STAGE_LABELS.map((label, index) => {
         const state = stateOf(index, stage, failed);
         const isLast = index === STAGE_LABELS.length - 1;
@@ -39,10 +39,10 @@ export function StageTracker({ stage, failed }: StageTrackerProps) {
               {!isLast && <span className="w-0.5 flex-1 bg-bvc-border" />}
             </div>
 
-            <div className={cn("flex flex-col gap-0.5", isLast ? "pb-0" : "pb-4")}>
+            <div className={cn("flex flex-col gap-0.5", isLast ? "pb-0 md:pb-4" : "pb-4 md:pb-5.5")}>
               <span
                 className={cn(
-                  "text-sm",
+                  "text-sm md:text-[15px]",
                   state === "pending" && "font-medium text-bvc-faint",
                   state === "done" && "font-semibold text-bvc-ink",
                   state === "active" && "font-bold text-bvc-ink",

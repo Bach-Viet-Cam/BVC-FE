@@ -56,7 +56,7 @@ export function RecordPanel({
   if (rec === "preview") {
     const playedRatio = takeLen > 0 ? playPos / takeLen : 0;
     return (
-      <div className="mt-auto flex flex-col gap-3">
+      <div className="mt-auto flex flex-col gap-3 md:mx-auto md:my-auto md:w-full md:max-w-[760px]">
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -115,7 +115,7 @@ export function RecordPanel({
   }
 
   return (
-    <div className="mt-auto flex flex-col gap-3">
+    <div className="mt-auto flex flex-col gap-3 md:mx-auto md:my-auto md:w-full md:max-w-[760px]">
       {micDenied && <NoticeBanner message="Cần cho phép truy cập micro để dùng tính năng này." />}
 
       <div className="flex items-center gap-3.5">

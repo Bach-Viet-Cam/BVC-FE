@@ -1,5 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { AssignmentInfoCard } from "@/features/practice/components/AssignmentInfoCard";
+import { MetronomeView } from "@/features/practice/components/MetronomeView";
+import { PracticeDrawer } from "@/features/practice/components/PracticeDrawer";
+import { PracticeTopBar } from "@/features/practice/components/PracticeTopBar";
+import { TunerView } from "@/features/practice/components/TunerView";
 import { RecordPanel } from "@/features/practice/components/RecordPanel";
 import { UploadPanel } from "@/features/practice/components/UploadPanel";
 import { TempoCard } from "@/features/practice/components/TempoCard";
@@ -19,16 +24,27 @@ import { useRecorder } from "@/features/practice/hooks/useRecorder";
 import { noteAt, simBpm, simCents } from "@/features/practice/utils/practiceSimulation";
 import { fileErrorMessage, validateFile } from "@/features/practice/utils/validateRecording";
 import type { RecordingFile, SubmitMode } from "@/features/practice/types/practiceTypes";
-import { MobileHeader } from "@/shared/components/bvc/MobileHeader";
 import { BvcDialogPopup } from "@/shared/components/bvc/BvcDialogPopup";
 import { Dialog } from "@/shared/components/ui/dialog";
 import { toast } from "@/shared/components/ui/toast";
+import { useIsMobile } from "@/shared/hooks/use-mobile";
 import { cn } from "@/shared/utils/cn";
+
+type DrawerKind = "tuner" | "metronome";
+
+// Laptop: TunerPage/MetronomePage chuyển về đây kèm state.drawer để mở sẵn ngăn kéo
+function drawerFromState(state: unknown): DrawerKind | null {
+  const value = typeof state === "object" && state !== null ? (state as { drawer?: unknown }).drawer : null;
+  return value === "tuner" || value === "metronome" ? value : null;
+}
 
 export function RecordPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { songId } = useParams();
+  const isMobile = useIsMobile();
   const { demo, blocked, left, submit, uploading, submission } = usePracticeDemo();
+  const [drawer, setDrawer] = useState<DrawerKind | null>(() => drawerFromState(location.state));
 
   const [mode, setMode] = useState<SubmitMode>("record");
   const [tempoOpen, setTempoOpen] = useState(true);
@@ -76,6 +92,7 @@ export function RecordPage() {
     return () => clearInterval(timer);
   }, [filePlaying, file]);
 
+  const tunerShown = mode === "record" && !demo.noPitch;
   const live = rec === "recording" && !demo.micDenied;
   const liveBpm = live ? Math.round(simBpm(elapsed)) : null;
   const cents = live ? simCents(elapsed) : 0;
@@ -146,6 +163,12 @@ export function RecordPage() {
     recorder.start();
   }
 
+  // Điện thoại: trang riêng. Laptop: ngăn kéo, không rời màn ghi âm
+  function openDetail(kind: DrawerKind) {
+    if (isMobile) navigate(`/practice/${songId}/${kind}`);
+    else setDrawer(kind);
+  }
+
   function switchMode(next: SubmitMode) {
     if (recActive) return;
     setMode(next);
@@ -161,127 +184,162 @@ export function RecordPage() {
 
   return (
     <PracticeFrame>
-      <MobileHeader
+      <PracticeTopBar
         title={SAMPLE.piece}
         subtitle={`${SAMPLE.className} · ${SAMPLE.instrument} · ${SAMPLE.lesson}`}
         rightSlot={<DemoPanel />}
+        deadlineSlot={
+          <div className="flex shrink-0 items-center gap-2 rounded-xl border border-bvc-border bg-bvc-panel px-3.5 py-2.25 text-[13.5px]">
+            <span className="text-bvc-muted">Hạn nộp</span>
+            <span className="font-semibold text-bvc-ink">{SAMPLE.deadline}</span>
+            <span className="h-4 w-px bg-bvc-border-strong" />
+            <span className="text-bvc-muted">Còn</span>
+            <span className="font-semibold text-bvc-ink">{left}</span>
+            <span className="text-bvc-muted">lượt nộp</span>
+          </div>
+        }
       />
-      <p className="shrink-0 px-4.5 pb-2.5 text-[13px] text-bvc-muted">
+      <p className="shrink-0 px-4.5 pb-2.5 text-[13px] text-bvc-muted md:hidden">
         Hạn nộp {SAMPLE.deadline} · Còn {left} lượt nộp
       </p>
 
-      <div className="mx-3.5">
-        <TempoCard
-          open={tempoOpen}
-          onToggle={() => setTempoOpen((value) => !value)}
-          liveBpm={liveBpm}
-          bpmHint={bpmHint}
-          hintTone={hintTone}
-          litBeat={litBeat}
-          clickOn={clickOn}
-          onToggleClick={() => setClickOn((value) => !value)}
-          canOpenDetail={canOpenDetail}
-          onOpenMetronome={() => navigate(`/practice/${songId}/metronome`)}
-          micDenied={demo.micDenied}
-        />
+      {/* Điện thoại: `contents` giữ nguyên bố cục cũ; từ md thành cột cuộn của bản laptop */}
+      <div className="contents md:flex md:min-h-0 md:flex-1 md:flex-col md:gap-5 md:overflow-y-auto md:px-8 md:pt-6 md:pb-7">
+        <div className={cn("contents md:grid md:gap-5", tunerShown ? "md:grid-cols-2" : "md:grid-cols-1")}>
+          <div className="mx-3.5 md:mx-0">
+            <TempoCard
+              open={tempoOpen}
+              onToggle={() => setTempoOpen((value) => !value)}
+              liveBpm={liveBpm}
+              bpmHint={bpmHint}
+              hintTone={hintTone}
+              litBeat={litBeat}
+              clickOn={clickOn}
+              onToggleClick={() => setClickOn((value) => !value)}
+              canOpenDetail={canOpenDetail}
+              onOpenMetronome={() => openDetail("metronome")}
+              micDenied={demo.micDenied}
+            />
+          </div>
+
+          {tunerShown && (
+            <div className="mx-3.5 mt-2.5 md:mx-0 md:mt-0">
+              <TunerCard
+                open={tunerOpen}
+                onToggle={() => setTunerOpen((value) => !value)}
+                live={live}
+                cents={cents}
+                detectedNote={detectedNote}
+                detectedHz={detectedHz}
+                expectedNote={expectedNote}
+                canOpenDetail={canOpenDetail}
+                onOpenTuner={() => openDetail("tuner")}
+                micDenied={demo.micDenied}
+              />
+            </div>
+          )}
+        </div>
+
+        <div className="contents lg:grid lg:min-h-0 lg:flex-1 lg:grid-cols-[1fr_3fr] lg:gap-5">
+          <AssignmentInfoCard left={left} />
+
+          <div className="mx-3.5 mt-3 flex min-h-0 flex-1 flex-col gap-2.75 pb-5.5 md:mx-0 md:mt-0 md:min-h-98 md:rounded-[22px] md:border md:border-bvc-border md:bg-white md:p-5.5 md:pb-5.5">
+            <div className="contents md:flex md:shrink-0 md:items-center md:justify-between md:gap-4">
+              <div className="flex shrink-0 gap-1 rounded-bvc-md border border-bvc-border-strong bg-bvc-surface p-0.75 md:w-85 md:border-0 md:bg-bvc-panel">
+                {(["record", "upload"] as const).map((value) => (
+                  <button
+                    key={value}
+                    type="button"
+                    aria-pressed={mode === value}
+                    onClick={() => switchMode(value)}
+                    className={cn(
+                      "min-h-10 flex-1 cursor-pointer rounded-bvc-sm text-sm font-semibold md:min-h-10.5",
+                      mode === value ? "bg-bvc-ink text-white" : "text-bvc-muted",
+                      recActive && "opacity-60"
+                    )}
+                  >
+                    {value === "record" ? "Ghi âm" : "Tải file lên"}
+                  </button>
+                ))}
+              </div>
+
+              <p className="shrink-0 text-xs leading-normal text-bvc-muted md:text-right md:text-[12.5px]">
+                Định dạng MP3, WAV, M4A · tối đa 20 MB · thời lượng từ 00:10 đến 03:00
+              </p>
+            </div>
+
+            {notices.map((text) => (
+              <NoticeBanner key={text} message={text} />
+            ))}
+
+            {mode === "record" ? (
+              <RecordPanel
+                rec={rec}
+                elapsed={elapsed}
+                countBeat={countBeat}
+                takeLen={takeLen}
+                playing={recorder.playing}
+                playPos={recorder.playPos}
+                blocked={blocked}
+                micDenied={demo.micDenied}
+                uploading={uploading}
+                errorText={fileErrorMessage(errorKind)}
+                weakMessage={MSG.weak}
+                sendDisabled={sendDisabled}
+                sendLabel={sendLabel}
+                onStart={handleStart}
+                onStop={recorder.stop}
+                onTogglePlay={recorder.togglePlay}
+                onRerecord={recorder.reset}
+                onSend={handleSend}
+              />
+            ) : (
+              <UploadPanel
+                file={file}
+                playing={filePlaying}
+                position={filePos}
+                blocked={blocked}
+                uploading={uploading}
+                errorText={fileErrorMessage(errorKind)}
+                weakMessage={MSG.weak}
+                sendDisabled={sendDisabled}
+                sendLabel={sendLabel}
+                onPick={() => {
+                  if (blocked) return;
+                  setFile(makeFile(0));
+                  setFileIdx(0);
+                  setFilePos(0);
+                  setFilePlaying(false);
+                }}
+                onPickOther={() => {
+                  if (blocked) return;
+                  const next = (fileIdx + 1) % SAMPLE.files.length;
+                  setFile(makeFile(next));
+                  setFileIdx(next);
+                  setFilePos(0);
+                  setFilePlaying(false);
+                }}
+                onTogglePlay={() => setFilePlaying((value) => !value)}
+                onSend={handleSend}
+              />
+            )}
+          </div>
+        </div>
       </div>
 
-      {mode === "record" && !demo.noPitch && (
-        <div className="mx-3.5 mt-2.5">
-          <TunerCard
-            open={tunerOpen}
-            onToggle={() => setTunerOpen((value) => !value)}
-            live={live}
-            cents={cents}
-            detectedNote={detectedNote}
-            detectedHz={detectedHz}
-            expectedNote={expectedNote}
-            canOpenDetail={canOpenDetail}
-            onOpenTuner={() => navigate(`/practice/${songId}/tuner`)}
-            micDenied={demo.micDenied}
-          />
-        </div>
+      {drawer && !isMobile && (
+        <PracticeDrawer
+          title={drawer === "tuner" ? "Lên dây" : "Metronome"}
+          subtitle={
+            drawer === "tuner"
+              ? `${SAMPLE.instrument} · 4 dây · A4 440 Hz`
+              : `${SAMPLE.piece} · tốc độ yêu cầu ${SAMPLE.targetBpm} BPM`
+          }
+          onClose={() => setDrawer(null)}
+        >
+          {drawer === "tuner" ? <TunerView /> : <MetronomeView />}
+        </PracticeDrawer>
       )}
-
-      <div className="mx-3.5 mt-3 flex min-h-0 flex-1 flex-col gap-2.75 pb-5.5">
-        <div className="flex shrink-0 gap-1 rounded-bvc-md border border-bvc-border-strong bg-bvc-surface p-0.75">
-          {(["record", "upload"] as const).map((value) => (
-            <button
-              key={value}
-              type="button"
-              aria-pressed={mode === value}
-              onClick={() => switchMode(value)}
-              className={cn(
-                "min-h-10 flex-1 cursor-pointer rounded-bvc-sm text-sm font-semibold",
-                mode === value ? "bg-bvc-ink text-white" : "text-bvc-muted",
-                recActive && "opacity-60"
-              )}
-            >
-              {value === "record" ? "Ghi âm" : "Tải file lên"}
-            </button>
-          ))}
-        </div>
-
-        <p className="shrink-0 text-xs leading-normal text-bvc-muted">
-          Định dạng MP3, WAV, M4A · tối đa 20 MB · thời lượng từ 00:10 đến 03:00
-        </p>
-
-        {notices.map((text) => (
-          <NoticeBanner key={text} message={text} />
-        ))}
-
-        {mode === "record" ? (
-          <RecordPanel
-            rec={rec}
-            elapsed={elapsed}
-            countBeat={countBeat}
-            takeLen={takeLen}
-            playing={recorder.playing}
-            playPos={recorder.playPos}
-            blocked={blocked}
-            micDenied={demo.micDenied}
-            uploading={uploading}
-            errorText={fileErrorMessage(errorKind)}
-            weakMessage={MSG.weak}
-            sendDisabled={sendDisabled}
-            sendLabel={sendLabel}
-            onStart={handleStart}
-            onStop={recorder.stop}
-            onTogglePlay={recorder.togglePlay}
-            onRerecord={recorder.reset}
-            onSend={handleSend}
-          />
-        ) : (
-          <UploadPanel
-            file={file}
-            playing={filePlaying}
-            position={filePos}
-            blocked={blocked}
-            uploading={uploading}
-            errorText={fileErrorMessage(errorKind)}
-            weakMessage={MSG.weak}
-            sendDisabled={sendDisabled}
-            sendLabel={sendLabel}
-            onPick={() => {
-              if (blocked) return;
-              setFile(makeFile(0));
-              setFileIdx(0);
-              setFilePos(0);
-              setFilePlaying(false);
-            }}
-            onPickOther={() => {
-              if (blocked) return;
-              const next = (fileIdx + 1) % SAMPLE.files.length;
-              setFile(makeFile(next));
-              setFileIdx(next);
-              setFilePos(0);
-              setFilePlaying(false);
-            }}
-            onTogglePlay={() => setFilePlaying((value) => !value)}
-            onSend={handleSend}
-          />
-        )}
-      </div>
 
       <Dialog open={micPopup} onOpenChange={setMicPopup}>
         <BvcDialogPopup>

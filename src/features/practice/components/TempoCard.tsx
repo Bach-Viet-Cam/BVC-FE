@@ -57,7 +57,9 @@ export function TempoCard({
         <span className="flex min-w-[92px] flex-col gap-0.5">
           <span className="text-[11px] font-bold tracking-[0.1em] text-bvc-faint uppercase">Mục tiêu</span>
           <span className="flex items-baseline gap-[5px]">
-            <span className="text-[30px] leading-[1.1] font-semibold text-bvc-ink">{SAMPLE.targetBpm}</span>
+            <span className="text-[30px] leading-[1.1] font-semibold text-bvc-ink md:text-[72px]">
+              {SAMPLE.targetBpm}
+            </span>
             <span className="text-xs text-bvc-muted">BPM</span>
           </span>
         </span>

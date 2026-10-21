@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { PracticeFrame } from "@/features/practice/components/PracticeFrame";
+import { PracticeTopBar } from "@/features/practice/components/PracticeTopBar";
 import { StageTracker } from "@/features/practice/components/StageTracker";
 import { DemoPanel } from "@/features/practice/components/DemoPanel";
 import { MAX_RETRIES, MSG, SAMPLE } from "@/features/practice/constants/practiceConstants";
 import { usePracticeDemo } from "@/features/practice/context/PracticeDemoContext";
 import { fmtTime, mbText } from "@/features/practice/utils/practiceFormat";
-import { MobileHeader } from "@/shared/components/bvc/MobileHeader";
 import { toast } from "@/shared/components/ui/toast";
 import { cn } from "@/shared/utils/cn";
 
@@ -43,8 +43,10 @@ export function ProcessingPage() {
   if (!submission) {
     return (
       <PracticeFrame>
-        <MobileHeader title={SAMPLE.piece} subtitle="Chưa có bản nộp nào" />
-        <p className="px-3.5 text-sm text-bvc-muted">Bạn chưa gửi bản thu nào. Quay lại màn ghi âm để nộp bài.</p>
+        <PracticeTopBar title={SAMPLE.piece} subtitle="Chưa có bản nộp nào" />
+        <p className="px-3.5 text-sm text-bvc-muted md:mx-auto md:w-full md:max-w-170 md:px-8 md:pt-8">
+          Bạn chưa gửi bản thu nào. Quay lại màn ghi âm để nộp bài.
+        </p>
       </PracticeFrame>
     );
   }
@@ -54,13 +56,13 @@ export function ProcessingPage() {
 
   return (
     <PracticeFrame>
-      <MobileHeader
+      <PracticeTopBar
         title={SAMPLE.piece}
         subtitle={`${SAMPLE.className} · ${SAMPLE.instrument} · ${SAMPLE.lesson}`}
         rightSlot={<DemoPanel />}
       />
 
-      <div className="flex-1 overflow-y-auto px-3.5 pb-6">
+      <div className="mx-auto w-full flex-1 overflow-y-auto px-3.5 pb-6 md:max-w-170 md:px-8 md:pt-8">
         <div className="flex items-center gap-2.5">
           <span
             className={cn(
@@ -93,14 +95,14 @@ export function ProcessingPage() {
         )}
 
         {status === "Hoàn tất" && (
-          <p className="mt-3 rounded-bvc-md border border-bvc-border bg-bvc-surface px-3.5 py-3 text-[13px] text-bvc-ink">
+          <p className="mt-3 rounded-bvc-md border border-bvc-border bg-bvc-surface px-3.5 py-3 text-[13px] text-bvc-ink md:bg-bvc-panel md:text-sm">
             Hoàn tất. Đang mở kết quả phân tích của bạn.
           </p>
         )}
 
         {status === "Từ chối" && (
           <div className="mt-3 flex flex-col gap-3">
-            <p className="rounded-bvc-md border border-bvc-warn/50 bg-bvc-accent-tint px-3.5 py-3 text-[13px] leading-normal text-bvc-accent-text">
+            <p className="rounded-bvc-md border border-bvc-warn/50 bg-bvc-accent-tint px-3.5 py-3 text-[13px] leading-normal text-bvc-accent-text md:border-bvc-notice-border md:px-4.5 md:py-3.75 md:text-sm">
               Bản thu không đạt chất lượng: {reason}. Lượt này không bị tính vào số lần nộp. Bạn có thể ghi âm hoặc tải
               file khác.
             </p>
@@ -110,7 +112,7 @@ export function ProcessingPage() {
                 clearSubmission();
                 navigate(`/practice/${songId}/record`);
               }}
-              className="flex min-h-13 w-full cursor-pointer items-center justify-center rounded-[15px] bg-bvc-ink text-[15px] font-semibold text-white"
+              className="flex min-h-13 w-full md:min-h-13 cursor-pointer items-center justify-center rounded-[15px] bg-bvc-ink text-[15px] font-semibold text-white"
             >
               Ghi âm lại
             </button>
@@ -119,7 +121,7 @@ export function ProcessingPage() {
 
         {status === "Lỗi xử lý" && !exhausted && (
           <div className="mt-3 flex flex-col gap-3">
-            <p className="rounded-bvc-md border border-bvc-warn/50 bg-bvc-accent-tint px-3.5 py-3 text-[13px] leading-normal text-bvc-accent-text">
+            <p className="rounded-bvc-md border border-bvc-warn/50 bg-bvc-accent-tint px-3.5 py-3 text-[13px] leading-normal text-bvc-accent-text md:border-bvc-notice-border md:px-4.5 md:py-3.75 md:text-sm">
               Xử lý bản thu thất bại. File của bạn vẫn được giữ lại. Lượt này không bị tính vào số lần nộp.
               {retrySec > 0 && ` Bạn có thể thử lại sau ${retrySec} giây.`}
             </p>
@@ -131,7 +133,7 @@ export function ProcessingPage() {
               disabled={retrySec > 0}
               onClick={retry}
               className={cn(
-                "flex min-h-13 w-full items-center justify-center rounded-[15px] text-[15px] font-semibold",
+                "flex min-h-13 w-full md:min-h-13 items-center justify-center rounded-[15px] text-[15px] font-semibold",
                 retrySec > 0
                   ? "cursor-not-allowed border border-bvc-border bg-bvc-surface text-bvc-faint"
                   : "cursor-pointer bg-bvc-ink text-white"
@@ -144,14 +146,14 @@ export function ProcessingPage() {
 
         {exhausted && (
           <div className="mt-3 flex flex-col gap-3">
-            <p className="rounded-bvc-md border border-bvc-warn/50 bg-bvc-accent-tint px-3.5 py-3 text-[13px] leading-normal text-bvc-accent-text">
+            <p className="rounded-bvc-md border border-bvc-warn/50 bg-bvc-accent-tint px-3.5 py-3 text-[13px] leading-normal text-bvc-accent-text md:border-bvc-notice-border md:px-4.5 md:py-3.75 md:text-sm">
               Hệ thống vẫn chưa xử lý được sau 3 lần thử lại. File phân tích của bạn đã bị xóa khỏi máy chủ. Bạn có thể
               tải bản thu về và nộp lại sau; bản nộp mới sẽ tính vào số lần nộp.
             </p>
             <button
               type="button"
               onClick={() => toast.success(MSG.download)}
-              className="flex min-h-13 w-full cursor-pointer items-center justify-center rounded-[15px] bg-bvc-ink text-[15px] font-semibold text-white"
+              className="flex min-h-13 w-full md:min-h-13 cursor-pointer items-center justify-center rounded-[15px] bg-bvc-ink text-[15px] font-semibold text-white"
             >
               Tải file về
             </button>

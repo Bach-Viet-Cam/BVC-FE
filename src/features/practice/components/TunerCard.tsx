@@ -84,9 +84,9 @@ export function TunerCard({
           </span>
         </span>
 
-        <span className="flex min-w-[104px] shrink-0 flex-col items-center gap-px rounded-bvc-lg bg-bvc-ink px-3.5 pt-[9px] pb-2.5 text-white">
+        <span className="flex min-w-[104px] shrink-0 flex-col items-center gap-px rounded-bvc-lg bg-bvc-ink px-3.5 pt-[9px] pb-2.5 md:min-w-47.5 md:px-6 md:pt-4 text-white">
           <span className="text-[10.5px] font-bold tracking-[0.12em] text-bvc-bar uppercase">Cần chơi</span>
-          <span className="text-[32px] leading-[1.1] font-extrabold">{expectedNote.vn}</span>
+          <span className="text-[32px] leading-[1.1] font-extrabold md:text-[60px]">{expectedNote.vn}</span>
           <span className="text-[12.5px] text-bvc-bar">{expectedNote.en}</span>
         </span>
 

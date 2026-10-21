@@ -27,6 +27,8 @@
   --color-bvc-ok:            #2E7D4F;
   --color-bvc-warn:          #D99B1E;
   --color-bvc-error:         #F4622E;
+  --color-bvc-panel:         #F2F6F2;
+  --color-bvc-notice-border: #E6D29A;
 
   /* BVC border radii */
   --radius-bvc-sm: 11px;

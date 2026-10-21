@@ -108,7 +108,7 @@ export function DemoPanel() {
             onClick={() => setOpen(false)}
             className="absolute inset-0 z-[70] cursor-pointer bg-bvc-ink/40"
           />
-          <div className="absolute inset-x-0 top-[70px] bottom-0 z-[80] flex flex-col overflow-y-auto rounded-t-3xl bg-white">
+          <div className="absolute inset-x-0 top-[70px] bottom-0 z-[80] flex flex-col overflow-y-auto rounded-t-3xl bg-white md:inset-x-auto md:top-1/2 md:left-1/2 md:bottom-auto md:max-h-[80dvh] md:w-130 md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-3xl md:shadow-[0_12px_40px_rgba(18,63,51,0.18)]">
             <div className="flex items-center gap-2 px-4 pt-5 pb-3">
               <span className="flex-1 text-[18px] font-extrabold text-bvc-ink">Demo</span>
               <button

@@ -57,7 +57,7 @@ export function UploadPanel({
   const progress = file.dur > 0 ? (position / file.dur) * 100 : 0;
 
   return (
-    <div className="mt-auto flex flex-col gap-3">
+    <div className="mt-auto flex flex-col gap-3 md:mx-auto md:my-auto md:w-full md:max-w-[760px]">
       <div className="flex flex-col gap-2.5 rounded-bvc-lg border border-bvc-border bg-bvc-surface p-3.5">
         <div className="flex items-center gap-3">
           <button
