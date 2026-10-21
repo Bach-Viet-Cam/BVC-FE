@@ -3,6 +3,7 @@ import { CentsMeter } from "@/features/practice/components/CentsMeter";
 import { NoticeBanner } from "@/features/practice/components/NoticeBanner";
 import { MSG, STRINGS, TUNER_TOLERANCE_CENTS } from "@/features/practice/constants/practiceConstants";
 import { usePracticeDemo } from "@/features/practice/context/PracticeDemoContext";
+import type { PracticeAudio } from "@/features/practice/hooks/usePracticeAudio";
 import { useTuner } from "@/features/practice/hooks/useTuner";
 import { signed } from "@/features/practice/utils/practiceFormat";
 import { centsColor } from "@/features/practice/utils/tunerColor";
@@ -11,15 +12,21 @@ import { cn } from "@/shared/utils/cn";
 
 // Thân + chân màn lên dây, dùng cho trang riêng (điện thoại) và ngăn kéo (laptop).
 // Cha phải là cột flex để phần thân cuộn được còn chân luôn ở dưới.
-export function TunerView() {
+interface TunerViewProps {
+  audio: PracticeAudio;
+}
+
+export function TunerView({ audio }: TunerViewProps) {
   const { demo } = usePracticeDemo();
-  const { selected, tuned, cents, tunedCount, currentString, pickString } = useTuner(demo.micDenied);
+  const micDenied = demo.micDenied || audio.micState === "denied";
+  const { selected, tuned, live, cents, hz, note, tunedCount, currentString, pickString } = useTuner({
+    audio,
+    micDenied,
+  });
 
-  const live = !demo.micDenied;
   const color = centsColor(cents, live);
-  const hz = currentString.f * Math.pow(2, cents / 1200);
 
-  const advice = demo.micDenied
+  const advice = !live
     ? "Chạm một dây rồi gảy hoặc kéo dây"
     : Math.abs(cents) <= TUNER_TOLERANCE_CENTS
       ? "Chuẩn — giữ nguyên dây này"
@@ -35,11 +42,11 @@ export function TunerView() {
             className="text-[76px] leading-none font-extrabold tracking-[-0.04em]"
             style={{ color: live ? "var(--color-bvc-ink)" : "var(--color-bvc-faint)" }}
           >
-            {live ? currentString.vn : "--"}
+            {live && note ? note.vn : "--"}
           </span>
           <div className="flex items-baseline gap-2.5">
-            <span className="text-base text-bvc-muted">{currentString.en}</span>
-            <span className="text-sm text-bvc-muted">{live ? `${hz.toFixed(1)} Hz` : "--"}</span>
+            <span className="text-base text-bvc-muted">{live && note ? note.en : "--"}</span>
+            <span className="text-sm text-bvc-muted">{live && hz !== null ? `${hz.toFixed(1)} Hz` : "--"}</span>
           </div>
         </div>
 
@@ -95,7 +102,7 @@ export function TunerView() {
           })}
         </div>
 
-        {demo.micDenied && <NoticeBanner className="mt-3" message={MSG.mic} />}
+        {micDenied && <NoticeBanner className="mt-3" message={MSG.mic} />}
 
         <p className="mt-3 text-xs leading-normal text-bvc-muted">
           Chạm vào một dây để kiểm tra. Màn hình này chỉ dùng khi chưa ghi âm.

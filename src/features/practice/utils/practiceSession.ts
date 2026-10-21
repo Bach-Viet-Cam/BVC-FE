@@ -11,6 +11,7 @@ function hzToNearestMidi(hz: number): number {
 }
 
 // TODO(BE): thay bằng dữ liệu assignment + file phân tích (GBR-10, GBR-47, GBR-48) khi BE có API
+// TODO(BE): TempoCard còn đọc SAMPLE.targetBpm; chuyển sang session.targetBpm khi BE trả dữ liệu thật
 export function buildDemoSession(noPitch: boolean): PracticeSessionConfig {
   return {
     targetBpm: SAMPLE.targetBpm,

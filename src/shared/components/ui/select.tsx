@@ -50,12 +50,14 @@ export function SelectItem({ className, children, ...props }: SelectItemProps) {
   );
 }
 
-type SelectPopupProps = React.ComponentProps<typeof BaseSelect.Popup>;
+type SelectPopupProps = React.ComponentProps<typeof BaseSelect.Popup> & {
+  positionerClassName?: string; // vd. nâng z-index khi select nằm trong lớp phủ
+};
 
-export function SelectPopup({ className, children, ...props }: SelectPopupProps) {
+export function SelectPopup({ className, positionerClassName, children, ...props }: SelectPopupProps) {
   return (
     <BaseSelect.Portal>
-      <BaseSelect.Positioner className="z-50 outline-none select-none" sideOffset={6}>
+      <BaseSelect.Positioner className={cn("z-50 outline-none select-none", positionerClassName)} sideOffset={6}>
         <BaseSelect.Popup
           {...props}
           className={cn(

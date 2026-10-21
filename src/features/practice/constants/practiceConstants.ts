@@ -84,6 +84,9 @@ export const SUBS: Record<SubdivisionKey, string> = {
   quarter: "Móc kép · 1/4 phách",
 };
 
+// Số tick mỗi phách của từng kiểu chia nhỏ phách (metronome)
+export const SUB_TICKS: Record<SubdivisionKey, number> = { white: 0.5, black: 1, half: 2, quarter: 4 };
+
 export const STAGE_LABELS = ["Kiểm tra chất lượng", "Phân tích audio", "So sánh với bản mẫu", "Tổng hợp kết quả"];
 
 export const STAGE_ACTIVE_LABELS = [
@@ -118,3 +121,10 @@ export const PITCH_CONFIRM_FRAMES = 2;
 export const TUNER_HOLD_S = 0.25;
 export const TUNER_UI_TICK_MS = 150;
 export const TUNER_NOTE_HYSTERESIS_CENTS = 75;
+
+export const CLICK_LOOKAHEAD_S = 0.12;
+export const CLICK_TICK_MS = 25;
+export const CLICK_START_LEAD_S = 0.05;
+export const CLICK_HISTORY_SIZE = 32;
+export const BEAT_UI_TICK_MS = 40;
+export const TUNER_STRING_HOLD_MS = 400; // giữ trong dung sai bấy lâu mới tính là dây đã đúng

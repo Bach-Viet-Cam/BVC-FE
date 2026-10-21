@@ -21,6 +21,7 @@ import {
 } from "@/features/practice/constants/practiceConstants";
 import { usePracticeDemo } from "@/features/practice/context/PracticeDemoContext";
 import { usePracticeAudio } from "@/features/practice/hooks/usePracticeAudio";
+import { useClickTrack } from "@/features/practice/hooks/useClickTrack";
 import { useLiveTuner } from "@/features/practice/hooks/useLiveTuner";
 import { usePitchStream } from "@/features/practice/hooks/usePitchStream";
 import { useRecorder } from "@/features/practice/hooks/useRecorder";
@@ -60,7 +61,6 @@ export function RecordPage() {
   const [fileIdx, setFileIdx] = useState(0);
   const [filePlaying, setFilePlaying] = useState(false);
   const [filePos, setFilePos] = useState(0);
-  const [clickBeat, setClickBeat] = useState(0);
 
   const session = useMemo(() => buildDemoSession(demo.noPitch), [demo.noPitch]);
   const audio = usePracticeAudio({ micWanted: mode === "record", fminHz: session.fminHz });
@@ -78,16 +78,14 @@ export function RecordPage() {
   const recActive = rec === "countin" || rec === "recording";
   const canOpenDetail = mode === "record" && (rec === "idle" || rec === "preview");
 
-  // Tiếng gõ nhịp chạy tự do khi chưa ghi âm
-  useEffect(() => {
-    if (!clickOn) return;
-    const start = Date.now();
-    const timer = setInterval(() => {
-      const beatMs = 60000 / SAMPLE.targetBpm;
-      setClickBeat(Math.floor((Date.now() - start) / beatMs) % COUNT_IN_BEATS);
-    }, 40);
-    return () => clearInterval(timer);
-  }, [clickOn]);
+  // Tiếng gõ nhịp theo đồng hồ AudioContext; tạm dừng ở chế độ upload, giữ giá trị clickOn
+  const click = useClickTrack({
+    ctx: audio.ctx,
+    enabled: clickOn && mode === "record",
+    bpm: session.targetBpm,
+    beatsPerBar: session.beatsPerBar,
+    gridOrigin: recorder.recordStartTime,
+  });
 
   useEffect(() => {
     if (!filePlaying || !file) return;
@@ -108,7 +106,8 @@ export function RecordPage() {
   const live = rec === "recording" && !micDenied;
   const liveBpm = live ? Math.round(simBpm(elapsed)) : null;
 
-  const tunerActive = tunerShown && tunerOpen && !micDenied && audio.ready;
+  // Ngăn kéo lên dây tự đo bằng micro này, nên thẻ tuner nhường để không tính pitch hai lần
+  const tunerActive = tunerShown && tunerOpen && !micDenied && audio.ready && drawer !== "tuner";
   const pitchStream = usePitchStream({
     audio,
     enabled: tunerActive, // bước 04 sẽ mở rộng điều kiện này
@@ -124,20 +123,25 @@ export function RecordPage() {
   const bpmHint = useMemo(() => {
     if (rec === "countin") return "Đang đếm nhịp";
     if (!live || liveBpm === null) return micDenied ? "" : "Đang lắng nghe";
-    const diff = ((liveBpm - SAMPLE.targetBpm) / SAMPLE.targetBpm) * 100;
+    const diff = ((liveBpm - session.targetBpm) / session.targetBpm) * 100;
     if (Math.abs(diff) <= TEMPO_TOLERANCE_PERCENT) return "Đúng nhịp";
     return diff > 0 ? "Hơi nhanh" : "Hơi chậm";
-  }, [rec, live, liveBpm, micDenied]);
+  }, [rec, live, liveBpm, micDenied, session.targetBpm]);
 
   const hintTone = bpmHint === "Đúng nhịp" ? "ok" : bpmHint === "Hơi nhanh" || bpmHint === "Hơi chậm" ? "warn" : "idle";
 
-  const litBeat = recActive
-    ? rec === "countin"
+  // Đang ghi mà không bật click thì đèn vẫn chạy theo lưới bản ghi
+  const recordingBeat = Math.floor(((elapsed - timelineOffsetSec) * session.targetBpm) / 60) % COUNT_IN_BEATS;
+  const litBeat =
+    rec === "countin"
       ? countBeat
-      : Math.floor((elapsed * SAMPLE.targetBpm) / 60) % COUNT_IN_BEATS
-    : clickOn
-      ? clickBeat
-      : -1;
+      : rec === "recording"
+        ? clickOn
+          ? click.litBeat
+          : recordingBeat
+        : clickOn
+          ? click.litBeat
+          : -1;
 
   // Bản thu mô phỏng: dung lượng suy ra từ thời lượng
   const errorKind = useMemo(() => {
@@ -244,7 +248,10 @@ export function RecordPage() {
                 hintTone={hintTone}
                 litBeat={litBeat}
                 clickOn={clickOn}
-                onToggleClick={() => setClickOn((value) => !value)}
+                onToggleClick={() => {
+                  void audio.ctx.resume(); // cử chỉ người dùng mở khoá âm thanh
+                  setClickOn((value) => !value);
+                }}
                 canOpenDetail={canOpenDetail}
                 onOpenMetronome={() => openDetail("metronome")}
                 micDenied={micDenied}
@@ -377,7 +384,7 @@ export function RecordPage() {
           }
           onClose={() => setDrawer(null)}
         >
-          {drawer === "tuner" ? <TunerView /> : <MetronomeView />}
+          {drawer === "tuner" ? <TunerView audio={audio} /> : <MetronomeView />}
         </PracticeDrawer>
       )}
 

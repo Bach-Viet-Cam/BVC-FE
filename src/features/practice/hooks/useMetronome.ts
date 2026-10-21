@@ -1,6 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { BPM_MAX, BPM_MIN, SAMPLE, SIGS } from "@/features/practice/constants/practiceConstants";
+import {
+  BEAT_UI_TICK_MS,
+  BPM_MAX,
+  BPM_MIN,
+  CLICK_START_LEAD_S,
+  SAMPLE,
+  SIGS,
+  SUB_TICKS,
+} from "@/features/practice/constants/practiceConstants";
 import type { BeatAccent, SubdivisionKey } from "@/features/practice/types/practiceTypes";
+import { ClickScheduler, outputLatencyOf } from "@/features/practice/utils/clickScheduler";
 
 const FRESH_ACCENTS: BeatAccent[] = ["strong", "soft", "soft", "soft", "soft", "soft"];
 
@@ -16,22 +25,71 @@ export function useMetronome() {
   const [vibrate, setVibrate] = useState(true);
   const [playing, setPlaying] = useState(false);
   const [currentBeat, setCurrentBeat] = useState(0);
+  const [ctx, setCtx] = useState<AudioContext | null>(null);
+  const ctxRef = useRef<AudioContext | null>(null);
   const taps = useRef<number[]>([]);
 
   const beats = SIGS[sigIndex].beats;
 
+  const accentsRef = useRef(accents);
+  const vibrateRef = useRef(vibrate);
   useEffect(() => {
-    if (!playing) return;
-    const start = Date.now();
-    const timer = setInterval(() => {
-      const beatMs = 60000 / bpm;
-      setCurrentBeat(Math.floor((Date.now() - start) / beatMs) % beats);
-    }, 40);
+    accentsRef.current = accents;
+    vibrateRef.current = vibrate;
+  }, [accents, vibrate]);
+
+  // AudioContext riêng của metronome, tạo khi bấm phát lần đầu (cử chỉ người dùng) và đóng khi rời màn
+  useEffect(
+    () => () => {
+      void ctxRef.current?.close();
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (!playing || !ctx) return;
+    const origin = ctx.currentTime + CLICK_START_LEAD_S;
+    const beatSec = 60 / bpm;
+    const ticksPerBeat = SUB_TICKS[subdivision];
+    const scheduler = new ClickScheduler(ctx, {
+      originTime: origin,
+      bpm,
+      beatsPerBar: beats,
+      ticksPerBeat,
+      accentOf: (tick) => {
+        if (!Number.isInteger(tick / ticksPerBeat)) return false; // tick chia nhỏ giữa hai phách
+        const level = accentsRef.current[Math.floor(tick / ticksPerBeat) % beats];
+        return level === "off" ? null : level === "strong";
+      },
+    });
+    scheduler.start();
+
+    let lastIndex = -1;
+    const timer = window.setInterval(() => {
+      const heard = ctx.currentTime - outputLatencyOf(ctx);
+      const index = Math.floor((heard - origin) / beatSec);
+      if (index < 0 || index === lastIndex) return;
+      lastIndex = index;
+      const beat = index % beats;
+      setCurrentBeat(beat);
+      if (vibrateRef.current && accentsRef.current[beat] === "strong") navigator.vibrate?.(20);
+    }, BEAT_UI_TICK_MS);
+
     return () => {
-      clearInterval(timer);
+      scheduler.stop();
+      window.clearInterval(timer);
       setCurrentBeat(0);
     };
-  }, [playing, bpm, beats]);
+  }, [playing, ctx, bpm, beats, subdivision]);
+
+  const togglePlaying = useCallback(() => {
+    if (!playing && !ctxRef.current) {
+      ctxRef.current = new AudioContext({ latencyHint: "interactive" });
+      setCtx(ctxRef.current);
+    }
+    if (!playing) void ctxRef.current?.resume();
+    setPlaying(!playing);
+  }, [playing]);
 
   const setSig = useCallback((index: number) => {
     setSigIndex(index);
@@ -70,7 +128,7 @@ export function useMetronome() {
     vibrate,
     toggleVibrate: () => setVibrate((value) => !value),
     playing,
-    togglePlaying: () => setPlaying((value) => !value),
+    togglePlaying,
     currentBeat,
     tapTempo,
   };

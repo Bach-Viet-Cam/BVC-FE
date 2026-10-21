@@ -8,12 +8,14 @@ export const PopoverTitle = BasePopover.Title;
 export const PopoverDescription = BasePopover.Description;
 export const PopoverClose = BasePopover.Close;
 
-type PopoverPopupProps = React.ComponentProps<typeof BasePopover.Popup>;
+type PopoverPopupProps = React.ComponentProps<typeof BasePopover.Popup> & {
+  positionerClassName?: string; // vd. nâng z-index khi popover nằm trong lớp phủ
+};
 
-export function PopoverContent({ className, children, ...props }: PopoverPopupProps) {
+export function PopoverContent({ className, positionerClassName, children, ...props }: PopoverPopupProps) {
   return (
     <BasePopover.Portal>
-      <BasePopover.Positioner className="z-50 outline-none select-none" sideOffset={8}>
+      <BasePopover.Positioner className={cn("z-50 outline-none select-none", positionerClassName)} sideOffset={8}>
         <BasePopover.Popup
           {...props}
           className={cn(
