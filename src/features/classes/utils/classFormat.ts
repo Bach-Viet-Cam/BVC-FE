@@ -8,7 +8,7 @@ export const CLASS_DURATION_DAYS = 42;
 
 export const CLASS_STATUS_LABELS: Record<ClassStatus, string> = {
   ACTIVE: "Hoạt động",
-  FINISHED: "Đã kết thúc",
+  ENDED: "Đã kết thúc",
 };
 
 export const ACCOUNT_STATUS_LABELS: Record<AccountStatus, string> = {
@@ -33,6 +33,16 @@ export function addDays(isoDate: string, days: number): string {
 
 export function calculateEndDate(startDate: string): string {
   return /^\d{4}-\d{2}-\d{2}$/.test(startDate) ? addDays(startDate, CLASS_DURATION_DAYS) : "";
+}
+
+const CLASS_WEEKS = CLASS_DURATION_DAYS / 7;
+
+// "4/6" for a running class, "6/6" once finished, "—" before the start date.
+export function formatCurrentWeek(startDate: string, status: ClassStatus, today: string = todayInVietnam()): string {
+  if (status === "ENDED") return `${CLASS_WEEKS}/${CLASS_WEEKS}`;
+  const elapsedDays = (Date.parse(`${today}T00:00:00.000Z`) - Date.parse(`${startDate}T00:00:00.000Z`)) / DAY_MS;
+  if (Number.isNaN(elapsedDays) || elapsedDays < 0) return "—";
+  return `${Math.min(Math.floor(elapsedDays / 7) + 1, CLASS_WEEKS)}/${CLASS_WEEKS}`;
 }
 
 export function formatIsoDate(isoDate: string): string {

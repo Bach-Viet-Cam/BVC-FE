@@ -76,7 +76,7 @@ describe("Teacher assignment detail", () => {
   });
 
   it("shows no action in a finished class", () => {
-    renderPanel(buildAssignment({ classStatus: "FINISHED", status: "CLOSED" }));
+    renderPanel(buildAssignment({ classStatus: "ENDED", status: "CLOSED" }));
     expect(screen.queryByRole("link", { name: "Sửa" })).not.toBeInTheDocument();
     expect(buttonNames()).toEqual([]);
   });
