@@ -11,6 +11,7 @@ export const TEACHER_NAV: NavItem[] = [
   { label: "Lớp học", to: "/teacher/classes" },
   { label: "Lộ trình học tập", to: "/teacher/roadmap" },
   { label: "Bài tập", to: "/teacher/assignments" },
+  { label: "Quản lý thử thách", to: "/teacher/challenges" },
   { label: "Tiến độ sinh viên", to: "/teacher/progress" },
   { label: "Duyệt bài nộp", to: "/teacher/review" },
   { label: "Đánh giá sinh viên", to: "/teacher/student-review" },
