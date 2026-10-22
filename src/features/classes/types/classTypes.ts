@@ -54,7 +54,18 @@ export interface ClassPayload {
   cohort: string;
   instrumentId: string;
   description: string | null;
+}
+
+// Configured by System Admin; a class runs exactly from startDate to endDate of its semester.
+export interface Semester {
+  name: string;
   startDate: string;
+  endDate: string;
+}
+
+export interface SemesterList {
+  items: Semester[];
+  defaultName: string | null;
 }
 
 export interface Member {

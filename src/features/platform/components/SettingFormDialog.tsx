@@ -5,7 +5,7 @@ import { Sliders } from "lucide-react";
 import { Dialog, DialogClose, DialogDescription, DialogPopup, DialogTitle } from "@/shared/components/ui/dialog";
 import { CONFIG_GROUP_LABELS } from "@/features/platform/constants/configConstants";
 import { type SystemConfigItem } from "@/features/platform/types/configTypes";
-import { toFormValue } from "@/features/platform/utils/configValue";
+import { SEMESTERS_CONFIG_KEY, toFormValue } from "@/features/platform/utils/configValue";
 import { settingSchema, type SettingFormValues } from "@/features/platform/utils/validateSetting";
 
 interface SettingFormProps {
@@ -64,6 +64,13 @@ function SettingForm({ config, onSubmit, onClose }: SettingFormProps) {
             <option value="true">Bật (Hoạt động)</option>
             <option value="false">Tắt (Không kích hoạt)</option>
           </select>
+        ) : config.key === SEMESTERS_CONFIG_KEY ? (
+          <textarea
+            id="setting-value"
+            rows={10}
+            {...register("value")}
+            className="w-full resize-y rounded-[11px] border border-bvc-border-strong bg-white px-3.5 py-2.5 font-mono text-[12.5px] text-bvc-ink transition-colors focus:border-bvc-ink focus:outline-none"
+          />
         ) : (
           <input
             id="setting-value"
@@ -72,11 +79,19 @@ function SettingForm({ config, onSubmit, onClose }: SettingFormProps) {
             className="h-[40px] w-full rounded-[11px] border border-bvc-border-strong bg-white px-3.5 font-mono text-[13.5px] text-bvc-ink placeholder:font-sans placeholder:text-bvc-faint transition-colors focus:border-bvc-ink focus:outline-none"
           />
         )}
-        {config.valueType === "JSON" && (
+        {config.key === SEMESTERS_CONFIG_KEY ? (
           <p className="text-[12px] text-bvc-muted">
-            Nhập các giá trị cách nhau bằng dấu phẩy, ví dụ:{" "}
-            <code className="font-mono text-bvc-ink">mp3, wav, m4a</code>.
+            Mỗi học kỳ gồm <code className="font-mono text-bvc-ink">name</code>,{" "}
+            <code className="font-mono text-bvc-ink">startDate</code>,{" "}
+            <code className="font-mono text-bvc-ink">endDate</code> (yyyy-MM-dd). Tên không được trùng.
           </p>
+        ) : (
+          config.valueType === "JSON" && (
+            <p className="text-[12px] text-bvc-muted">
+              Nhập các giá trị cách nhau bằng dấu phẩy, ví dụ:{" "}
+              <code className="font-mono text-bvc-ink">mp3, wav, m4a</code>.
+            </p>
+          )
         )}
         {errors.value && <p className="text-[12px] font-medium text-bvc-error">{errors.value.message}</p>}
         {serverError && <p className="text-[12px] font-medium text-bvc-error">{serverError}</p>}
