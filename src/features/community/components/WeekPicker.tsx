@@ -57,7 +57,7 @@ export function WeekPicker({ id, value, onChange, hasError = false, now = new Da
     (_, index) => new Date(currentMonday.getTime() + (index - PAST_WEEKS_SHOWN) * WEEK_MS)
   );
   // A stored draft week may fall outside the window: still show it so the selection is visible.
-  const hasStoredValue = /^d{4}-d{2}-d{2}$/.test(value) && !mondays.some((monday) => isoDate(monday) === value);
+  const hasStoredValue = /^\d{4}-\d{2}-\d{2}$/.test(value) && !mondays.some((monday) => isoDate(monday) === value);
   const options = [...(hasStoredValue ? [new Date(`${value}T00:00:00Z`)] : []), ...mondays]
     .map((monday) => toOption(monday, currentValue))
     .sort((left, right) => left.value.localeCompare(right.value));

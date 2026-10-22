@@ -230,4 +230,15 @@ describe("WeekPicker", () => {
       vi.useRealTimers();
     }
   });
+
+  it.each([
+    ["a far-future stored week", "2027-03-01", false],
+    ["a stored week 6 weeks in the past", "2026-09-07", true],
+  ])("still shows %s as the checked option", (_label, stored, isDisabled) => {
+    render(<WeekPicker id="week" value={stored} onChange={vi.fn()} now={new Date("2026-10-22T05:00:00Z")} />);
+    const radio = (screen.getAllByRole("radio") as HTMLInputElement[]).find((item) => item.value === stored);
+    expect(radio).toBeDefined();
+    expect(radio?.checked).toBe(true);
+    expect(radio?.disabled).toBe(isDisabled);
+  });
 });
