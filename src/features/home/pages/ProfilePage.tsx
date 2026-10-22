@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Pencil } from "lucide-react";
 import { MobileHeader } from "@/shared/components/bvc";
+import { useAuth } from "@/shared/context/AuthContext";
 
 const INSTRUMENTS = ["Đàn tranh", "Đàn bầu", "Tỳ bà", "Sáo trúc"];
 
@@ -20,6 +21,7 @@ const TOGGLE_SETTINGS = [
 ] as const;
 
 export function ProfilePage() {
+  const { logout } = useAuth();
   const [selectedInstrument, setSelectedInstrument] = useState(
     INSTRUMENTS[0],
   );
@@ -169,6 +171,7 @@ export function ProfilePage() {
         <div className="shrink-0 px-[16px] pb-[26px] pt-[14px]">
           <button
             type="button"
+            onClick={() => void logout()}
             className="h-[50px] w-full cursor-pointer rounded-[16px] border border-[#E6D29A] bg-bvc-accent-tint text-[15px] font-bold text-bvc-accent-text"
           >
             Đăng xuất
