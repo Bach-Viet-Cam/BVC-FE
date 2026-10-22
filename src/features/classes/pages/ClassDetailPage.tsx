@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { AssignmentList } from "@/features/classes/components/AssignmentList";
 import { ClassInfoPanel } from "@/features/classes/components/ClassInfoPanel";
+import { ClassProgressBoard } from "@/features/classes/components/ClassProgressBoard";
 import { type ClassTabKey, ClassTabs } from "@/features/classes/components/ClassTabs";
 import { ConfirmDialog } from "@/features/classes/components/ConfirmDialog";
 import { ListState } from "@/features/classes/components/ListState";
@@ -9,8 +10,8 @@ import { MembersTab } from "@/features/classes/components/MembersTab";
 import { RoadmapTab } from "@/features/classes/components/RoadmapTab";
 import { useClassActions } from "@/features/classes/hooks/useClassActions";
 import { useClassDetail } from "@/features/classes/hooks/useClassDetail";
-import { MobileHeader } from "@/shared/components/bvc/MobileHeader";
-import { MobileScreen } from "@/shared/components/bvc/MobileScreen";
+import { TeacherPageHeader } from "@/shared/components/bvc/TeacherPageHeader";
+import { TeacherScreen } from "@/shared/components/bvc/TeacherScreen";
 import { toast } from "@/shared/components/ui/toast";
 
 const TAB_KEYS: ClassTabKey[] = ["members", "roadmap", "assignments", "progress"];
@@ -38,38 +39,44 @@ export function ClassDetailPage() {
   };
 
   return (
-    <MobileScreen>
-      <MobileHeader
+    <TeacherScreen className="lg:overflow-hidden">
+      <TeacherPageHeader
         title={classDetail?.name ?? "Chi tiết lớp"}
         subtitle="Chi tiết lớp"
         onBack={() => navigate("/teacher/classes")}
       />
       {!classDetail ? (
-        <div className="px-[18px]">
+        <div className="px-[18px] lg:px-[32px] lg:pt-[22px]">
           <ListState isLoading={isLoading} error={error} isEmpty={false} emptyMessage="" onRetry={reload}>
             {null}
           </ListState>
         </div>
       ) : (
-        <>
-          <ClassInfoPanel classDetail={classDetail} onEndClass={() => setIsEndDialogOpen(true)} />
-          <ClassTabs
-            activeTab={activeTab}
-            onChange={(tab) => setSearchParams(tab === "members" ? {} : { tab }, { replace: true })}
-          />
-          {activeTab === "members" && <MembersTab classDetail={classDetail} onMembersChanged={reload} />}
-          {activeTab === "roadmap" && <RoadmapTab classId={classDetail.id} isClassFinished={classDetail.isReadOnly} />}
-          {activeTab === "assignments" && (
-            <AssignmentList classId={classDetail.id} canCreate={!classDetail.isReadOnly} />
-          )}
-          {activeTab === "progress" && (
-            // The progress tab comes with sub-project 4.
-            <p className="m-[18px] rounded-[18px] bg-bvc-soft p-[15px] text-[13.5px] text-bvc-muted">
-              Chức năng đang phát triển.
-            </p>
-          )}
-          <div className="mt-auto shrink-0 border-t border-bvc-border px-[18px] pb-[24px] pt-[12px] text-[12.5px] leading-[1.5] text-bvc-muted">
-            Cả lớp học {classDetail.instrument.name.toLowerCase()}, không chia nhóm.
+        // Web: class info on the left, tabs + tab content scrolling on the right. Phone: stacked.
+        <div className="flex flex-1 flex-col lg:min-h-0 lg:flex-row">
+          <aside className="flex shrink-0 flex-col lg:w-[360px] lg:overflow-y-auto lg:border-r lg:border-bvc-border-strong lg:bg-bvc-surface lg:p-[22px_20px]">
+            <ClassInfoPanel classDetail={classDetail} onEndClass={() => setIsEndDialogOpen(true)} />
+          </aside>
+          <div className="flex min-w-0 flex-1 flex-col lg:overflow-y-auto">
+            <ClassTabs
+              activeTab={activeTab}
+              onChange={(tab) => setSearchParams(tab === "members" ? {} : { tab }, { replace: true })}
+            />
+            {activeTab === "members" && <MembersTab classDetail={classDetail} onMembersChanged={reload} />}
+            {activeTab === "roadmap" && (
+              <RoadmapTab classId={classDetail.id} isClassFinished={classDetail.isReadOnly} />
+            )}
+            {activeTab === "assignments" && (
+              <AssignmentList classId={classDetail.id} canCreate={!classDetail.isReadOnly} />
+            )}
+            {activeTab === "progress" && (
+              <div className="px-[18px] pb-[18px] pt-[14px] lg:px-[32px] lg:pb-[24px] lg:pt-[20px]">
+                <ClassProgressBoard classId={classDetail.id} />
+              </div>
+            )}
+            <div className="mt-auto shrink-0 border-t border-bvc-border px-[18px] pb-[24px] pt-[12px] text-[12.5px] leading-[1.5] text-bvc-muted lg:px-[32px]">
+              Cả lớp học {classDetail.instrument.name.toLowerCase()}, không chia nhóm.
+            </div>
           </div>
           <ConfirmDialog
             isOpen={isEndDialogOpen}
@@ -80,8 +87,8 @@ export function ClassDetailPage() {
             onConfirm={confirmEndClass}
             onCancel={() => setIsEndDialogOpen(false)}
           />
-        </>
+        </div>
       )}
-    </MobileScreen>
+    </TeacherScreen>
   );
 }

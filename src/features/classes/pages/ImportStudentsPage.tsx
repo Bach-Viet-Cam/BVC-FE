@@ -3,8 +3,8 @@ import { ClassWriteGuard } from "@/features/classes/components/ClassWriteGuard";
 import { ImportStudentsPanel } from "@/features/classes/components/ImportStudentsPanel";
 import { useClassDetail } from "@/features/classes/hooks/useClassDetail";
 import { useImportStudents } from "@/features/classes/hooks/useImportStudents";
-import { MobileHeader } from "@/shared/components/bvc/MobileHeader";
-import { MobileScreen } from "@/shared/components/bvc/MobileScreen";
+import { TeacherPageHeader } from "@/shared/components/bvc/TeacherPageHeader";
+import { TeacherScreen } from "@/shared/components/bvc/TeacherScreen";
 import { toast } from "@/shared/components/ui/toast";
 
 export function ImportStudentsPage() {
@@ -35,8 +35,8 @@ export function ImportStudentsPage() {
   };
 
   return (
-    <MobileScreen>
-      <MobileHeader
+    <TeacherScreen>
+      <TeacherPageHeader
         title="Nhập danh sách SV"
         subtitle={
           classDetail ? `${classDetail.name} · ${classDetail.cohort} · ${classDetail.instrument.name}` : undefined
@@ -63,6 +63,6 @@ export function ImportStudentsPage() {
           />
         )}
       </ClassWriteGuard>
-    </MobileScreen>
+    </TeacherScreen>
   );
 }

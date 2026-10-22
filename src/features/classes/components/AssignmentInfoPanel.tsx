@@ -28,7 +28,7 @@ export function AssignmentInfoPanel({ assignment, isWorking = false, onAction }:
   const statusAction = STATUS_ACTION[assignment.status];
 
   return (
-    <section className="mx-[18px] mb-[14px] flex flex-col gap-[12px] rounded-[18px] bg-bvc-soft p-[14px]">
+    <section className="mx-[18px] mb-[14px] flex flex-col gap-[12px] rounded-[18px] bg-bvc-soft p-[14px] lg:m-0 lg:gap-[16px] lg:rounded-[20px] lg:border lg:border-bvc-border lg:bg-white lg:p-[18px]">
       <div className="flex flex-wrap items-center gap-[8px]">
         <StatusLabel label={ASSIGNMENT_STATUS_LABELS[assignment.status]} tone={STATUS_TONES[assignment.status]} />
         <span className="rounded-[8px] bg-white px-[9px] py-[4px] text-[12px]">

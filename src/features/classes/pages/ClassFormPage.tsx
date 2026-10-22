@@ -125,8 +125,8 @@ function ClassDesktopForm({
   });
 
   return (
-    <form onSubmit={submit} noValidate className="flex min-h-0 flex-1 flex-col">
-      <header className="flex shrink-0 items-center gap-4 border-b border-bvc-border-strong px-[32px] py-5">
+    <form onSubmit={submit} noValidate className="flex flex-1 flex-col lg:min-h-0">
+      <header className="flex shrink-0 items-center gap-[10px] border-b border-bvc-border-strong px-[18px] py-4 lg:gap-4 lg:px-[32px] lg:py-5">
         <button
           type="button"
           onClick={onCancel}
@@ -135,9 +135,11 @@ function ClassDesktopForm({
         >
           <ChevronLeft size={18} strokeWidth={2} className="text-bvc-ink" />
         </button>
-        <div className="flex flex-col gap-[3px]">
-          <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-bvc-muted">Lớp học</span>
-          <span className="text-[24px] font-extrabold tracking-[-0.025em] text-bvc-ink">
+        <div className="flex min-w-0 flex-col gap-[3px]">
+          <span className="hidden text-[12px] font-bold uppercase tracking-[0.14em] text-bvc-muted lg:block">
+            Lớp học
+          </span>
+          <span className="text-[18px] font-extrabold tracking-[-0.025em] text-bvc-ink lg:text-[24px]">
             {isCreate ? "Tạo lớp học" : "Sửa lớp học"}
           </span>
         </div>
@@ -146,7 +148,7 @@ function ClassDesktopForm({
             type="button"
             onClick={onCancel}
             disabled={isSaving}
-            className="flex min-h-[44px] cursor-pointer items-center rounded-[14px] border border-bvc-border-strong bg-white px-[18px] text-[14px] font-semibold text-bvc-ink disabled:cursor-not-allowed disabled:opacity-60"
+            className="hidden min-h-[44px] cursor-pointer items-center rounded-[14px] border border-bvc-border-strong bg-white px-[18px] text-[14px] font-semibold text-bvc-ink disabled:cursor-not-allowed disabled:opacity-60 sm:flex"
           >
             Hủy
           </button>
@@ -160,8 +162,8 @@ function ClassDesktopForm({
         </div>
       </header>
 
-      <main className="flex flex-1 overflow-hidden">
-        <div className="flex flex-1 flex-col gap-[18px] overflow-y-auto p-[22px_32px]">
+      <div className="flex flex-1 flex-col lg:min-h-0 lg:flex-row lg:overflow-hidden">
+        <div className="flex flex-1 flex-col gap-[18px] p-[18px] lg:overflow-y-auto lg:p-[22px_32px]">
           <div className="flex flex-col gap-[20px] rounded-[20px] border border-bvc-border bg-white p-[20px]">
             <div className="flex items-center justify-between">
               <span className="text-[15px] font-bold text-bvc-ink">Thông tin lớp học</span>
@@ -264,7 +266,7 @@ function ClassDesktopForm({
               />
             </Field>
 
-            <div className="grid grid-cols-2 gap-[14px]">
+            <div className="grid gap-[14px] sm:grid-cols-2">
               <Field id="class-start-date" label="Ngày bắt đầu" isRequired hint="Theo học kỳ đã chọn">
                 <input
                   id="class-start-date"
@@ -287,7 +289,7 @@ function ClassDesktopForm({
           </div>
         </div>
 
-        <aside className="flex w-[380px] shrink-0 flex-col gap-[20px] overflow-y-auto border-l border-bvc-border-strong bg-bvc-surface p-[22px_20px]">
+        <aside className="flex w-full shrink-0 flex-col gap-[20px] border-t border-bvc-border-strong bg-bvc-surface p-[18px] lg:w-[380px] lg:overflow-y-auto lg:border-l lg:border-t-0 lg:p-[22px_20px]">
           <div className="flex flex-col gap-[10px] rounded-[20px] border border-bvc-border bg-white p-[18px]">
             <span className="flex items-center gap-[8px] text-[15px] font-bold text-bvc-ink">
               <Users size={16} className="text-bvc-muted" />
@@ -317,7 +319,7 @@ function ClassDesktopForm({
             </ul>
           </div>
         </aside>
-      </main>
+      </div>
     </form>
   );
 }
@@ -348,9 +350,9 @@ export function ClassFormPage() {
   const isFinished = classDetail?.isReadOnly ?? false;
 
   return (
-    <div className="flex h-screen w-full flex-col overflow-hidden bg-white">
+    <div className="flex min-w-0 flex-1 flex-col bg-white lg:min-h-0 lg:overflow-hidden">
       {isLoading || loadError || isFinished ? (
-        <div className="p-[32px]">
+        <div className="p-[18px] lg:p-[32px]">
           <ListState
             isLoading={isLoading}
             error={loadError}

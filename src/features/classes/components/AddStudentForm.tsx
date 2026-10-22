@@ -34,7 +34,7 @@ export function AddStudentForm({ isSaving, onCancel, onSubmit }: AddStudentFormP
 
   return (
     <form onSubmit={submit} noValidate className="flex grow flex-col">
-      <div className="flex grow flex-col gap-[18px] px-[18px] pb-[18px] pt-[6px] md:max-w-xl">
+      <div className="flex grow flex-col gap-[18px] px-[18px] pb-[18px] pt-[6px] lg:m-[22px_32px] lg:max-w-[720px] lg:grow-0 lg:rounded-[20px] lg:border lg:border-bvc-border lg:p-[20px]">
         <FormField id="student-code" label="Mã sinh viên" isRequired error={errors.studentCode?.message}>
           <input
             id="student-code"

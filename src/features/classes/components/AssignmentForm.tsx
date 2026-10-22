@@ -69,7 +69,7 @@ export function AssignmentForm({
 
   return (
     <form onSubmit={submitWith(!isEdit)} noValidate className="flex grow flex-col">
-      <div className="flex grow flex-col gap-[16px] px-[18px] pb-[18px] pt-[6px] md:max-w-2xl">
+      <div className="flex grow flex-col gap-[16px] px-[18px] pb-[18px] pt-[6px] lg:m-[22px_32px] lg:max-w-[720px] lg:grow-0 lg:rounded-[20px] lg:border lg:border-bvc-border lg:p-[20px]">
         <FormField id="assignment-class" label="Lớp" isRequired error={errors.classId?.message}>
           {isEdit ? (
             <input id="assignment-class" value={className} readOnly className={INPUT_CLASSES} />

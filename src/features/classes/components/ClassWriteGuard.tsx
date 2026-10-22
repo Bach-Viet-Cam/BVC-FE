@@ -21,7 +21,7 @@ export function ClassWriteGuard({
 }: ClassWriteGuardProps) {
   if (!classDetail || classDetail.isReadOnly) {
     return (
-      <div className="px-[18px]">
+      <div className="px-[18px] lg:px-[32px] lg:pt-[22px]">
         <ListState
           isLoading={isLoading}
           error={error}
