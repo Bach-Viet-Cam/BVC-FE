@@ -163,19 +163,19 @@ export function AppRouter() {
             <Route path="/teacher/progress" element={<StudentProgressPage />} />
             <Route path="/teacher/assignments" element={<AssignmentListPage />} />
             <Route path="/categories" element={<CategoriesPage />} />
+            {/* M03 classes & members: web-first inside the lecturer shell */}
+            <Route path="/teacher/classes/new" element={<ClassFormPage />} />
+            <Route path="/teacher/classes/:classId" element={<ClassDetailPage />} />
+            <Route path="/teacher/classes/:classId/edit" element={<ClassFormPage />} />
+            <Route path="/teacher/classes/:classId/members/new" element={<AddStudentPage />} />
+            <Route path="/teacher/classes/:classId/import" element={<ImportStudentsPage />} />
+            <Route path="/teacher/assignments/new" element={<AssignmentFormPage />} />
+            <Route path="/teacher/assignments/:assignmentId/edit" element={<AssignmentFormPage />} />
+            <Route path="/teacher/assignments/:assignmentId" element={<TeacherAssignmentDetailPage />} />
+            <Route path="/teacher/assignments/:assignmentId/students/:studentId" element={<StudentSubmissionsPage />} />
           </Route>
-          {/* M03 classes & members */}
-          <Route path="/teacher/classes/new" element={<ClassFormPage />} />
-          <Route path="/teacher/classes/:classId" element={<ClassDetailPage />} />
-          <Route path="/teacher/classes/:classId/edit" element={<ClassFormPage />} />
-          <Route path="/teacher/classes/:classId/members/new" element={<AddStudentPage />} />
-          <Route path="/teacher/classes/:classId/import" element={<ImportStudentsPage />} />
-          <Route path="/teacher/assignments/:assignmentId/edit" element={<AssignmentFormPage />} />
-          <Route path="/teacher/assignments/:assignmentId" element={<TeacherAssignmentDetailPage />} />
-          <Route path="/teacher/assignments/:assignmentId/students/:studentId" element={<StudentSubmissionsPage />} />
           <Route path="/teacher/classes/:classId/assign" element={<EnsembleAssignPage />} />
           <Route path="/teacher/review" element={<ReviewPage />} />
-          <Route path="/teacher/assignments/new" element={<AssignmentFormPage />} />
           <Route path="/teacher/student-review" element={<StudentReviewPage />} />
 
           {/* M02 - quản lý bài hát (trang tự bọc TeacherShell) */}

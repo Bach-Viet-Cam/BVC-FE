@@ -19,7 +19,7 @@ export function ClassTabs({ activeTab, onChange }: ClassTabsProps) {
     <nav
       aria-label="Tab lớp"
       role="tablist"
-      className="flex shrink-0 justify-center gap-[22px] no-scrollbar overflow-x-auto overflow-y-hidden border-b border-bvc-border px-[18px]"
+      className="flex shrink-0 justify-center gap-[22px] no-scrollbar overflow-x-auto overflow-y-hidden border-b border-bvc-border bg-white px-[18px] lg:sticky lg:top-0 lg:z-10 lg:justify-start lg:gap-[28px] lg:px-[32px] lg:pt-[8px]"
     >
       {TABS.map((tab) => {
         const isActive = tab.key === activeTab;

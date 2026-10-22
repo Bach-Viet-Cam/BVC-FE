@@ -6,9 +6,10 @@ import { useLecturerClasses } from "@/features/classes/hooks/useLecturerClasses"
 import { useSaveAssignment } from "@/features/classes/hooks/useSaveAssignment";
 import { type ApiFieldError } from "@/features/classes/types/classTypes";
 import { type AssignmentContentPayload } from "@/features/classes/types/teacherAssignmentTypes";
+import { ASSIGNMENT_KIND_LABELS } from "@/features/classes/utils/teacherAssignmentFormat";
 import { EMPTY_ASSIGNMENT_FORM, toAssignmentFormValues } from "@/features/classes/utils/validateAssignment";
-import { MobileHeader } from "@/shared/components/bvc/MobileHeader";
-import { MobileScreen } from "@/shared/components/bvc/MobileScreen";
+import { TeacherPageHeader } from "@/shared/components/bvc/TeacherPageHeader";
+import { TeacherScreen } from "@/shared/components/bvc/TeacherScreen";
 import { toast } from "@/shared/components/ui/toast";
 
 export function AssignmentFormPage() {
@@ -20,6 +21,7 @@ export function AssignmentFormPage() {
   const { classes, isLoading: isClassesLoading } = useLecturerClasses();
   const { saveAssignment, isSaving } = useSaveAssignment(assignmentId);
   const presetClassId = searchParams.get("classId") ?? "";
+  const presetKind = searchParams.get("kind") ?? "";
   const backPath = assignmentId ? `/teacher/assignments/${assignmentId}` : "/teacher/assignments";
   // New assignments only go to active classes; when editing, the class is fixed.
   const formClasses = isEdit ? classes : classes.filter((item) => item.status === "ACTIVE");
@@ -41,17 +43,21 @@ export function AssignmentFormPage() {
   const isPageLoading = isClassesLoading || (isEdit && isLoading);
   const initialValues = assignment
     ? toAssignmentFormValues(assignment)
-    : { ...EMPTY_ASSIGNMENT_FORM, classId: presetClassId };
+    : {
+        ...EMPTY_ASSIGNMENT_FORM,
+        classId: presetClassId,
+        kind: presetKind in ASSIGNMENT_KIND_LABELS ? presetKind : "",
+      };
 
   return (
-    <MobileScreen>
-      <MobileHeader
+    <TeacherScreen>
+      <TeacherPageHeader
         title={isEdit ? "Sửa bài tập" : "Tạo bài tập"}
         subtitle={assignment?.title}
         onBack={() => navigate(backPath)}
       />
       {isPageLoading || (isEdit && (error || !assignment)) ? (
-        <div className="px-[18px]">
+        <div className="px-[18px] lg:px-[32px] lg:pt-[22px]">
           <ListState isLoading={isPageLoading} error={error} isEmpty={false} emptyMessage="" onRetry={reload}>
             {null}
           </ListState>
@@ -68,6 +74,6 @@ export function AssignmentFormPage() {
           onSubmit={handleSubmit}
         />
       )}
-    </MobileScreen>
+    </TeacherScreen>
   );
 }

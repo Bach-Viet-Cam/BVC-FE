@@ -6,8 +6,8 @@ import { ConfirmDialog } from "@/features/classes/components/ConfirmDialog";
 import { ListState } from "@/features/classes/components/ListState";
 import { useAssignmentActions } from "@/features/classes/hooks/useAssignmentActions";
 import { useTeacherAssignmentDetail } from "@/features/classes/hooks/useTeacherAssignmentDetail";
-import { MobileHeader } from "@/shared/components/bvc/MobileHeader";
-import { MobileScreen } from "@/shared/components/bvc/MobileScreen";
+import { TeacherPageHeader } from "@/shared/components/bvc/TeacherPageHeader";
+import { TeacherScreen } from "@/shared/components/bvc/TeacherScreen";
 import { toast } from "@/shared/components/ui/toast";
 
 export function TeacherAssignmentDetailPage() {
@@ -49,36 +49,41 @@ export function TeacherAssignmentDetailPage() {
   };
 
   return (
-    <MobileScreen>
-      <MobileHeader
+    <TeacherScreen className="lg:overflow-hidden">
+      <TeacherPageHeader
         title={assignment?.title ?? "Chi tiết bài tập"}
         subtitle="Chi tiết bài tập"
         onBack={() => navigate("/teacher/assignments")}
       />
       {!assignment ? (
-        <div className="px-[18px]">
+        <div className="px-[18px] lg:px-[32px] lg:pt-[22px]">
           <ListState isLoading={isLoading} error={error} isEmpty={false} emptyMessage="" onRetry={reload}>
             {null}
           </ListState>
         </div>
       ) : (
-        <>
-          <AssignmentInfoPanel assignment={assignment} isWorking={isWorking} onAction={handleAction} />
-          <h2 className="m-0 px-[18px] pb-[8px] text-[16px] font-extrabold">
-            Sinh viên ({assignment.students.length})
-          </h2>
-          <div className="flex flex-col gap-[10px] px-[18px] pb-[22px]">
-            {assignment.students.length === 0 ? (
-              <p className="m-0 rounded-[18px] bg-bvc-soft p-[15px] text-[13.5px] text-bvc-muted">
-                Lớp chưa có sinh viên.
-              </p>
-            ) : (
-              <div className="grid gap-[10px] lg:grid-cols-2">
-                {assignment.students.map((student) => (
-                  <AssignmentStudentRow key={student.studentId} assignmentId={assignment.id} student={student} />
-                ))}
-              </div>
-            )}
+        // Web: assignment info on the left, the student list scrolling on the right. Phone: stacked.
+        <div className="flex flex-1 flex-col lg:min-h-0 lg:flex-row">
+          <aside className="flex shrink-0 flex-col lg:w-[360px] lg:overflow-y-auto lg:border-r lg:border-bvc-border-strong lg:bg-bvc-surface lg:p-[22px_20px]">
+            <AssignmentInfoPanel assignment={assignment} isWorking={isWorking} onAction={handleAction} />
+          </aside>
+          <div className="flex min-w-0 flex-1 flex-col lg:overflow-y-auto lg:pt-[22px]">
+            <h2 className="m-0 px-[18px] pb-[8px] text-[16px] font-extrabold lg:px-[32px]">
+              Sinh viên ({assignment.students.length})
+            </h2>
+            <div className="flex flex-col gap-[10px] px-[18px] pb-[22px] lg:px-[32px]">
+              {assignment.students.length === 0 ? (
+                <p className="m-0 rounded-[18px] bg-bvc-soft p-[15px] text-[13.5px] text-bvc-muted">
+                  Lớp chưa có sinh viên.
+                </p>
+              ) : (
+                <div className="grid gap-[10px] lg:grid-cols-2 2xl:grid-cols-3">
+                  {assignment.students.map((student) => (
+                    <AssignmentStudentRow key={student.studentId} assignmentId={assignment.id} student={student} />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           <ConfirmDialog
             isOpen={pendingAction !== null}
@@ -93,8 +98,8 @@ export function TeacherAssignmentDetailPage() {
             onConfirm={confirmPending}
             onCancel={() => setPendingAction(null)}
           />
-        </>
+        </div>
       )}
-    </MobileScreen>
+    </TeacherScreen>
   );
 }
