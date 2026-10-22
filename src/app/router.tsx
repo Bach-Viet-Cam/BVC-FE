@@ -52,7 +52,6 @@ import { EnsembleAssignPage } from "@/features/classes/pages/EnsembleAssignPage"
 import { RoadmapPage } from "@/features/classes/pages/RoadmapPage";
 import { ReviewPage } from "@/features/classes/pages/ReviewPage";
 import { StudentProgressPage } from "@/features/classes/pages/StudentProgressPage";
-import { TeacherStudentProgressPage } from "@/features/classes/pages/TeacherStudentProgressPage";
 import { AssignmentFormPage } from "@/features/classes/pages/AssignmentFormPage";
 import { ClassDetailPage } from "@/features/classes/pages/ClassDetailPage";
 import { AddStudentPage } from "@/features/classes/pages/AddStudentPage";
@@ -171,7 +170,6 @@ export function AppRouter() {
           <Route path="/teacher/classes/:classId/edit" element={<ClassFormPage />} />
           <Route path="/teacher/classes/:classId/members/new" element={<AddStudentPage />} />
           <Route path="/teacher/classes/:classId/import" element={<ImportStudentsPage />} />
-          <Route path="/teacher/classes/:classId/students/:studentId" element={<TeacherStudentProgressPage />} />
           <Route path="/teacher/assignments/:assignmentId/edit" element={<AssignmentFormPage />} />
           <Route path="/teacher/assignments/:assignmentId" element={<TeacherAssignmentDetailPage />} />
           <Route path="/teacher/assignments/:assignmentId/students/:studentId" element={<StudentSubmissionsPage />} />
