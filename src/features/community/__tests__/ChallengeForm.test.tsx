@@ -2,7 +2,7 @@ import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AxiosError } from "axios";
 import { MemoryRouter } from "react-router-dom";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { challengeApi } from "@/features/community/api/challengeApi";
 import { ChallengeForm } from "@/features/community/components/ChallengeForm";
 import { WeekPicker } from "@/features/community/components/WeekPicker";
@@ -191,9 +191,19 @@ describe("ChallengeForm", () => {
 });
 
 describe("WeekPicker", () => {
+  const originalTimezone = process.env.TZ;
+  // Run in a zone far from UTC+7 so browser-local date maths would give a different week.
+  beforeAll(() => {
+    process.env.TZ = "America/Los_Angeles";
+  });
+  afterAll(() => {
+    if (originalTimezone === undefined) delete process.env.TZ;
+    else process.env.TZ = originalTimezone;
+  });
+
   it("offers only Monday-start weeks and disables past weeks", () => {
     // Thursday 2026-10-22: the current week starts Monday 2026-10-19.
-    render(<WeekPicker id="week" value="" onChange={vi.fn()} now={new Date(2026, 9, 22)} />);
+    render(<WeekPicker id="week" value="" onChange={vi.fn()} now={new Date("2026-10-22T05:00:00Z")} />);
     const radios = screen.getAllByRole("radio") as HTMLInputElement[];
     expect(radios.length).toBeGreaterThan(4);
     for (const radio of radios) {
@@ -202,5 +212,22 @@ describe("WeekPicker", () => {
     }
     expect(radios.some((radio) => radio.value === "2026-10-19" && !radio.disabled)).toBe(true);
     expect(radios.some((radio) => radio.value < "2026-10-19")).toBe(true);
+  });
+
+  it("uses the UTC+7 calendar for the current week, whatever the machine timezone", () => {
+    // 2026-10-25T17:30Z is Monday 26/10/2026 00:30 in UTC+7 but still Sunday in UTC and the Americas.
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-25T17:30:00Z"));
+    try {
+      render(<WeekPicker id="week" value="" onChange={vi.fn()} />);
+      const radios = screen.getAllByRole("radio") as HTMLInputElement[];
+      const byValue = (value: string) => radios.find((radio) => radio.value === value);
+      expect(byValue("2026-10-26")?.disabled).toBe(false);
+      expect(byValue("2026-10-19")?.disabled).toBe(true);
+      expect(radios.filter((radio) => !radio.disabled)[0].value).toBe("2026-10-26");
+      expect(screen.getByLabelText("26/10 - 01/11/2026")).toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

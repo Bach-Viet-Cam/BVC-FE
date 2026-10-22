@@ -1,8 +1,10 @@
-import { addWeeks, format, parseISO, startOfWeek } from "date-fns";
 import { cn } from "@/shared/utils/cn";
 
 const PAST_WEEKS_SHOWN = 2;
 const FUTURE_WEEKS_SHOWN = 8;
+const VIETNAM_OFFSET_MS = 7 * 60 * 60 * 1000;
+const DAY_MS = 24 * 60 * 60 * 1000;
+const WEEK_MS = 7 * DAY_MS;
 
 interface WeekPickerProps {
   id: string;
@@ -20,25 +22,43 @@ interface WeekOption {
   isPast: boolean;
 }
 
+function pad(value: number): string {
+  return String(value).padStart(2, "0");
+}
+
+// Weeks are Monday to Sunday in UTC+7 (as on the server). Each week is the UTC midnight of its Monday
+// calendar date, so no browser-local date arithmetic is involved.
+function isoDate(date: Date): string {
+  return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}`;
+}
+
+function currentVietnamMonday(now: Date): Date {
+  const shifted = new Date(now.getTime() + VIETNAM_OFFSET_MS);
+  const today = Date.UTC(shifted.getUTCFullYear(), shifted.getUTCMonth(), shifted.getUTCDate());
+  return new Date(today - ((shifted.getUTCDay() + 6) % 7) * DAY_MS);
+}
+
 function toOption(monday: Date, currentValue: string): WeekOption {
-  const sunday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6);
+  const sunday = new Date(monday.getTime() + 6 * DAY_MS);
+  const value = isoDate(monday);
   return {
-    value: format(monday, "yyyy-MM-dd"),
-    label: `${format(monday, "dd/MM")} - ${format(sunday, "dd/MM/yyyy")}`,
-    isPast: format(monday, "yyyy-MM-dd") < currentValue,
+    value,
+    label: `${pad(monday.getUTCDate())}/${pad(monday.getUTCMonth() + 1)} - ${pad(sunday.getUTCDate())}/${pad(sunday.getUTCMonth() + 1)}/${sunday.getUTCFullYear()}`,
+    isPast: value < currentValue,
   };
 }
 
 // Hand-built list of Monday-start weeks: the current week plus the next ones; earlier weeks are disabled.
 export function WeekPicker({ id, value, onChange, hasError = false, now = new Date() }: WeekPickerProps) {
-  const currentMonday = startOfWeek(now, { weekStartsOn: 1 });
-  const currentValue = format(currentMonday, "yyyy-MM-dd");
-  const mondays = Array.from({ length: PAST_WEEKS_SHOWN + 1 + FUTURE_WEEKS_SHOWN }, (_, index) =>
-    addWeeks(currentMonday, index - PAST_WEEKS_SHOWN)
+  const currentMonday = currentVietnamMonday(now);
+  const currentValue = isoDate(currentMonday);
+  const mondays = Array.from(
+    { length: PAST_WEEKS_SHOWN + 1 + FUTURE_WEEKS_SHOWN },
+    (_, index) => new Date(currentMonday.getTime() + (index - PAST_WEEKS_SHOWN) * WEEK_MS)
   );
   // A stored draft week may fall outside the window: still show it so the selection is visible.
-  const hasStoredValue = value !== "" && !mondays.some((monday) => format(monday, "yyyy-MM-dd") === value);
-  const options = [...(hasStoredValue ? [parseISO(value)] : []), ...mondays]
+  const hasStoredValue = /^d{4}-d{2}-d{2}$/.test(value) && !mondays.some((monday) => isoDate(monday) === value);
+  const options = [...(hasStoredValue ? [new Date(`${value}T00:00:00Z`)] : []), ...mondays]
     .map((monday) => toOption(monday, currentValue))
     .sort((left, right) => left.value.localeCompare(right.value));
 
