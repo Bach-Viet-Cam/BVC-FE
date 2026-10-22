@@ -1,5 +1,5 @@
 import { classesApi } from "@/features/classes/api/classesApi";
-import { useApiQuery } from "@/features/classes/hooks/useApiQuery";
+import { useApiQuery } from "@/shared/hooks/useApiQuery";
 
 export function useSemesters() {
   const { data, error, isLoading } = useApiQuery("semesters", async () => (await classesApi.listSemesters()).data.data);

@@ -83,6 +83,7 @@ import { BonusListPage } from "@/features/community/pages/BonusListPage";
 import { BonusDetailPage } from "@/features/community/pages/BonusDetailPage";
 import { BonusSubmitPage } from "@/features/community/pages/BonusSubmitPage";
 import { LeaderboardPage } from "@/features/community/pages/LeaderboardPage";
+import { LeaderboardDesktopPage } from "@/features/community/pages/LeaderboardDesktopPage";
 import { ChallengesPage } from "@/features/community/pages/ChallengesPage";
 import { ChallengeDetailPage } from "@/features/community/pages/ChallengeDetailPage";
 
@@ -210,6 +211,7 @@ export function AppRouter() {
         <Route element={<ProtectedRoute allowedRoles={[ROLES.TEACHER, ROLES.SYSTEM_ADMIN]} />}>
           <Route element={<DesktopLayout />}>
             <Route path="/community/verified" element={<VerifiedContentPage />} />
+            <Route path="/leaderboard" element={<LeaderboardDesktopPage />} />
           </Route>
         </Route>
 

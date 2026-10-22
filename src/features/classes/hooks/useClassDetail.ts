@@ -1,5 +1,5 @@
 import { classesApi } from "@/features/classes/api/classesApi";
-import { useApiQuery } from "@/features/classes/hooks/useApiQuery";
+import { useApiQuery } from "@/shared/hooks/useApiQuery";
 import { parseApiError } from "@/features/classes/utils/mapApiErrors";
 
 export function useClassDetail(classId: string | undefined) {

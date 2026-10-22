@@ -1,5 +1,5 @@
 import { classesApi } from "@/features/classes/api/classesApi";
-import { useApiQuery } from "@/features/classes/hooks/useApiQuery";
+import { useApiQuery } from "@/shared/hooks/useApiQuery";
 
 // All classes of the lecturer (any status) for filters and the assignment form.
 export function useLecturerClasses() {

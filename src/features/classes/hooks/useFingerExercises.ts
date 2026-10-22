@@ -1,5 +1,5 @@
 import { roadmapsApi } from "@/features/classes/api/roadmapsApi";
-import { useApiQuery } from "@/features/classes/hooks/useApiQuery";
+import { useApiQuery } from "@/shared/hooks/useApiQuery";
 
 export function useFingerExercises(instrumentId: string | null, query: string) {
   const { data, error, isLoading } = useApiQuery(

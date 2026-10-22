@@ -1,5 +1,5 @@
 import { assignmentsApi } from "@/features/classes/api/assignmentsApi";
-import { useApiQuery } from "@/features/classes/hooks/useApiQuery";
+import { useApiQuery } from "@/shared/hooks/useApiQuery";
 import { parseApiError } from "@/features/classes/utils/mapApiErrors";
 
 export function useTeacherAssignmentDetail(assignmentId: string | undefined) {
