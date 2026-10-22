@@ -165,6 +165,8 @@ export function AppRouter() {
             <Route path="/teacher/progress" element={<StudentProgressPage />} />
             <Route path="/teacher/assignments" element={<AssignmentListPage />} />
             <Route path="/teacher/challenges" element={<LecturerChallengesPage />} />
+            <Route path="/teacher/challenges/new" element={<ChallengeFormPage />} />
+            <Route path="/teacher/challenges/:id/edit" element={<ChallengeFormPage />} />
             <Route path="/categories" element={<CategoriesPage />} />
             {/* M03 classes & members: web-first inside the lecturer shell */}
             <Route path="/teacher/classes/new" element={<ClassFormPage />} />
@@ -189,7 +191,6 @@ export function AppRouter() {
 
           {/* Community - desktop */}
           <Route path="/community/bonus/new" element={<BonusFormPage />} />
-          <Route path="/community/challenges/new" element={<ChallengeFormPage />} />
         </Route>
 
         {/* Quản trị viên - màn hình desktop */}
