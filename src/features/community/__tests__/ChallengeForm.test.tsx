@@ -191,14 +191,12 @@ describe("ChallengeForm", () => {
 });
 
 describe("WeekPicker", () => {
-  const originalTimezone = process.env.TZ;
   // Run in a zone far from UTC+7 so browser-local date maths would give a different week.
   beforeAll(() => {
-    process.env.TZ = "America/Los_Angeles";
+    vi.stubEnv("TZ", "America/Los_Angeles");
   });
   afterAll(() => {
-    if (originalTimezone === undefined) delete process.env.TZ;
-    else process.env.TZ = originalTimezone;
+    vi.unstubAllEnvs();
   });
 
   it("offers only Monday-start weeks and disables past weeks", () => {
