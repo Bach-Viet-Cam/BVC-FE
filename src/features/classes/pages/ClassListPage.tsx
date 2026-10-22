@@ -1,100 +1,121 @@
-import { useMemo, useState } from "react";
-import { Plus } from "lucide-react";
-import { Link } from "react-router-dom";
-import { ClassCard } from "@/features/classes/components/ClassCard";
-import { FilterSelect } from "@/features/classes/components/FilterSelect";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ListState } from "@/features/classes/components/ListState";
-import { SearchInput } from "@/features/classes/components/SearchInput";
 import { useClassList } from "@/features/classes/hooks/useClassList";
-import { useInstruments } from "@/features/classes/hooks/useInstruments";
-import { type ClassStatusFilter } from "@/features/classes/types/classTypes";
-import { MobileAppShell } from "@/shared/components/bvc/MobileAppShell";
-import { MobileScreen } from "@/shared/components/bvc/MobileScreen";
-import { useDebouncedValue } from "@/shared/hooks/useDebouncedValue";
+import { formatCurrentWeek } from "@/features/classes/utils/classFormat";
+import { DesktopPageHeader, StatCard } from "@/shared/components/bvc";
 
-const ALL = "ALL";
-const STATUS_OPTIONS = [
-  { value: ALL, label: "Tất cả" },
-  { value: "ACTIVE", label: "Hoạt động" },
-  { value: "FINISHED", label: "Đã kết thúc" },
-];
+const ALL_COHORTS = "ALL";
+const ROW_GRID = "grid grid-cols-[2.2fr_1.2fr_1fr_0.8fr_1fr_1.1fr_0.8fr] items-center gap-[14px] px-[20px]";
 
 export function ClassListPage() {
-  const [searchText, setSearchText] = useState("");
-  const [cohort, setCohort] = useState(ALL);
-  const [instrumentId, setInstrumentId] = useState(ALL);
-  const [status, setStatus] = useState<ClassStatusFilter>("ACTIVE");
-  const debouncedSearch = useDebouncedValue(searchText.trim());
-  const { instruments } = useInstruments();
-  const { result, isLoading, error, reload } = useClassList({
-    q: debouncedSearch,
-    cohort: cohort === ALL ? undefined : cohort,
-    instrumentId: instrumentId === ALL ? undefined : instrumentId,
-    status,
-  });
+  const navigate = useNavigate();
+  const [activeCohort, setActiveCohort] = useState<string>(ALL_COHORTS);
+  const { result, isLoading, error, reload } = useClassList({ status: "ALL" });
 
-  const cohortOptions = useMemo(
-    () => [{ value: ALL, label: "Tất cả" }, ...(result?.cohorts ?? []).map((item) => ({ value: item, label: item }))],
-    [result?.cohorts]
-  );
-  const instrumentOptions = useMemo(
-    () => [{ value: ALL, label: "Tất cả" }, ...instruments.map((item) => ({ value: item.id, label: item.name }))],
-    [instruments]
-  );
-  const hasNoClassAtAll = (result?.cohorts.length ?? 0) === 0;
-  const emptyMessage = hasNoClassAtAll ? "Bạn chưa có lớp học nào." : "Không tìm thấy lớp học phù hợp.";
+  const allClasses = result?.items ?? [];
+  const classes = activeCohort === ALL_COHORTS ? allClasses : allClasses.filter((cls) => cls.cohort === activeCohort);
+  const totalClasses = result?.pagination.total ?? 0;
+  const activeClasses = result?.activeCount ?? 0;
+  const totalStudents = allClasses.reduce((sum, cls) => sum + cls.memberCount, 0);
 
   return (
-    <MobileScreen>
-      <MobileAppShell />
-      <div className="flex shrink-0 items-end justify-between px-[18px] pb-[10px] pt-[16px]">
-        <div className="flex flex-col gap-[3px]">
-          <h1 className="m-0 text-[25px] font-extrabold tracking-[-0.025em]">Lớp học của tôi</h1>
-          <span className="text-[12.5px] text-bvc-muted">{result?.activeCount ?? 0} lớp đang hoạt động</span>
-        </div>
-        <Link
-          to="/teacher/classes/new"
-          className="inline-flex min-h-[44px] items-center justify-center gap-[8px] rounded-[14px] bg-bvc-ink px-[18px] text-[14px] font-semibold text-white"
-        >
-          <Plus size={16} strokeWidth={2} aria-hidden="true" /> Tạo mới
-        </Link>
-      </div>
-      <div className="flex shrink-0 px-[18px] pb-[10px]">
-        <SearchInput id="class-search" label="Tìm lớp" value={searchText} onChange={setSearchText} />
-      </div>
-      <div className="no-scrollbar flex shrink-0 gap-[7px] overflow-x-auto px-[18px] pb-[12px]">
-        <FilterSelect label="Khóa" value={cohort} allValue={ALL} options={cohortOptions} onChange={setCohort} />
-        <FilterSelect
-          label="Nhạc cụ"
-          value={instrumentId}
-          allValue={ALL}
-          options={instrumentOptions}
-          onChange={setInstrumentId}
+    <>
+      <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <DesktopPageHeader
+          breadcrumb="Lớp học"
+          title="Danh sách lớp học"
+          actions={
+            <>
+              <div className="flex gap-2">
+                {[ALL_COHORTS, ...(result?.cohorts ?? [])].map((cohort) => (
+                  <button
+                    key={cohort}
+                    type="button"
+                    onClick={() => setActiveCohort(cohort)}
+                    className={
+                      activeCohort === cohort
+                        ? "cursor-pointer rounded-[11px] bg-bvc-ink px-3 py-1.5 text-[13px] font-bold text-white"
+                        : "cursor-pointer rounded-[11px] border border-bvc-border-strong px-3 py-1.5 text-[13px] text-bvc-muted"
+                    }
+                  >
+                    {cohort === ALL_COHORTS ? "Tất cả" : cohort}
+                  </button>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => navigate("/teacher/classes/new")}
+                className="flex min-h-[44px] cursor-pointer items-center rounded-[14px] bg-bvc-ink px-[18px] text-[14px] font-bold text-white"
+              >
+                Tạo lớp mới
+              </button>
+            </>
+          }
         />
-        <FilterSelect
-          label="Trạng thái"
-          value={status}
-          allValue={ALL}
-          options={STATUS_OPTIONS}
-          onChange={(value) => setStatus(value as ClassStatusFilter)}
-        />
-      </div>
-      <div className="flex grow flex-col gap-[10px] px-[18px] pb-[22px]">
-        <ListState
-          isLoading={isLoading}
-          error={error}
-          isEmpty={(result?.items.length ?? 0) === 0}
-          emptyMessage={emptyMessage}
-          onRetry={reload}
-        >
-          <div className="grid gap-[10px] lg:grid-cols-2">
-            {result?.items.map((classSummary) => (
-              <ClassCard key={classSummary.id} classSummary={classSummary} />
-            ))}
+
+        <div className="flex flex-1 flex-col gap-[18px] overflow-y-auto p-[22px_32px_26px]">
+          <div className="grid grid-cols-4 gap-[12px]">
+            <StatCard label="Tổng lớp" value={String(totalClasses)} />
+            <StatCard label="Đang hoạt động" value={String(activeClasses)} variant="ok" />
+            <StatCard label="Kết thúc" value={String(totalClasses - activeClasses)} variant="surface" />
+            <StatCard label="Sinh viên" value={String(totalStudents)} />
           </div>
-        </ListState>
-        <span className="text-[12.5px] text-bvc-muted">Chỉ hiện lớp do bạn phụ trách.</span>
-      </div>
-    </MobileScreen>
+
+          <ListState
+            isLoading={isLoading}
+            error={error}
+            isEmpty={classes.length === 0}
+            emptyMessage="Bạn chưa có lớp học nào."
+            onRetry={reload}
+            skeletonCount={4}
+          >
+            <div className="flex flex-1 flex-col overflow-hidden rounded-[20px] border border-bvc-border bg-white">
+              <div
+                className={`${ROW_GRID} h-[46px] shrink-0 border-b border-bvc-border bg-bvc-surface text-[12px] font-bold uppercase tracking-[0.08em] text-bvc-muted`}
+              >
+                <span>Tên lớp</span>
+                <span>Nhạc cụ</span>
+                <span>Khóa</span>
+                <span>Sĩ số</span>
+                <span>Tuần hiện tại</span>
+                <span>Trạng thái</span>
+                <span>Hành động</span>
+              </div>
+
+              {classes.map((cls) => (
+                <div key={cls.id} className={`${ROW_GRID} h-[54px] border-b border-bvc-line text-[14px] last:border-0`}>
+                  <span className="truncate font-semibold text-bvc-ink">{cls.name}</span>
+                  <span className="text-bvc-ink">{cls.instrument.name}</span>
+                  <span className="text-bvc-muted">{cls.cohort}</span>
+                  <span className="font-mono text-bvc-ink">{cls.memberCount}</span>
+                  <span className="font-mono text-bvc-ink">{formatCurrentWeek(cls.startDate, cls.status)}</span>
+                  <span className="flex items-center gap-[6px] text-[13px] text-bvc-ink">
+                    {cls.status === "ACTIVE" ? (
+                      <>
+                        <span className="size-[7px] shrink-0 rounded-full bg-bvc-ok" />
+                        Đang học
+                      </>
+                    ) : (
+                      <>
+                        <span className="size-[7px] shrink-0 rounded-full bg-bvc-bar-strong" />
+                        Kết thúc
+                      </>
+                    )}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/teacher/classes/${cls.id}`)}
+                    className="cursor-pointer text-left text-[13px] font-semibold text-bvc-accent-text"
+                  >
+                    Xem lớp
+                  </button>
+                </div>
+              ))}
+            </div>
+          </ListState>
+        </div>
+      </main>
+    </>
   );
 }

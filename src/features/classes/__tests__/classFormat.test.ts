@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   calculateEndDate,
+  formatCurrentWeek,
   formatDateRange,
   formatIsoDate,
   maskDateInput,
@@ -13,6 +14,14 @@ describe("classFormat", () => {
   it("computes the end date as start + 6 weeks", () => {
     expect(calculateEndDate("2026-09-01")).toBe("2026-10-13");
     expect(calculateEndDate("")).toBe("");
+  });
+
+  it("formats the current week of a class out of 6", () => {
+    expect(formatCurrentWeek("2026-09-30", "ACTIVE", "2026-09-30")).toBe("1/6");
+    expect(formatCurrentWeek("2026-09-30", "ACTIVE", "2026-10-21")).toBe("4/6");
+    expect(formatCurrentWeek("2026-09-30", "ACTIVE", "2026-12-31")).toBe("6/6");
+    expect(formatCurrentWeek("2026-11-01", "ACTIVE", "2026-10-21")).toBe("-");
+    expect(formatCurrentWeek("2026-09-30", "ENDED", "2026-10-02")).toBe("6/6");
   });
 
   it("formats dates as dd/MM/yyyy and card ranges as dd/mm – dd/mm/yyyy", () => {

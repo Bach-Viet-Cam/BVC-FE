@@ -3,7 +3,7 @@ import {
   type AssignmentBase,
   type AssignmentContentPayload,
   type CreateAssignmentPayload,
-} from "@/features/classes/types/assignmentTypes";
+} from "@/features/classes/types/teacherAssignmentTypes";
 
 const TITLE_MAX = 200;
 const DESCRIPTION_MAX = 1000;

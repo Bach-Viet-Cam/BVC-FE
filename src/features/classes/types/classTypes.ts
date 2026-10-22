@@ -1,4 +1,4 @@
-export type ClassStatus = "ACTIVE" | "FINISHED";
+export type ClassStatus = "ACTIVE" | "ENDED";
 export type ClassStatusFilter = ClassStatus | "ALL";
 export type AccountStatus = "PENDING" | "ACTIVE" | "LOCKED";
 export type AccountStatusFilter = "ALL" | "ACTIVE" | "PENDING";

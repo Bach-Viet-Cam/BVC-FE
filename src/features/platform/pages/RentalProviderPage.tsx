@@ -3,11 +3,11 @@ import { DesktopPageHeader, StatCard } from "@/shared/components/bvc";
 const INSTRUMENTS = [
   { name: "Đàn tranh 16 dây", condition: "Tốt", price: "350.000₫", status: "Đang thuê", tenant: "Trần Minh Anh" },
   { name: "Đàn tranh 17 dây", condition: "Tốt", price: "420.000₫", status: "Đang thuê", tenant: "Lê Quốc Bảo" },
-  { name: "Đàn bầu gỗ trắc", condition: "Khá tốt", price: "280.000₫", status: "Còn trống", tenant: "—" },
+  { name: "Đàn bầu gỗ trắc", condition: "Khá tốt", price: "280.000₫", status: "Còn trống", tenant: "-" },
   { name: "Đàn nhị cao cấp", condition: "Tốt", price: "200.000₫", status: "Đang thuê", tenant: "Phạm Gia Hân" },
-  { name: "Sáo trúc bạch dương", condition: "Mới", price: "120.000₫", status: "Còn trống", tenant: "—" },
+  { name: "Sáo trúc bạch dương", condition: "Mới", price: "120.000₫", status: "Còn trống", tenant: "-" },
   { name: "Đàn tỳ bà", condition: "Tốt", price: "380.000₫", status: "Đang thuê", tenant: "Nguyễn Gia Khánh" },
-  { name: "Đàn tranh 19 dây", condition: "Khá tốt", price: "460.000₫", status: "Còn trống", tenant: "—" },
+  { name: "Đàn tranh 19 dây", condition: "Khá tốt", price: "460.000₫", status: "Còn trống", tenant: "-" },
   { name: "Đàn bầu điện", condition: "Mới", price: "320.000₫", status: "Đang thuê", tenant: "Trần Bảo Châu" },
 ];
 
@@ -24,14 +24,20 @@ export function RentalProviderPage() {
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-white">
       <DesktopPageHeader
-        breadcrumb="M06 · Cho thuê nhạc cụ"
+        breadcrumb="Cho thuê nhạc cụ"
         title="Quản lý cho thuê"
         actions={
           <>
-            <button type="button" className="min-h-[42px] cursor-pointer rounded-[14px] border border-bvc-border-strong bg-white px-[16px] text-[14px] font-semibold text-bvc-ink">
+            <button
+              type="button"
+              className="min-h-[42px] cursor-pointer rounded-[14px] border border-bvc-border-strong bg-white px-[16px] text-[14px] font-semibold text-bvc-ink"
+            >
               + Thêm nhạc cụ
             </button>
-            <button type="button" className="min-h-[42px] cursor-pointer rounded-[14px] bg-bvc-ink px-[16px] text-[14px] font-bold text-white">
+            <button
+              type="button"
+              className="min-h-[42px] cursor-pointer rounded-[14px] bg-bvc-ink px-[16px] text-[14px] font-bold text-white"
+            >
               Xem đơn hàng
             </button>
           </>
@@ -53,7 +59,10 @@ export function RentalProviderPage() {
           <div className="flex flex-1 flex-col overflow-hidden rounded-[20px] border border-bvc-border bg-white">
             <div className="flex shrink-0 items-center justify-between border-b border-bvc-border px-[18px] py-[15px]">
               <span className="text-[15px] font-bold">Danh sách nhạc cụ</span>
-              <button type="button" className="min-h-[38px] cursor-pointer rounded-[12px] border border-bvc-border-strong bg-white px-[12px] text-[13px]">
+              <button
+                type="button"
+                className="min-h-[38px] cursor-pointer rounded-[12px] border border-bvc-border-strong bg-white px-[12px] text-[13px]"
+              >
                 + Thêm nhạc cụ
               </button>
             </div>
@@ -77,18 +86,12 @@ export function RentalProviderPage() {
                   <span
                     className="size-[7px] shrink-0 rounded-full"
                     style={{
-                      backgroundColor:
-                        inst.status === "Còn trống"
-                          ? "var(--color-bvc-ok)"
-                          : "var(--color-bvc-warn)",
+                      backgroundColor: inst.status === "Còn trống" ? "var(--color-bvc-ok)" : "var(--color-bvc-warn)",
                     }}
                   />
                   <span
                     style={{
-                      color:
-                        inst.status === "Còn trống"
-                          ? "var(--color-bvc-ok)"
-                          : "var(--color-bvc-warn)",
+                      color: inst.status === "Còn trống" ? "var(--color-bvc-ok)" : "var(--color-bvc-warn)",
                     }}
                   >
                     {inst.status}
@@ -126,7 +129,10 @@ export function RentalProviderPage() {
                     <span className="text-[14px] font-semibold">{req.name}</span>
                     <span className="text-[12px] text-bvc-muted">{req.instrument}</span>
                   </div>
-                  <button type="button" className="min-h-[34px] cursor-pointer rounded-[11px] border border-bvc-border-strong bg-white px-[10px] text-[12.5px] font-semibold">
+                  <button
+                    type="button"
+                    className="min-h-[34px] cursor-pointer rounded-[11px] border border-bvc-border-strong bg-white px-[10px] text-[12.5px] font-semibold"
+                  >
                     Duyệt
                   </button>
                   <button type="button" className="cursor-pointer text-[12.5px] text-bvc-muted">
@@ -147,9 +153,8 @@ export function RentalProviderPage() {
                     className="w-full rounded-[4px]"
                     style={{
                       height: `${h}%`,
-                      backgroundColor: i === REVENUE_BARS.length - 1
-                        ? "var(--color-bvc-accent)"
-                        : "var(--color-bvc-bar)",
+                      backgroundColor:
+                        i === REVENUE_BARS.length - 1 ? "var(--color-bvc-accent)" : "var(--color-bvc-bar)",
                     }}
                   />
                   <span className="font-bvc-mono text-[10px] text-bvc-faint">{MONTHS[i]}</span>

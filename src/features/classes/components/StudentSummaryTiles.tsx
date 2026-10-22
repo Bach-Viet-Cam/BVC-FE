@@ -1,6 +1,6 @@
 import { StatusLabel } from "@/features/classes/components/StatusLabel";
-import { type StudentSummary } from "@/features/classes/types/progressTypes";
-import { formatPercent } from "@/features/classes/utils/assignmentFormat";
+import { type StudentSummary } from "@/features/classes/types/teacherProgressTypes";
+import { formatPercent } from "@/features/classes/utils/teacherAssignmentFormat";
 import { PROGRESS_STATUS_LABELS, PROGRESS_STATUS_TONES } from "@/features/classes/utils/progressFormat";
 
 interface StudentSummaryTilesProps {

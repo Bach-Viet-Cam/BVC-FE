@@ -5,12 +5,12 @@ import { ActionButton } from "@/features/classes/components/ActionButton";
 import { INPUT_CLASSES } from "@/features/classes/components/FormField";
 import { StatusLabel } from "@/features/classes/components/StatusLabel";
 import { type ApiFieldError } from "@/features/classes/types/classTypes";
-import { type StudentSubmission, type SubmissionStatus } from "@/features/classes/types/assignmentTypes";
+import { type StudentSubmission, type SubmissionStatus } from "@/features/classes/types/teacherAssignmentTypes";
 import {
   SUBMISSION_STATUS_LABELS,
   formatPercent,
   formatVietnamDateTime,
-} from "@/features/classes/utils/assignmentFormat";
+} from "@/features/classes/utils/teacherAssignmentFormat";
 import { applyFieldErrors } from "@/features/classes/utils/mapApiErrors";
 import { cn } from "@/shared/utils/cn";
 

@@ -11,7 +11,7 @@ import {
   type CreateAssignmentPayload,
   type StudentSubmissions,
   type SubmissionComment,
-} from "@/features/classes/types/assignmentTypes";
+} from "@/features/classes/types/teacherAssignmentTypes";
 
 export const assignmentsApi = {
   listAssignments: (params: AssignmentListParams) =>

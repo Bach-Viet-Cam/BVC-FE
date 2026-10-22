@@ -5,8 +5,8 @@ import { FooterActions } from "@/features/classes/components/FooterActions";
 import { FormField, INPUT_CLASSES } from "@/features/classes/components/FormField";
 import { useClassPieces } from "@/features/classes/hooks/useClassPieces";
 import { type ApiFieldError } from "@/features/classes/types/classTypes";
-import { type AssignmentContentPayload, type AssignmentPiece } from "@/features/classes/types/assignmentTypes";
-import { ASSIGNMENT_KIND_LABELS } from "@/features/classes/utils/assignmentFormat";
+import { type AssignmentContentPayload, type AssignmentPiece } from "@/features/classes/types/teacherAssignmentTypes";
+import { ASSIGNMENT_KIND_LABELS } from "@/features/classes/utils/teacherAssignmentFormat";
 import { applyFieldErrors } from "@/features/classes/utils/mapApiErrors";
 import {
   ASSIGNMENT_DESCRIPTION_MAX,

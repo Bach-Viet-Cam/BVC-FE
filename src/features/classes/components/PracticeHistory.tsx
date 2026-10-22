@@ -4,13 +4,13 @@ import { ActionButton } from "@/features/classes/components/ActionButton";
 import { INPUT_CLASSES } from "@/features/classes/components/FormField";
 import { ListState } from "@/features/classes/components/ListState";
 import { HISTORY_PAGE_LIMIT, useStudentHistory } from "@/features/classes/hooks/useStudentHistory";
-import { type HistoryItem } from "@/features/classes/types/progressTypes";
+import { type HistoryItem } from "@/features/classes/types/teacherProgressTypes";
 import {
   ASSIGNMENT_KIND_LABELS,
   SUBMISSION_STATUS_LABELS,
   formatPercent,
   formatVietnamDateTime,
-} from "@/features/classes/utils/assignmentFormat";
+} from "@/features/classes/utils/teacherAssignmentFormat";
 import { maskDateInput, parseVietnameseDate } from "@/features/classes/utils/classFormat";
 
 interface PracticeHistoryProps {

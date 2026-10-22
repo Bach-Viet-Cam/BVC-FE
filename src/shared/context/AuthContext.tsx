@@ -1,7 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { axiosClient } from "@/shared/api/axiosClient";
+import { authApi } from "@/features/auth/api/authApi";
+import { clearAsyncDataCache } from "@/shared/hooks/useAsyncData";
 
 export type UserInfo = {
   userId: string;
@@ -26,23 +27,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
+    let isMounted = true;
+    const restoreSession = async () => {
       try {
-        setUserState(JSON.parse(storedUser) as UserInfo);
+        const { data } = await authApi.refresh();
+        localStorage.setItem("accessToken", data.data.accessToken);
+        const me = await authApi.getMe();
+        if (isMounted) setUserState(me.data.data);
       } catch {
+        localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
+        if (isMounted) setUserState(null);
+      } finally {
+        if (isMounted) setIsLoading(false);
       }
-    }
-    setIsLoading(false);
+    };
+    void restoreSession();
+    return () => { isMounted = false; };
   }, []);
 
   const setUser = (nextUser: UserInfo | null) => {
-    setUserState(nextUser);
-    if (nextUser) {
-      localStorage.setItem("user", JSON.stringify(nextUser));
-      return;
+    if (!nextUser) {
+      for (const key of Object.keys(sessionStorage)) {
+        if (key.startsWith('audio-evaluation:')) sessionStorage.removeItem(key);
+      }
     }
+    // Dữ liệu cache (vd. cờ "đã lưu") thuộc về người xem trước, đổi người là bỏ
+    clearAsyncDataCache();
+    setUserState(nextUser);
     localStorage.removeItem("user");
   };
 
@@ -51,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
-      await axiosClient.post("/auth/logout");
+      await authApi.logout();
     } finally {
       setUser(null);
       localStorage.removeItem("accessToken");

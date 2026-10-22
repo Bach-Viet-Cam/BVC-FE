@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { assignmentsApi } from "@/features/classes/api/assignmentsApi";
-import { type AssignmentAction } from "@/features/classes/types/assignmentTypes";
+import { type AssignmentAction } from "@/features/classes/types/teacherAssignmentTypes";
 import { parseApiError } from "@/features/classes/utils/mapApiErrors";
 
 type ActionOutcome = { message: string } | { error: string };

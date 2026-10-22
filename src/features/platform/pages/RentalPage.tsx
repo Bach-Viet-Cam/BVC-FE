@@ -1,9 +1,5 @@
 import { useState } from "react";
-import {
-  MobileHeader,
-  FilterChips,
-  StatusDot,
-} from "@/shared/components/bvc";
+import { MobileHeader, FilterChips, StatusDot } from "@/shared/components/bvc";
 
 interface RentalItem {
   id: string;
@@ -74,30 +70,16 @@ export function RentalPage() {
       <div className="flex h-dvh w-full max-w-[428px] flex-col overflow-hidden bg-white">
         <MobileHeader title="Thuê nhạc cụ" variant="back" />
 
-        <FilterChips
-          chips={FILTER_CHIPS}
-          active={activeFilter}
-          onChange={setActiveFilter}
-        />
+        <FilterChips chips={FILTER_CHIPS} active={activeFilter} onChange={setActiveFilter} />
 
         {/* Scrollable list */}
-        <div
-          className="mt-3 flex-1 space-y-3 overflow-y-auto px-[14px] pb-5"
-          style={{ scrollbarWidth: "none" }}
-        >
+        <div className="mt-3 flex-1 space-y-3 overflow-y-auto px-[14px] pb-5" style={{ scrollbarWidth: "none" }}>
           {RENTAL_ITEMS.map((item) => (
-            <div
-              key={item.id}
-              className="rounded-[20px] border border-bvc-border p-[14px]"
-            >
+            <div key={item.id} className="rounded-[20px] border border-bvc-border p-[14px]">
               {/* Row 1: name + price */}
               <div className="flex items-start justify-between gap-2">
-                <span className="text-[16px] font-bold text-bvc-ink">
-                  {item.name}
-                </span>
-                <span className="font-bvc-mono shrink-0 text-[14px] text-bvc-accent-text">
-                  {item.price}
-                </span>
+                <span className="text-[16px] font-bold text-bvc-ink">{item.name}</span>
+                <span className="font-bvc-mono shrink-0 text-[14px] text-bvc-accent-text">{item.price}</span>
               </div>
 
               {/* Row 2: provider + status */}
@@ -112,10 +94,7 @@ export function RentalPage() {
               {/* Row 4: tags */}
               <div className="mt-2 flex flex-wrap gap-2">
                 {item.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="rounded-full bg-bvc-surface px-2 py-1 text-[12px] text-bvc-muted"
-                  >
+                  <span key={tag} className="rounded-full bg-bvc-surface px-2 py-1 text-[12px] text-bvc-muted">
                     {tag}
                   </span>
                 ))}

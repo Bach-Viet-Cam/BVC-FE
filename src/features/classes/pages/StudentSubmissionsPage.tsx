@@ -1,32 +1,17 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { ListState } from "@/features/classes/components/ListState";
 import { SubmissionCard } from "@/features/classes/components/SubmissionCard";
-import { useSaveComment } from "@/features/classes/hooks/useSaveComment";
+import { useCommentHandler } from "@/features/classes/hooks/useCommentHandler";
 import { useStudentSubmissions } from "@/features/classes/hooks/useStudentSubmissions";
-import { type ApiFieldError } from "@/features/classes/types/classTypes";
 import { MobileHeader } from "@/shared/components/bvc/MobileHeader";
 import { MobileScreen } from "@/shared/components/bvc/MobileScreen";
-import { toast } from "@/shared/components/ui/toast";
 
 // A15–A18: lecturer listens to each attempt and writes one comment per submission.
 export function StudentSubmissionsPage() {
   const navigate = useNavigate();
   const { assignmentId = "", studentId = "" } = useParams<{ assignmentId: string; studentId: string }>();
   const { result, isLoading, error, reload } = useStudentSubmissions(assignmentId, studentId);
-  const { saveComment } = useSaveComment();
-
-  const handleSaveComment =
-    (submissionId: string) =>
-    async (content: string): Promise<ApiFieldError[] | null> => {
-      const outcome = await saveComment(submissionId, content);
-      if ("message" in outcome) {
-        toast.success(outcome.message);
-        reload();
-        return null;
-      }
-      if (outcome.error.fieldErrors.length === 0) toast.error(outcome.error.message);
-      return outcome.error.fieldErrors;
-    };
+  const handleSaveComment = useCommentHandler(reload);
 
   const student = result?.student;
   return (

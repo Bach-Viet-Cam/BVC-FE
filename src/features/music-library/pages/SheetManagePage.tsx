@@ -1,132 +1,128 @@
-import { DesktopSidebar, DesktopPageHeader, StatCard } from "@/shared/components/bvc";
+import { useState } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
+import { Plus } from "lucide-react";
+import { TeacherShell } from "@/shared/components/bvc/TeacherShell";
+import { FocusHeader } from "@/shared/components/bvc/FocusHeader";
+import { EmptyState } from "@/shared/components/bvc/EmptyState";
+import { ConfirmDialog } from "@/shared/components/bvc/ConfirmDialog";
+import { ActionButton } from "@/shared/components/bvc/ActionButton";
+import { cn } from "@/shared/utils/cn";
+import { InstrumentSheetGroup } from "@/features/music-library/components/InstrumentSheetGroup";
+import { SheetFormPanel } from "@/features/music-library/components/SheetFormPanel";
+import { useMusicCategories } from "@/features/music-library/hooks/useMusicCategories";
+import { useSongSheets } from "@/features/music-library/hooks/useSongSheets";
+import { useVisibilityConfirm } from "@/features/music-library/hooks/useVisibilityConfirm";
+import type { LecturerSheetMusic } from "@/features/music-library/types/lecturerTypes";
+import type { SheetFormValues } from "@/features/music-library/utils/validateSheet";
 
-const NAV_ITEMS = [
-  { label: "Lớp học", to: "/teacher" },
-  { label: "Bài tập", to: "/teacher/assignments" },
-  { label: "Duyệt bài nộp", to: "/teacher/review" },
-  { label: "Thư viện bài nhạc", to: "/songs" },
-  { label: "Phân loại nội dung", to: "/categories" },
-];
-
-interface SheetRow {
-  name: string;
-  song: string;
-  instrument: string;
-  format: string;
-  size: string;
-  status: "ok" | "warn";
-  statusLabel: string;
-}
-
-const SHEETS: SheetRow[] = [
-  { name: "Lý ngựa ô - Đàn tranh", song: "Lý ngựa ô", instrument: "Đàn tranh", format: "PDF", size: "1.2 MB", status: "ok", statusLabel: "Verified" },
-  { name: "Lý ngựa ô - Đàn bầu", song: "Lý ngựa ô", instrument: "Đàn bầu", format: "PDF", size: "0.9 MB", status: "ok", statusLabel: "Verified" },
-  { name: "Trống cơm - Đàn tranh", song: "Trống cơm", instrument: "Đàn tranh", format: "PDF+MusicXML", size: "2.1 MB", status: "ok", statusLabel: "Verified" },
-  { name: "Lưu thủy kim tiền - Đàn tranh", song: "Lưu thủy kim tiền", instrument: "Đàn tranh", format: "PDF", size: "1.5 MB", status: "warn", statusLabel: "Chờ duyệt" },
-  { name: "Bèo dạt mây trôi - Đàn tranh", song: "Bèo dạt mây trôi", instrument: "Đàn tranh", format: "PDF", size: "0.8 MB", status: "warn", statusLabel: "Chờ duyệt" },
-  { name: "Se chỉ luồn kim - Đàn nhị", song: "Se chỉ luồn kim", instrument: "Đàn nhị", format: "MusicXML", size: "0.3 MB", status: "ok", statusLabel: "Verified" },
-];
-
-const STATUS_COLORS = {
-  ok: "var(--color-bvc-ok)",
-  warn: "var(--color-bvc-warn)",
-};
+type PanelState = { mode: "create"; instrumentId?: string } | { mode: "edit"; sheet: LecturerSheetMusic } | null;
 
 export function SheetManagePage() {
-  return (
-    <div className="flex h-screen w-full overflow-hidden bg-white">
-      <DesktopSidebar
-        items={NAV_ITEMS}
-        user={{ initials: "NH", name: "Nguyễn Thu Hương", role: "Giảng viên" }}
-        showLogo={false}
-      />
+  const { songId = "" } = useParams();
+  const [params, setParams] = useSearchParams();
+  const { options } = useMusicCategories("lecturer");
+  const data = useSongSheets(songId);
+  const visibility = useVisibilityConfirm(data.changeVisibility);
+  // Mở sẵn form khi đi từ nút "Tạo bản nhạc" ở trang chi tiết bài hát (?new=1&instrument=...)
+  const [panel, setPanel] = useState<PanelState>(() =>
+    params.get("new") ? { mode: "create", instrumentId: params.get("instrument") ?? undefined } : null
+  );
 
-      <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        <DesktopPageHeader
-          breadcrumb="M02 · Thư viện học liệu"
-          title="Quản lý bản nhạc"
+  const closePanel = () => {
+    setPanel(null);
+    if (params.has("new")) setParams({}, { replace: true });
+  };
+
+  const submitSheet = async (values: SheetFormValues, editing?: LecturerSheetMusic) => {
+    const failure = await data.saveSheet(values, editing);
+    if (!failure) closePanel();
+    return failure;
+  };
+
+  const { song, sheets, groups } = data;
+  const pendingSheet = visibility.pending?.item;
+
+  return (
+    <TeacherShell className="lg:flex-row lg:overflow-hidden">
+      <div className="flex min-w-0 flex-1 flex-col lg:overflow-y-auto">
+        <FocusHeader
+          backTo={song && !song.canEdit ? `/library/${song.id}` : "/songs"}
+          backLabel={song && !song.canEdit ? "Quay lại trang bài hát" : "Quay lại thư viện bài hát của tôi"}
+          title={song ? `Bản nhạc - ${song.title}` : "Bản nhạc"}
+          subtitle={
+            song &&
+            `${sheets.length} bản · ${groups.length} nhạc cụ · mỗi nhạc cụ 1 bản chính`
+          }
           actions={
-            <button
-              type="button"
-              className="flex min-h-[44px] cursor-pointer items-center rounded-[14px] bg-bvc-ink px-[18px] text-[14px] font-bold text-white"
-            >
-              Tải lên bản nhạc
-            </button>
+            <ActionButton onClick={() => setPanel({ mode: "create" })} disabled={!song}>
+              <Plus className="size-[18px]" aria-hidden />
+              Thêm bản nhạc
+            </ActionButton>
           }
         />
 
-        <div className="flex flex-1 flex-col gap-[18px] overflow-hidden p-[22px_32px_26px]">
-          {/* Stats */}
-          <div className="grid grid-cols-4 gap-[12px]">
-            <StatCard label="Tổng bản nhạc" value="137" />
-            <div className="flex flex-col gap-[5px] rounded-[18px] border border-bvc-border p-[15px_16px]">
-              <span className="flex items-center gap-[7px] text-[12.5px] text-bvc-muted">
-                <span className="size-[7px] shrink-0 rounded-full bg-bvc-warn" />
-                Chờ duyệt
-              </span>
-              <span className="font-bvc-mono text-[29px] font-semibold leading-none">6</span>
-            </div>
-            <StatCard label="File PDF" value="119" />
-            <StatCard label="File MusicXML" value="18" />
-          </div>
-
-          {/* Sheet table */}
-          <div className="flex flex-1 flex-col overflow-hidden rounded-[20px] border border-bvc-border bg-white">
-            {/* Toolbar */}
-            <div className="flex shrink-0 items-center justify-between gap-[16px] border-b border-bvc-border px-[18px] py-[15px]">
-              <span className="text-[15px] font-bold text-bvc-ink">Danh sách bản nhạc</span>
-              <div className="flex items-center gap-[8px]">
-                <input
-                  type="search"
-                  placeholder="Tên bản nhạc, bài nhạc, nhạc cụ"
-                  className="h-[38px] w-[280px] rounded-[12px] border border-bvc-border-strong bg-white px-[12px] text-[13px] text-bvc-ink focus:outline-none"
-                />
-                <button
-                  type="button"
-                  className="min-h-[38px] cursor-pointer rounded-[12px] border border-bvc-border-strong bg-white px-[13px] text-[13px] text-bvc-ink"
-                >
-                  Lọc trạng thái
-                </button>
-              </div>
-            </div>
-
-            {/* Column headers */}
-            <div className="grid shrink-0 grid-cols-[2fr_1.4fr_1.2fr_1.1fr_1fr_1fr] gap-[14px] border-b border-bvc-border px-[18px] py-[11px] text-[12px] font-bold uppercase tracking-[0.08em] text-bvc-muted">
-              <span>Bản nhạc</span>
-              <span>Bài nhạc</span>
-              <span>Nhạc cụ</span>
-              <span>Định dạng</span>
-              <span>Dung lượng</span>
-              <span>Trạng thái</span>
-            </div>
-
-            {/* Rows */}
-            <div className="flex-1 overflow-y-auto">
-              {SHEETS.map((sheet) => (
-                <div
-                  key={sheet.name}
-                  className="grid grid-cols-[2fr_1.4fr_1.2fr_1.1fr_1fr_1fr] items-center gap-[14px] border-b border-bvc-border px-[18px] py-[14px] text-[14px] last:border-b-0"
-                >
-                  <span className="font-semibold text-bvc-ink">{sheet.name}</span>
-                  <span className="text-bvc-muted">{sheet.song}</span>
-                  <span className="text-bvc-muted">{sheet.instrument}</span>
-                  <span className="font-bvc-mono text-[13px] text-bvc-muted">{sheet.format}</span>
-                  <span className="font-bvc-mono text-[13px] text-bvc-muted">{sheet.size}</span>
-                  <span className="flex items-center gap-[7px] text-[13.5px]">
-                    <span
-                      className="size-[7px] shrink-0 rounded-full"
-                      style={{ backgroundColor: STATUS_COLORS[sheet.status] }}
-                    />
-                    <span style={{ color: STATUS_COLORS[sheet.status] }}>
-                      {sheet.statusLabel}
-                    </span>
-                  </span>
-                </div>
+        <div className={cn("flex flex-col gap-7 px-[18px] py-6 md:px-8", data.isRefreshing && "opacity-70")}>
+          {data.error ? (
+            <EmptyState
+              title="Không tải được bản nhạc"
+              description={data.error}
+              actions={<ActionButton onClick={data.reload}>Thử lại</ActionButton>}
+            />
+          ) : data.isFirstLoad ? (
+            <div aria-hidden className="flex animate-pulse flex-col gap-3">
+              {Array.from({ length: 3 }, (_, index) => (
+                <span key={index} className="h-44 rounded-[18px] bg-bvc-surface" />
               ))}
             </div>
-          </div>
+          ) : groups.length === 0 ? (
+            <EmptyState
+              title="Bài hát chưa có bản nhạc"
+              description="Nhạc cụ của bài hát được lấy từ các bản nhạc. Thêm bản nhạc đầu tiên và chọn nhạc cụ cho bản đó."
+              actions={<ActionButton onClick={() => setPanel({ mode: "create" })}>Thêm bản nhạc</ActionButton>}
+            />
+          ) : (
+            groups.map((group) => (
+              <InstrumentSheetGroup
+                key={group.instrument.id}
+                instrument={group.instrument}
+                sheets={group.sheets}
+                selectedSheetId={panel?.mode === "edit" ? panel.sheet.id : undefined}
+                busySheetId={data.busySheetId}
+                onAdd={(instrumentId) => setPanel({ mode: "create", instrumentId })}
+                onEdit={(sheet) => setPanel({ mode: "edit", sheet })}
+                onReplaceFile={data.replaceFile}
+                onRequestVisibility={(sheet, nextVisible) =>
+                  visibility.request(sheet, nextVisible ? "PUBLIC" : "HIDDEN")
+                }
+              />
+            ))
+          )}
         </div>
-      </main>
-    </div>
+      </div>
+
+      {panel && song && (
+        <SheetFormPanel
+          key={panel.mode === "edit" ? panel.sheet.id : `new-${panel.instrumentId ?? ""}`}
+          song={song}
+          sheets={sheets}
+          editing={panel.mode === "edit" ? panel.sheet : undefined}
+          presetInstrumentId={panel.mode === "create" ? panel.instrumentId : undefined}
+          instrumentOptions={data.instrumentOptions}
+          levelOptions={options.levels}
+          onCancel={closePanel}
+          onSubmit={submitSheet}
+        />
+      )}
+
+      <ConfirmDialog
+        open={visibility.pending !== null}
+        onOpenChange={(open) => !open && visibility.cancel()}
+        title={`Ẩn “${pendingSheet?.name}”?`}
+        description="Sinh viên sẽ không còn thấy bản này. Bản đã lưu sẽ hiện “Không khả dụng”."
+        confirmLabel="Ẩn"
+        onConfirm={visibility.confirm}
+        isLoading={visibility.isApplying}
+      />
+    </TeacherShell>
   );
 }

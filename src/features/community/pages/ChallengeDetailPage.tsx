@@ -12,7 +12,7 @@ interface TopRow {
 // ── Mock data ─────────────────────────────────────────────────────────────────
 
 const CHALLENGE = {
-  title: "Lý ngựa ô — Thử thách tuần 39",
+  title: "Lý ngựa ô - Thử thách tuần 39",
   status: "Đang diễn ra",
   bpmTarget: "120",
   deadline: "30/09",
@@ -23,7 +23,7 @@ const REQUIREMENTS = [
   "Độ chính xác cao độ ≥ 85%",
   "BPM: 120 ± 5",
   "Không dùng metronome hỗ trợ",
-  "Bài: Lý ngựa ô — bè chính",
+  "Bài: Lý ngựa ô - bè chính",
 ];
 
 const TOP_5: TopRow[] = [

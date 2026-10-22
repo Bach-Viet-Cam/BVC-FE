@@ -1,62 +1,30 @@
-import { type AssignmentKind, type SubmissionStatus } from "@/features/classes/types/assignmentTypes";
-import { type Pagination } from "@/features/classes/types/classTypes";
+import { type SortDirection } from "@/shared/types/commonTypes";
 
 export type ProgressStatus = "ON_TRACK" | "AT_RISK" | "BEHIND";
+export type ProgressSortKey = "studentCode" | "username" | "averageAccuracy";
 
-export interface ProgressStudent {
-  studentId: string;
-  fullName: string;
+export interface ClassOption {
+  id: string;
+  name: string;
+}
+
+export interface ProgressItem {
+  userId: string;
+  username: string;
   studentCode: string | null;
-  average: number | null;
+  submissionCount: number;
+  averageAccuracy: number | null;
   status: ProgressStatus | null;
-  assignmentsWithSubmissions: number;
-  lastSubmittedAt: string | null;
 }
 
-export interface ClassProgress {
-  counts: { ON_TRACK: number; AT_RISK: number; BEHIND: number; NO_DATA: number };
-  students: ProgressStudent[];
+export interface ProgressResult {
+  summary: { onTrack: number; atRisk: number; behind: number };
+  items: ProgressItem[];
 }
 
-export interface WeeklyAverage {
-  week: number;
-  startDate: string;
-  endDate: string;
-  average: number | null;
+export interface ProgressParams {
+  status?: ProgressStatus;
+  q?: string;
+  sortBy: ProgressSortKey;
+  sortDir: SortDirection;
 }
-
-export interface StudentSummary {
-  student: { id: string; fullName: string; studentCode: string | null };
-  class: { id: string; name: string; cohort: string; instrument: { id: string; name: string }; startDate: string };
-  average: number | null;
-  status: ProgressStatus | null;
-  minAccuracy: number;
-  totalSessions: number;
-  sessionsLast7Days: number;
-  weekly: WeeklyAverage[];
-}
-
-export interface HistoryItem {
-  submissionId: string;
-  assignmentId: string;
-  assignmentTitle: string;
-  kind: AssignmentKind;
-  status: SubmissionStatus;
-  accuracy: number | null;
-  submittedAt: string;
-}
-
-export interface HistoryParams {
-  from?: string;
-  to?: string;
-  page?: number;
-  limit?: number;
-}
-
-export interface StudentHistory {
-  items: HistoryItem[];
-  pagination: Pagination;
-}
-
-export type ProgressSortKey = "name" | "code" | "average" | "last";
-export type SortDirection = "asc" | "desc";

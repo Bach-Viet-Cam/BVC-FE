@@ -1,38 +1,77 @@
-export type PracticeMode = "full" | "section" | "slow" | "step";
+export type RecordState = "idle" | "countin" | "recording" | "preview";
 
-export interface Song {
-  id: string;
-  title: string;
-  instrument: string;
-  level: string;
-  currentPage: number;
-  totalPages: number;
+export type SubmitMode = "record" | "upload";
+
+export type SubmissionStatus = "Đang xử lý" | "Từ chối" | "Lỗi xử lý" | "Hoàn tất";
+
+export type FileErrorKind = "" | "format" | "size" | "duration";
+
+export type BeatAccent = "strong" | "soft" | "off";
+
+export type SubdivisionKey = "white" | "black" | "half" | "quarter";
+
+export type AiFailureMode = "none" | "once" | "always";
+
+export type StageState = "pending" | "active" | "done" | "fail";
+
+export interface RecordingFile {
+  name: string;
+  fmt: string;
+  mb: number;
+  dur: number;
+  source?: SubmitMode;
 }
 
-export interface TeacherNote {
-  id: string;
-  teacherName: string;
-  barNumber: number;
-  content: string;
+export interface NoteInfo {
+  vn: string;
+  en: string;
+  f: number;
 }
 
-export interface TunerState {
-  noteName: string;
-  scientificNote: string;
-  frequency: number;
-  cents: number;
+export interface StringInfo {
+  code: string;
+  vn: string;
+  en: string;
+  f: number;
+  off: number;
 }
 
-export interface MetronomeState {
-  bpm: number;
-  timeSignature: string;
-  currentBeat: number;
-}
-
-export interface MicQuality {
-  status: "good" | "warning" | "error";
+export interface TimeSignature {
   label: string;
-  deviceLabel: string;
-  sampleRate: string;
-  hasClipping: boolean;
+  beats: number;
+}
+
+export interface MappedNote {
+  name: string;
+  start: number;
+  dur: number;
+}
+
+export interface Submission {
+  id: number;
+  file: RecordingFile;
+  status: SubmissionStatus;
+  stage: number;
+  stageStart: number;
+  fails: number;
+  retriesUsed: number;
+  exhausted: boolean;
+  retryAt: number;
+  reason: string;
+  doneAt: number;
+  notified: boolean;
+}
+
+export interface DemoFlags {
+  expired: boolean;
+  micDenied: boolean;
+  otherProc: boolean;
+  noPitch: boolean;
+  invalid: "none" | "format" | "size" | "duration";
+  weakNet: boolean;
+  qcFail: boolean;
+  leaveProc: boolean;
+  autoStop: boolean;
+  aiMode: AiFailureMode;
+  failJob: number;
 }

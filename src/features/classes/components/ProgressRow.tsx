@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { StatusLabel } from "@/features/classes/components/StatusLabel";
-import { type ProgressStudent } from "@/features/classes/types/progressTypes";
+import { type ProgressStudent } from "@/features/classes/types/teacherProgressTypes";
 import { PROGRESS_STATUS_LABELS, PROGRESS_STATUS_TONES, formatProgressSummary } from "@/features/classes/utils/progressFormat";
 
 interface ProgressRowProps {

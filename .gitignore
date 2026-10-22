@@ -42,3 +42,5 @@ pnpm-lock.yaml
 .opencode.json
 .mcp.json
 .windsurfrules
+
+/src/features/practice/docs/

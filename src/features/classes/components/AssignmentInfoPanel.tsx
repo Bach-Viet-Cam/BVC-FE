@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import { ActionButton } from "@/features/classes/components/ActionButton";
 import { StatusLabel } from "@/features/classes/components/StatusLabel";
-import { type AssignmentBase, type AssignmentStatus } from "@/features/classes/types/assignmentTypes";
-import { ASSIGNMENT_KIND_LABELS, ASSIGNMENT_STATUS_LABELS } from "@/features/classes/utils/assignmentFormat";
+import { type AssignmentBase, type AssignmentStatus } from "@/features/classes/types/teacherAssignmentTypes";
+import { ASSIGNMENT_KIND_LABELS, ASSIGNMENT_STATUS_LABELS } from "@/features/classes/utils/teacherAssignmentFormat";
 
 export type AssignmentPanelAction = "publish" | "close" | "reopen" | "delete";
 
@@ -44,7 +44,7 @@ export function AssignmentInfoPanel({ assignment, isWorking = false, onAction }:
         <div className="flex flex-col gap-[2px]">
           <span className="text-[12px] text-bvc-muted">BPM</span>
           <span className="font-bvc-mono text-[14.5px] font-semibold">
-            {assignment.effectiveBpm ? `${assignment.effectiveBpm} BPM` : "—"}
+            {assignment.effectiveBpm ? `${assignment.effectiveBpm} BPM` : "-"}
           </span>
         </div>
         <div className="col-span-2 flex flex-col gap-[2px]">

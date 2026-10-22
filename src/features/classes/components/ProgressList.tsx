@@ -5,7 +5,7 @@ import { ListState } from "@/features/classes/components/ListState";
 import { ProgressRow } from "@/features/classes/components/ProgressRow";
 import { SearchInput } from "@/features/classes/components/SearchInput";
 import { useClassProgress } from "@/features/classes/hooks/useClassProgress";
-import { type ProgressSortKey, type ProgressStatus, type SortDirection } from "@/features/classes/types/progressTypes";
+import { type ProgressSortKey, type ProgressStatus, type SortDirection } from "@/features/classes/types/teacherProgressTypes";
 import { PROGRESS_STATUS_LABELS, sortProgressStudents } from "@/features/classes/utils/progressFormat";
 
 interface ProgressListProps {

@@ -1,5 +1,5 @@
-import { type ProgressSortKey, type ProgressStatus, type ProgressStudent, type SortDirection } from "@/features/classes/types/progressTypes";
-import { formatPercent, formatVietnamDateTime } from "@/features/classes/utils/assignmentFormat";
+import { type ProgressSortKey, type ProgressStatus, type ProgressStudent, type SortDirection } from "@/features/classes/types/teacherProgressTypes";
+import { formatPercent, formatVietnamDateTime } from "@/features/classes/utils/teacherAssignmentFormat";
 
 export const PROGRESS_STATUS_LABELS: Record<ProgressStatus, string> = {
   ON_TRACK: "Đúng tiến độ",

@@ -3,9 +3,9 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { PracticeHistory } from "@/features/classes/components/PracticeHistory";
-import { progressApi } from "@/features/classes/api/progressApi";
+import { teacherProgressApi } from "@/features/classes/api/teacherProgressApi";
 
-vi.mock("@/features/classes/api/progressApi", () => ({ progressApi: { getStudentHistory: vi.fn() } }));
+vi.mock("@/features/classes/api/teacherProgressApi", () => ({ teacherProgressApi: { getStudentHistory: vi.fn() } }));
 
 const ITEM = {
   submissionId: "x1",
@@ -18,7 +18,7 @@ const ITEM = {
 };
 
 function mockHistory(items: unknown[]) {
-  vi.mocked(progressApi.getStudentHistory).mockResolvedValue({
+  vi.mocked(teacherProgressApi.getStudentHistory).mockResolvedValue({
     data: { data: { items, pagination: { page: 1, limit: 100, total: items.length } }, message: "", success: true },
   } as never);
 }
@@ -55,7 +55,7 @@ describe("PracticeHistory", () => {
     await userEvent.type(screen.getByLabelText("đến"), "10102026");
     await userEvent.click(screen.getByRole("button", { name: "Lọc" }));
     expect(await screen.findByText("Từ ngày không được sau đến ngày.")).toBeInTheDocument();
-    expect(progressApi.getStudentHistory).toHaveBeenCalledTimes(1);
+    expect(teacherProgressApi.getStudentHistory).toHaveBeenCalledTimes(1);
     expect(screen.getByText("Độc tấu — Lý ngựa ô")).toBeInTheDocument();
   });
 
@@ -67,7 +67,7 @@ describe("PracticeHistory", () => {
     await userEvent.type(screen.getByLabelText("đến"), "16102026");
     await userEvent.click(screen.getByRole("button", { name: "Lọc" }));
     await vi.waitFor(() =>
-      expect(progressApi.getStudentHistory).toHaveBeenLastCalledWith(
+      expect(teacherProgressApi.getStudentHistory).toHaveBeenLastCalledWith(
         "c1",
         "s1",
         expect.objectContaining({ from: "2026-10-01", to: "2026-10-16" })
@@ -85,7 +85,7 @@ describe("PracticeHistory", () => {
     mockHistory([ITEM]);
     renderHistory();
     await screen.findByText("Độc tấu — Lý ngựa ô");
-    vi.mocked(progressApi.getStudentHistory).mockRejectedValueOnce(new Error("network"));
+    vi.mocked(teacherProgressApi.getStudentHistory).mockRejectedValueOnce(new Error("network"));
     await userEvent.type(screen.getByLabelText("Từ"), "01102026");
     await userEvent.click(screen.getByRole("button", { name: "Lọc" }));
     expect(await screen.findByText("Tải dữ liệu thất bại. Vui lòng thử lại.")).toBeInTheDocument();

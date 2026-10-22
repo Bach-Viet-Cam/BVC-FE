@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { StatusLabel } from "@/features/classes/components/StatusLabel";
-import { type AssignmentStudent, type StudentAssignmentStatus } from "@/features/classes/types/assignmentTypes";
-import { STUDENT_STATUS_LABELS, formatStudentSummary } from "@/features/classes/utils/assignmentFormat";
+import { type AssignmentStudent, type StudentAssignmentStatus } from "@/features/classes/types/teacherAssignmentTypes";
+import { STUDENT_STATUS_LABELS, formatStudentSummary } from "@/features/classes/utils/teacherAssignmentFormat";
 
 interface AssignmentStudentRowProps {
   assignmentId: string;
@@ -23,7 +23,7 @@ export function AssignmentStudentRow({ assignmentId, student }: AssignmentStuden
       <span className="flex justify-between gap-[10px]">
         <span className="flex min-w-0 flex-col gap-[2px]">
           <span className="text-[15px] font-bold">{student.fullName}</span>
-          <span className="font-bvc-mono text-[12px] text-bvc-muted">{student.studentCode ?? "—"}</span>
+          <span className="font-bvc-mono text-[12px] text-bvc-muted">{student.studentCode ?? "-"}</span>
         </span>
         <StatusLabel
           label={STUDENT_STATUS_LABELS[student.status]}

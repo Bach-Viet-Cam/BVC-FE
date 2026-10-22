@@ -1,137 +1,104 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FilterChips, MobileHeader, TagBadge } from "@/shared/components/bvc";
+import { useMyAssignments } from "@/features/classes/hooks/useMyAssignments";
+import { type AssignmentListItem } from "@/features/classes/types/assignmentTypes";
+import { ASSIGNMENT_STATUS_META, formatShortDeadline } from "@/features/classes/utils/assignmentFormat";
 
-import { MobileHeader } from "@/shared/components/bvc/MobileHeader";
-import { FilterChips } from "@/shared/components/bvc/FilterChips";
-import { StatusDot } from "@/shared/components/bvc/StatusDot";
+type BonusFilter = "open" | "done" | "expired";
 
-// ── Types ─────────────────────────────────────────────────────────────────────
-
-type BonusStatus = "open" | "done" | "expired";
-type Difficulty = "Cơ bản" | "Trung cấp" | "Nâng cao";
-
-interface BonusItem {
-  id: string;
-  title: string;
-  points: string;
-  deadline: string;
-  difficulty: Difficulty;
-  participants: number;
-  status: BonusStatus;
-}
-
-// ── Mock data ─────────────────────────────────────────────────────────────────
-
-const FILTER_CHIPS = [
+const CHIPS = [
   { value: "all", label: "Tất cả" },
   { value: "open", label: "Đang mở" },
   { value: "done", label: "Đã làm" },
   { value: "expired", label: "Hết hạn" },
 ];
 
-const BONUS_ITEMS: BonusItem[] = [
-  {
-    id: "b1",
-    title: "Recording Lý ngựa ô — bè thứ 2",
-    points: "+2",
-    deadline: "30/09",
-    difficulty: "Trung cấp",
-    participants: 14,
-    status: "open",
-  },
-  {
-    id: "b2",
-    title: "Sáng tác câu dạo đàn tranh",
-    points: "+1",
-    deadline: "28/09",
-    difficulty: "Nâng cao",
-    participants: 6,
-    status: "open",
-  },
-  {
-    id: "b3",
-    title: "Recording scale Sol trưởng x60 BPM",
-    points: "+1",
-    deadline: "20/09",
-    difficulty: "Cơ bản",
-    participants: 31,
-    status: "done",
-  },
-  {
-    id: "b4",
-    title: "Chép tay bản nhạc Trống cơm",
-    points: "+2",
-    deadline: "15/09",
-    difficulty: "Cơ bản",
-    participants: 22,
-    status: "expired",
-  },
-];
-
-// ─────────────────────────────────────────────────────────────────────────────
+function matchesFilter(item: AssignmentListItem, filter: BonusFilter | "all", now: Date): boolean {
+  if (filter === "all") return true;
+  if (filter === "open") return new Date(item.deadline).getTime() >= now.getTime();
+  if (filter === "done") return item.status === "PASSED" || item.status === "SUBMITTED";
+  return item.status === "OVERDUE";
+}
 
 export function BonusListPage() {
   const navigate = useNavigate();
-  const [activeFilter, setActiveFilter] = useState<string>("all");
+  const { items, error, isLoading, searchText, setSearchText } = useMyAssignments("BONUS");
+  const [filter, setFilter] = useState<BonusFilter | "all">("open");
+  const [classFilter, setClassFilter] = useState("all");
 
-  const filtered =
-    activeFilter === "all"
-      ? BONUS_ITEMS
-      : BONUS_ITEMS.filter((item) => item.status === activeFilter);
+  const now = new Date();
+  const classes = Array.from(new Map(items.map((item) => [item.classId, item.className])).entries());
+  const visible = items
+    .filter((item) => matchesFilter(item, filter, now))
+    .filter((item) => classFilter === "all" || item.classId === classFilter);
 
   return (
-    <div className="flex min-h-dvh justify-center bg-bvc-surface">
-      <div className="flex h-dvh w-full max-w-[428px] flex-col overflow-hidden bg-white">
+    <>
+      <MobileHeader title="Bài bonus" onBack={() => navigate("/assignments")} />
+      <div className="flex shrink-0 flex-col gap-[10px] px-[14px] pb-[8px]">
+        <input
+          type="search"
+          value={searchText}
+          onChange={(event) => setSearchText(event.target.value)}
+          placeholder="Tìm theo tên bài bonus"
+          maxLength={100}
+          className="h-[44px] rounded-[14px] border border-bvc-border-strong bg-white px-[14px] text-[14px] text-bvc-ink placeholder:text-bvc-faint focus:outline-none"
+        />
+        {classes.length > 1 && (
+          <select
+            aria-label="Lớp"
+            value={classFilter}
+            onChange={(event) => setClassFilter(event.target.value)}
+            className="h-[40px] rounded-[12px] border border-bvc-border-strong bg-white px-[12px] text-[13.5px] text-bvc-ink focus:outline-none"
+          >
+            <option value="all">Tất cả lớp</option>
+            {classes.map(([id, name]) => (
+              <option key={id} value={id}>
+                {name}
+              </option>
+            ))}
+          </select>
+        )}
+      </div>
+      <div className="shrink-0 pb-[2px]">
+        {/* giá trị chip luôn thuộc CHIPS nên ép kiểu về BonusFilter | "all" là an toàn */}
+        <FilterChips chips={CHIPS} active={filter} onChange={(value) => setFilter(value as BonusFilter | "all")} />
+      </div>
 
-        {/* Header */}
-        <MobileHeader title="Bonus Assignments" variant="back" />
-
-        {/* Filter chips */}
-        <div className="shrink-0 pb-[10px]">
-          <FilterChips
-            chips={FILTER_CHIPS}
-            active={activeFilter}
-            onChange={setActiveFilter}
-          />
-        </div>
-
-        {/* List */}
-        <div className="flex-1 overflow-y-auto px-[14px] pb-[16px]">
-          <div className="flex flex-col gap-[8px]">
-            {filtered.map((item) => (
+      <div className="flex-1 overflow-y-auto pt-3">
+        {isLoading && <p className="px-[14px] text-[14px] text-bvc-muted">Đang tải...</p>}
+        {!isLoading && error && <p className="px-[14px] text-[14px] text-bvc-error">{error}</p>}
+        {!isLoading && !error && items.length === 0 && (
+          <p className="px-[14px] pt-8 text-center text-[14px] text-bvc-muted">Bạn chưa có bài bonus nào.</p>
+        )}
+        {!isLoading && !error && items.length > 0 && visible.length === 0 && (
+          <p className="px-[14px] pt-8 text-center text-[14px] text-bvc-muted">Không tìm thấy bài bonus phù hợp.</p>
+        )}
+        {!isLoading &&
+          !error &&
+          visible.map((item) => {
+            const meta = ASSIGNMENT_STATUS_META[item.status];
+            return (
               <button
                 key={item.id}
                 type="button"
                 onClick={() => navigate(`/community/bonus/${item.id}`)}
-                className={`w-full cursor-pointer rounded-[18px] border border-bvc-border p-[14px] text-left ${
-                  item.status === "expired" ? "opacity-50" : ""
-                }`}
+                className="mx-[14px] mb-3 block w-[calc(100%-28px)] cursor-pointer rounded-[18px] border border-bvc-border p-[13px] text-left"
               >
-                {/* Top row: title + points badge */}
-                <div className="flex items-start justify-between gap-[8px]">
-                  <span className="text-[14px] font-bold leading-snug text-bvc-ink">
-                    {item.title}
-                  </span>
-                  <span className="shrink-0 rounded-[9px] bg-bvc-accent-tint px-2 py-0.5 font-mono text-[13px] font-bold text-bvc-accent-text">
-                    {item.points}
-                  </span>
+                <div className="flex items-start justify-between gap-2">
+                  <span className="flex-1 text-[14px] font-bold leading-snug text-bvc-ink">{item.title}</span>
+                  <TagBadge label={meta.label} variant={meta.variant} />
                 </div>
-
-                {/* Bottom row: meta info + status */}
-                <div className="mt-[8px] flex items-center justify-between">
-                  <span className="text-[12px] text-bvc-muted">
-                    {item.difficulty} · {item.participants} người · Hạn{" "}
-                    {item.deadline}
-                  </span>
-                  {item.status === "done" && (
-                    <StatusDot status="ok" size={7} />
-                  )}
-                </div>
+                <p className="mt-1 text-[12px] text-bvc-muted">
+                  Accuracy từ {item.minAccuracy}%{item.bonusPoints !== null ? ` · +${item.bonusPoints} điểm` : ""} · Hạn{" "}
+                  {formatShortDeadline(item.deadline)}
+                </p>
               </button>
-            ))}
-          </div>
-        </div>
+            );
+          })}
+        <div className="h-4" />
       </div>
-    </div>
+    </>
   );
 }

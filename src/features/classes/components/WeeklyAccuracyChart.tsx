@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { type WeeklyAverage } from "@/features/classes/types/progressTypes";
+import { type WeeklyAverage } from "@/features/classes/types/teacherProgressTypes";
 import { formatDateRange } from "@/features/classes/utils/classFormat";
-import { formatPercent } from "@/features/classes/utils/assignmentFormat";
+import { formatPercent } from "@/features/classes/utils/teacherAssignmentFormat";
 
 interface WeeklyAccuracyChartProps {
   weekly: WeeklyAverage[];

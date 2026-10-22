@@ -89,12 +89,9 @@ export function RentalMarketplacePage() {
       <div className="flex h-dvh w-full max-w-[428px] flex-col overflow-hidden bg-white">
         <MobileHeader title="Thuê nhạc cụ" />
 
-        {/* Filter row — instrument */}
+        {/* Filter row - instrument */}
         <div className="px-[14px] pt-3 pb-2">
-          <div
-            className="overflow-x-auto flex gap-2 pb-1"
-            style={{ scrollbarWidth: "none" }}
-          >
+          <div className="overflow-x-auto flex gap-2 pb-1" style={{ scrollbarWidth: "none" }}>
             {INSTRUMENT_FILTERS.map((f) => {
               const isActive = activeInstrument === f;
               return (
@@ -115,10 +112,7 @@ export function RentalMarketplacePage() {
           </div>
 
           {/* Area filter */}
-          <div
-            className="overflow-x-auto flex gap-2 pb-1 mt-2"
-            style={{ scrollbarWidth: "none" }}
-          >
+          <div className="overflow-x-auto flex gap-2 pb-1 mt-2" style={{ scrollbarWidth: "none" }}>
             {AREA_FILTERS.map((f) => {
               const isActive = activeArea === f;
               return (
@@ -140,9 +134,7 @@ export function RentalMarketplacePage() {
         </div>
 
         {/* Item count */}
-        <div className="text-[12px] text-bvc-muted px-[14px] pb-2">
-          8 nhạc cụ phù hợp
-        </div>
+        <div className="text-[12px] text-bvc-muted px-[14px] pb-2">8 nhạc cụ phù hợp</div>
 
         {/* List */}
         <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
@@ -157,22 +149,16 @@ export function RentalMarketplacePage() {
               >
                 {/* Row 1: name + availability badge */}
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-[15px] font-bold text-bvc-ink truncate flex-1">
-                    {item.name}
-                  </span>
+                  <span className="text-[15px] font-bold text-bvc-ink truncate flex-1">{item.name}</span>
                   <span
                     className={`text-[12px] font-semibold rounded-[9px] px-2 py-0.5 flex items-center gap-1 shrink-0 ${
-                      item.available
-                        ? "text-bvc-ink"
-                        : "text-bvc-ink"
+                      item.available ? "text-bvc-ink" : "text-bvc-ink"
                     }`}
                   >
                     <span
                       className="size-[7px] rounded-full shrink-0"
                       style={{
-                        backgroundColor: item.status === "ok"
-                          ? "var(--color-bvc-ok)"
-                          : "var(--color-bvc-warn)",
+                        backgroundColor: item.status === "ok" ? "var(--color-bvc-ok)" : "var(--color-bvc-warn)",
                       }}
                     />
                     {item.available ? "Còn trống" : "Đã cho thuê"}
@@ -180,16 +166,12 @@ export function RentalMarketplacePage() {
                 </div>
 
                 {/* Row 2: provider */}
-                <div className="text-[12px] text-bvc-muted mt-[3px]">
-                  {item.provider}
-                </div>
+                <div className="text-[12px] text-bvc-muted mt-[3px]">{item.provider}</div>
 
                 {/* Row 3: price + distance */}
                 <div className="flex items-center justify-between mt-2">
                   <div className="flex items-baseline gap-1">
-                    <span className="font-mono font-bold text-[15px] text-bvc-ink">
-                      {item.price}
-                    </span>
+                    <span className="font-mono font-bold text-[15px] text-bvc-ink">{item.price}</span>
                     <span className="text-[12px] text-bvc-muted">₫/tháng</span>
                   </div>
                   <div className="flex items-center gap-1">
@@ -199,9 +181,7 @@ export function RentalMarketplacePage() {
                 </div>
 
                 {/* Row 4: deposit */}
-                <div className="text-[12px] text-bvc-muted mt-1">
-                  Cọc: {item.deposit}₫
-                </div>
+                <div className="text-[12px] text-bvc-muted mt-1">Cọc: {item.deposit}₫</div>
               </div>
             ))}
           </div>

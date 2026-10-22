@@ -3,9 +3,9 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ProgressList } from "@/features/classes/components/ProgressList";
-import { progressApi } from "@/features/classes/api/progressApi";
+import { teacherProgressApi } from "@/features/classes/api/teacherProgressApi";
 
-vi.mock("@/features/classes/api/progressApi", () => ({ progressApi: { getClassProgress: vi.fn() } }));
+vi.mock("@/features/classes/api/teacherProgressApi", () => ({ teacherProgressApi: { getClassProgress: vi.fn() } }));
 
 const STUDENTS = [
   {
@@ -47,7 +47,7 @@ const STUDENTS = [
 ];
 
 function mockProgress(students: unknown[], counts = { ON_TRACK: 1, AT_RISK: 1, BEHIND: 1, NO_DATA: 1 }) {
-  vi.mocked(progressApi.getClassProgress).mockResolvedValue({
+  vi.mocked(teacherProgressApi.getClassProgress).mockResolvedValue({
     data: { data: { counts, students }, message: "", success: true },
   } as never);
 }
@@ -113,7 +113,7 @@ describe("ProgressList", () => {
     mockProgress(STUDENTS);
     const view = renderList();
     await screen.findByText("An Giỏi");
-    vi.mocked(progressApi.getClassProgress).mockRejectedValueOnce(new Error("network"));
+    vi.mocked(teacherProgressApi.getClassProgress).mockRejectedValueOnce(new Error("network"));
     view.rerender(
       <MemoryRouter>
         <ProgressList classId="c2" />

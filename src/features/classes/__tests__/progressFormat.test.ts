@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { PROGRESS_STATUS_LABELS, formatProgressSummary, sortProgressStudents } from "@/features/classes/utils/progressFormat";
-import { type ProgressStudent } from "@/features/classes/types/progressTypes";
+import { type ProgressStudent } from "@/features/classes/types/teacherProgressTypes";
 
 const student = (overrides: Partial<ProgressStudent>): ProgressStudent => ({
   studentId: "s",

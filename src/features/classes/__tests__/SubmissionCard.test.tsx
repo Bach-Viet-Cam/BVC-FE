@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { SubmissionCard } from "@/features/classes/components/SubmissionCard";
-import { type StudentSubmission } from "@/features/classes/types/assignmentTypes";
+import { type StudentSubmission } from "@/features/classes/types/teacherAssignmentTypes";
 
 const SUBMISSION: StudentSubmission = {
   id: "sub1",

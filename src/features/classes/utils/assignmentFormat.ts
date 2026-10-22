@@ -1,70 +1,33 @@
-import {
-  type AssignmentKind,
-  type AssignmentStatus,
-  type StudentAssignmentStatus,
-  type SubmissionStatus,
-} from "@/features/classes/types/assignmentTypes";
+import { type StudentAssignmentStatus } from "@/features/classes/types/assignmentTypes";
 
-export const ASSIGNMENT_KIND_LABELS: Record<AssignmentKind, string> = {
-  SOLO: "Độc tấu",
-  ENSEMBLE: "Hòa tấu",
-  BONUS: "Bonus",
-  OTHER: "Bài tập khác",
+type TagVariant = "ok" | "warn" | "muted" | "error" | "pending";
+
+export const ASSIGNMENT_STATUS_META: Record<StudentAssignmentStatus, { label: string; variant: TagVariant }> = {
+  PASSED: { label: "Đạt", variant: "ok" },
+  SUBMITTED: { label: "Đã nộp", variant: "pending" },
+  OVERDUE: { label: "Quá hạn", variant: "error" },
+  NOT_SUBMITTED: { label: "Chưa nộp", variant: "muted" },
 };
 
-export const ASSIGNMENT_STATUS_LABELS: Record<AssignmentStatus, string> = {
-  DRAFT: "Nháp",
-  PUBLISHED: "Đã đăng",
-  CLOSED: "Đã đóng",
-};
+export const SUBMIT_BLOCKED_MESSAGE = "Bạn đã hết lượt nộp hoặc bài đã quá hạn.";
 
-export const STUDENT_STATUS_LABELS: Record<StudentAssignmentStatus, string> = {
-  NOT_SUBMITTED: "Chưa nộp",
-  SUBMITTED: "Đã nộp",
-  PASSED: "Đạt",
-};
-
-export const SUBMISSION_STATUS_LABELS: Record<SubmissionStatus, string> = {
-  PROCESSING: "Đang xử lý",
-  COMPLETED: "Hoàn tất",
-  REJECTED: "Từ chối",
-  FAILED: "Lỗi xử lý",
-};
-
-// Timestamps are UTC; they are always shown in Asia/Ho_Chi_Minh, whatever the browser time zone.
-export function formatVietnamDateTime(isoTimestamp: string, withYear = true): string {
-  const parts = Object.fromEntries(
-    new Intl.DateTimeFormat("en-GB", {
-      timeZone: "Asia/Ho_Chi_Minh",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      hourCycle: "h23",
-    })
-      .formatToParts(new Date(isoTimestamp))
-      .map((part) => [part.type, part.value])
-  );
-  const date = withYear ? `${parts.day}/${parts.month}/${parts.year}` : `${parts.day}/${parts.month}`;
-  return `${date} ${parts.hour}:${parts.minute}`;
+export function formatShortDeadline(isoDate: string): string {
+  const date = new Date(isoDate);
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return `${pad(date.getDate())}/${pad(date.getMonth() + 1)} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
-// At most one decimal, truncated so it never crosses the threshold (69.6 stays 69.6, not 70).
-export function formatPercent(value: number): string {
-  return `${Number.isInteger(value) ? value : Math.floor(value * 10) / 10}%`;
+export function formatFullDeadline(isoDate: string): string {
+  const date = new Date(isoDate);
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()} · ${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
-export function formatStudentSummary(student: {
-  submissionCount: number;
-  lastSubmittedAt: string | null;
-  bestAccuracy: number | null;
-}): string {
-  if (student.submissionCount === 0 || !student.lastSubmittedAt) return "Chưa có lần nộp";
-  const parts = [
-    `${student.submissionCount} lần nộp`,
-    `gần nhất ${formatVietnamDateTime(student.lastSubmittedAt, false)}`,
-  ];
-  if (student.bestAccuracy !== null) parts.push(`cao nhất ${formatPercent(student.bestAccuracy)}`);
-  return parts.join(" · ");
+export function describeTimeLeft(isoDate: string, now: Date): string {
+  const diffMs = new Date(isoDate).getTime() - now.getTime();
+  if (diffMs < 0) return "Đã quá hạn";
+  const days = Math.floor(diffMs / (24 * 60 * 60 * 1000));
+  if (days >= 1) return `còn ${days} ngày`;
+  const hours = Math.max(1, Math.floor(diffMs / (60 * 60 * 1000)));
+  return `còn ${hours} giờ`;
 }

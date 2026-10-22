@@ -1,14 +1,5 @@
 import { useState } from "react";
-import { DesktopSidebar, DesktopPageHeader, StatCard } from "@/shared/components/bvc";
-
-const NAV_ITEMS = [
-  { label: "Tổng quan", to: "/admin" },
-  { label: "Người dùng", to: "/admin/users" },
-  { label: "Nội dung đã xác minh", to: "/community/verified" },
-  { label: "Duyệt nội dung", to: "/community/approval" },
-  { label: "Quản lý bài nhạc", to: "/songs" },
-  { label: "Cấu hình", to: "/admin/config" },
-];
+import { DesktopPageHeader, StatCard } from "@/shared/components/bvc";
 
 interface ContentItem {
   id: string;
@@ -25,7 +16,7 @@ const ITEMS: ContentItem[] = [
     type: "Arrangement",
     contributor: "Minh Anh",
     date: "24/09",
-    title: "Lý ngựa ô — arrangement jazz phong cách hiện đại",
+    title: "Lý ngựa ô - arrangement jazz phong cách hiện đại",
     desc: "Sắp xếp lại theo nhịp swing, thêm phần intro piano 8 bar.",
   },
   {
@@ -33,7 +24,7 @@ const ITEMS: ContentItem[] = [
     type: "Bản thu",
     contributor: "Phương Linh",
     date: "23/09",
-    title: "Trống cơm — recording bè đàn tranh nâng cao",
+    title: "Trống cơm - recording bè đàn tranh nâng cao",
     desc: "Tempo 112 BPM, độ chính xác 94%, full 3 phút.",
   },
   {
@@ -41,7 +32,7 @@ const ITEMS: ContentItem[] = [
     type: "Bản nhạc",
     contributor: "Quốc Bảo",
     date: "22/09",
-    title: "Bèo dạt mây trôi — sheet simplified",
+    title: "Bèo dạt mây trôi - sheet simplified",
     desc: "Phiên bản đơn giản hóa cho người mới học, 2 trang A4.",
   },
   {
@@ -49,7 +40,7 @@ const ITEMS: ContentItem[] = [
     type: "Arrangement",
     contributor: "Gia Hân",
     date: "21/09",
-    title: "Hát ru — arrangement acoustic guitar + đàn tranh",
+    title: "Hát ru - arrangement acoustic guitar + đàn tranh",
     desc: "Kết hợp ghi-ta và đàn tranh, key C, tempo 72.",
   },
   {
@@ -57,7 +48,7 @@ const ITEMS: ContentItem[] = [
     type: "Bản thu",
     contributor: "Hoàng Tùng",
     date: "20/09",
-    title: "Se chỉ luồn kim — recording học kỳ 2",
+    title: "Se chỉ luồn kim - recording học kỳ 2",
     desc: "Lần thu thứ 3, điểm AI: 88%.",
   },
 ];
@@ -72,9 +63,7 @@ function TypeBadge({ type }: { type: string }) {
   }
   if (type === "Bản thu") {
     return (
-      <span className="rounded-[9px] bg-bvc-surface px-2 py-0.5 text-[12px] font-semibold text-bvc-muted">
-        {type}
-      </span>
+      <span className="rounded-[9px] bg-bvc-surface px-2 py-0.5 text-[12px] font-semibold text-bvc-muted">{type}</span>
     );
   }
   return (
@@ -90,15 +79,10 @@ export function ContentApprovalPage() {
   const selected = ITEMS.find((it) => it.id === selectedId) ?? ITEMS[0];
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-white">
-      <DesktopSidebar
-        items={NAV_ITEMS}
-        user={{ initials: "AD", name: "Admin BVC", role: "Quản trị viên" }}
-      />
-
+    <>
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <DesktopPageHeader
-          breadcrumb="M06 · Quản trị"
+          breadcrumb="Quản trị"
           title="Duyệt nội dung cộng đồng"
           actions={
             <>
@@ -123,7 +107,6 @@ export function ContentApprovalPage() {
         />
 
         <div className="flex flex-1 flex-col gap-[18px] overflow-hidden p-[22px_32px_26px]">
-          {/* Stat cards */}
           <div className="grid grid-cols-3 gap-[12px]">
             <StatCard label="Chờ duyệt" value="12" variant="accent" />
             <StatCard label="Đã duyệt tháng này" value="34" />
@@ -135,15 +118,11 @@ export function ContentApprovalPage() {
                 />
                 Từ chối
               </span>
-              <span className="font-mono text-[29px] font-semibold leading-none text-bvc-ink">
-                5
-              </span>
+              <span className="font-mono text-[29px] font-semibold leading-none text-bvc-ink">5</span>
             </div>
           </div>
 
-          {/* Two-column layout */}
           <div className="flex flex-1 gap-[20px] overflow-hidden">
-            {/* Left — item list */}
             <div className="flex flex-1 flex-col overflow-y-auto">
               {ITEMS.map((item) => (
                 <button
@@ -167,14 +146,9 @@ export function ContentApprovalPage() {
               ))}
             </div>
 
-            {/* Right — detail panel */}
             <div className="flex w-[380px] shrink-0 flex-col gap-[14px] overflow-y-auto rounded-[20px] border border-bvc-border p-[20px]">
-              {/* Title */}
-              <div className="text-[16px] font-extrabold tracking-[-0.025em] text-bvc-ink">
-                {selected.title}
-              </div>
+              <div className="text-[16px] font-extrabold tracking-[-0.025em] text-bvc-ink">{selected.title}</div>
 
-              {/* Preview */}
               <div>
                 <span className="text-[12px] font-bold uppercase tracking-[0.1em] text-bvc-muted">
                   Nội dung đính kèm
@@ -184,11 +158,8 @@ export function ContentApprovalPage() {
                 </div>
               </div>
 
-              {/* Info rows */}
               <div>
-                <span className="text-[12px] font-bold uppercase tracking-[0.1em] text-bvc-muted">
-                  Thông tin
-                </span>
+                <span className="text-[12px] font-bold uppercase tracking-[0.1em] text-bvc-muted">Thông tin</span>
                 <div className="mt-[8px] flex flex-col">
                   <div className="flex h-[36px] items-center justify-between border-b border-bvc-line text-[13px]">
                     <span className="text-bvc-muted">Loại</span>
@@ -204,12 +175,11 @@ export function ContentApprovalPage() {
                   </div>
                   <div className="flex h-[36px] items-center justify-between text-[13px]">
                     <span className="text-bvc-muted">Lần dùng trước</span>
-                    <span className="font-mono text-bvc-muted">—</span>
+                    <span className="font-mono text-bvc-muted">-</span>
                   </div>
                 </div>
               </div>
 
-              {/* Actions */}
               <div className="mt-auto flex flex-col gap-[10px]">
                 <textarea
                   placeholder="Lý do từ chối (tùy chọn)..."
@@ -234,6 +204,6 @@ export function ContentApprovalPage() {
           </div>
         </div>
       </main>
-    </div>
+    </>
   );
 }

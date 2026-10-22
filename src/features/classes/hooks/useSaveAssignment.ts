@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { assignmentsApi } from "@/features/classes/api/assignmentsApi";
-import { type AssignmentBase, type AssignmentContentPayload } from "@/features/classes/types/assignmentTypes";
+import { type AssignmentBase, type AssignmentContentPayload } from "@/features/classes/types/teacherAssignmentTypes";
 import { type ParsedApiError, parseApiError } from "@/features/classes/utils/mapApiErrors";
 
 type SaveResult = { assignment: AssignmentBase; message: string } | { error: ParsedApiError };
