@@ -17,6 +17,7 @@ export const TEACHER_NAV: NavItem[] = [
   { label: "Thư viện bài hát", to: "/songs" },
   { label: "Phân loại nội dung", to: "/categories" },
   { label: "Nội dung đã xác minh", to: "/community/verified" },
+  { label: "Bảng xếp hạng", to: "/leaderboard" },
   { label: "Thông báo", to: "/notifications" },
 ];
 
@@ -28,6 +29,7 @@ const ADMIN_NAV: NavItem[] = [
   { label: "Giám sát hệ thống", to: "/admin/monitoring" },
   { label: "Quản lý thông báo", to: "/admin/notifications" },
   { label: "Nội dung đã xác minh", to: "/community/verified" },
+  { label: "Bảng xếp hạng", to: "/leaderboard" },
 ];
 
 export interface StudentTab extends NavItem {

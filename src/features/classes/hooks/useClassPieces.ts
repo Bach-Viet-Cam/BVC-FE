@@ -1,5 +1,5 @@
 import { assignmentsApi } from "@/features/classes/api/assignmentsApi";
-import { useApiQuery } from "@/features/classes/hooks/useApiQuery";
+import { useApiQuery } from "@/shared/hooks/useApiQuery";
 
 export function useClassPieces(classId: string) {
   const { data, isLoading } = useApiQuery(

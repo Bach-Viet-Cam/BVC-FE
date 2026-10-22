@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Bookmark, ClipboardList, LibraryBig } from "lucide-react";
+import { Bookmark, ClipboardList, LibraryBig, Trophy } from "lucide-react";
 import { StudentShell } from "@/shared/components/bvc/StudentShell";
 import { EmptyState } from "@/shared/components/bvc/EmptyState";
 import { TagBadge } from "@/shared/components/bvc/TagBadge";
@@ -15,6 +15,7 @@ const QUICK_LINKS = [
   { label: "Thư viện bài hát", description: "Tìm bản nhạc để luyện", to: "/library", icon: LibraryBig },
   { label: "Bài tập của tôi", description: "Xem hạn nộp và kết quả", to: "/assignments", icon: ClipboardList },
   { label: "Đã lưu", description: "Bài hát và bản nhạc đã lưu", to: "/saved", icon: Bookmark },
+  { label: "Bảng xếp hạng", description: "Thứ hạng của bạn trong học kỳ", to: "/community/leaderboard", icon: Trophy },
 ];
 
 // Trang chủ sinh viên: chỉ hiện dữ liệu BE đã có (bài tập); tiến độ luyện / chuỗi ngày chờ API M01
@@ -82,7 +83,7 @@ export function HomePage() {
           <h2 id="quick-heading" className="text-xl font-extrabold tracking-[-0.02em] text-bvc-ink md:text-2xl">
             Truy cập nhanh
           </h2>
-          <ul className="grid gap-3 sm:grid-cols-3">
+          <ul className="grid gap-3 sm:grid-cols-2">
             {QUICK_LINKS.map(({ label, description, to, icon: Icon }) => (
               <li key={to}>
                 <Link

@@ -1,5 +1,5 @@
 import { roadmapsApi } from "@/features/classes/api/roadmapsApi";
-import { useApiQuery } from "@/features/classes/hooks/useApiQuery";
+import { useApiQuery } from "@/shared/hooks/useApiQuery";
 
 // classId null = no class chosen yet: nothing is fetched.
 export function useClassRoadmap(classId: string | null) {
