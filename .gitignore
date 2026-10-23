@@ -44,3 +44,4 @@ pnpm-lock.yaml
 .windsurfrules
 
 /src/features/practice/docs/
+/src/features/practice/pages/mock-ui

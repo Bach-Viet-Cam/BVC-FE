@@ -5,7 +5,7 @@ interface PracticeFrameProps {
   children: ReactNode;
 }
 
-// Khung dùng chung cho các màn luyện tập (trừ màn ghi âm dùng StudentShell): cột 428px trên điện thoại, toàn màn hình từ md (laptop).
+// Khung dùng chung cho các màn luyện tập (trừ màn ghi âm và kết quả dùng StudentShell): cột 428px trên điện thoại, toàn màn hình từ md (laptop).
 // Kèm banner báo có kết quả (MSG-43)
 export function PracticeFrame({ children }: PracticeFrameProps) {
   return (
