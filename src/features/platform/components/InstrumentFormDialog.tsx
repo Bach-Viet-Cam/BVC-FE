@@ -26,28 +26,28 @@ function InstrumentForm({ instrument, onSubmit, onClose }: InstrumentFormProps) 
   });
 
   const submit = async (values: InstrumentFormValues) => {
-    if (await onSubmit(values)) onClose();
+    if (await onSubmit({ ...values, code: values.code.trim().toUpperCase() })) onClose();
   };
 
   return (
     <form onSubmit={handleSubmit(submit)} className="flex flex-col gap-4.5 pt-1">
       <div className="flex flex-col gap-1.5">
         <label className="text-[13px] font-bold text-bvc-ink" htmlFor="instrument-code">
-          Mã nhạc cụ (Slug) <span className="text-bvc-error">*</span>
+          Mã nhạc cụ (Mã viết tắt) <span className="text-bvc-error">*</span>
         </label>
         <input
           id="instrument-code"
-          placeholder="dan-bau, dan-tranh, sao-truc..."
+          placeholder="DTR, DBA, DNH, DSA..."
           disabled={instrument !== null}
           {...register("code")}
-          className="h-[40px] w-full rounded-[11px] border border-bvc-border-strong bg-white px-3.5 font-mono text-[13.5px] text-bvc-ink placeholder:font-sans placeholder:text-bvc-faint transition-colors focus:border-bvc-ink focus:outline-none disabled:cursor-not-allowed disabled:bg-bvc-surface disabled:text-bvc-muted"
+          className="h-[40px] w-full rounded-[11px] border border-bvc-border-strong bg-white px-3.5 font-mono text-[13.5px] uppercase text-bvc-ink placeholder:normal-case placeholder:font-sans placeholder:text-bvc-faint transition-colors focus:border-bvc-ink focus:outline-none disabled:cursor-not-allowed disabled:bg-bvc-surface disabled:text-bvc-muted"
         />
         {instrument ? (
           <p className="text-[12px] text-bvc-muted">Mã định danh kỹ thuật không thể thay đổi sau khi tạo.</p>
         ) : (
           <p className="text-[12px] text-bvc-muted">
-            Chỉ gồm chữ cái viết thường và dấu gạch nối, ví dụ:{" "}
-            <code className="font-mono text-bvc-ink">dan-nguyet</code>.
+            Mã viết tắt ngắn gọn dạng chữ in hoa, ví dụ:{" "}
+            <code className="font-mono text-bvc-ink">DTR, DBA, DNH, DSA</code>.
           </p>
         )}
         {errors.code && <p className="text-[12px] font-medium text-bvc-error">{errors.code.message}</p>}
