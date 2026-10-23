@@ -9,14 +9,6 @@ import { MetronomePage } from "@/features/practice/pages/MetronomePage";
 import { ProcessingPage } from "@/features/practice/pages/ProcessingPage";
 import { ResultsPage } from "@/features/practice/pages/ResultsPage";
 
-// Mobile — practice (M01 Smart Practice Studio)
-import { PracticeDemoProvider } from "@/features/practice/context/PracticeDemoContext";
-import { RecordPage } from "@/features/practice/pages/RecordPage";
-import { TunerPage } from "@/features/practice/pages/TunerPage";
-import { MetronomePage } from "@/features/practice/pages/MetronomePage";
-import { ProcessingPage } from "@/features/practice/pages/ProcessingPage";
-import { ResultsPage } from "@/features/practice/pages/ResultsPage";
-
 import { LoginPage } from "@/features/auth/pages/LoginPage";
 import { ScrollToTop } from "@/shared/components/ScrollToTop";
 import { NotFoundPage } from "@/shared/pages/NotFoundPage";

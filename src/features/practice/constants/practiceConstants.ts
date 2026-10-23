@@ -36,7 +36,6 @@ export const SAMPLE = {
   deadline: "28/10/2026",
   targetBpm: 96,
   pieceLen: 120,
-  submissionsLeft: 3,
   files: [
     { name: "ban-thu-bai-1.m4a", fmt: "m4a", mb: 3.2, dur: 118 },
     { name: "ban-thu-bai-2.mp3", fmt: "mp3", mb: 4.1, dur: 127 },

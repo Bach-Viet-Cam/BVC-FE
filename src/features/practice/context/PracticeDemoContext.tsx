@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { Outlet } from "react-router-dom";
 import { audioAnalysisApi } from "@/features/practice/api/audioAnalysisApi";
 import { practiceSubmissionApi } from "@/features/practice/api/practiceSubmissionApi";
-import { MSG, SAMPLE } from "@/features/practice/constants/practiceConstants";
+import { MSG } from "@/features/practice/constants/practiceConstants";
 import type { DemoFlags } from "@/features/practice/types/practiceTypes";
 import type { PracticeSubmission, PracticeSubmitTarget } from "@/features/practice/types/practiceSubmissionTypes";
 import { isSlowUpload, isWeakConnection } from "@/features/practice/utils/networkQuality";
@@ -34,7 +34,6 @@ interface PracticeDemoValue {
   setDemoFlag: <K extends keyof DemoFlags>(key: K, value: DemoFlags[K]) => void;
   toggleDemoFlag: (key: keyof DemoFlags) => void;
   resetDemo: () => void;
-  left: number;
   blocked: boolean;
   submit: (file: File, target: PracticeSubmitTarget) => Promise<PracticeSubmission | null>;
   uploading: boolean;
@@ -122,16 +121,13 @@ export function PracticeDemoProvider() {
     setBannerVisible(false);
   }, []);
 
-  const left = SAMPLE.submissionsLeft;
-
   const value = useMemo<PracticeDemoValue>(
     () => ({
       demo,
       setDemoFlag,
       toggleDemoFlag,
       resetDemo,
-      left,
-      blocked: Boolean(demo.expired || left <= 0 || demo.otherProc),
+      blocked: Boolean(demo.expired || demo.otherProc),
       submit,
       uploading,
       uploadWeak,
@@ -139,7 +135,7 @@ export function PracticeDemoProvider() {
       bannerVisible,
       dismissBanner: () => setBannerVisible(false),
     }),
-    [demo, setDemoFlag, toggleDemoFlag, resetDemo, left, submit, uploading, uploadWeak, lastSubmitted, bannerVisible]
+    [demo, setDemoFlag, toggleDemoFlag, resetDemo, submit, uploading, uploadWeak, lastSubmitted, bannerVisible]
   );
 
   return (
