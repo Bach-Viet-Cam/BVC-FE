@@ -36,6 +36,10 @@ export function EnsemblePage() {
   const isPromptOpen = isPromptForced || (listening.needsChoice && status === "ready" && !isPromptDismissed);
 
   const requestStart = useCallback(() => {
+    if (!listening.hasMic) {
+      void listening.requestAccess();
+      return;
+    }
     if (listening.permission === "denied") {
       void listening.requestAccess();
       return;
@@ -192,6 +196,7 @@ export function EnsemblePage() {
               micError={practice.micError}
               isCountInOn={practice.isCountInOn}
               onCountInChange={practice.setIsCountInOn}
+              hasMic={listening.hasMic}
               listeningMode={listening.mode}
               headphoneLabel={listening.headphoneLabel}
               micPermission={listening.permission}
