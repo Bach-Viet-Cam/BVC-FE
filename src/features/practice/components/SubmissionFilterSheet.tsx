@@ -27,6 +27,11 @@ const FIELD_CLASS =
   "h-11 w-full min-w-0 rounded-[13px] border border-bvc-border-strong bg-white px-3 text-sm text-bvc-ink outline-none focus:border-bvc-ink";
 const MONO_FIELD_CLASS = cn(FIELD_CLASS, "font-bvc-mono");
 
+// Bật/tắt một lựa chọn trong nhóm chọn nhiều (loại bài, phạm vi)
+function toggleValue<T extends string>(current: T[], value: T): T[] {
+  return current.includes(value) ? current.filter((item) => item !== value) : [...current, value];
+}
+
 interface SubmissionFilterSheetProps {
   open: boolean;
   advanced: SubmissionAdvancedFilter;
@@ -98,13 +103,6 @@ function AdvancedForm({ advanced, countMatches, onApply }: AdvancedFormProps) {
   function setAccuracyRange(min: string, max: string) {
     setValue("minAccuracy", min, { shouldValidate: true });
     setValue("maxAccuracy", max, { shouldValidate: true });
-  }
-
-  // Bật/tắt một lựa chọn trong nhóm chọn nhiều (loại bài, phạm vi)
-  function toggleList<K extends "kinds" | "scopes">(field: K, value: SubmissionFilterValues[K][number]) {
-    const current: SubmissionFilterValues[K] = values[field] ?? [];
-    const next = current.includes(value) ? current.filter((item) => item !== value) : [...current, value];
-    setValue(field, next as SubmissionFilterValues[K], { shouldValidate: true });
   }
 
   function resetAll() {
@@ -252,7 +250,7 @@ function AdvancedForm({ advanced, countMatches, onApply }: AdvancedFormProps) {
                 key={option.value}
                 label={option.label}
                 active={(values.kinds ?? []).includes(option.value)}
-                onClick={() => toggleList("kinds", option.value)}
+                onClick={() => setValue("kinds", toggleValue(values.kinds ?? [], option.value), { shouldValidate: true })}
               />
             ))}
           </div>
@@ -266,7 +264,7 @@ function AdvancedForm({ advanced, countMatches, onApply }: AdvancedFormProps) {
                 key={option.value}
                 label={option.label}
                 active={(values.scopes ?? []).includes(option.value)}
-                onClick={() => toggleList("scopes", option.value)}
+                onClick={() => setValue("scopes", toggleValue(values.scopes ?? [], option.value), { shouldValidate: true })}
               />
             ))}
           </div>

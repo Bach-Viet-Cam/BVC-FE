@@ -3,15 +3,15 @@ import { practiceSubmissionApi } from "@/features/practice/api/practiceSubmissio
 import type { PracticeSubmission } from "@/features/practice/types/practiceSubmissionTypes";
 
 // GBR-49: bản nộp của bài này đang xử lý thì khóa ghi âm và tải lên (bài khác vẫn nộp được)
-export function useActiveSubmission(pieceId: string) {
+export function useActiveSubmission(sheetMusicId: string) {
   const [active, setActive] = useState<PracticeSubmission | null>(null);
   const [round, setRound] = useState(0);
 
   useEffect(() => {
-    if (!pieceId) return;
+    if (!sheetMusicId) return;
     const controller = new AbortController();
     practiceSubmissionApi
-      .getActive(pieceId, controller.signal)
+      .getActive(sheetMusicId, controller.signal)
       .then((response) => {
         if (!controller.signal.aborted) setActive(response.data.data);
       })
@@ -20,7 +20,7 @@ export function useActiveSubmission(pieceId: string) {
         if (!controller.signal.aborted) setActive(null);
       });
     return () => controller.abort();
-  }, [pieceId, round]);
+  }, [sheetMusicId, round]);
 
   const refresh = useCallback(() => setRound((value) => value + 1), []);
 

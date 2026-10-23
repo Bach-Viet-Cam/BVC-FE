@@ -14,6 +14,8 @@ export interface SubmissionHistoryItem {
   // Bài hát được nộp; lịch sử gom bài nộp của mọi bài hát
   pieceId: string;
   pieceTitle: string;
+  // Bản nhạc (sheet) đã nộp, dùng để luyện lại đoạn
+  sheetMusicId: string;
   title: string;
   submittedAt: string;
   status: SubmissionHistoryStatus;

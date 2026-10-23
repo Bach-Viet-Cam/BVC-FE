@@ -22,7 +22,7 @@ export function useSubmissionCompare() {
   }
 
   function practiceSegment() {
-    navigate(`/practice/${pair?.newer.pieceId ?? ""}/record`);
+    navigate(`/practice/sheets/${pair?.newer.sheetMusicId ?? ""}/record`);
   }
 
   return { older: pair?.older, newer: pair?.newer, backToSelect, practiceSegment };

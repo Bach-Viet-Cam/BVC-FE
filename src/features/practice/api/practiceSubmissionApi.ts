@@ -13,9 +13,9 @@ export const practiceSubmissionApi = {
       signal,
       timeout: 15_000,
     }),
-  getActive: (pieceId: string, signal?: AbortSignal) =>
+  getActive: (sheetMusicId: string, signal?: AbortSignal) =>
     axiosClient.get<ApiResponse<PracticeSubmission | null>>("/practice/submissions/active", {
-      params: { pieceId },
+      params: { sheetMusicId },
       signal,
       timeout: 15_000,
     }),

@@ -31,7 +31,6 @@ export interface PracticeContext {
 }
 
 export interface PracticeContextQuery {
-  pieceId: string;
   sheetMusicId: string;
   assignmentId?: string;
 }

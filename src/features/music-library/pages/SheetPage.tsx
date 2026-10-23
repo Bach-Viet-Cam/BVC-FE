@@ -69,7 +69,7 @@ export function SheetPage() {
   const zoomBase = zoom ?? SHEET_ZOOM.initial;
 
   // Màn luyện tập chỉ dành cho sinh viên; khách đăng nhập xong quay lại đúng bản này
-  const practicePath = `/practice/${song.id}/record?sheetId=${sheet.id}${assignmentId ? `&assignmentId=${encodeURIComponent(assignmentId)}` : ""}`;
+  const practicePath = `/practice/sheets/${sheet.id}/record${assignmentId ? `?assignmentId=${encodeURIComponent(assignmentId)}` : ""}`;
   const practiceClass = actionButtonClass(
     "primary",
     "md",
@@ -127,6 +127,7 @@ export function SheetPage() {
                 Luyện tập
               </Link>
             )}
+
             {role === "guest" && (
               <button type="button" onClick={() => setPracticePromptOpen(true)} className={practiceClass}>
                 {practiceIcon}

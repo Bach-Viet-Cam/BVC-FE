@@ -18,6 +18,7 @@ export const SUBMISSION_HISTORY_MOCK: SubmissionHistoryItem[] = [
   {
     id: "5",
     pieceId: "ly-ngua-o",
+    sheetMusicId: "sheet-ly-ngua-o",
     pieceTitle: "Lý ngựa ô",
     title: "Lý ngựa ô #5",
     submittedAt: "2026-10-09T14:58:00",
@@ -29,6 +30,7 @@ export const SUBMISSION_HISTORY_MOCK: SubmissionHistoryItem[] = [
   {
     id: "6",
     pieceId: "mua-xuan-oi",
+    sheetMusicId: "sheet-mua-xuan-oi",
     pieceTitle: "Mùa xuân ơi",
     title: "Mùa xuân ơi #2",
     submittedAt: "2026-10-09T08:20:00",
@@ -40,6 +42,7 @@ export const SUBMISSION_HISTORY_MOCK: SubmissionHistoryItem[] = [
   {
     id: "4",
     pieceId: "ly-ngua-o",
+    sheetMusicId: "sheet-ly-ngua-o",
     pieceTitle: "Lý ngựa ô",
     title: "Lý ngựa ô #4",
     submittedAt: "2026-10-08T21:14:00",
@@ -51,6 +54,7 @@ export const SUBMISSION_HISTORY_MOCK: SubmissionHistoryItem[] = [
   {
     id: "3",
     pieceId: "ly-ngua-o",
+    sheetMusicId: "sheet-ly-ngua-o",
     pieceTitle: "Lý ngựa ô",
     title: "Lý ngựa ô #3",
     submittedAt: "2026-10-08T09:40:00",
@@ -62,6 +66,7 @@ export const SUBMISSION_HISTORY_MOCK: SubmissionHistoryItem[] = [
   {
     id: "2",
     pieceId: "ly-ngua-o",
+    sheetMusicId: "sheet-ly-ngua-o",
     pieceTitle: "Lý ngựa ô",
     title: "Lý ngựa ô #2",
     submittedAt: "2026-10-06T20:05:00",
@@ -73,6 +78,7 @@ export const SUBMISSION_HISTORY_MOCK: SubmissionHistoryItem[] = [
   {
     id: "7",
     pieceId: "mua-xuan-oi",
+    sheetMusicId: "sheet-mua-xuan-oi",
     pieceTitle: "Mùa xuân ơi",
     title: "Mùa xuân ơi #1",
     submittedAt: "2026-10-05T18:10:00",
@@ -84,6 +90,7 @@ export const SUBMISSION_HISTORY_MOCK: SubmissionHistoryItem[] = [
   {
     id: "1",
     pieceId: "ly-ngua-o",
+    sheetMusicId: "sheet-ly-ngua-o",
     pieceTitle: "Lý ngựa ô",
     title: "Lý ngựa ô #1",
     submittedAt: "2026-10-04T19:32:00",

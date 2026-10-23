@@ -56,14 +56,13 @@ function drawerFromState(state: unknown): DrawerKind | null {
 export function RecordPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { songId = "" } = useParams();
+  const { sheetId = "" } = useParams();
   const [searchParams] = useSearchParams();
-  const sheetId = searchParams.get("sheetId") ?? "";
   const assignmentId = searchParams.get("assignmentId") ?? undefined;
   const isMobile = useIsMobile();
   const { demo, blocked: demoBlocked, submit, uploading, uploadWeak } = usePracticeDemo();
-  const { context, error: contextError, isLoading: contextLoading } = usePracticeContext(songId, sheetId, assignmentId);
-  const { active, refresh: refreshActive } = useActiveSubmission(songId);
+  const { context, error: contextError, isLoading: contextLoading } = usePracticeContext(sheetId, assignmentId);
+  const { active, refresh: refreshActive } = useActiveSubmission(sheetId);
   const blocked = demoBlocked || Boolean(active); // GBR-49: chỉ khóa bài đang có bản xử lý
   const [drawer, setDrawer] = useState<DrawerKind | null>(() => drawerFromState(location.state));
 
@@ -201,7 +200,7 @@ export function RecordPage() {
     if (blocked || uploading || errorKind || !sheetId) return;
     const source = mode === "record" ? (rec === "preview" ? recorder.take?.file : undefined) : pickedFile;
     if (!source) return;
-    const submission = await submit(source, { pieceId: songId, sheetMusicId: sheetId, assignmentId });
+    const submission = await submit(source, { sheetMusicId: sheetId, assignmentId });
     if (!submission) {
       refreshActive();
       return;
@@ -209,7 +208,7 @@ export function RecordPage() {
     // GBR-51: bản thu được bỏ khỏi màn ghi âm ngay khi gửi
     if (mode === "record") recorder.reset();
     else clearPickedFile();
-    navigate(`/practice/${songId}/processing?submissionId=${submission.id}`);
+    navigate(`/practice/submissions/${submission.id}/processing`);
   }
 
   function handleStart() {
@@ -235,7 +234,7 @@ export function RecordPage() {
 
   // Điện thoại: trang riêng. Laptop: ngăn kéo, không rời màn ghi âm
   function openDetail(kind: DrawerKind) {
-    if (isMobile) navigate(`/practice/${songId}/${kind}`);
+    if (isMobile) navigate(`/practice/sheets/${sheetId}/${kind}${assignmentId ? `?assignmentId=${assignmentId}` : ""}`);
     else setDrawer(kind);
   }
 
@@ -416,7 +415,7 @@ export function RecordPage() {
               {!sheetId && (
                 <button
                   type="button"
-                  onClick={() => navigate(`/library/${songId}${assignmentId ? `?assignmentId=${assignmentId}` : ""}`)}
+                  onClick={() => navigate("/library")}
                   className="flex min-h-11 w-full shrink-0 cursor-pointer items-center justify-center rounded-[15px] border border-bvc-border-strong bg-white text-sm font-semibold text-bvc-ink"
                 >
                   Chọn bản nhạc để nộp bài

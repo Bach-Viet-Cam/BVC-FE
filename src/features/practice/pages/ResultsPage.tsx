@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { RotateCw } from "lucide-react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { practiceSubmissionApi } from "@/features/practice/api/practiceSubmissionApi";
 import { AiFeedbackCard } from "@/features/practice/components/AiFeedbackCard";
 import { ClassRankCard } from "@/features/practice/components/ClassRankCard";
 import { PitchContourCard } from "@/features/practice/components/PitchContourCard";
@@ -19,15 +20,21 @@ type OpenSheet = "mode" | "segment" | null;
 // BE mới trả trạng thái bài nộp, chưa trả điểm cao độ / nhịp / tempo, pitch contour, xếp hạng lớp, lịch sử lần nộp.
 export function ResultsPage() {
   const navigate = useNavigate();
-  const { songId = "" } = useParams();
-  const [searchParams] = useSearchParams();
+  const { submissionId = "" } = useParams();
   const [sheet, setSheet] = useState<OpenSheet>(null);
 
   // TODO(BE): truyền đoạn đã chọn (start/end bar, count-in) sang màn ghi âm khi hỗ trợ luyện theo đoạn
-  function startPractice() {
+  async function startPractice() {
     setSheet(null);
-    const query = searchParams.toString();
-    navigate(`/practice/${songId}/record${query ? `?${query}` : ""}`);
+    // Luyện lại cần sheet của bản nộp này; không lấy được thì quay về trang trước
+    try {
+      const { data } = await practiceSubmissionApi.get(submissionId);
+      const sheetMusicId = data.data.sheetMusicId;
+      if (sheetMusicId) navigate(`/practice/sheets/${sheetMusicId}/record`);
+      else navigate(-1);
+    } catch {
+      navigate(-1);
+    }
   }
 
   return (

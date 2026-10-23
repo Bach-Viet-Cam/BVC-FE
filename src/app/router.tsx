@@ -129,11 +129,11 @@ export function AppRouter() {
 
           {/* M01 — tiến trình xử lý chạy nền nên các màn luyện tập dùng chung một provider */}
           <Route element={<PracticeDemoProvider />}>
-            <Route path="/practice/:songId/record" element={<RecordPage />} />
-            <Route path="/practice/:songId/tuner" element={<TunerPage />} />
-            <Route path="/practice/:songId/metronome" element={<MetronomePage />} />
-            <Route path="/practice/:songId/processing" element={<ProcessingPage />} />
-            <Route path="/practice/:songId/results" element={<ResultsPage />} />
+            <Route path="/practice/sheets/:sheetId/record" element={<RecordPage />} />
+            <Route path="/practice/sheets/:sheetId/tuner" element={<TunerPage />} />
+            <Route path="/practice/sheets/:sheetId/metronome" element={<MetronomePage />} />
+            <Route path="/practice/submissions/:submissionId/processing" element={<ProcessingPage />} />
+            <Route path="/practice/submissions/:submissionId" element={<ResultsPage />} />
             {/* SCR-01, SCR-02 - lịch sử và so sánh bài nộp (mockup) */}
             <Route path="/practice/submissions" element={<SubmissionHistoryPage />} />
             <Route path="/practice/submissions/compare" element={<SubmissionComparePage />} />

@@ -25,7 +25,7 @@ export const ensembleApi = {
       },
     });
   },
-  createSubmission: (body: { pieceId: string; sheetMusicId: string; assignmentId?: string; studentUploadId: string }) =>
+  createSubmission: (body: { sheetMusicId: string; assignmentId?: string; studentUploadId: string }) =>
     axiosClient.post<ApiResponse<EnsembleSubmission>>("/practice/submissions", { ...body, practiceMode: "ENSEMBLE" }, { timeout: 30_000 }),
   getSubmission: (id: string) =>
     axiosClient.get<ApiResponse<EnsembleSubmission>>(`/practice/submissions/${encodeURIComponent(id)}`, { timeout: 15_000 }),

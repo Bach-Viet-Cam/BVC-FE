@@ -87,7 +87,7 @@ export function useSubmissionHistory() {
   }
 
   function openSubmission(item: SubmissionHistoryItem) {
-    navigate(`/practice/${item.pieceId}/results`);
+    navigate(`/practice/submissions/${item.id}`);
   }
 
   function setPieceIds(pieceIds: string[]) {
