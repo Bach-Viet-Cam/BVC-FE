@@ -16,6 +16,7 @@ import {
 import { DesktopPageHeader } from "@/shared/components/bvc";
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@/shared/components/ui/tabs";
 import { InstrumentFormDialog } from "@/features/platform/components/InstrumentFormDialog";
+import { formatConfigDate, parseSemesters, SEMESTERS_CONFIG_KEY } from "@/features/platform/utils/configValue";
 import { SettingFormDialog } from "@/features/platform/components/SettingFormDialog";
 import {
   CONFIG_GROUP_LABELS,
@@ -29,6 +30,8 @@ import {
   type InstrumentSortKey,
   type SystemConfigItem,
 } from "@/features/platform/types/configTypes";
+
+const SEMESTERS_DESCRIPTION = "Các học kỳ dùng khi tạo lớp: mỗi học kỳ có tên, ngày bắt đầu và ngày kết thúc.";
 
 function parseJsonArray(value: string): string[] {
   try {
@@ -465,7 +468,14 @@ function SettingsTab() {
                 !error &&
                 items.map((config) => {
                   const isJson = config.valueType === "JSON";
-                  const jsonItems = isJson ? parseJsonArray(config.value) : [];
+                  const isSemesters = config.key === SEMESTERS_CONFIG_KEY;
+                  const jsonItems = isJson
+                    ? isSemesters
+                      ? parseSemesters(config.value).map(
+                          (semester) => `${semester.name} · ${formatConfigDate(semester.startDate)} – ${formatConfigDate(semester.endDate)}`
+                        )
+                      : parseJsonArray(config.value)
+                    : [];
                   const isBytes = config.key.includes("SIZE_BYTES");
                   const isAccuracy = config.key.includes("ACCURACY");
 
@@ -479,8 +489,10 @@ function SettingsTab() {
                               {config.key}
                             </span>
                           </div>
-                          {config.description && (
-                            <p className="text-[12px] leading-relaxed text-bvc-muted">{config.description}</p>
+                          {(isSemesters ? SEMESTERS_DESCRIPTION : config.description) && (
+                            <p className="text-[12px] leading-relaxed text-bvc-muted">
+                              {isSemesters ? SEMESTERS_DESCRIPTION : config.description}
+                            </p>
                           )}
                         </div>
                       </td>
