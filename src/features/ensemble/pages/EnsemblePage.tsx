@@ -1,15 +1,18 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { EnsembleFrame } from "@/features/ensemble/components/EnsembleFrame";
 import { EnsembleHeader } from "@/features/ensemble/components/EnsembleHeader";
+import { HeadphonePrompt } from "@/features/ensemble/components/HeadphonePrompt";
 import { MyTakeLane } from "@/features/ensemble/components/MyTakeLane";
 import { PieceBriefCard } from "@/features/ensemble/components/PieceBriefCard";
 import { ScoreLanes } from "@/features/ensemble/components/ScoreLanes";
 import { TransportBar } from "@/features/ensemble/components/TransportBar";
 import { useEnsembleAssignment } from "@/features/ensemble/hooks/useEnsembleAssignment";
 import { useEnsemblePractice } from "@/features/ensemble/hooks/useEnsemblePractice";
+import { useListeningSetup } from "@/features/ensemble/hooks/useListeningSetup";
 import { useTakePlayback } from "@/features/ensemble/hooks/useTakePlayback";
 import { useTrackPeaks } from "@/features/ensemble/hooks/useTrackPeaks";
+import { type ListeningMode } from "@/features/ensemble/types/ensembleTypes";
 import { formatDate } from "@/features/ensemble/utils/formatClock";
 
 const LEAVE_CONFIRM_MESSAGE = "Rời màn hình sẽ hủy bản thu đang thực hiện. Bạn có muốn rời đi?";
@@ -23,6 +26,49 @@ export function EnsemblePage() {
   const assignment = useEnsembleAssignment(assignmentId);
   const peaksByTrack = useTrackPeaks(practice.tracks);
   const { status, cancel } = practice;
+
+  const listening = useListeningSetup(Boolean(practice.tracksResult));
+  const [isPromptForced, setIsPromptForced] = useState(false);
+  const [startAfterChoice, setStartAfterChoice] = useState(false);
+  const [isPromptDismissed, setIsPromptDismissed] = useState(false);
+
+  // Tự hiện khi không thấy tai nghe và chưa chọn — nhưng chỉ lúc sẵn sàng, không chen ngang khi đang thu/nghe lại (H3).
+  const isPromptOpen = isPromptForced || (listening.needsChoice && status === "ready" && !isPromptDismissed);
+
+  const requestStart = useCallback(() => {
+    if (listening.permission === "denied") {
+      void listening.requestAccess();
+      return;
+    }
+    if (listening.mode) {
+      void practice.start(listening.mode);
+      return;
+    }
+    setStartAfterChoice(true);
+    setIsPromptForced(true);
+  }, [listening, practice]);
+
+  const chooseMode = (mode: ListeningMode) => {
+    listening.choose(mode);
+    setIsPromptForced(false);
+    if (startAfterChoice) void practice.start(mode);
+    setStartAfterChoice(false);
+  };
+
+  const changePromptOpen = (isOpen: boolean) => {
+    if (isOpen) return;
+    setIsPromptForced(false);
+    setStartAfterChoice(false);
+    setIsPromptDismissed(true);
+  };
+
+  const deviceKey = `${listening.headphoneLabel ?? ""}|${listening.mode ?? ""}`;
+  const [lastDeviceKey, setLastDeviceKey] = useState(deviceKey);
+  if (deviceKey !== lastDeviceKey) {
+    setLastDeviceKey(deviceKey);
+    setIsPromptDismissed(false);
+    if (listening.mode) setIsPromptForced(false);
+  }
 
   const [isAccompanied, setIsAccompanied] = useState(true);
   const playback = useTakePlayback(practice.take, {
@@ -58,17 +104,14 @@ export function EnsemblePage() {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement | null;
-      if (
-        target &&
-        (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)
-      ) {
+      if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) {
         return;
       }
 
       if (event.code === "Space") {
         event.preventDefault();
         if (status === "ready") {
-          void practice.start();
+          requestStart();
         } else if (status === "recording") {
           void practice.stop();
         } else if (status === "preview") {
@@ -85,7 +128,7 @@ export function EnsemblePage() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [status, isBusy, practice, playback]);
+  }, [status, isBusy, practice, playback, requestStart]);
 
   const leave = () => {
     const message = hasUnsavedTake ? "Bản thu chưa được lưu sẽ mất. Bạn có muốn rời đi?" : LEAVE_CONFIRM_MESSAGE;
@@ -149,7 +192,12 @@ export function EnsemblePage() {
               micError={practice.micError}
               isCountInOn={practice.isCountInOn}
               onCountInChange={practice.setIsCountInOn}
-              onStart={() => void practice.start()}
+              listeningMode={listening.mode}
+              headphoneLabel={listening.headphoneLabel}
+              micPermission={listening.permission}
+              onChangeListeningMode={() => setIsPromptForced(true)}
+              onRequestMicAccess={() => void listening.requestAccess()}
+              onStart={requestStart}
               onStop={() => void practice.stop()}
               onSave={() => void practice.save()}
               onDiscard={practice.discardTake}
@@ -191,7 +239,8 @@ export function EnsemblePage() {
           </div>
         </div>
       </main>
+
+      <HeadphonePrompt isOpen={isPromptOpen} onOpenChange={changePromptOpen} onChoose={chooseMode} />
     </EnsembleFrame>
   );
 }
-

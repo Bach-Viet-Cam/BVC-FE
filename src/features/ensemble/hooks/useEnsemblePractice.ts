@@ -4,10 +4,12 @@ import { useTrackMixer } from "@/features/ensemble/hooks/useTrackMixer";
 import {
   type EnsembleTake,
   type EnsembleTracksResult,
+  type ListeningMode,
   type PracticeStatus,
   type TrackSetting,
 } from "@/features/ensemble/types/ensembleTypes";
 import { computePeaks } from "@/features/ensemble/utils/audioPeaks";
+import { MIC_CONSTRAINTS } from "@/features/ensemble/utils/listeningMode";
 import { getEffectiveVolume } from "@/features/ensemble/utils/mixerMath";
 import { encodeWav } from "@/features/ensemble/utils/wavEncoder";
 import { toast } from "@/shared/components/ui/toast";
@@ -78,9 +80,12 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
   }, []);
 
   // Rời màn: thu hồi URL tạm
-  useEffect(() => () => {
-    if (takeRef.current) URL.revokeObjectURL(takeRef.current.url);
-  }, []);
+  useEffect(
+    () => () => {
+      if (takeRef.current) URL.revokeObjectURL(takeRef.current.url);
+    },
+    []
+  );
 
   const applyVolumes = useCallback(() => {
     settingsRef.current.forEach((setting) => {
@@ -298,38 +303,46 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
     [changeStatus, durationSec, stop, tracks]
   );
 
-  const start = useCallback(async () => {
-    if (statusRef.current !== "ready" || !tracksResult) return;
-    setMicError(null);
-    abortedRef.current = false;
-    const context = ensureContext(); // gọi ngay trong cú bấm để trình duyệt cho phép phát âm thanh
-    await context.resume();
-    let stream: MediaStream;
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    } catch {
-      setMicError(MIC_DENIED_MESSAGE);
-      return;
-    }
-    streamRef.current = stream;
-    const micSource = context.createMediaStreamSource(stream);
-    const analyser = context.createAnalyser();
-    analyser.fftSize = 2048;
-    micSource.connect(analyser); // chỉ để vẽ; không nối ra loa nên không vọng tiếng
-    micSourceRef.current = micSource;
-    setMicAnalyser(analyser);
-    const beatMs = 60000 / tracksResult.targetBpm;
-    if (isCountInOn) {
-      changeStatus("countIn");
-      for (let beat = 0; beat < COUNT_IN_BEATS; beat += 1) {
-        setCountBeat(beat);
-        playClick(context, beat === 0);
-        await sleep(beatMs);
-        if (abortedRef.current) return;
+  const start = useCallback(
+    async (mode: ListeningMode) => {
+      if (statusRef.current !== "ready" || !tracksResult) return;
+      setMicError(null);
+      abortedRef.current = false;
+      const context = ensureContext(); // gọi ngay trong cú bấm để trình duyệt cho phép phát âm thanh
+      await context.resume();
+      let stream: MediaStream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: MIC_CONSTRAINTS[mode] });
+      } catch {
+        setMicError(MIC_DENIED_MESSAGE);
+        return;
       }
-    }
-    beginRecording(stream, beatMs);
-  }, [beginRecording, changeStatus, ensureContext, isCountInOn, tracksResult]);
+      streamRef.current = stream;
+      if (import.meta.env.DEV) {
+        (window as unknown as { __ensembleMicSettings?: MediaTrackSettings }).__ensembleMicSettings = stream
+          .getAudioTracks()[0]
+          ?.getSettings();
+      }
+      const micSource = context.createMediaStreamSource(stream);
+      const analyser = context.createAnalyser();
+      analyser.fftSize = 2048;
+      micSource.connect(analyser); // chỉ để vẽ; không nối ra loa nên không vọng tiếng
+      micSourceRef.current = micSource;
+      setMicAnalyser(analyser);
+      const beatMs = 60000 / tracksResult.targetBpm;
+      if (isCountInOn) {
+        changeStatus("countIn");
+        for (let beat = 0; beat < COUNT_IN_BEATS; beat += 1) {
+          setCountBeat(beat);
+          playClick(context, beat === 0);
+          await sleep(beatMs);
+          if (abortedRef.current) return;
+        }
+      }
+      beginRecording(stream, beatMs);
+    },
+    [beginRecording, changeStatus, ensureContext, isCountInOn, tracksResult]
+  );
 
   return {
     tracksResult,

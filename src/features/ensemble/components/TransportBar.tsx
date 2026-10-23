@@ -1,20 +1,21 @@
 import { useEffect, useState } from "react";
-import { Check, Loader2, Mic, RotateCcw, Sparkles, Square } from "lucide-react";
-import { type PracticeStatus } from "@/features/ensemble/types/ensembleTypes";
+import { Check, Headphones, Loader2, Mic, RotateCcw, Sparkles, Speaker, Square } from "lucide-react";
+import { type ListeningMode, type MicPermission, type PracticeStatus } from "@/features/ensemble/types/ensembleTypes";
 import { formatClock } from "@/features/ensemble/utils/formatClock";
 import { Switch } from "@/shared/components/ui/switch";
 import { cn } from "@/shared/utils/cn";
 
 const COUNT_IN_BEATS = 4;
 
-const STATUS_CONFIG: Record<
-  PracticeStatus,
-  { label: string; dot: string; textColor: string }
-> = {
+const STATUS_CONFIG: Record<PracticeStatus, { label: string; dot: string; textColor: string }> = {
   ready: { label: "Sẵn sàng thu", dot: "bg-bvc-ok", textColor: "text-bvc-ok" },
   countIn: { label: "Đang đếm nhịp vào...", dot: "bg-bvc-accent animate-pulse", textColor: "text-bvc-accent-text" },
   recording: { label: "Đang hòa tấu trực tiếp", dot: "bg-bvc-error animate-ping", textColor: "text-bvc-error" },
-  processing: { label: "Đang xử lý âm thanh...", dot: "bg-bvc-accent animate-pulse", textColor: "text-bvc-accent-text" },
+  processing: {
+    label: "Đang xử lý âm thanh...",
+    dot: "bg-bvc-accent animate-pulse",
+    textColor: "text-bvc-accent-text",
+  },
   preview: { label: "Nghe lại & Kiểm tra hòa âm", dot: "bg-bvc-ok", textColor: "text-bvc-ok" },
   saving: { label: "Đang lưu bản thu...", dot: "bg-bvc-ink animate-pulse", textColor: "text-bvc-ink" },
   saved: { label: "Đã lưu bản thu thành công", dot: "bg-bvc-ok", textColor: "text-bvc-ok" },
@@ -32,6 +33,11 @@ interface TransportBarProps {
   micError: string | null;
   isCountInOn: boolean;
   onCountInChange: (checked: boolean) => void;
+  listeningMode: ListeningMode | null;
+  headphoneLabel: string | null;
+  micPermission: MicPermission;
+  onChangeListeningMode: () => void;
+  onRequestMicAccess: () => void;
   onStart: () => void;
   onStop: () => void;
   onSave: () => void;
@@ -66,12 +72,7 @@ export function TransportBar(props: TransportBarProps) {
     return () => window.clearInterval(timerId);
   }, [status, props.recordingStartedAt, props.targetBpm]);
 
-  const activeBeat =
-    status === "countIn"
-      ? countBeat
-      : status === "recording"
-        ? recordingBeat
-        : -1;
+  const activeBeat = status === "countIn" ? countBeat : status === "recording" ? recordingBeat : -1;
 
   return (
     <section
@@ -102,15 +103,38 @@ export function TransportBar(props: TransportBarProps) {
           <span className="text-[10px] font-bold tracking-wider text-bvc-faint uppercase">Nhịp phách</span>
           <div className="flex items-center gap-2">
             {!hasTake && (
-              <label className="flex h-6.5 cursor-pointer items-center gap-1.5 rounded-md border border-bvc-border bg-bvc-surface/50 px-2 text-[11px] font-bold text-bvc-ink transition-colors hover:bg-bvc-surface">
-                <span className="whitespace-nowrap">Đếm 4 nhịp</span>
-                <Switch
-                  size="sm"
-                  checked={props.isCountInOn}
-                  onCheckedChange={props.onCountInChange}
-                  disabled={status !== "ready"}
-                />
-              </label>
+              <>
+                <button
+                  type="button"
+                  onClick={props.onChangeListeningMode}
+                  disabled={status !== "ready" || props.micPermission !== "granted"}
+                  title={props.headphoneLabel ?? undefined}
+                  className="flex h-6.5 max-w-44 cursor-pointer items-center gap-1.5 rounded-md border border-bvc-border bg-bvc-surface/50 px-2 text-[11px] font-bold text-bvc-ink transition-colors hover:bg-bvc-surface disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {props.listeningMode === "speaker" ? (
+                    <Speaker size={13} className="shrink-0" />
+                  ) : (
+                    <Headphones size={13} className="shrink-0" />
+                  )}
+                  <span className="truncate">
+                    {props.listeningMode === "speaker"
+                      ? "Loa ngoài"
+                      : props.listeningMode === "headphones"
+                        ? `Tai nghe${props.headphoneLabel ? ` · ${props.headphoneLabel}` : ""}`
+                        : "Chọn cách nghe"}
+                  </span>
+                </button>
+
+                <label className="flex h-6.5 cursor-pointer items-center gap-1.5 rounded-md border border-bvc-border bg-bvc-surface/50 px-2 text-[11px] font-bold text-bvc-ink transition-colors hover:bg-bvc-surface">
+                  <span className="whitespace-nowrap">Đếm 4 nhịp</span>
+                  <Switch
+                    size="sm"
+                    checked={props.isCountInOn}
+                    onCheckedChange={props.onCountInChange}
+                    disabled={status !== "ready"}
+                  />
+                </label>
+              </>
             )}
 
             <div className="flex items-center gap-1" aria-hidden>
@@ -144,7 +168,9 @@ export function TransportBar(props: TransportBarProps) {
           <button
             type="button"
             onClick={props.onStart}
-            className="flex h-11.5 w-full cursor-pointer items-center justify-center gap-2.5 rounded-xl bg-bvc-accent font-bold text-[14px] text-white shadow-sm transition-all hover:bg-bvc-ink active:scale-[0.99]"
+            disabled={props.micPermission === "pending"}
+            aria-disabled={props.micPermission === "pending"}
+            className="flex h-11.5 w-full cursor-pointer items-center justify-center gap-2.5 rounded-xl bg-bvc-accent font-bold text-[14px] text-white shadow-sm transition-all hover:bg-bvc-ink active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Mic size={18} strokeWidth={2.4} />
             <span>Bắt đầu thu bè {props.myInstrumentName}</span>
@@ -224,13 +250,36 @@ export function TransportBar(props: TransportBarProps) {
         )}
       </div>
 
-      {props.micError && (
+      {props.micPermission === "denied" && (
+        <div
+          role="alert"
+          className="flex flex-col gap-2 rounded-lg bg-bvc-accent-tint p-2.5 text-[12.5px] text-bvc-accent-text sm:flex-row sm:items-center sm:justify-between"
+        >
+          <span>
+            Chưa có quyền micro. Nếu trình duyệt không hỏi lại, hãy bấm biểu tượng ổ khóa cạnh thanh địa chỉ, cho phép
+            micro rồi tải lại trang.
+          </span>
+          <button
+            type="button"
+            onClick={props.onRequestMicAccess}
+            className="h-8 shrink-0 cursor-pointer rounded-md bg-bvc-ink px-3 text-[12px] font-bold text-white transition-opacity hover:opacity-90"
+          >
+            Cấp quyền micro
+          </button>
+        </div>
+      )}
+
+      {props.micPermission !== "denied" && props.micError && (
         <p role="alert" className="rounded-lg bg-bvc-accent-tint p-2 text-[12px] font-medium text-bvc-accent-text">
           {props.micError}
+        </p>
+      )}
+
+      {props.listeningMode === "speaker" && (status === "countIn" || status === "recording") && (
+        <p className="text-[12px] text-bvc-muted">
+          Đang dùng loa ngoài · đã bật khử vọng, bản thu có thể lẫn một phần tiếng bè.
         </p>
       )}
     </section>
   );
 }
-
-

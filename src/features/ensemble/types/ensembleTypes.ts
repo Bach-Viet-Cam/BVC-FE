@@ -53,3 +53,6 @@ export interface EnsembleAssignmentInfo {
   className: string;
   deadline: string;
 }
+
+export type ListeningMode = "headphones" | "speaker";
+export type MicPermission = "pending" | "granted" | "denied";
