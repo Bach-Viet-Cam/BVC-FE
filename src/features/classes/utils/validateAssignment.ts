@@ -26,7 +26,7 @@ export const assignmentFormSchema = z.object({
     .max(TITLE_MAX, `Tiêu đề không được vượt quá ${TITLE_MAX} ký tự.`),
   kind: z.string().min(1, "Loại bài không được để trống."),
   description: z.string().trim().max(DESCRIPTION_MAX, `Mô tả không được vượt quá ${DESCRIPTION_MAX} ký tự.`),
-  pieceId: z.string(),
+  sheetMusicId: z.string(),
   requiredBpm: z.string().refine(isValidBpm, BPM_RANGE_MESSAGE),
 });
 
@@ -40,7 +40,7 @@ export const EMPTY_ASSIGNMENT_FORM: AssignmentFormValues = {
   title: "",
   kind: "",
   description: "",
-  pieceId: "",
+  sheetMusicId: "",
   requiredBpm: "",
 };
 
@@ -50,7 +50,7 @@ export function toAssignmentFormValues(assignment: AssignmentBase): AssignmentFo
     title: assignment.title,
     kind: assignment.kind,
     description: assignment.description ?? "",
-    pieceId: assignment.piece?.id ?? "",
+    sheetMusicId: assignment.sheetMusic?.id ?? "",
     requiredBpm: assignment.requiredBpm === null ? "" : String(assignment.requiredBpm),
   };
 }
@@ -60,7 +60,7 @@ export function toAssignmentContent(values: AssignmentFormValues): AssignmentCon
     title: values.title.trim(),
     description: values.description.trim() || null,
     kind: values.kind as AssignmentContentPayload["kind"],
-    pieceId: values.pieceId || null,
+    sheetMusicId: values.sheetMusicId || null,
     requiredBpm: values.requiredBpm.trim() ? Number(values.requiredBpm) : null,
   };
 }
