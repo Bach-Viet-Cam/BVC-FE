@@ -7,7 +7,7 @@ import {
   type AssignmentDetail,
   type AssignmentListParams,
   type AssignmentListResult,
-  type ClassPiece,
+  type ClassSheetMusic,
   type CreateAssignmentPayload,
   type StudentSubmissions,
   type SubmissionComment,
@@ -16,8 +16,8 @@ import {
 export const assignmentsApi = {
   listAssignments: (params: AssignmentListParams) =>
     axiosClient.get<ApiResponse<AssignmentListResult>>("/assignments", { params }),
-  listClassPieces: (classId: string) =>
-    axiosClient.get<ApiResponse<ClassPiece[]>>("/assignments/pieces", { params: { classId } }),
+  listClassSheetMusic: (classId: string) =>
+    axiosClient.get<ApiResponse<ClassSheetMusic[]>>("/assignments/sheet-music", { params: { classId } }),
   getAssignment: (assignmentId: string) =>
     axiosClient.get<ApiResponse<AssignmentDetail>>(`/assignments/${assignmentId}`),
   createAssignment: (payload: CreateAssignmentPayload) =>

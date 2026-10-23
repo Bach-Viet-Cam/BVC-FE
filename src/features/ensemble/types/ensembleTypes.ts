@@ -14,6 +14,7 @@ export interface EnsembleTracksResult {
   targetBpm: number;
   myInstrumentId: string;
   myInstrumentName: string;
+  mySheetMusicId: string | null;
   tracks: EnsembleTrack[];
 }
 
@@ -24,24 +25,35 @@ export interface TrackSetting {
   isSolo: boolean;
 }
 
-export interface EnsembleSessionResult {
+export type EnsembleSubmissionStatus = "PROCESSING" | "COMPLETED" | "REJECTED" | "FAILED";
+export type EnsembleSubmissionStage = "QUALITY_CHECK" | "AUDIO_ANALYSIS" | "COMPARISON" | "FEEDBACK";
+
+export interface EnsembleSubmission {
   id: string;
-  status: "RECORDING" | "COMPLETED" | "FAILED";
-  recordingUrl: string | null;
+  assignmentId: string | null;
+  status: EnsembleSubmissionStatus;
+  stage: EnsembleSubmissionStage | null;
+  retryCount: number;
+  maxRetries: number;
+  retryAvailableAt: string | null;
+  isFileDeleted: boolean;
+  rejectReason: string | null;
+  errorMessage: string | null;
 }
 
-/** GET /ensemble-sessions/:id - một phiên hòa tấu sinh viên đã lưu. */
-export interface EnsembleSessionDetail extends EnsembleSessionResult {
+export interface EnsembleSessionDetail {
+  id: string;
   pieceId: string;
   instrumentId: string;
   assignmentId: string | null;
   targetBpm: number;
+  status: "RECORDING" | "COMPLETED" | "FAILED";
+  recordingUrl: string | null;
   createdAt: string;
 }
 
 export type PracticeStatus = "ready" | "countIn" | "recording" | "processing" | "preview" | "saving" | "saved";
 
-/** Bản thu tạm sau khi dừng: đã đổi sang WAV, chờ người học nghe lại rồi bấm lưu. */
 export interface EnsembleTake {
   blob: Blob;
   url: string;
@@ -49,18 +61,19 @@ export interface EnsembleTake {
   durationSec: number;
 }
 
-/** Vị trí tâm ghế trên sân khấu, tính theo % chiều rộng (x) và chiều cao (y). */
 export interface SeatPosition {
   x: number;
   y: number;
 }
 
-/** Phần thông tin bài tập màn hòa tấu cần; `GET /assignments/:id` trả nhiều trường hơn. */
 export interface EnsembleAssignmentInfo {
   id: string;
   title: string;
   className: string;
   deadline: string;
+  canSubmit: boolean;
+  usedSubmissions: number;
+  maxSubmissions: number;
 }
 
 export type ListeningMode = "headphones" | "speaker";

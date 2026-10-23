@@ -14,18 +14,31 @@ import { useTakePlayback } from "@/features/ensemble/hooks/useTakePlayback";
 import { useTrackPeaks } from "@/features/ensemble/hooks/useTrackPeaks";
 import { type ListeningMode } from "@/features/ensemble/types/ensembleTypes";
 import { formatDate } from "@/features/ensemble/utils/formatClock";
+import { rememberSubmission } from "@/features/practice/utils/submissionStorage";
+import { useAuth } from "@/shared/context/AuthContext";
 
 const LEAVE_CONFIRM_MESSAGE = "Rời màn hình sẽ hủy bản thu đang thực hiện. Bạn có muốn rời đi?";
 
 export function EnsemblePage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const pieceId = searchParams.get("pieceId") ?? "";
   const assignmentId = searchParams.get("assignmentId") ?? undefined;
   const practice = useEnsemblePractice(pieceId, assignmentId);
   const assignment = useEnsembleAssignment(assignmentId);
   const peaksByTrack = useTrackPeaks(practice.tracks);
-  const { status, cancel } = practice;
+  const { status, cancel, stop, discardTake } = practice;
+
+  const handleSubmit = useCallback(async () => {
+    const submitted = await practice.submit();
+    if (submitted) {
+      rememberSubmission(user?.userId ?? "guest", pieceId, submitted.id);
+      navigate(
+        `/practice/${pieceId}/processing?submissionId=${submitted.id}${assignmentId ? `&assignmentId=${assignmentId}` : ""}`
+      );
+    }
+  }, [assignmentId, navigate, pieceId, practice, user?.userId]);
 
   const listening = useListeningSetup(Boolean(practice.tracksResult));
   const [isPromptForced, setIsPromptForced] = useState(false);
@@ -97,6 +110,15 @@ export function EnsemblePage() {
   const hasUnsavedTake = status === "preview";
   const backTarget = assignmentId ? `/assignment/${assignmentId}` : "/assignments";
 
+  const submitBlockedReason = !practice.tracksResult?.mySheetMusicId
+    ? "Nhạc cụ của bạn chưa có bản mẫu cho bài này nên chưa nộp để chấm được. Bạn vẫn có thể luyện và nghe lại."
+    : null;
+  const quotaNote = assignment && !assignment.canSubmit
+    ? "Bài tập đã đóng hoặc hết lượt nộp — bản thu sẽ chỉ lưu làm bài luyện tập."
+    : assignment
+      ? `Đã dùng ${assignment.usedSubmissions}/${assignment.maxSubmissions} lượt nộp.`
+      : null;
+
   useEffect(() => {
     if (!isBusy && !hasUnsavedTake) return;
     const warn = (event: BeforeUnloadEvent) => event.preventDefault();
@@ -117,22 +139,22 @@ export function EnsemblePage() {
         if (status === "ready") {
           requestStart();
         } else if (status === "recording") {
-          void practice.stop();
+          void stop();
         } else if (status === "preview") {
           playback.togglePlay();
         }
       } else if (event.code === "KeyR" && status === "preview" && !isBusy) {
         event.preventDefault();
-        practice.discardTake();
-      } else if (event.code === "KeyS" && status === "preview" && !isBusy) {
+        discardTake();
+      } else if (event.code === "KeyS" && status === "preview" && !isBusy && submitBlockedReason === null) {
         event.preventDefault();
-        void practice.save();
+        void handleSubmit();
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [status, isBusy, practice, playback, requestStart]);
+  }, [status, isBusy, handleSubmit, playback, requestStart, submitBlockedReason, stop, discardTake]);
 
   const leave = () => {
     const message = hasUnsavedTake ? "Bản thu chưa được lưu sẽ mất. Bạn có muốn rời đi?" : LEAVE_CONFIRM_MESSAGE;
@@ -204,12 +226,18 @@ export function EnsemblePage() {
               onRequestMicAccess={() => void listening.requestAccess()}
               onStart={requestStart}
               onStop={() => void practice.stop()}
-              onSave={() => void practice.save()}
+              onSubmit={() => void handleSubmit()}
               onDiscard={practice.discardTake}
               onPracticeAgain={practice.reset}
               onBack={() => navigate(backTarget)}
               backLabel={assignmentId ? "Về bài tập" : "Về danh sách bài tập"}
+              uploadPercent={practice.uploadPercent}
+              submitBlockedReason={submitBlockedReason}
             />
+
+            {quotaNote && (status === "ready" || status === "preview") && (
+              <p className="px-1 text-[12px] text-bvc-muted">{quotaNote}</p>
+            )}
 
             <MyTakeLane
               status={status}

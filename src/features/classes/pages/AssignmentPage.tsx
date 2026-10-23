@@ -70,37 +70,28 @@ function InfoRow({ label, value, highlight }: InfoRowProps) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// COMPONENT: BẢNG YÊU CẦU BÀI TẬP (SPECS CARD - CỘT PHẢI)
-// ─────────────────────────────────────────────────────────────────────────────
-
 function AssignmentRequirementsCard({ assignment }: { assignment: AssignmentDetail }) {
   return (
     <div className="rounded-2xl border border-bvc-border bg-white p-4.5 shadow-2xs md:p-5">
       <div className="flex items-center justify-between">
         <p className="text-[11px] font-extrabold uppercase tracking-wider text-bvc-muted">Yêu cầu bài tập</p>
-        <span className="text-[12px] font-semibold text-bvc-muted">
-          {assignment.className}
-        </span>
+        <span className="text-[12px] font-semibold text-bvc-muted">{assignment.className}</span>
       </div>
 
       <div className="mt-2.5 flex flex-col">
         <InfoRow label="Lớp học" value={assignment.className} />
         <InfoRow label="Hạn nộp" value={formatFullDeadline(assignment.deadline)} />
         {assignment.pieceTitle && <InfoRow label="Bản nhạc" value={assignment.pieceTitle} />}
-        {assignment.targetBpm !== null && (
-          <InfoRow label="Tốc độ BPM" value={`${assignment.targetBpm} BPM`} />
-        )}
+        {assignment.targetBpm !== null && <InfoRow label="Tốc độ BPM" value={`${assignment.targetBpm} BPM`} />}
         <InfoRow label="Accuracy tối thiểu" value={`${assignment.minAccuracy}%`} highlight />
-        <InfoRow label="Lượt nộp đã dùng" value={`${assignment.usedSubmissions} / ${assignment.maxSubmissions}`} />
+        <InfoRow label="Lượt nộp tối đa" value={`${assignment.usedSubmissions} / ${assignment.maxSubmissions}`} />
       </div>
 
-      {/* Thước đo chuẩn Accuracy mục tiêu */}
       <div className="mt-3.5 rounded-xl border border-bvc-border bg-bvc-surface/40 p-3">
         <div className="flex items-center justify-between text-[11.5px] font-bold">
           <span className="flex items-center gap-1 text-bvc-muted">
             <Target size={13} className="text-bvc-accent" />
-            <span>Mục tiêu đánh giá AI</span>
+            <span>Ngưỡng đạt</span>
           </span>
           <span className="font-bvc-mono font-black text-bvc-ink">≥ {assignment.minAccuracy}%</span>
         </div>
@@ -120,10 +111,6 @@ function AssignmentRequirementsCard({ assignment }: { assignment: AssignmentDeta
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// COMPONENT: RUBRIC CHẤM ĐIỂM (CỘT PHẢI - GỌN GÀNG, DỄ NHÌN)
-// ─────────────────────────────────────────────────────────────────────────────
-
 function AssignmentRubricCard({ rubric }: { rubric: { name: string; weight: number }[] }) {
   if (!rubric || rubric.length === 0) return null;
 
@@ -136,7 +123,10 @@ function AssignmentRubricCard({ rubric }: { rubric: { name: string; weight: numb
 
       <div className="mt-3 flex flex-col gap-2.5">
         {rubric.map((criterion) => (
-          <div key={criterion.name} className="flex flex-col gap-1 border-b border-bvc-line/50 pb-2.5 last:border-0 last:pb-0">
+          <div
+            key={criterion.name}
+            className="flex flex-col gap-1 border-b border-bvc-line/50 pb-2.5 last:border-0 last:pb-0"
+          >
             <div className="flex items-center justify-between text-[12.5px]">
               <span className="font-medium text-bvc-ink">{criterion.name}</span>
               <span className="font-bvc-mono text-[12px] font-bold text-bvc-accent">{criterion.weight}%</span>
@@ -153,10 +143,6 @@ function AssignmentRubricCard({ rubric }: { rubric: { name: string; weight: numb
     </div>
   );
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// COMPONENT: THƯỚC ĐO CÁC LƯỢT NỘP (ATTEMPT TIMELINE)
-// ─────────────────────────────────────────────────────────────────────────────
 
 function AttemptTimeline({ assignment }: { assignment: AssignmentDetail }) {
   const max = assignment.maxSubmissions;
@@ -187,8 +173,8 @@ function AttemptTimeline({ assignment }: { assignment: AssignmentDetail }) {
                 sub
                   ? "border-bvc-accent/60 bg-bvc-accent-tint/30 text-bvc-ink"
                   : isCurrentOrPast
-                  ? "border-bvc-border bg-bvc-surface text-bvc-ink"
-                  : "border-dashed border-bvc-border/90 bg-white text-bvc-muted"
+                    ? "border-bvc-border bg-bvc-surface text-bvc-ink"
+                    : "border-dashed border-bvc-border/90 bg-white text-bvc-muted"
               )}
             >
               <div className="flex items-center gap-1">
@@ -210,10 +196,6 @@ function AttemptTimeline({ assignment }: { assignment: AssignmentDetail }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// COMPONENT: PHÒNG THU ÂM & HÀNH ĐỘNG NỘP (CỘT TRÁI - TỐI ƯU RỘNG RÃI, DỄ THAO TÁC)
-// ─────────────────────────────────────────────────────────────────────────────
-
 interface AssignmentStudioBoxProps {
   assignment: AssignmentDetail;
   recordingTarget: string | null;
@@ -221,12 +203,7 @@ interface AssignmentStudioBoxProps {
   onNavigate: (to: string) => void;
 }
 
-function AssignmentStudioBox({
-  assignment,
-  recordingTarget,
-  ensembleTarget,
-  onNavigate,
-}: AssignmentStudioBoxProps) {
+function AssignmentStudioBox({ assignment, recordingTarget, ensembleTarget, onNavigate }: AssignmentStudioBoxProps) {
   return (
     <div className="rounded-2xl border border-bvc-border bg-white p-4.5 shadow-2xs sm:p-5">
       <div className="flex flex-col gap-3.5 sm:flex-row sm:items-center sm:justify-between">
@@ -235,9 +212,7 @@ function AssignmentStudioBox({
             <Mic size={20} strokeWidth={2.2} />
           </div>
           <div>
-            <h3 className="font-bvc-display text-[15px] font-bold text-bvc-ink">
-              Phòng thu âm diễn tấu
-            </h3>
+            <h3 className="font-bvc-display text-[15px] font-bold text-bvc-ink">Thu âm diễn tấu</h3>
             <p className="text-[12px] text-bvc-muted">
               {assignment.canSubmit
                 ? "Thu trực tiếp bằng micro hoặc tải lên bản thu (.wav, .m4a, .mp3)"
@@ -246,7 +221,6 @@ function AssignmentStudioBox({
           </div>
         </div>
 
-        {/* Nút hành động trực tiếp */}
         <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap shrink-0">
           {assignment.hasEnsembleTracks && assignment.pieceId && (
             <button
@@ -279,10 +253,6 @@ function AssignmentStudioBox({
     </div>
   );
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// MAIN PAGE COMPONENT
-// ─────────────────────────────────────────────────────────────────────────────
 
 export function AssignmentPage() {
   const navigate = useNavigate();
@@ -318,14 +288,12 @@ export function AssignmentPage() {
   }
 
   const urgency = getDeadlineUrgency(assignment.deadline);
-  // Học viên chọn bản nhạc (nhạc cụ) trên trang bài nhạc trước khi thu âm; bài tập không có bài nhạc thì không nộp qua M01
   const recordingTarget = assignment.pieceId ? `/library/${assignment.pieceId}?assignmentId=${assignment.id}` : null;
   const ensembleTarget = `/ensemble/new?pieceId=${assignment.pieceId}&assignmentId=${assignment.id}`;
 
   return (
     <StudentShell>
       <div className="mx-auto flex w-full max-w-[1140px] flex-1 flex-col gap-4 px-3.5 py-4 sm:px-6 md:gap-5 md:px-10 md:py-8">
-        {/* Navigation Breadcrumb */}
         <div className="flex items-center justify-between">
           <Link
             to="/assignments"
@@ -334,24 +302,16 @@ export function AssignmentPage() {
             <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-0.5" />
             <span>Quay lại danh sách bài tập</span>
           </Link>
-          <span className="text-[12.5px] font-semibold text-bvc-muted">
-            {assignment.className}
-          </span>
+          <span className="text-[12.5px] font-semibold text-bvc-muted">{assignment.className}</span>
         </div>
 
-        {/* Bố cục Responsive: 1 cột trên Mobile/Tablet, 2 cột (2/3 + 1/3) trên Desktop */}
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-6">
-          {/* Cột chính (bên trái): lg:col-span-2 */}
           <div className="flex flex-col gap-4 lg:col-span-2">
-            
-            {/* Card 1: Thông tin bài tập chi tiết */}
             <div className="relative overflow-hidden rounded-3xl border border-bvc-border bg-white p-5 shadow-2xs sm:p-6">
-              {/* Hoa văn trang trí chìm */}
               <div className="pointer-events-none absolute -bottom-8 -right-8 size-36 opacity-[0.03]">
                 <AssignmentTypeIcon type={assignment.type} size={144} className="text-bvc-ink" />
               </div>
 
-              {/* Hàng metadata thanh lịch (ZERO PILLS) */}
               <div className="flex items-center justify-between gap-2 flex-wrap text-[12px]">
                 <div className="flex items-center gap-2 text-bvc-muted">
                   <AssignmentTypeIcon type={assignment.type} size={14} className="text-bvc-accent" strokeWidth={2.2} />
@@ -366,7 +326,6 @@ export function AssignmentPage() {
                   <span>{ASSIGNMENT_TYPE_LABELS[assignment.type] || "Bài tập"}</span>
                 </div>
 
-                {/* Status Dot */}
                 <div className="flex items-center gap-1.5 font-semibold text-[12px]">
                   {assignment.status === "OVERDUE" && (
                     <span className="flex items-center gap-1.5 text-bvc-error">
@@ -395,12 +354,10 @@ export function AssignmentPage() {
                 </div>
               </div>
 
-              {/* Tên bài tập */}
               <h1 className="mt-3.5 font-bvc-display text-[22px] font-black tracking-tight text-bvc-ink sm:text-[25px] md:text-[28px]">
                 {assignment.title}
               </h1>
 
-              {/* Banner thời hạn nộp */}
               <div
                 className={cn(
                   "mt-4 flex items-center justify-between gap-3 rounded-2xl border p-3.5",
@@ -415,9 +372,7 @@ export function AssignmentPage() {
                   ) : (
                     <Clock size={17} className="shrink-0 text-bvc-accent-text" />
                   )}
-                  <span className="text-[13px] font-bold">
-                    Hạn nộp: {formatFullDeadline(assignment.deadline)}
-                  </span>
+                  <span className="text-[13px] font-bold">Hạn nộp: {formatFullDeadline(assignment.deadline)}</span>
                 </div>
                 <span className="rounded-lg bg-white/90 px-2.5 py-1 font-bvc-mono text-[11.5px] font-bold shadow-2xs">
                   {describeTimeLeft(assignment.deadline, new Date())}
@@ -436,10 +391,8 @@ export function AssignmentPage() {
               )}
             </div>
 
-            {/* Card 2: Thước đo lượt nộp trực quan */}
             <AttemptTimeline assignment={assignment} />
 
-            {/* Card 3: PHÒNG THU ÂM & NỘP BÀI (Đặt ở cột trái theo yêu cầu) */}
             <AssignmentStudioBox
               assignment={assignment}
               recordingTarget={recordingTarget}
@@ -447,17 +400,14 @@ export function AssignmentPage() {
               onNavigate={navigate}
             />
 
-            {/* Trên Mobile (< lg): Yêu cầu bài tập + Rubric hiển thị dưới Thu âm */}
             <div className="flex flex-col gap-4 lg:hidden">
               <AssignmentRequirementsCard assignment={assignment} />
               <AssignmentRubricCard rubric={assignment.rubric} />
             </div>
 
-            {/* Card 4: Lịch sử bài nộp của bạn */}
             <MySubmissionList submissions={assignment.submissions} />
           </div>
 
-          {/* Cột phụ (bên phải): Bảng yêu cầu & Rubric chấm điểm (Sticky trên Desktop) */}
           <div className="hidden lg:flex flex-col gap-4 lg:sticky lg:top-24">
             <AssignmentRequirementsCard assignment={assignment} />
             <AssignmentRubricCard rubric={assignment.rubric} />
@@ -465,12 +415,9 @@ export function AssignmentPage() {
         </div>
       </div>
 
-      {/* Thanh nút bấm cố định dưới đáy màn hình trên Mobile (< lg) */}
       <div className="sticky bottom-0 z-20 flex flex-col gap-2 border-t border-bvc-border bg-white/95 p-3.5 backdrop-blur-sm lg:hidden shadow-lg">
         {!assignment.canSubmit && (
-          <p className="text-center text-[12px] font-medium text-bvc-error">
-            {SUBMIT_BLOCKED_MESSAGE}
-          </p>
+          <p className="text-center text-[12px] font-medium text-bvc-error">{SUBMIT_BLOCKED_MESSAGE}</p>
         )}
         <button
           type="button"

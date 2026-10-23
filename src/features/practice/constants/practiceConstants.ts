@@ -3,10 +3,9 @@ import type { NoteInfo, StringInfo, SubdivisionKey, TimeSignature } from "@/feat
 export const TUNER_TOLERANCE_CENTS = 10;
 export const TEMPO_TOLERANCE_PERCENT = 5;
 export const COUNT_IN_BEATS = 4;
-// Tiến trình xử lý: hỏi BE mỗi 1,5 giây; bốn bước tối đa khoảng 1 phút nên dừng hỏi sau 90 giây không có kết quả
+// Tiến trình xử lý: hỏi BE mỗi 1,5 giây cho đến khi nhận trạng thái cuối.
 export const PROGRESS_POLL_MS = 1500;
 export const PROGRESS_POLL_MAX_MS = 5000;
-export const PROGRESS_BACKSTOP_MS = 90_000;
 export const RESULT_REDIRECT_MS = 1500; // GBR-52
 // MSG-17: mạng yếu khi effectiveType chậm, downlink thấp hoặc tốc độ tải lên thực tế thấp
 export const WEAK_EFFECTIVE_TYPES = ["slow-2g", "2g", "3g"];

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ensembleApi } from "@/features/ensemble/api/ensembleApi";
 import { useTrackMixer } from "@/features/ensemble/hooks/useTrackMixer";
 import {
+  type EnsembleSubmission,
   type EnsembleTake,
   type EnsembleTracksResult,
   type ListeningMode,
@@ -51,6 +52,8 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
   const [trackAnalysers, setTrackAnalysers] = useState<ReadonlyMap<string, AnalyserNode>>(EMPTY_ANALYSERS);
 
   const [take, setTake] = useState<EnsembleTake | null>(null);
+  const [uploadPercent, setUploadPercent] = useState(0);
+  const [submission, setSubmission] = useState<EnsembleSubmission | null>(null);
   const takeRef = useRef<EnsembleTake | null>(null);
   const accompanimentTimersRef = useRef<number[]>([]);
 
@@ -202,6 +205,8 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
     chunksRef.current = [];
     releaseRecording();
     replaceTake(null);
+    setSubmission(null);
+    setUploadPercent(0);
     setElapsedSec(0);
     setCountBeat(0);
     changeStatus("ready");
@@ -209,25 +214,30 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
 
   useEffect(() => () => cancel(), [cancel]);
 
-  const save = useCallback(async () => {
+  const submit = useCallback(async (): Promise<EnsembleSubmission | null> => {
     const current = takeRef.current;
-    if (!current || statusRef.current !== "preview") return;
+    const sheetMusicId = tracksResult?.mySheetMusicId;
+    if (!current || !sheetMusicId || statusRef.current !== "preview") return null;
     pauseTracks();
     changeStatus("saving");
+    setUploadPercent(0);
     try {
-      const form = new FormData();
-      form.set("pieceId", pieceId);
-      if (assignmentId) form.set("assignmentId", assignmentId);
-      form.set("trackSettings", JSON.stringify(settingsRef.current));
-      form.set("recording", current.blob, "take.wav");
-      const { data } = await ensembleApi.createSession(form);
-      toast.success(data.message);
+      const file = new File([current.blob], "ban-thu-hoa-tau.wav", { type: "audio/wav" });
+      const { data: upload } = await ensembleApi.uploadRecording(file, setUploadPercent);
+      const { data } = await ensembleApi.createSubmission({ pieceId, sheetMusicId, assignmentId, studentUploadId: upload.data.fileId });
+      setSubmission(data.data);
+      toast.success("Đã nộp bản thu. Hệ thống đang phân tích.");
+      if (assignmentId && data.data.assignmentId === null) {
+        toast.info("Bài tập đã đóng hoặc hết lượt nộp nên bản thu được lưu làm bài luyện tập.");
+      }
       changeStatus("saved");
+      return data.data;
     } catch (error: unknown) {
-      toast.error(getApiErrorMessage(error, "Không thể lưu bản thu. Vui lòng thử lại."));
-      changeStatus("preview"); // giữ bản thu để lưu lại
+      toast.error(getApiErrorMessage(error, "Không thể nộp bản thu. Vui lòng thử lại."));
+      changeStatus("preview"); // giữ bản thu để nộp lại
+      return null;
     }
-  }, [assignmentId, changeStatus, pauseTracks, pieceId]);
+  }, [assignmentId, changeStatus, pauseTracks, pieceId, tracksResult]);
 
   const stop = useCallback(async () => {
     const recorder = recorderRef.current;
@@ -261,6 +271,8 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
   const discardTake = useCallback(() => {
     pauseTracks();
     replaceTake(null);
+    setSubmission(null);
+    setUploadPercent(0);
     setElapsedSec(0);
     setCountBeat(0);
     changeStatus("ready");
@@ -363,7 +375,9 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
     setIsMetronomeOn,
     micError,
     take,
-    save,
+    uploadPercent,
+    submission,
+    submit,
     discardTake,
     playTracksFrom,
     pauseTracks,

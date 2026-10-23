@@ -16,9 +16,9 @@ const STATUS_CONFIG: Record<PracticeStatus, { label: string; dot: string; textCo
     dot: "bg-bvc-accent animate-pulse",
     textColor: "text-bvc-accent-text",
   },
-  preview: { label: "Nghe lại & Kiểm tra hòa âm", dot: "bg-bvc-ok", textColor: "text-bvc-ok" },
-  saving: { label: "Đang lưu bản thu...", dot: "bg-bvc-ink animate-pulse", textColor: "text-bvc-ink" },
-  saved: { label: "Đã lưu bản thu thành công", dot: "bg-bvc-ok", textColor: "text-bvc-ok" },
+  preview: { label: "Nghe lại rồi nộp bản thu", dot: "bg-bvc-ok", textColor: "text-bvc-ok" },
+  saving: { label: "Đang tải lên và nộp bài...", dot: "bg-bvc-ink animate-pulse", textColor: "text-bvc-ink" },
+  saved: { label: "Đã nộp bản thu", dot: "bg-bvc-ok", textColor: "text-bvc-ok" },
 };
 
 interface TransportBarProps {
@@ -41,11 +41,13 @@ interface TransportBarProps {
   onRequestMicAccess: () => void;
   onStart: () => void;
   onStop: () => void;
-  onSave: () => void;
+  onSubmit: () => void;
   onDiscard: () => void;
   onPracticeAgain: () => void;
   onBack: () => void;
   backLabel: string;
+  uploadPercent: number;
+  submitBlockedReason: string | null;
 }
 
 export function TransportBar(props: TransportBarProps) {
@@ -204,28 +206,40 @@ export function TransportBar(props: TransportBarProps) {
         {(status === "processing" || status === "saving") && (
           <div className="flex h-11.5 w-full items-center justify-center gap-2.5 rounded-xl border border-bvc-border bg-bvc-surface text-[13.5px] font-semibold text-bvc-ink">
             <Loader2 size={18} className="animate-spin text-bvc-accent" />
-            <span>{status === "saving" ? "Đang lưu bản thu lên hệ thống..." : "Đang xử lý sóng âm..."}</span>
+            <span>
+              {status === "saving"
+                ? props.uploadPercent < 100
+                  ? `Đang tải lên ${props.uploadPercent}%...`
+                  : "Đang nộp..."
+                : "Đang xử lý sóng âm..."}
+            </span>
           </div>
         )}
 
         {status === "preview" && (
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={props.onDiscard}
-              className="flex h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border border-bvc-border bg-white text-[13.5px] font-semibold text-bvc-ink transition-colors hover:bg-bvc-surface active:scale-[0.99]"
-            >
-              <RotateCcw size={16} strokeWidth={2} />
-              <span>Thu lại (R)</span>
-            </button>
-            <button
-              type="button"
-              onClick={props.onSave}
-              className="flex h-11 cursor-pointer items-center justify-center gap-2 rounded-xl bg-bvc-ink text-[13.5px] font-bold text-white shadow-md transition-all hover:bg-emerald-950 active:scale-[0.99]"
-            >
-              <Sparkles size={16} strokeWidth={2} />
-              <span>Lưu bản thu (S)</span>
-            </button>
+          <div className="flex flex-col gap-2">
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={props.onDiscard}
+                className="flex h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border border-bvc-border bg-white text-[13.5px] font-semibold text-bvc-ink transition-colors hover:bg-bvc-surface active:scale-[0.99]"
+              >
+                <RotateCcw size={16} strokeWidth={2} />
+                <span>Thu lại (R)</span>
+              </button>
+              <button
+                type="button"
+                onClick={props.onSubmit}
+                disabled={props.submitBlockedReason !== null}
+                className="flex h-11 cursor-pointer items-center justify-center gap-2 rounded-xl bg-bvc-ink text-[13.5px] font-bold text-white shadow-md transition-all hover:bg-emerald-950 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <Sparkles size={16} strokeWidth={2} />
+                <span>Nộp bản thu (S)</span>
+              </button>
+            </div>
+            {props.submitBlockedReason !== null && (
+              <p className="text-[12px] text-bvc-accent-text">{props.submitBlockedReason}</p>
+            )}
           </div>
         )}
 

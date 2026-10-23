@@ -68,7 +68,7 @@ export function AssignmentFormPage() {
           mode={isEdit ? "edit" : "create"}
           initialValues={initialValues}
           classes={formClasses}
-          currentPiece={assignment?.piece ?? null}
+          currentSheetMusic={assignment?.sheetMusic ?? null}
           isSaving={isSaving}
           onCancel={() => navigate(backPath)}
           onSubmit={handleSubmit}

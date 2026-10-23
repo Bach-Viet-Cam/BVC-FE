@@ -11,6 +11,7 @@ import {
   type Member,
   type MemberListParams,
   type MemberListResult,
+  type MemberLookup,
   type SemesterList,
   type StudentPayload,
 } from "@/features/classes/types/classTypes";
@@ -28,6 +29,8 @@ export const classesApi = {
 
   listMembers: (classId: string, params: MemberListParams) =>
     axiosClient.get<ApiResponse<MemberListResult>>(`/classes/${classId}/members`, { params }),
+  lookupMember: (classId: string, email: string) =>
+    axiosClient.get<ApiResponse<MemberLookup>>(`/classes/${classId}/members/lookup`, { params: { email } }),
   addMember: (classId: string, payload: StudentPayload) =>
     axiosClient.post<ApiResponse<Member>>(`/classes/${classId}/members`, payload),
   removeMember: (classId: string, studentId: string) =>

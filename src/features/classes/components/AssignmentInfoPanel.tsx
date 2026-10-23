@@ -2,7 +2,11 @@ import { Link } from "react-router-dom";
 import { ActionButton } from "@/features/classes/components/ActionButton";
 import { StatusLabel } from "@/features/classes/components/StatusLabel";
 import { type AssignmentBase, type AssignmentStatus } from "@/features/classes/types/teacherAssignmentTypes";
-import { ASSIGNMENT_KIND_LABELS, ASSIGNMENT_STATUS_LABELS } from "@/features/classes/utils/teacherAssignmentFormat";
+import {
+  ASSIGNMENT_KIND_LABELS,
+  ASSIGNMENT_STATUS_LABELS,
+  sheetMusicLabel,
+} from "@/features/classes/utils/teacherAssignmentFormat";
 
 export type AssignmentPanelAction = "publish" | "close" | "reopen" | "delete";
 
@@ -50,8 +54,8 @@ export function AssignmentInfoPanel({ assignment, isWorking = false, onAction }:
         <div className="col-span-2 flex flex-col gap-[2px]">
           <span className="text-[12px] text-bvc-muted">Bài nhạc</span>
           <span className="flex flex-wrap items-center gap-[8px] text-[14.5px] font-semibold">
-            {assignment.piece?.title ?? "Không chọn"}
-            {assignment.piece && !assignment.piece.isAvailable && (
+            {assignment.sheetMusic ? sheetMusicLabel(assignment.sheetMusic) : "Không chọn"}
+            {assignment.sheetMusic && !assignment.sheetMusic.isAvailable && (
               <span className="rounded-[8px] bg-bvc-accent-tint px-[8px] py-[2px] text-[11.5px] font-normal text-bvc-accent-text">
                 Không còn khả dụng
               </span>
