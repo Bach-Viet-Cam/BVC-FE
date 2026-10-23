@@ -1,30 +1,43 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { type ListeningMode, type MicPermission } from "@/features/ensemble/types/ensembleTypes";
-import { readDevices, readStoredChoice, saveStoredChoice } from "@/features/ensemble/utils/listeningMode";
+import { clearStoredChoice, readDevices } from "@/features/ensemble/utils/listeningMode";
 
 interface ListeningState {
   permission: MicPermission;
+  hasMic: boolean;
   headphoneLabel: string | null;
   signature: string;
-  /** Lựa chọn tay cho bộ thiết bị hiện tại (null = chưa chọn). */
+  /** Lựa chọn tay trong phiên hiện tại (null = chưa chọn). */
   manualMode: ListeningMode | null;
 }
 
-const INITIAL_STATE: ListeningState = { permission: "pending", headphoneLabel: null, signature: "", manualMode: null };
+const INITIAL_STATE: ListeningState = {
+  permission: "pending",
+  hasMic: true,
+  headphoneLabel: null,
+  signature: "",
+  manualMode: null,
+};
 
 export function useListeningSetup(isEnabled: boolean) {
   const [state, setState] = useState<ListeningState>(INITIAL_STATE);
   const isMountedRef = useRef(true);
 
+  // Xóa storage cũ để mỗi lần vào trang đều dò mới và cảnh báo ngay nếu không có tai nghe
+  useEffect(() => {
+    clearStoredChoice();
+  }, []);
+
   const evaluateDevices = useCallback(async () => {
     const snapshot = await readDevices();
     if (!isMountedRef.current) return;
-    const stored = readStoredChoice();
     setState((previous) => ({
       ...previous,
+      hasMic: snapshot.hasMic,
       headphoneLabel: snapshot.headphoneLabel,
       signature: snapshot.signature,
-      manualMode: stored && stored.signature === snapshot.signature ? stored.mode : null,
+      // Nếu có tai nghe thì tự gán headphones; nếu không có thì giữ lựa chọn trong phiên hiện tại
+      manualMode: snapshot.headphoneLabel ? "headphones" : previous.manualMode,
     }));
   }, []);
 
@@ -34,10 +47,17 @@ export function useListeningSetup(isEnabled: boolean) {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       stream.getTracks().forEach((track) => track.stop());
       if (!isMountedRef.current) return;
-      setState((previous) => ({ ...previous, permission: "granted" }));
+      setState((previous) => ({ ...previous, permission: "granted", hasMic: true }));
       await evaluateDevices();
-    } catch {
-      if (isMountedRef.current) setState((previous) => ({ ...previous, permission: "denied" }));
+    } catch (err: unknown) {
+      if (!isMountedRef.current) return;
+      const errorName = err instanceof Error ? err.name : "";
+      const isNotFound = errorName === "NotFoundError" || errorName === "DevicesNotFoundError";
+      setState((previous) => ({
+        ...previous,
+        permission: "denied",
+        hasMic: !isNotFound,
+      }));
     }
   }, [evaluateDevices]);
 
@@ -58,12 +78,18 @@ export function useListeningSetup(isEnabled: boolean) {
       .then((stream) => {
         stream.getTracks().forEach((track) => track.stop());
         if (isCancelled) return;
-        setState((previous) => ({ ...previous, permission: "granted" }));
+        setState((previous) => ({ ...previous, permission: "granted", hasMic: true }));
         return evaluateDevices();
       })
-      .catch(() => {
+      .catch((err: unknown) => {
         if (!isCancelled) {
-          setState((previous) => ({ ...previous, permission: "denied" }));
+          const errorName = err instanceof Error ? err.name : "";
+          const isNotFound = errorName === "NotFoundError" || errorName === "DevicesNotFoundError";
+          setState((previous) => ({
+            ...previous,
+            permission: "denied",
+            hasMic: !isNotFound,
+          }));
         }
       });
 
@@ -81,20 +107,18 @@ export function useListeningSetup(isEnabled: boolean) {
   }, [state.permission, evaluateDevices]);
 
   const choose = useCallback((mode: ListeningMode) => {
-    setState((previous) => {
-      saveStoredChoice({ signature: previous.signature, mode });
-      return { ...previous, manualMode: mode };
-    });
+    setState((previous) => ({ ...previous, manualMode: mode }));
   }, []);
 
   const mode: ListeningMode | null = state.headphoneLabel ? "headphones" : state.manualMode;
 
   return {
     permission: state.permission,
+    hasMic: state.hasMic,
     mode,
     headphoneLabel: state.headphoneLabel,
-    /** Có quyền nhưng không thấy tai nghe và chưa chọn tay → cần hỏi. */
-    needsChoice: state.permission === "granted" && mode === null,
+    /** Có quyền, có mic nhưng không thấy tai nghe và chưa chọn cách nghe trong phiên này → LUÔN BÁO NGAY */
+    needsChoice: state.permission === "granted" && state.hasMic && mode === null,
     choose,
     requestAccess,
   };

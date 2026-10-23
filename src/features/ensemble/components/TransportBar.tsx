@@ -33,6 +33,7 @@ interface TransportBarProps {
   micError: string | null;
   isCountInOn: boolean;
   onCountInChange: (checked: boolean) => void;
+  hasMic: boolean;
   listeningMode: ListeningMode | null;
   headphoneLabel: string | null;
   micPermission: MicPermission;
@@ -168,8 +169,8 @@ export function TransportBar(props: TransportBarProps) {
           <button
             type="button"
             onClick={props.onStart}
-            disabled={props.micPermission === "pending"}
-            aria-disabled={props.micPermission === "pending"}
+            disabled={props.micPermission === "pending" || !props.hasMic}
+            aria-disabled={props.micPermission === "pending" || !props.hasMic}
             className="flex h-11.5 w-full cursor-pointer items-center justify-center gap-2.5 rounded-xl bg-bvc-accent font-bold text-[14px] text-white shadow-sm transition-all hover:bg-bvc-ink active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Mic size={18} strokeWidth={2.4} />
@@ -250,7 +251,23 @@ export function TransportBar(props: TransportBarProps) {
         )}
       </div>
 
-      {props.micPermission === "denied" && (
+      {!props.hasMic && (
+        <div
+          role="alert"
+          className="flex flex-col gap-2 rounded-lg bg-bvc-accent-tint p-2.5 text-[12.5px] text-bvc-accent-text sm:flex-row sm:items-center sm:justify-between"
+        >
+          <span>Không tìm thấy micro trên thiết bị. Vui lòng kết nối micro hoặc tai nghe có mic để bắt đầu thu bè.</span>
+          <button
+            type="button"
+            onClick={props.onRequestMicAccess}
+            className="h-8 shrink-0 cursor-pointer rounded-md bg-bvc-ink px-3 text-[12px] font-bold text-white transition-opacity hover:opacity-90"
+          >
+            Dò lại micro
+          </button>
+        </div>
+      )}
+
+      {props.hasMic && props.micPermission === "denied" && (
         <div
           role="alert"
           className="flex flex-col gap-2 rounded-lg bg-bvc-accent-tint p-2.5 text-[12.5px] text-bvc-accent-text sm:flex-row sm:items-center sm:justify-between"

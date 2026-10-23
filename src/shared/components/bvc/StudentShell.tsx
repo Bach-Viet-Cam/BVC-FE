@@ -14,10 +14,9 @@ interface StudentShellProps {
   className?: string;
 }
 
-// Các route Luyện tập / Hòa tấu hiện dùng id mẫu cho tới khi M01, M05 có màn danh sách
+// Luyện tập bắt đầu từ một bản nhạc trong Thư viện (SheetPage), nên không có mục menu riêng
 const NAV_ITEMS = [
   { label: "Hôm nay", to: "/home" },
-  { label: "Luyện tập", to: "/practice/ly-ngua-o/record" },
   { label: "Thư viện", to: "/library" },
   { label: "Bài tập", to: "/assignments" },
 ];

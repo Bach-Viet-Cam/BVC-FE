@@ -2,7 +2,7 @@ import { Pause, Play } from "lucide-react";
 import { InfoHint } from "@/features/practice/components/InfoHint";
 import { NoteIcon } from "@/features/practice/components/NoteIcon";
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
-import { BPM_MAX, BPM_MIN, SAMPLE, SIGS, SUBS } from "@/features/practice/constants/practiceConstants";
+import { BPM_MAX, BPM_MIN, PRACTICE_DEFAULTS, SIGS, SUBS } from "@/features/practice/constants/practiceConstants";
 import { useMetronome } from "@/features/practice/hooks/useMetronome";
 import type { SubdivisionKey } from "@/features/practice/types/practiceTypes";
 import { cn } from "@/shared/utils/cn";
@@ -57,7 +57,7 @@ export function MetronomeView() {
 
         <div className="mt-4 flex gap-2">
           {PRESETS.map((preset) => {
-            const value = Math.round(SAMPLE.targetBpm * preset.ratio);
+            const value = Math.round(PRACTICE_DEFAULTS.targetBpm * preset.ratio);
             const active = bpm === value;
             return (
               <button

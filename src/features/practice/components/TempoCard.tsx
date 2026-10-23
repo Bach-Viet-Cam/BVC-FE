@@ -1,7 +1,7 @@
 import { ChevronRight } from "lucide-react";
 import { CollapsibleCard } from "@/features/practice/components/CollapsibleCard";
 import { NoticeBanner } from "@/features/practice/components/NoticeBanner";
-import { COUNT_IN_BEATS, MSG, SAMPLE } from "@/features/practice/constants/practiceConstants";
+import { COUNT_IN_BEATS, MSG, PRACTICE_DEFAULTS } from "@/features/practice/constants/practiceConstants";
 import { cn } from "@/shared/utils/cn";
 
 interface TempoCardProps {
@@ -42,7 +42,7 @@ export function TempoCard({
       label="Nhịp"
       open={open}
       onToggle={onToggle}
-      summary={<span className="text-xs text-bvc-muted">4/4 · {SAMPLE.targetBpm} BPM</span>}
+      summary={<span className="text-xs text-bvc-muted">4/4 · {PRACTICE_DEFAULTS.targetBpm} BPM</span>}
     >
       <button
         type="button"
@@ -58,7 +58,7 @@ export function TempoCard({
           <span className="text-[11px] font-bold tracking-[0.1em] text-bvc-faint uppercase">Mục tiêu</span>
           <span className="flex items-baseline gap-[5px]">
             <span className="text-[30px] leading-[1.1] font-semibold text-bvc-ink md:text-[72px]">
-              {SAMPLE.targetBpm}
+              {PRACTICE_DEFAULTS.targetBpm}
             </span>
             <span className="text-xs text-bvc-muted">BPM</span>
           </span>

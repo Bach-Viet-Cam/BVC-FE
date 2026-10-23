@@ -2,6 +2,7 @@ import { axiosClient } from "@/shared/api/axiosClient";
 import { type ApiResponse } from "@/shared/types/commonTypes";
 import {
   type EnsembleAssignmentInfo,
+  type EnsembleSessionDetail,
   type EnsembleSessionResult,
   type EnsembleTracksResult,
 } from "@/features/ensemble/types/ensembleTypes";
@@ -18,4 +19,6 @@ export const ensembleApi = {
       headers: { "Content-Type": "multipart/form-data" },
       timeout: 120000,
     }),
+  getSession: (sessionId: string) =>
+    axiosClient.get<ApiResponse<EnsembleSessionDetail>>(`/ensemble-sessions/${sessionId}`),
 };

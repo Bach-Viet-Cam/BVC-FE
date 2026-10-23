@@ -1,6 +1,6 @@
 import { type ListeningMode } from "@/features/ensemble/types/ensembleTypes";
 
-const STORAGE_KEY = "bvc.ensemble.listeningChoice";
+export const STORAGE_KEY = "bvc.ensemble.listeningChoice";
 const HEADPHONE_PATTERN = /head(phone|set)|airpods|buds|earphone|tai nghe/i;
 
 /** Tai nghe: không lọc gì để giữ nguyên tiếng đàn. Loa ngoài: chỉ khử vọng để bớt tiếng bè lọt vào micro. */
@@ -10,45 +10,35 @@ export const MIC_CONSTRAINTS: Record<ListeningMode, MediaTrackConstraints> = {
 };
 
 export interface DeviceSnapshot {
+  hasMic: boolean;
   headphoneLabel: string | null;
-  /** Chuỗi nhận diện bộ thiết bị hiện tại để nhớ lựa chọn tay. */
+  /** Chuỗi nhận diện bộ thiết bị hiện tại. */
   signature: string;
 }
 
 export async function readDevices(): Promise<DeviceSnapshot> {
   try {
     const devices = (await navigator.mediaDevices.enumerateDevices()).filter((device) => device.kind !== "videoinput");
+    const audioInputs = devices.filter((device) => device.kind === "audioinput");
     const headphone = devices.find((device) => HEADPHONE_PATTERN.test(device.label));
     const signature = devices
       .map((device) => `${device.kind}:${device.label}`)
       .sort()
       .join("|");
-    return { headphoneLabel: headphone?.label ?? null, signature };
+    return {
+      hasMic: audioInputs.length > 0,
+      headphoneLabel: headphone?.label ?? null,
+      signature,
+    };
   } catch {
-    return { headphoneLabel: null, signature: "" };
+    return { hasMic: false, headphoneLabel: null, signature: "" };
   }
 }
 
-interface StoredChoice {
-  signature: string;
-  mode: ListeningMode;
-}
-
-export function readStoredChoice(): StoredChoice | null {
+export function clearStoredChoice(): void {
   try {
-    const parsed: unknown = JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? "null");
-    if (typeof parsed !== "object" || parsed === null) return null;
-    const { signature, mode } = parsed as Partial<StoredChoice>;
-    return typeof signature === "string" && (mode === "headphones" || mode === "speaker") ? { signature, mode } : null;
+    window.localStorage.removeItem(STORAGE_KEY);
   } catch {
-    return null;
-  }
-}
-
-export function saveStoredChoice(choice: StoredChoice): void {
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(choice));
-  } catch {
-    /* bị chặn lưu trữ: lần sau hỏi lại */
+    /* ignore */
   }
 }

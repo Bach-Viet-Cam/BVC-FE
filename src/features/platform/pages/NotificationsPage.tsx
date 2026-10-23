@@ -1,6 +1,7 @@
 import { Clock, Megaphone, Settings, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { MobileHeader, FilterChips } from "@/shared/components/bvc";
+import { FilterChips } from "@/shared/components/bvc";
+import { RoleShell } from "@/shared/components/bvc/RoleShell";
 import { useMyNotifications } from "@/features/platform/hooks/useMyNotifications";
 import { type NotificationType } from "@/features/platform/types/notificationTypes";
 import { type MyNotificationFilter, type MyNotificationItem } from "@/features/platform/types/myNotificationTypes";
@@ -106,58 +107,56 @@ export function NotificationsPage() {
   };
 
   return (
-    <div className="flex min-h-dvh justify-center bg-bvc-surface">
-      <div className="flex h-dvh w-full max-w-[428px] flex-col overflow-hidden bg-white">
-        <MobileHeader
-          title="Thông báo"
-          rightSlot={
-            <button
-              type="button"
-              disabled={unreadCount === 0}
-              onClick={() => void markAllRead()}
-              className="min-h-[44px] px-2 text-[13px] font-semibold text-bvc-accent-text disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Đọc tất cả
-            </button>
-          }
-        />
-
+    <RoleShell
+      title="Thông báo"
+      actions={
+        <button
+          type="button"
+          disabled={unreadCount === 0}
+          onClick={() => void markAllRead()}
+          className="min-h-[44px] cursor-pointer px-2 text-[13px] font-semibold text-bvc-accent-text disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Đọc tất cả
+        </button>
+      }
+    >
+      <div className="-mx-[14px]">
         <FilterChips
           chips={MY_NOTIFICATION_FILTERS}
           active={filter}
           onChange={(value) => setFilter(value as MyNotificationFilter)} // value luôn lấy từ MY_NOTIFICATION_FILTERS
         />
-
-        <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
-          {isLoading || error ? (
-            <p className={cn("px-[14px] pt-6 text-center text-[14px]", error ? "text-bvc-error" : "text-bvc-muted")}>
-              {error ?? "Đang tải..."}
-            </p>
-          ) : (
-            <>
-              <NotifSection title="Hôm nay" items={today} now={now} onOpen={openNotification} />
-              <NotifSection title="Trước đó" items={earlier} now={now} onOpen={openNotification} />
-              {items.length === 0 && (
-                <div className="flex h-[200px] items-center justify-center text-[14px] text-bvc-faint">
-                  Không có thông báo
-                </div>
-              )}
-              {hasMore && (
-                <div className="flex justify-center px-[14px] py-4">
-                  <button
-                    type="button"
-                    disabled={isLoadingMore}
-                    onClick={() => void loadMore()}
-                    className="min-h-[40px] rounded-[12px] border border-bvc-border-strong px-4 text-[13px] font-semibold text-bvc-ink disabled:opacity-50"
-                  >
-                    {isLoadingMore ? "Đang tải..." : "Xem thêm"}
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-        </div>
       </div>
-    </div>
+
+      <div className="overflow-hidden rounded-[20px] border border-bvc-border bg-white">
+        {isLoading || error ? (
+          <p className={cn("px-[14px] pt-6 text-center text-[14px]", error ? "text-bvc-error" : "text-bvc-muted")}>
+            {error ?? "Đang tải..."}
+          </p>
+        ) : (
+          <>
+            <NotifSection title="Hôm nay" items={today} now={now} onOpen={openNotification} />
+            <NotifSection title="Trước đó" items={earlier} now={now} onOpen={openNotification} />
+            {items.length === 0 && (
+              <div className="flex h-[200px] items-center justify-center text-[14px] text-bvc-faint">
+                Không có thông báo
+              </div>
+            )}
+            {hasMore && (
+              <div className="flex justify-center px-[14px] py-4">
+                <button
+                  type="button"
+                  disabled={isLoadingMore}
+                  onClick={() => void loadMore()}
+                  className="min-h-[40px] rounded-[12px] border border-bvc-border-strong px-4 text-[13px] font-semibold text-bvc-ink disabled:opacity-50"
+                >
+                  {isLoadingMore ? "Đang tải..." : "Xem thêm"}
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </RoleShell>
   );
 }

@@ -2,7 +2,6 @@ import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { PracticeFrame } from "@/features/practice/components/PracticeFrame";
 import { PracticeTopBar } from "@/features/practice/components/PracticeTopBar";
 import { TunerView } from "@/features/practice/components/TunerView";
-import { SAMPLE } from "@/features/practice/constants/practiceConstants";
 import { usePracticeAudio } from "@/features/practice/hooks/usePracticeAudio";
 import { buildDemoSession } from "@/features/practice/utils/practiceSession";
 import { useIsMobile } from "@/shared/hooks/use-mobile";
@@ -19,12 +18,7 @@ export function TunerPage() {
 
   return (
     <PracticeFrame>
-      <PracticeTopBar
-        variant="close"
-        title="Lên dây"
-        subtitle={`${SAMPLE.instrument} · 4 dây · A4 440 Hz`}
-        onBack={() => navigate(-1)}
-      />
+      <PracticeTopBar variant="close" title="Lên dây" subtitle="Chuẩn A4 440 Hz" onBack={() => navigate(-1)} />
       <TunerView audio={audio} />
     </PracticeFrame>
   );

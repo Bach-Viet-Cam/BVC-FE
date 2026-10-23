@@ -4,7 +4,7 @@ import {
   BPM_MAX,
   BPM_MIN,
   CLICK_START_LEAD_S,
-  SAMPLE,
+  PRACTICE_DEFAULTS,
   SIGS,
   SUB_TICKS,
 } from "@/features/practice/constants/practiceConstants";
@@ -18,7 +18,7 @@ function clampBpm(value: number): number {
 }
 
 export function useMetronome() {
-  const [bpm, setBpmValue] = useState(SAMPLE.targetBpm);
+  const [bpm, setBpmValue] = useState(PRACTICE_DEFAULTS.targetBpm);
   const [sigIndex, setSigIndex] = useState(2);
   const [accents, setAccents] = useState<BeatAccent[]>(FRESH_ACCENTS);
   const [subdivision, setSubdivision] = useState<SubdivisionKey>("black");

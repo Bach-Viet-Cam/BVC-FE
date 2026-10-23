@@ -30,6 +30,15 @@ export interface EnsembleSessionResult {
   recordingUrl: string | null;
 }
 
+/** GET /ensemble-sessions/:id - một phiên hòa tấu sinh viên đã lưu. */
+export interface EnsembleSessionDetail extends EnsembleSessionResult {
+  pieceId: string;
+  instrumentId: string;
+  assignmentId: string | null;
+  targetBpm: number;
+  createdAt: string;
+}
+
 export type PracticeStatus = "ready" | "countIn" | "recording" | "processing" | "preview" | "saving" | "saved";
 
 /** Bản thu tạm sau khi dừng: đã đổi sang WAV, chờ người học nghe lại rồi bấm lưu. */

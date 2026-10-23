@@ -27,21 +27,12 @@ const ADMIN_NAV: NavItem[] = [
   { label: "Người dùng", to: "/admin/users" },
   { label: "Cấu hình hệ thống", to: "/admin/config" },
   { label: "Phân loại nội dung", to: "/admin/categories" },
+  { label: "Lộ trình học tập", to: "/admin/roadmaps" },
+  { label: "Cấu hình chấm điểm", to: "/admin/grading-settings" },
   { label: "Giám sát hệ thống", to: "/admin/monitoring" },
   { label: "Quản lý thông báo", to: "/admin/notifications" },
   { label: "Nội dung đã xác minh", to: "/community/verified" },
   { label: "Bảng xếp hạng", to: "/leaderboard" },
-];
-
-export interface StudentTab extends NavItem {
-  icon: "home" | "practice" | "library" | "assignments";
-}
-
-export const STUDENT_TABS: StudentTab[] = [
-  { label: "Hôm nay", to: "/home", icon: "home" },
-  { label: "Luyện tập", to: "/practice/ly-ngua-o/record", icon: "practice" },
-  { label: "Thư viện", to: "/library", icon: "library" },
-  { label: "Bài tập", to: "/assignments", icon: "assignments" },
 ];
 
 export const NAV_BY_ROLE: Record<number, NavItem[]> = {

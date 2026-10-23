@@ -14,7 +14,7 @@ import { cn } from "@/shared/utils/cn";
 const SELECT_CLASSES =
   "h-[40px] w-full rounded-[12px] border border-bvc-border-strong bg-white px-3 text-[13px] text-bvc-ink focus:outline-none disabled:opacity-60";
 const NAV_BUTTON_CLASSES =
-  "min-h-[42px] cursor-pointer rounded-[14px] border border-bvc-border-strong bg-white px-[15px] text-[14px] disabled:cursor-default disabled:opacity-50";
+  "min-h-[42px] flex-1 cursor-pointer rounded-[14px] border border-bvc-border-strong bg-white px-[15px] text-[14px] disabled:cursor-default disabled:opacity-50 sm:flex-none";
 
 // Lecturer listens to the submissions of one student of one assignment and writes the comments;
 // the queue is the students who have submitted, newest first.
@@ -59,12 +59,12 @@ export function ReviewPage() {
   const goTo = (index: number) => setStudentId(queue[index]?.studentId ?? null);
 
   return (
-    <div className="flex h-screen w-full flex-col overflow-hidden bg-white">
-      <header className="flex shrink-0 items-center gap-[16px] border-b border-bvc-border-strong px-[32px] py-[22px] pb-[18px]">
+    <div className="flex min-w-0 flex-1 flex-col bg-white lg:min-h-0 lg:overflow-hidden">
+      <header className="flex shrink-0 flex-wrap items-center gap-[12px] border-b border-bvc-border-strong px-[18px] py-[16px] lg:gap-[16px] lg:px-[32px] lg:py-[22px] lg:pb-[18px]">
         <button
           type="button"
           aria-label="Quay lại"
-          onClick={() => navigate("/teacher")}
+          onClick={() => navigate("/teacher/home")}
           className="flex size-[42px] shrink-0 cursor-pointer items-center justify-center rounded-[14px] border border-bvc-border-strong bg-white text-bvc-ink"
         >
           <ChevronLeft size={20} strokeWidth={1.8} />
@@ -73,13 +73,13 @@ export function ReviewPage() {
           <div className="text-[12px] font-bold uppercase tracking-[0.14em] text-bvc-muted">
             {selectedStudent ? `Hàng đợi nhận xét · ${selectedIndex + 1} / ${queue.length}` : "Nhận xét bài nộp"}
           </div>
-          <div className="truncate text-[24px] font-extrabold tracking-[-0.025em]">
+          <div className="truncate text-[19px] font-extrabold tracking-[-0.025em] lg:text-[24px]">
             {selectedStudent && selectedAssignment
               ? `${selectedStudent.fullName} - ${selectedAssignment.title}`
               : "Chọn bài nộp để nhận xét"}
           </div>
         </div>
-        <div className="flex gap-[9px]">
+        <div className="flex w-full gap-[9px] sm:w-auto">
           <button
             type="button"
             disabled={selectedIndex <= 0}
@@ -99,8 +99,8 @@ export function ReviewPage() {
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden">
-        <aside className="flex w-[290px] shrink-0 flex-col gap-[10px] overflow-y-auto border-r border-bvc-border-strong bg-bvc-surface p-[16px_12px]">
+      <div className="flex flex-1 flex-col lg:flex-row lg:overflow-hidden">
+        <aside className="flex w-full shrink-0 flex-col gap-[10px] border-b border-bvc-border-strong bg-bvc-surface p-[16px_12px] lg:w-[290px] lg:overflow-y-auto lg:border-r lg:border-b-0">
           <select
             aria-label="Chọn lớp"
             value={selectedClass?.id ?? ""}
@@ -185,7 +185,7 @@ export function ReviewPage() {
           </ListState>
         </aside>
 
-        <main className="flex min-w-0 flex-1 flex-col gap-[10px] overflow-y-auto p-[22px_32px_26px]">
+        <section className="flex min-w-0 flex-1 flex-col gap-[10px] p-[18px] lg:overflow-y-auto lg:p-[22px_32px_26px]">
           {selectedStudent && (
             <ListState
               isLoading={isSwitchingStudent}
@@ -206,7 +206,7 @@ export function ReviewPage() {
               </div>
             </ListState>
           )}
-        </main>
+        </section>
       </div>
     </div>
   );

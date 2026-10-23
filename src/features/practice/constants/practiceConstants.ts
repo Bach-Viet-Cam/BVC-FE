@@ -1,10 +1,4 @@
-import type {
-  NoteInfo,
-  RecordingFile,
-  StringInfo,
-  SubdivisionKey,
-  TimeSignature,
-} from "@/features/practice/types/practiceTypes";
+import type { NoteInfo, StringInfo, SubdivisionKey, TimeSignature } from "@/features/practice/types/practiceTypes";
 
 export const TUNER_TOLERANCE_CENTS = 10;
 export const TEMPO_TOLERANCE_PERCENT = 5;
@@ -28,18 +22,10 @@ export const FILE_MAX_S = 180;
 export const BPM_MIN = 40;
 export const BPM_MAX = 208;
 
-export const SAMPLE = {
-  piece: "Lý ngựa ô - Đàn Nhị",
-  className: "Lớp Violin K18A",
-  instrument: "Violin",
-  lesson: "Bài 3",
-  deadline: "28/10/2026",
+// Giá trị mặc định khi bài nhạc chưa có tempo / độ dài từ BE
+export const PRACTICE_DEFAULTS = {
   targetBpm: 96,
   pieceLen: 120,
-  files: [
-    { name: "ban-thu-bai-1.m4a", fmt: "m4a", mb: 3.2, dur: 118 },
-    { name: "ban-thu-bai-2.mp3", fmt: "mp3", mb: 4.1, dur: 127 },
-  ] as RecordingFile[],
 };
 
 export const MSG = {

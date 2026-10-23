@@ -3,7 +3,7 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { PracticeFrame } from "@/features/practice/components/PracticeFrame";
 import { PracticeTopBar } from "@/features/practice/components/PracticeTopBar";
 import { StageTracker } from "@/features/practice/components/StageTracker";
-import { MSG, RESULT_REDIRECT_MS, SAMPLE } from "@/features/practice/constants/practiceConstants";
+import { MSG, RESULT_REDIRECT_MS } from "@/features/practice/constants/practiceConstants";
 import { usePracticeDemo } from "@/features/practice/context/PracticeDemoContext";
 import { useSubmissionProgress } from "@/features/practice/hooks/useSubmissionProgress";
 import { mbText } from "@/features/practice/utils/practiceFormat";
@@ -60,7 +60,7 @@ export function ProcessingPage() {
   if (!submissionId) {
     return (
       <PracticeFrame>
-        <PracticeTopBar title={SAMPLE.piece} subtitle="Chưa có bản nộp nào" />
+        <PracticeTopBar title="Tiến trình xử lý" subtitle="Chưa có bản nộp nào" />
         <p className="px-3.5 text-sm text-bvc-muted md:mx-auto md:w-full md:max-w-170 md:px-8 md:pt-8">
           {MSG.noSubmission}
         </p>
@@ -91,7 +91,11 @@ export function ProcessingPage() {
 
   return (
     <PracticeFrame>
-      <PracticeTopBar title={SAMPLE.piece} subtitle={`${SAMPLE.className} · ${SAMPLE.instrument} · ${SAMPLE.lesson}`} />
+      <PracticeTopBar
+        title={SAMPLE.piece}
+        subtitle={`${SAMPLE.className} · ${SAMPLE.instrument} · ${SAMPLE.lesson}`}
+        rightSlot={<DemoPanel />}
+      />
 
       <div className="mx-auto w-full flex-1 overflow-y-auto px-3.5 pb-6 md:max-w-170 md:px-8 md:pt-8">
         <div className="flex items-center gap-2.5">
