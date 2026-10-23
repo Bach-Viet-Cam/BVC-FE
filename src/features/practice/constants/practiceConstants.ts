@@ -107,5 +107,3 @@ export const MIC_CONSTRAINTS: MediaTrackConstraints = {
   autoGainControl: false,
   channelCount: 1,
 };
-
-export const PLAYBACK_RATES = [0.5, 0.75, 1, 1.25, 1.5, 2];

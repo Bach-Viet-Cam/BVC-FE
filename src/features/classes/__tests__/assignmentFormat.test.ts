@@ -46,4 +46,22 @@ describe("assignmentFormat", () => {
       formatStudentSummary({ submissionCount: 1, lastSubmittedAt: "2026-10-16T02:30:00.000Z", bestAccuracy: 69.6 })
     ).toBe("1 lần nộp · gần nhất 16/10 09:30 · cao nhất 69.6%");
   });
+
+  it("handles student assignment type labels and deadline urgency", async () => {
+    const { ASSIGNMENT_TYPE_LABELS, getDeadlineUrgency, describeTimeLeft } = await import(
+      "@/features/classes/utils/assignmentFormat"
+    );
+    expect(ASSIGNMENT_TYPE_LABELS.PRACTICE).toBe("Luyện ngón");
+    expect(ASSIGNMENT_TYPE_LABELS.RHYTHM).toBe("Luyện rhythm");
+    expect(ASSIGNMENT_TYPE_LABELS.RECORDING).toBe("Thu âm");
+    expect(ASSIGNMENT_TYPE_LABELS.BONUS).toBe("Bonus");
+
+    const now = new Date("2026-10-23T04:00:00.000Z");
+    expect(getDeadlineUrgency("2026-10-20T00:00:00.000Z", now)).toBe("overdue");
+    expect(getDeadlineUrgency("2026-10-25T00:00:00.000Z", now)).toBe("urgent");
+    expect(getDeadlineUrgency("2026-11-05T00:00:00.000Z", now)).toBe("normal");
+
+    expect(describeTimeLeft("2026-10-20T00:00:00.000Z", now)).toBe("Đã quá hạn");
+    expect(describeTimeLeft("2026-10-25T00:00:00.000Z", now)).toBe("còn 1 ngày");
+  });
 });

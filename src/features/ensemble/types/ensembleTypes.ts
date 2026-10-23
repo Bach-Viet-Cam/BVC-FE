@@ -30,4 +30,26 @@ export interface EnsembleSessionResult {
   recordingUrl: string | null;
 }
 
-export type PracticeStatus = "ready" | "countIn" | "recording" | "saving" | "saved";
+export type PracticeStatus = "ready" | "countIn" | "recording" | "processing" | "preview" | "saving" | "saved";
+
+/** Bản thu tạm sau khi dừng: đã đổi sang WAV, chờ người học nghe lại rồi bấm lưu. */
+export interface EnsembleTake {
+  blob: Blob;
+  url: string;
+  peaks: number[];
+  durationSec: number;
+}
+
+/** Vị trí tâm ghế trên sân khấu, tính theo % chiều rộng (x) và chiều cao (y). */
+export interface SeatPosition {
+  x: number;
+  y: number;
+}
+
+/** Phần thông tin bài tập màn hòa tấu cần; `GET /assignments/:id` trả nhiều trường hơn. */
+export interface EnsembleAssignmentInfo {
+  id: string;
+  title: string;
+  className: string;
+  deadline: string;
+}
