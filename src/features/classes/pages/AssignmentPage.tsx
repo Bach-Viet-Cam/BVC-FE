@@ -1,28 +1,288 @@
-import { useNavigate, useParams } from "react-router-dom";
-import { Clock } from "lucide-react";
-import { MobileHeader, TagBadge } from "@/shared/components/bvc";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import {
+  Activity,
+  AlertCircle,
+  ArrowLeft,
+  Award,
+  BookOpen,
+  CheckCircle2,
+  Clock,
+  Mic,
+  Music2,
+  Target,
+} from "lucide-react";
+import { StudentShell } from "@/shared/components/bvc/StudentShell";
 import { MySubmissionList } from "@/features/classes/components/MySubmissionList";
 import { useAssignmentDetail } from "@/features/classes/hooks/useAssignmentDetail";
 import {
-  ASSIGNMENT_STATUS_META,
+  ASSIGNMENT_TYPE_LABELS,
   SUBMIT_BLOCKED_MESSAGE,
   describeTimeLeft,
   formatFullDeadline,
+  getDeadlineUrgency,
 } from "@/features/classes/utils/assignmentFormat";
+import { type AssignmentDetail, type AssignmentType } from "@/features/classes/types/assignmentTypes";
+import { cn } from "@/shared/utils/cn";
+
+function AssignmentTypeIcon({
+  type,
+  size = 14,
+  className,
+  strokeWidth = 2,
+}: {
+  type: AssignmentType;
+  size?: number;
+  className?: string;
+  strokeWidth?: number;
+}) {
+  switch (type) {
+    case "RHYTHM":
+      return <Activity size={size} className={className} strokeWidth={strokeWidth} />;
+    case "RECORDING":
+      return <Mic size={size} className={className} strokeWidth={strokeWidth} />;
+    case "PRACTICE":
+      return <Music2 size={size} className={className} strokeWidth={strokeWidth} />;
+    case "EXAM":
+      return <Award size={size} className={className} strokeWidth={strokeWidth} />;
+    case "SHEET":
+      return <BookOpen size={size} className={className} strokeWidth={strokeWidth} />;
+    case "BONUS":
+      return <Award size={size} className={className} strokeWidth={strokeWidth} />;
+    default:
+      return <Music2 size={size} className={className} strokeWidth={strokeWidth} />;
+  }
+}
 
 interface InfoRowProps {
   label: string;
   value: string;
+  highlight?: boolean;
 }
 
-function InfoRow({ label, value }: InfoRowProps) {
+function InfoRow({ label, value, highlight }: InfoRowProps) {
   return (
-    <div className="flex items-center justify-between gap-3 border-b border-bvc-line py-[10px] text-[13px] last:border-0">
+    <div className="flex items-center justify-between gap-3 border-b border-bvc-line/80 py-2.5 text-[13px] last:border-0">
       <span className="text-bvc-muted">{label}</span>
-      <span className="text-right font-semibold text-bvc-ink">{value}</span>
+      <span className={cn("text-right font-semibold", highlight ? "text-bvc-accent font-bold" : "text-bvc-ink")}>
+        {value}
+      </span>
     </div>
   );
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COMPONENT: BẢNG YÊU CẦU BÀI TẬP (SPECS CARD - CỘT PHẢI)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function AssignmentRequirementsCard({ assignment }: { assignment: AssignmentDetail }) {
+  return (
+    <div className="rounded-2xl border border-bvc-border bg-white p-4.5 shadow-2xs md:p-5">
+      <div className="flex items-center justify-between">
+        <p className="text-[11px] font-extrabold uppercase tracking-wider text-bvc-muted">Yêu cầu bài tập</p>
+        <span className="text-[12px] font-semibold text-bvc-muted">
+          {assignment.className}
+        </span>
+      </div>
+
+      <div className="mt-2.5 flex flex-col">
+        <InfoRow label="Lớp học" value={assignment.className} />
+        <InfoRow label="Hạn nộp" value={formatFullDeadline(assignment.deadline)} />
+        {assignment.pieceTitle && <InfoRow label="Bản nhạc" value={assignment.pieceTitle} />}
+        {assignment.targetBpm !== null && (
+          <InfoRow label="Tốc độ BPM" value={`${assignment.targetBpm} BPM`} />
+        )}
+        <InfoRow label="Accuracy tối thiểu" value={`${assignment.minAccuracy}%`} highlight />
+        <InfoRow label="Lượt nộp đã dùng" value={`${assignment.usedSubmissions} / ${assignment.maxSubmissions}`} />
+      </div>
+
+      {/* Thước đo chuẩn Accuracy mục tiêu */}
+      <div className="mt-3.5 rounded-xl border border-bvc-border bg-bvc-surface/40 p-3">
+        <div className="flex items-center justify-between text-[11.5px] font-bold">
+          <span className="flex items-center gap-1 text-bvc-muted">
+            <Target size={13} className="text-bvc-accent" />
+            <span>Mục tiêu đánh giá AI</span>
+          </span>
+          <span className="font-bvc-mono font-black text-bvc-ink">≥ {assignment.minAccuracy}%</span>
+        </div>
+        <div className="relative mt-2 h-1.5 w-full overflow-hidden rounded-full bg-bvc-border/80">
+          <div
+            className="h-full rounded-full bg-bvc-accent transition-all duration-300"
+            style={{ width: `${assignment.minAccuracy}%` }}
+          />
+        </div>
+        <div className="mt-1.5 flex justify-between text-[10.5px] text-bvc-muted">
+          <span>0%</span>
+          <span className="font-semibold text-bvc-accent">Ngưỡng đạt {assignment.minAccuracy}%</span>
+          <span>100%</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COMPONENT: RUBRIC CHẤM ĐIỂM (CỘT PHẢI - GỌN GÀNG, DỄ NHÌN)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function AssignmentRubricCard({ rubric }: { rubric: { name: string; weight: number }[] }) {
+  if (!rubric || rubric.length === 0) return null;
+
+  return (
+    <div className="rounded-2xl border border-bvc-border bg-white p-4.5 shadow-2xs md:p-5">
+      <div className="flex items-center justify-between">
+        <p className="text-[11px] font-extrabold uppercase tracking-wider text-bvc-muted">Rubric chấm điểm</p>
+        <span className="font-bvc-mono text-[11px] font-semibold text-bvc-muted">Tổng 100%</span>
+      </div>
+
+      <div className="mt-3 flex flex-col gap-2.5">
+        {rubric.map((criterion) => (
+          <div key={criterion.name} className="flex flex-col gap-1 border-b border-bvc-line/50 pb-2.5 last:border-0 last:pb-0">
+            <div className="flex items-center justify-between text-[12.5px]">
+              <span className="font-medium text-bvc-ink">{criterion.name}</span>
+              <span className="font-bvc-mono text-[12px] font-bold text-bvc-accent">{criterion.weight}%</span>
+            </div>
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-bvc-surface">
+              <div
+                className="h-full rounded-full bg-bvc-accent transition-all duration-300"
+                style={{ width: `${criterion.weight}%` }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COMPONENT: THƯỚC ĐO CÁC LƯỢT NỘP (ATTEMPT TIMELINE)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function AttemptTimeline({ assignment }: { assignment: AssignmentDetail }) {
+  const max = assignment.maxSubmissions;
+  const submissions = assignment.submissions;
+
+  return (
+    <div className="rounded-2xl border border-bvc-border bg-white p-4 shadow-2xs md:p-5">
+      <div className="flex items-center justify-between">
+        <p className="text-[11px] font-extrabold uppercase tracking-wider text-bvc-muted">
+          Tiến trình nộp bài ({assignment.usedSubmissions}/{max} lượt)
+        </p>
+        <span className="text-[11.5px] font-semibold text-bvc-muted">
+          {assignment.canSubmit ? "Có thể nộp thêm" : "Đã khóa nộp"}
+        </span>
+      </div>
+
+      <div className="mt-3.5 grid grid-cols-3 gap-2 sm:gap-3">
+        {Array.from({ length: max }).map((_, idx) => {
+          const attemptNumber = idx + 1;
+          const sub = submissions.find((s) => s.attemptNumber === attemptNumber);
+          const isCurrentOrPast = idx < assignment.usedSubmissions;
+
+          return (
+            <div
+              key={attemptNumber}
+              className={cn(
+                "flex flex-col items-center justify-center rounded-xl border p-2.5 text-center transition-all",
+                sub
+                  ? "border-bvc-accent/60 bg-bvc-accent-tint/30 text-bvc-ink"
+                  : isCurrentOrPast
+                  ? "border-bvc-border bg-bvc-surface text-bvc-ink"
+                  : "border-dashed border-bvc-border/90 bg-white text-bvc-muted"
+              )}
+            >
+              <div className="flex items-center gap-1">
+                {sub ? (
+                  <CheckCircle2 size={13} className="text-bvc-ok" />
+                ) : (
+                  <span className="font-bvc-mono text-[11px] font-bold text-bvc-faint">#{attemptNumber}</span>
+                )}
+                <span className="text-[11.5px] font-bold">Lượt {attemptNumber}</span>
+              </div>
+              <span className="font-bvc-mono text-[12px] font-extrabold text-bvc-ink mt-0.5">
+                {sub && sub.accuracy !== null ? `${Math.round(sub.accuracy * 100)}%` : sub ? "Đã nộp" : "Chưa nộp"}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COMPONENT: PHÒNG THU ÂM & HÀNH ĐỘNG NỘP (CỘT TRÁI - TỐI ƯU RỘNG RÃI, DỄ THAO TÁC)
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface AssignmentStudioBoxProps {
+  assignment: AssignmentDetail;
+  recordingTarget: string | null;
+  ensembleTarget: string;
+  onNavigate: (to: string) => void;
+}
+
+function AssignmentStudioBox({
+  assignment,
+  recordingTarget,
+  ensembleTarget,
+  onNavigate,
+}: AssignmentStudioBoxProps) {
+  return (
+    <div className="rounded-2xl border border-bvc-border bg-white p-4.5 shadow-2xs sm:p-5">
+      <div className="flex flex-col gap-3.5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex size-10.5 shrink-0 items-center justify-center rounded-xl bg-bvc-accent-tint text-bvc-accent">
+            <Mic size={20} strokeWidth={2.2} />
+          </div>
+          <div>
+            <h3 className="font-bvc-display text-[15px] font-bold text-bvc-ink">
+              Phòng thu âm diễn tấu
+            </h3>
+            <p className="text-[12px] text-bvc-muted">
+              {assignment.canSubmit
+                ? "Thu trực tiếp bằng micro hoặc tải lên bản thu (.wav, .m4a, .mp3)"
+                : "Bài nộp đã khóa hoặc bạn đã sử dụng hết số lượt quy định."}
+            </p>
+          </div>
+        </div>
+
+        {/* Nút hành động trực tiếp */}
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap shrink-0">
+          {assignment.hasEnsembleTracks && assignment.pieceId && (
+            <button
+              type="button"
+              onClick={() => onNavigate(ensembleTarget)}
+              className="flex h-10 items-center justify-center gap-1.5 rounded-xl border border-bvc-border bg-white px-3.5 text-[12.5px] font-semibold text-bvc-ink transition-colors hover:bg-bvc-surface active:scale-[0.98]"
+            >
+              <Music2 size={15} strokeWidth={2.2} />
+              <span>Hòa tấu ảo</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            disabled={!assignment.canSubmit || !recordingTarget}
+            onClick={() => recordingTarget && onNavigate(recordingTarget)}
+            className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl bg-bvc-accent px-4.5 text-[13px] font-bold text-white shadow-2xs transition-all hover:bg-bvc-ink active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <Mic size={16} strokeWidth={2.2} />
+            <span>Thu âm / Tải bản thu</span>
+          </button>
+        </div>
+      </div>
+
+      {!assignment.canSubmit && (
+        <div className="mt-3 rounded-xl border border-red-200 bg-red-50/60 p-2.5 text-center text-[12px] font-medium text-bvc-error">
+          {SUBMIT_BLOCKED_MESSAGE}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MAIN PAGE COMPONENT
+// ─────────────────────────────────────────────────────────────────────────────
 
 export function AssignmentPage() {
   const navigate = useNavigate();
@@ -31,99 +291,208 @@ export function AssignmentPage() {
 
   if (isLoading || !assignment) {
     return (
-      <>
-        <MobileHeader title="Chi tiết bài tập" onBack={() => navigate("/assignments")} />
-        <p className={`px-[14px] text-[14px] ${error ? "text-bvc-error" : "text-bvc-muted"}`}>
-          {isLoading ? "Đang tải..." : error}
-        </p>
-      </>
+      <StudentShell>
+        <div className="mx-auto flex w-full max-w-[1100px] flex-1 flex-col gap-4 px-3.5 py-4 sm:px-6 md:gap-6 md:px-10 md:py-8">
+          <Link
+            to="/assignments"
+            className="group inline-flex items-center gap-1.5 text-[13px] font-bold text-bvc-accent transition-colors hover:text-bvc-ink"
+          >
+            <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-0.5" />
+            <span>Quay lại bài tập của tôi</span>
+          </Link>
+          <div className="py-20 text-center">
+            {isLoading ? (
+              <div className="flex flex-col items-center gap-2.5 text-bvc-muted">
+                <span className="size-6 animate-spin rounded-full border-2 border-bvc-accent border-t-transparent" />
+                <span className="text-[14px] font-semibold">Đang tải chi tiết bài tập...</span>
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-bvc-border bg-bvc-surface/60 p-5 text-[14px] font-semibold text-bvc-error">
+                {error}
+              </div>
+            )}
+          </div>
+        </div>
+      </StudentShell>
     );
   }
 
-  const status = ASSIGNMENT_STATUS_META[assignment.status];
+  const urgency = getDeadlineUrgency(assignment.deadline);
   // Học viên chọn bản nhạc (nhạc cụ) trên trang bài nhạc trước khi thu âm; bài tập không có bài nhạc thì không nộp qua M01
   const recordingTarget = assignment.pieceId ? `/library/${assignment.pieceId}?assignmentId=${assignment.id}` : null;
   const ensembleTarget = `/ensemble/new?pieceId=${assignment.pieceId}&assignmentId=${assignment.id}`;
 
   return (
-    <>
-      <MobileHeader
-        title="Chi tiết bài tập"
-        subtitle={assignment.weekNo ? `${assignment.className} · Tuần ${assignment.weekNo}` : assignment.className}
-        onBack={() => navigate("/assignments")}
-      />
-
-      <div className="flex-1 overflow-y-auto">
-        <div className="mx-[14px] mt-3 flex items-center gap-3 rounded-[18px] border border-[#F3D98A] bg-[#FEF8EC] p-[12px]">
-          <Clock size={20} className="shrink-0 text-bvc-warn" strokeWidth={1.8} />
-          <span className="flex-1 text-[13px] font-bold text-[#A07010]">
-            Hạn nộp: {formatFullDeadline(assignment.deadline)}
-          </span>
-          <span className="shrink-0 text-[12px] text-bvc-muted">
-            {describeTimeLeft(assignment.deadline, new Date())}
+    <StudentShell>
+      <div className="mx-auto flex w-full max-w-[1140px] flex-1 flex-col gap-4 px-3.5 py-4 sm:px-6 md:gap-5 md:px-10 md:py-8">
+        {/* Navigation Breadcrumb */}
+        <div className="flex items-center justify-between">
+          <Link
+            to="/assignments"
+            className="group inline-flex items-center gap-1.5 text-[13px] font-bold text-bvc-accent transition-colors hover:text-bvc-ink"
+          >
+            <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-0.5" />
+            <span>Quay lại danh sách bài tập</span>
+          </Link>
+          <span className="text-[12.5px] font-semibold text-bvc-muted">
+            {assignment.className}
           </span>
         </div>
 
-        <div className="mx-[14px] mt-3 rounded-[20px] border border-bvc-border p-[16px]">
-          <div className="flex items-start justify-between gap-2">
-            <h2 className="text-[17px] font-extrabold leading-snug text-bvc-ink">{assignment.title}</h2>
-            <TagBadge label={status.label} variant={status.variant} />
-          </div>
-          {assignment.description && (
-            <p className="mt-2 text-[13px] leading-relaxed text-bvc-muted">{assignment.description}</p>
-          )}
-          <div className="mt-3">
-            <InfoRow label="Lớp" value={assignment.className} />
-            <InfoRow label="Hạn nộp" value={formatFullDeadline(assignment.deadline)} />
-            {assignment.pieceTitle && <InfoRow label="Bản nhạc" value={assignment.pieceTitle} />}
-            {assignment.targetBpm !== null && <InfoRow label="BPM yêu cầu" value={String(assignment.targetBpm)} />}
-            <InfoRow label="Accuracy tối thiểu" value={`${assignment.minAccuracy}%`} />
-            <InfoRow label="Lượt nộp" value={`${assignment.usedSubmissions} / ${assignment.maxSubmissions}`} />
-          </div>
-        </div>
+        {/* Bố cục Responsive: 1 cột trên Mobile/Tablet, 2 cột (2/3 + 1/3) trên Desktop */}
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-6">
+          {/* Cột chính (bên trái): lg:col-span-2 */}
+          <div className="flex flex-col gap-4 lg:col-span-2">
+            
+            {/* Card 1: Thông tin bài tập chi tiết */}
+            <div className="relative overflow-hidden rounded-3xl border border-bvc-border bg-white p-5 shadow-2xs sm:p-6">
+              {/* Hoa văn trang trí chìm */}
+              <div className="pointer-events-none absolute -bottom-8 -right-8 size-36 opacity-[0.03]">
+                <AssignmentTypeIcon type={assignment.type} size={144} className="text-bvc-ink" />
+              </div>
 
-        {assignment.rubric.length > 0 && (
-          <div className="mx-[14px] mt-3 rounded-[20px] border border-bvc-border p-[16px]">
-            <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-bvc-muted">Rubric chấm điểm</p>
-            <div className="mt-2 flex flex-col gap-2">
-              {assignment.rubric.map((criterion) => (
-                <div key={criterion.name} className="flex items-center gap-3">
-                  <span className="flex-1 text-[13px] text-bvc-ink">{criterion.name}</span>
-                  <div className="h-[4px] w-[90px] overflow-hidden rounded-full bg-bvc-border">
-                    <div className="h-full rounded-full bg-bvc-bar-strong" style={{ width: `${criterion.weight}%` }} />
-                  </div>
-                  <span className="w-[36px] text-right font-mono text-[12.5px] text-bvc-muted">
-                    {criterion.weight}%
+              {/* Hàng metadata thanh lịch (ZERO PILLS) */}
+              <div className="flex items-center justify-between gap-2 flex-wrap text-[12px]">
+                <div className="flex items-center gap-2 text-bvc-muted">
+                  <AssignmentTypeIcon type={assignment.type} size={14} className="text-bvc-accent" strokeWidth={2.2} />
+                  <span className="font-bold text-bvc-ink">{assignment.className}</span>
+                  {assignment.weekNo && (
+                    <>
+                      <span className="text-bvc-line">·</span>
+                      <span>Tuần {assignment.weekNo}</span>
+                    </>
+                  )}
+                  <span className="text-bvc-line">·</span>
+                  <span>{ASSIGNMENT_TYPE_LABELS[assignment.type] || "Bài tập"}</span>
+                </div>
+
+                {/* Status Dot */}
+                <div className="flex items-center gap-1.5 font-semibold text-[12px]">
+                  {assignment.status === "OVERDUE" && (
+                    <span className="flex items-center gap-1.5 text-bvc-error">
+                      <span className="size-1.5 rounded-full bg-bvc-error" />
+                      <span>Quá hạn</span>
+                    </span>
+                  )}
+                  {assignment.status === "NOT_SUBMITTED" && (
+                    <span className="flex items-center gap-1.5 text-bvc-muted font-medium">
+                      <span className="size-1.5 rounded-full bg-bvc-faint" />
+                      <span>Chưa nộp</span>
+                    </span>
+                  )}
+                  {assignment.status === "SUBMITTED" && (
+                    <span className="flex items-center gap-1.5 text-bvc-accent">
+                      <span className="size-1.5 rounded-full bg-bvc-accent" />
+                      <span>Đã nộp</span>
+                    </span>
+                  )}
+                  {assignment.status === "PASSED" && (
+                    <span className="flex items-center gap-1.5 text-bvc-ok">
+                      <span className="size-1.5 rounded-full bg-bvc-ok" />
+                      <span>Đạt</span>
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Tên bài tập */}
+              <h1 className="mt-3.5 font-bvc-display text-[22px] font-black tracking-tight text-bvc-ink sm:text-[25px] md:text-[28px]">
+                {assignment.title}
+              </h1>
+
+              {/* Banner thời hạn nộp */}
+              <div
+                className={cn(
+                  "mt-4 flex items-center justify-between gap-3 rounded-2xl border p-3.5",
+                  urgency === "overdue"
+                    ? "border-red-200 bg-red-50/60 text-bvc-error"
+                    : "border-bvc-accent-border/80 bg-bvc-accent-tint/70 text-bvc-accent-text"
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  {urgency === "overdue" ? (
+                    <AlertCircle size={17} className="shrink-0 text-bvc-error" />
+                  ) : (
+                    <Clock size={17} className="shrink-0 text-bvc-accent-text" />
+                  )}
+                  <span className="text-[13px] font-bold">
+                    Hạn nộp: {formatFullDeadline(assignment.deadline)}
                   </span>
                 </div>
-              ))}
+                <span className="rounded-lg bg-white/90 px-2.5 py-1 font-bvc-mono text-[11.5px] font-bold shadow-2xs">
+                  {describeTimeLeft(assignment.deadline, new Date())}
+                </span>
+              </div>
+
+              {assignment.description && (
+                <div className="mt-4 border-t border-bvc-line/90 pt-3.5">
+                  <p className="mb-1 text-[11.5px] font-bold uppercase tracking-wider text-bvc-muted">
+                    Hướng dẫn từ giảng viên
+                  </p>
+                  <p className="whitespace-pre-line text-[13.5px] leading-relaxed text-bvc-ink/90 sm:text-[14px]">
+                    {assignment.description}
+                  </p>
+                </div>
+              )}
             </div>
+
+            {/* Card 2: Thước đo lượt nộp trực quan */}
+            <AttemptTimeline assignment={assignment} />
+
+            {/* Card 3: PHÒNG THU ÂM & NỘP BÀI (Đặt ở cột trái theo yêu cầu) */}
+            <AssignmentStudioBox
+              assignment={assignment}
+              recordingTarget={recordingTarget}
+              ensembleTarget={ensembleTarget}
+              onNavigate={navigate}
+            />
+
+            {/* Trên Mobile (< lg): Yêu cầu bài tập + Rubric hiển thị dưới Thu âm */}
+            <div className="flex flex-col gap-4 lg:hidden">
+              <AssignmentRequirementsCard assignment={assignment} />
+              <AssignmentRubricCard rubric={assignment.rubric} />
+            </div>
+
+            {/* Card 4: Lịch sử bài nộp của bạn */}
+            <MySubmissionList submissions={assignment.submissions} />
           </div>
-        )}
-        <MySubmissionList submissions={assignment.submissions} />
-        <div className="h-4" />
+
+          {/* Cột phụ (bên phải): Bảng yêu cầu & Rubric chấm điểm (Sticky trên Desktop) */}
+          <div className="hidden lg:flex flex-col gap-4 lg:sticky lg:top-24">
+            <AssignmentRequirementsCard assignment={assignment} />
+            <AssignmentRubricCard rubric={assignment.rubric} />
+          </div>
+        </div>
       </div>
 
-      <div className="flex shrink-0 flex-col gap-[8px] px-[14px] pb-5 pt-3">
-        {!assignment.canSubmit && <p className="text-center text-[12.5px] text-bvc-error">{SUBMIT_BLOCKED_MESSAGE}</p>}
+      {/* Thanh nút bấm cố định dưới đáy màn hình trên Mobile (< lg) */}
+      <div className="sticky bottom-0 z-20 flex flex-col gap-2 border-t border-bvc-border bg-white/95 p-3.5 backdrop-blur-sm lg:hidden shadow-lg">
+        {!assignment.canSubmit && (
+          <p className="text-center text-[12px] font-medium text-bvc-error">
+            {SUBMIT_BLOCKED_MESSAGE}
+          </p>
+        )}
         <button
           type="button"
           disabled={!assignment.canSubmit || !recordingTarget}
           onClick={() => recordingTarget && navigate(recordingTarget)}
-          className="flex h-[54px] w-full cursor-pointer items-center justify-center rounded-[16px] bg-bvc-accent text-[16px] font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-bvc-accent text-[14px] font-bold text-white shadow-sm transition-all hover:bg-bvc-ink active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
         >
-          Thu âm / Tải lên
+          <Mic size={17} strokeWidth={2.2} />
+          <span>Thu âm / Tải lên</span>
         </button>
+
         {assignment.hasEnsembleTracks && assignment.pieceId && (
           <button
             type="button"
             onClick={() => navigate(ensembleTarget)}
-            className="flex h-[48px] w-full cursor-pointer items-center justify-center rounded-[16px] border border-bvc-border-strong bg-white text-[15px] font-semibold text-bvc-ink"
+            className="flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-bvc-border bg-white text-[13px] font-semibold text-bvc-ink transition-colors hover:bg-bvc-surface"
           >
-            Luyện với hòa tấu
+            <Music2 size={15} strokeWidth={2.2} />
+            <span>Luyện với hòa tấu</span>
           </button>
         )}
       </div>
-    </>
+    </StudentShell>
   );
 }

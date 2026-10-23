@@ -29,14 +29,14 @@ function InfoItem({ label, value, isMono = false }: InfoItemProps) {
 export function ClassInfoPanel({ classDetail, onEndClass }: ClassInfoPanelProps) {
   const isActive = !classDetail.isReadOnly;
   return (
-    <section className="mx-[18px] mb-[14px] flex shrink-0 flex-col gap-[12px] rounded-[18px] bg-bvc-soft p-[14px]">
+    <section className="mx-[18px] mb-[14px] flex shrink-0 flex-col gap-[12px] rounded-[18px] bg-bvc-soft p-[14px] lg:m-0 lg:gap-[16px] lg:rounded-[20px] lg:border lg:border-bvc-border lg:bg-white lg:p-[18px]">
       <div className="flex items-center gap-[8px]">
         <StatusLabel label={CLASS_STATUS_LABELS[classDetail.status]} tone={isActive ? "ok" : "muted"} />
         <span className="whitespace-nowrap rounded-[8px] bg-white px-[9px] py-[4px] text-[12px]">
           {classDetail.instrument.name}
         </span>
       </div>
-      <div className="grid grid-cols-2 gap-x-[12px] gap-y-[10px] md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-x-[12px] gap-y-[10px] md:grid-cols-4 lg:grid-cols-2">
         <InfoItem label="Khóa" value={classDetail.cohort} />
         <InfoItem label="Thành viên" value={`${classDetail.memberCount} sinh viên`} />
         <InfoItem label="Ngày bắt đầu" value={formatIsoDate(classDetail.startDate)} isMono />

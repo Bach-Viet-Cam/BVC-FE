@@ -45,7 +45,7 @@ export function MembersTab({ classDetail, onMembersChanged }: MembersTabProps) {
   return (
     <>
       {canEdit && (
-        <div className="grid shrink-0 grid-cols-2 gap-[8px] px-[18px] pb-[10px] pt-[14px] md:flex">
+        <div className="grid shrink-0 grid-cols-2 gap-[8px] px-[18px] pb-[10px] pt-[14px] md:flex lg:px-[32px] lg:pt-[20px]">
           <Link
             to={`/teacher/classes/${classDetail.id}/members/new`}
             className={`${LINK_BUTTON_BASE} bg-bvc-ink text-white`}
@@ -60,7 +60,9 @@ export function MembersTab({ classDetail, onMembersChanged }: MembersTabProps) {
           </Link>
         </div>
       )}
-      <div className={`flex shrink-0 gap-[8px] px-[18px] pb-[10px] ${canEdit ? "" : "pt-[14px]"}`}>
+      <div
+        className={`flex shrink-0 gap-[8px] px-[18px] pb-[10px] lg:max-w-[720px] lg:px-[32px] ${canEdit ? "" : "pt-[14px] lg:pt-[20px]"}`}
+      >
         <SearchInput id="member-search" label="Tên hoặc mã sinh viên" value={searchText} onChange={setSearchText} />
         <select
           aria-label="Lọc tài khoản"
@@ -73,10 +75,10 @@ export function MembersTab({ classDetail, onMembersChanged }: MembersTabProps) {
           <option value="PENDING">Chờ kích hoạt</option>
         </select>
       </div>
-      <div className="shrink-0 px-[18px] pb-[8px] text-[12.5px] text-bvc-muted" aria-live="polite">
+      <div className="shrink-0 px-[18px] pb-[8px] text-[12.5px] text-bvc-muted lg:px-[32px]" aria-live="polite">
         Hiện {result?.pagination.total ?? 0} / {result?.totalMembers ?? 0} sinh viên
       </div>
-      <div className="flex grow flex-col gap-[10px] px-[18px] pb-[12px]">
+      <div className="flex grow flex-col gap-[10px] px-[18px] pb-[12px] lg:px-[32px] lg:pb-[24px]">
         <ListState
           isLoading={isLoading}
           error={error}
@@ -84,7 +86,7 @@ export function MembersTab({ classDetail, onMembersChanged }: MembersTabProps) {
           emptyMessage={isFiltered ? "Không tìm thấy sinh viên phù hợp." : "Lớp chưa có sinh viên."}
           onRetry={reload}
         >
-          <div className="grid gap-[10px] lg:grid-cols-2">
+          <div className="grid gap-[10px] lg:grid-cols-2 2xl:grid-cols-3">
             {result?.items.map((member) => (
               <MemberCard key={member.studentId} member={member} canRemove={canEdit} onRemove={setMemberToRemove} />
             ))}

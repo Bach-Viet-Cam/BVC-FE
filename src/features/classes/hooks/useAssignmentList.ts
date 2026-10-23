@@ -1,5 +1,5 @@
 import { assignmentsApi } from "@/features/classes/api/assignmentsApi";
-import { useApiQuery } from "@/features/classes/hooks/useApiQuery";
+import { useApiQuery } from "@/shared/hooks/useApiQuery";
 import { type AssignmentListParams } from "@/features/classes/types/teacherAssignmentTypes";
 
 // params null = nothing to list yet (e.g. no class chosen): nothing is fetched.

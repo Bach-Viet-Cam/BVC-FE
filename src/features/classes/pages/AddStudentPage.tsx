@@ -5,8 +5,8 @@ import { useAddStudent } from "@/features/classes/hooks/useAddStudent";
 import { useClassDetail } from "@/features/classes/hooks/useClassDetail";
 import { type ApiFieldError } from "@/features/classes/types/classTypes";
 import { type StudentFormValues } from "@/features/classes/utils/validateStudent";
-import { MobileHeader } from "@/shared/components/bvc/MobileHeader";
-import { MobileScreen } from "@/shared/components/bvc/MobileScreen";
+import { TeacherPageHeader } from "@/shared/components/bvc/TeacherPageHeader";
+import { TeacherScreen } from "@/shared/components/bvc/TeacherScreen";
 import { toast } from "@/shared/components/ui/toast";
 
 export function AddStudentPage() {
@@ -28,8 +28,8 @@ export function AddStudentPage() {
   };
 
   return (
-    <MobileScreen>
-      <MobileHeader
+    <TeacherScreen>
+      <TeacherPageHeader
         title="Thêm sinh viên"
         subtitle={classDetail ? `${classDetail.name} · ${classDetail.cohort}` : undefined}
         onBack={() => navigate(backPath)}
@@ -43,6 +43,6 @@ export function AddStudentPage() {
       >
         {() => <AddStudentForm isSaving={isSaving} onCancel={() => navigate(backPath)} onSubmit={handleSubmit} />}
       </ClassWriteGuard>
-    </MobileScreen>
+    </TeacherScreen>
   );
 }

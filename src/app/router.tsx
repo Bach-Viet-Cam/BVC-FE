@@ -9,6 +9,14 @@ import { MetronomePage } from "@/features/practice/pages/MetronomePage";
 import { ProcessingPage } from "@/features/practice/pages/ProcessingPage";
 import { ResultsPage } from "@/features/practice/pages/ResultsPage";
 
+// Mobile — practice (M01 Smart Practice Studio)
+import { PracticeDemoProvider } from "@/features/practice/context/PracticeDemoContext";
+import { RecordPage } from "@/features/practice/pages/RecordPage";
+import { TunerPage } from "@/features/practice/pages/TunerPage";
+import { MetronomePage } from "@/features/practice/pages/MetronomePage";
+import { ProcessingPage } from "@/features/practice/pages/ProcessingPage";
+import { ResultsPage } from "@/features/practice/pages/ResultsPage";
+
 import { LoginPage } from "@/features/auth/pages/LoginPage";
 import { ScrollToTop } from "@/shared/components/ScrollToTop";
 import { NotFoundPage } from "@/shared/pages/NotFoundPage";
@@ -17,7 +25,6 @@ import { DashboardPage } from "@/shared/pages/DashboardPage";
 import { ProtectedRoute } from "@/shared/components/ProtectedRoute";
 import { AppLayout } from "@/shared/components/AppLayout";
 import { DesktopLayout } from "@/shared/components/DesktopLayout";
-import { MobileLayout } from "@/shared/components/MobileLayout";
 import { ROLES } from "@/shared/constants/roles";
 
 // Mobile - home
@@ -83,6 +90,7 @@ import { BonusListPage } from "@/features/community/pages/BonusListPage";
 import { BonusDetailPage } from "@/features/community/pages/BonusDetailPage";
 import { BonusSubmitPage } from "@/features/community/pages/BonusSubmitPage";
 import { LeaderboardPage } from "@/features/community/pages/LeaderboardPage";
+import { LeaderboardDesktopPage } from "@/features/community/pages/LeaderboardDesktopPage";
 import { ChallengesPage } from "@/features/community/pages/ChallengesPage";
 import { ChallengeDetailPage } from "@/features/community/pages/ChallengeDetailPage";
 
@@ -91,6 +99,7 @@ import { BonusFormPage } from "@/features/community/pages/BonusFormPage";
 import { VerifiedContentPage } from "@/features/community/pages/VerifiedContentPage";
 import { ChallengeFormPage } from "@/features/community/pages/ChallengeFormPage";
 import { AssignmentListPage } from "@/features/classes/pages/AssignmentListPage";
+import { LecturerChallengesPage } from "@/features/community/pages/LecturerChallengesPage";
 
 export function AppRouter() {
   return (
@@ -122,12 +131,21 @@ export function AppRouter() {
         <Route element={<ProtectedRoute allowedRoles={[ROLES.STUDENT]} />}>
           <Route path="/home" element={<HomePage />} />
 
-          <Route element={<MobileLayout />}>
-            <Route path="/assignments" element={<MyAssignmentsPage />} />
-            <Route path="/assignment/:assignmentId" element={<AssignmentPage />} />
-            <Route path="/ensemble/new" element={<EnsemblePage />} />
-            <Route path="/community/bonus" element={<BonusListPage />} />
-            <Route path="/community/bonus/:bonusId" element={<BonusDetailPage />} />
+          <Route path="/assignments" element={<MyAssignmentsPage />} />
+          <Route path="/assignment/:assignmentId" element={<AssignmentPage />} />
+          <Route path="/community/bonus" element={<BonusListPage />} />
+          <Route path="/community/bonus/:bonusId" element={<BonusDetailPage />} />
+
+          {/* Hòa tấu tự dựng khung responsive (EnsembleFrame), không dùng MobileLayout */}
+          <Route path="/ensemble/new" element={<EnsemblePage />} />
+
+          {/* M01 — tiến trình xử lý chạy nền nên các màn luyện tập dùng chung một provider */}
+          <Route element={<PracticeDemoProvider />}>
+            <Route path="/practice/:songId/record" element={<RecordPage />} />
+            <Route path="/practice/:songId/tuner" element={<TunerPage />} />
+            <Route path="/practice/:songId/metronome" element={<MetronomePage />} />
+            <Route path="/practice/:songId/processing" element={<ProcessingPage />} />
+            <Route path="/practice/:songId/results" element={<ResultsPage />} />
           </Route>
 
           {/* M01 — tiến trình xử lý chạy nền nên các màn luyện tập dùng chung một provider */}
@@ -162,20 +180,23 @@ export function AppRouter() {
             <Route path="/teacher/roadmap" element={<RoadmapPage />} />
             <Route path="/teacher/progress" element={<StudentProgressPage />} />
             <Route path="/teacher/assignments" element={<AssignmentListPage />} />
+            <Route path="/teacher/challenges" element={<LecturerChallengesPage />} />
+            <Route path="/teacher/challenges/new" element={<ChallengeFormPage />} />
+            <Route path="/teacher/challenges/:id/edit" element={<ChallengeFormPage />} />
             <Route path="/categories" element={<CategoriesPage />} />
+            {/* M03 classes & members: web-first inside the lecturer shell */}
+            <Route path="/teacher/classes/new" element={<ClassFormPage />} />
+            <Route path="/teacher/classes/:classId" element={<ClassDetailPage />} />
+            <Route path="/teacher/classes/:classId/edit" element={<ClassFormPage />} />
+            <Route path="/teacher/classes/:classId/members/new" element={<AddStudentPage />} />
+            <Route path="/teacher/classes/:classId/import" element={<ImportStudentsPage />} />
+            <Route path="/teacher/assignments/new" element={<AssignmentFormPage />} />
+            <Route path="/teacher/assignments/:assignmentId/edit" element={<AssignmentFormPage />} />
+            <Route path="/teacher/assignments/:assignmentId" element={<TeacherAssignmentDetailPage />} />
+            <Route path="/teacher/assignments/:assignmentId/students/:studentId" element={<StudentSubmissionsPage />} />
           </Route>
-          {/* M03 classes & members */}
-          <Route path="/teacher/classes/new" element={<ClassFormPage />} />
-          <Route path="/teacher/classes/:classId" element={<ClassDetailPage />} />
-          <Route path="/teacher/classes/:classId/edit" element={<ClassFormPage />} />
-          <Route path="/teacher/classes/:classId/members/new" element={<AddStudentPage />} />
-          <Route path="/teacher/classes/:classId/import" element={<ImportStudentsPage />} />
-          <Route path="/teacher/assignments/:assignmentId/edit" element={<AssignmentFormPage />} />
-          <Route path="/teacher/assignments/:assignmentId" element={<TeacherAssignmentDetailPage />} />
-          <Route path="/teacher/assignments/:assignmentId/students/:studentId" element={<StudentSubmissionsPage />} />
           <Route path="/teacher/classes/:classId/assign" element={<EnsembleAssignPage />} />
           <Route path="/teacher/review" element={<ReviewPage />} />
-          <Route path="/teacher/assignments/new" element={<AssignmentFormPage />} />
           <Route path="/teacher/student-review" element={<StudentReviewPage />} />
 
           {/* M02 - quản lý bài hát (trang tự bọc TeacherShell) */}
@@ -186,7 +207,6 @@ export function AppRouter() {
 
           {/* Community - desktop */}
           <Route path="/community/bonus/new" element={<BonusFormPage />} />
-          <Route path="/community/challenges/new" element={<ChallengeFormPage />} />
         </Route>
 
         {/* Quản trị viên - màn hình desktop */}
@@ -210,6 +230,7 @@ export function AppRouter() {
         <Route element={<ProtectedRoute allowedRoles={[ROLES.TEACHER, ROLES.SYSTEM_ADMIN]} />}>
           <Route element={<DesktopLayout />}>
             <Route path="/community/verified" element={<VerifiedContentPage />} />
+            <Route path="/leaderboard" element={<LeaderboardDesktopPage />} />
           </Route>
         </Route>
 

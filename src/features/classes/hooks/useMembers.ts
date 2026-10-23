@@ -1,5 +1,5 @@
 import { classesApi } from "@/features/classes/api/classesApi";
-import { useApiQuery } from "@/features/classes/hooks/useApiQuery";
+import { useApiQuery } from "@/shared/hooks/useApiQuery";
 import { type MemberListParams } from "@/features/classes/types/classTypes";
 
 export function useMembers(classId: string, params: MemberListParams) {

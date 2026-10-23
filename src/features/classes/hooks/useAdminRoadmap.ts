@@ -1,5 +1,5 @@
 import { roadmapsApi } from "@/features/classes/api/roadmapsApi";
-import { useApiQuery } from "@/features/classes/hooks/useApiQuery";
+import { useApiQuery } from "@/shared/hooks/useApiQuery";
 
 export function useAdminRoadmap(instrumentId: string | null) {
   const { data, error, isLoading, reload } = useApiQuery(

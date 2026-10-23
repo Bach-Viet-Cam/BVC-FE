@@ -84,5 +84,23 @@ describe("AssignmentList", () => {
     expect(assignmentsApi.listAssignments).toHaveBeenCalledWith(expect.objectContaining({ classId: "c1" }));
     expect(screen.queryByLabelText("Lớp")).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /Tạo bài tập/ })).not.toBeInTheDocument();
+    expect(screen.getByText("Lớp chưa có bài Hòa tấu.")).toBeInTheDocument();
+  });
+
+  it("shows the ensemble and solo slots above the other assignments in the class tab", async () => {
+    mockItems([ITEM, { ...ITEM, id: "a2", title: "Bonus tuần 3", kind: "BONUS" }]);
+    renderList({ classId: "c1", canCreate: true });
+    await screen.findByText("Độc tấu - Lý ngựa ô");
+    expect(screen.queryByLabelText("Loại")).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Tạo bài Hòa tấu/ })).toHaveAttribute(
+      "href",
+      "/teacher/assignments/new?classId=c1&kind=ENSEMBLE"
+    );
+    expect(screen.queryByRole("link", { name: /Tạo bài Độc tấu/ })).not.toBeInTheDocument();
+    const heading = screen.getByRole("heading", { name: "Bài tập khác" });
+    expect(heading.compareDocumentPosition(screen.getByText("Bonus tuần 3"))).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(heading.compareDocumentPosition(screen.getByText("Độc tấu - Lý ngựa ô"))).toBe(
+      Node.DOCUMENT_POSITION_PRECEDING
+    );
   });
 });

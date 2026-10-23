@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useApiQuery } from "@/features/classes/hooks/useApiQuery";
+import { useApiQuery } from "@/shared/hooks/useApiQuery";
 import { parseApiError, type ParsedApiError } from "@/features/classes/utils/mapApiErrors";
 import { settingsApi } from "@/features/platform/api/settingsApi";
 import { type GradingSettings, type GradingSettingsPayload } from "@/features/platform/types/settingsTypes";

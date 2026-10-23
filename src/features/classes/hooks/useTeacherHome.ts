@@ -1,6 +1,6 @@
 import { assignmentsApi } from "@/features/classes/api/assignmentsApi";
 import { progressApi } from "@/features/classes/api/progressApi";
-import { useApiQuery } from "@/features/classes/hooks/useApiQuery";
+import { useApiQuery } from "@/shared/hooks/useApiQuery";
 import { useClassList } from "@/features/classes/hooks/useClassList";
 import { type AssignmentStatus } from "@/features/classes/types/teacherAssignmentTypes";
 import { formatCurrentWeek } from "@/features/classes/utils/classFormat";

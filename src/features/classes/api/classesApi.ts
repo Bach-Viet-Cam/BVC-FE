@@ -11,12 +11,14 @@ import {
   type Member,
   type MemberListParams,
   type MemberListResult,
+  type SemesterList,
   type StudentPayload,
 } from "@/features/classes/types/classTypes";
 
 export const classesApi = {
   listInstruments: () => axiosClient.get<ApiResponse<Instrument[]>>("/instruments", { params: { active: "true" } }),
 
+  listSemesters: () => axiosClient.get<ApiResponse<SemesterList>>("/classes/semesters"),
   listClasses: (params: ClassListParams) => axiosClient.get<ApiResponse<ClassListResult>>("/classes", { params }),
   getClass: (classId: string) => axiosClient.get<ApiResponse<ClassDetail>>(`/classes/${classId}`),
   createClass: (payload: ClassPayload) => axiosClient.post<ApiResponse<ClassDetail>>("/classes", payload),

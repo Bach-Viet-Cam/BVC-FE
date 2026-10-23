@@ -7,6 +7,9 @@ import { ClassListPage } from "@/features/classes/pages/ClassListPage";
 
 vi.mock("@/features/classes/api/classesApi", () => ({ classesApi: { listClasses: vi.fn() } }));
 
+const isMobile = vi.fn(() => false);
+vi.mock("@/shared/hooks/use-mobile", () => ({ useIsMobile: () => isMobile() }));
+
 const navigate = vi.fn();
 vi.mock("react-router-dom", async (importOriginal) => ({
   ...(await importOriginal<typeof import("react-router-dom")>()),
@@ -53,7 +56,10 @@ const renderPage = () =>
   );
 
 describe("ClassListPage", () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    isMobile.mockReturnValue(false);
+  });
 
   it("lists the classes returned by the API with stats computed from them", async () => {
     mockClasses([CLASS_FA26, CLASS_SP26]);
@@ -79,6 +85,18 @@ describe("ClassListPage", () => {
     mockClasses([]);
     renderPage();
     expect(await screen.findByText("Bạn chưa có lớp học nào.")).toBeInTheDocument();
+  });
+
+  it("renders class cards instead of the table on a phone-width screen", async () => {
+    isMobile.mockReturnValue(true);
+    mockClasses([CLASS_FA26, CLASS_SP26]);
+    renderPage();
+    expect(await screen.findByText("TRD301 - Nhạc cụ truyền thống")).toBeInTheDocument();
+    expect(screen.getByText("1 lớp đang hoạt động")).toBeInTheDocument();
+    expect(screen.queryByText("Tuần hiện tại")).not.toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: "Mở lớp" })[0]).toHaveAttribute("href", "/teacher/classes/c1");
+    await userEvent.click(screen.getByRole("button", { name: "Tạo mới" }));
+    expect(navigate).toHaveBeenCalledWith("/teacher/classes/new");
   });
 
   it("shows the load error with a retry that refetches", async () => {

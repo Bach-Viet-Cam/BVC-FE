@@ -49,13 +49,13 @@ export function ImportStudentsPanel(props: ImportStudentsPanelProps) {
 
   return (
     <>
-      <div className="flex grow flex-col gap-[14px] px-[18px] pb-[16px] pt-[4px]">
-        <div className="flex gap-[10px]">
+      <div className="flex grow flex-col gap-[14px] px-[18px] pb-[16px] pt-[4px] lg:px-[32px] lg:pb-[24px] lg:pt-[22px]">
+        <div className="flex gap-[10px] lg:max-w-[720px]">
           <Step label="1 · Tải file mẫu & tải lên" isReached isCurrent={!hasPreview} />
           <Step label="2 · Kiểm tra & xác nhận" isReached={hasPreview} isCurrent={hasPreview} />
         </div>
 
-        <div className="flex flex-col gap-[10px] rounded-[16px] border border-bvc-border px-[14px] py-[12px]">
+        <div className="flex flex-col gap-[10px] rounded-[16px] border border-bvc-border px-[14px] py-[12px] lg:max-w-[720px] lg:p-[18px]">
           <span className="flex flex-col gap-[2px]">
             <span className="break-all text-[14px] font-semibold">{fileName ?? "Chưa chọn file"}</span>
             <span className="text-[12px] text-bvc-muted">
@@ -98,7 +98,7 @@ export function ImportStudentsPanel(props: ImportStudentsPanelProps) {
 
         {hasPreview && (
           <>
-            <div className="grid grid-cols-2 gap-[8px]">
+            <div className="grid grid-cols-2 gap-[8px] lg:max-w-[720px]">
               <div className="rounded-[14px] bg-bvc-soft p-[12px]">
                 <div className="font-bvc-mono text-[27px] font-semibold">{preview.validRows}</div>
                 <div className="text-[12.5px] text-bvc-muted">dòng hợp lệ</div>
@@ -113,7 +113,7 @@ export function ImportStudentsPanel(props: ImportStudentsPanelProps) {
                 {NO_VALID_ROW_MESSAGE}
               </p>
             )}
-            <div className="grid gap-[8px] lg:grid-cols-2">
+            <div className="grid gap-[8px] lg:grid-cols-2 2xl:grid-cols-3">
               {preview.rows.map((row) => (
                 <ImportRowCard key={row.rowNumber} row={row} />
               ))}
