@@ -91,11 +91,7 @@ export function ProcessingPage() {
 
   return (
     <PracticeFrame>
-      <PracticeTopBar
-        title={SAMPLE.piece}
-        subtitle={`${SAMPLE.className} · ${SAMPLE.instrument} · ${SAMPLE.lesson}`}
-        rightSlot={<DemoPanel />}
-      />
+      <PracticeTopBar title="Tiến trình xử lý" subtitle="Hệ thống đang chấm bản thu của bạn" />
 
       <div className="mx-auto w-full flex-1 overflow-y-auto px-3.5 pb-6 md:max-w-170 md:px-8 md:pt-8">
         <div className="flex items-center gap-2.5">
