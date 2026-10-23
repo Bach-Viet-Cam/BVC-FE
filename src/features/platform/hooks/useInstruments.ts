@@ -5,6 +5,7 @@ import {
   type InstrumentListParams,
   type InstrumentSortKey,
   type InstrumentStatusFilter,
+  type InstrumentTuneInput,
 } from "@/features/platform/types/configTypes";
 import { type InstrumentFormValues } from "@/features/platform/utils/validateInstrument";
 import { toast } from "@/shared/components/ui/toast";
@@ -58,6 +59,21 @@ export function useInstruments() {
     [reload]
   );
 
+  const saveTunes = useCallback(
+    async (instrumentId: string, tunes: InstrumentTuneInput[]): Promise<boolean> => {
+      try {
+        const { data: body } = await instrumentApi.setTunes(instrumentId, tunes);
+        toast.success(body.message || "Đã lưu cấu hình dây / nốt.");
+        reload();
+        return true;
+      } catch (saveError: unknown) {
+        toast.error(getApiErrorMessage(saveError, "Không thể lưu cấu hình dây / nốt. Vui lòng thử lại."));
+        return false;
+      }
+    },
+    [reload]
+  );
+
   const toggleActive = useCallback(
     async (instrument: InstrumentItem): Promise<void> => {
       try {
@@ -73,5 +89,6 @@ export function useInstruments() {
     [reload]
   );
 
-  return { filters, updateFilters, items: data ?? [], error, isLoading, reload, saveInstrument, toggleActive };
+  return { filters, updateFilters, items: data ?? [], error, isLoading, reload, saveInstrument, saveTunes, toggleActive };
 }
+

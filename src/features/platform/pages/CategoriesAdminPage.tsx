@@ -8,9 +8,9 @@ import {
   Music2,
   Pencil,
   Plus,
-  Power,
   RotateCw,
   Search,
+  SlidersHorizontal,
   Trash2,
   X,
 } from "lucide-react";
@@ -18,11 +18,14 @@ import { DesktopPageHeader } from "@/shared/components/bvc";
 import { CategoryDeleteDialog } from "@/features/platform/components/CategoryDeleteDialog";
 import { CategoryFormDialog } from "@/features/platform/components/CategoryFormDialog";
 import { InstrumentFormDialog } from "@/features/platform/components/InstrumentFormDialog";
+import { InstrumentTunesDialog } from "@/features/platform/components/InstrumentTunesDialog";
 import { PageStatus } from "@/features/platform/components/PageStatus";
 import { useContentCategories } from "@/features/platform/hooks/useContentCategories";
 import { useInstruments } from "@/features/platform/hooks/useInstruments";
 import { type CategoryFormTarget } from "@/features/platform/types/categoryTypes";
 import { type InstrumentItem } from "@/features/platform/types/configTypes";
+import { ActionTooltip } from "@/shared/components/ui/tooltip";
+import { Switch } from "@/shared/components/ui/switch";
 
 export function CategoriesAdminPage() {
   const { items, error, isLoading, reload, saveCategory, removeCategory } = useContentCategories();
@@ -39,6 +42,14 @@ export function CategoriesAdminPage() {
 
   const [isInstrumentFormOpen, setIsInstrumentFormOpen] = useState(false);
   const [instrumentTarget, setInstrumentTarget] = useState<InstrumentItem | null>(null);
+
+  const [isTunesDialogOpen, setIsTunesDialogOpen] = useState(false);
+  const [tunesTarget, setTunesTarget] = useState<InstrumentItem | null>(null);
+
+  const openTunesDialog = (inst: InstrumentItem) => {
+    setTunesTarget(inst);
+    setIsTunesDialogOpen(true);
+  };
 
   const totalRoots = items.length;
   const totalChildren = useMemo(() => items.reduce((acc, cat) => acc + cat.children.length, 0), [items]);
@@ -122,27 +133,30 @@ export function CategoriesAdminPage() {
         title="Phân loại nội dung"
         actions={
           <div className="flex items-center gap-2.5">
-            <button
-              type="button"
-              onClick={() => {
-                void reload();
-                void instruments.reload();
-              }}
-              disabled={isLoading || instruments.isLoading}
-              title="Làm mới dữ liệu"
-              className="flex size-[42px] cursor-pointer items-center justify-center rounded-[12px] border border-bvc-border bg-white text-bvc-muted transition-colors hover:border-bvc-border-strong hover:text-bvc-ink disabled:opacity-50"
-            >
-              <RotateCw size={16} className={isLoading || instruments.isLoading ? "animate-spin text-bvc-ink" : ""} />
-            </button>
+            <ActionTooltip content="Làm mới dữ liệu">
+              <button
+                type="button"
+                onClick={() => {
+                  void reload();
+                  void instruments.reload();
+                }}
+                disabled={isLoading || instruments.isLoading}
+                className="flex size-[42px] cursor-pointer items-center justify-center rounded-[12px] border border-bvc-border bg-white text-bvc-muted transition-colors hover:border-bvc-border-strong hover:text-bvc-ink disabled:opacity-50"
+              >
+                <RotateCw size={16} className={isLoading || instruments.isLoading ? "animate-spin text-bvc-ink" : ""} />
+              </button>
+            </ActionTooltip>
 
-            <button
-              type="button"
-              onClick={() => openCategoryForm(null)}
-              className="flex min-h-[42px] cursor-pointer items-center gap-2 rounded-[12px] bg-bvc-ink px-4 text-[13.5px] font-semibold text-white transition-colors hover:bg-black"
-            >
-              <FolderPlus size={16} />
-              <span>Thêm danh mục gốc</span>
-            </button>
+            <ActionTooltip content="Tạo một danh mục gốc mới">
+              <button
+                type="button"
+                onClick={() => openCategoryForm(null)}
+                className="flex min-h-[42px] cursor-pointer items-center gap-2 rounded-[12px] bg-bvc-ink px-4 text-[13.5px] font-semibold text-white transition-colors hover:bg-black"
+              >
+                <FolderPlus size={16} />
+                <span>Thêm danh mục gốc</span>
+              </button>
+            </ActionTooltip>
           </div>
         }
       />
@@ -180,7 +194,7 @@ export function CategoriesAdminPage() {
         </div>
 
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
-          <div className="flex flex-col overflow-hidden rounded-[18px] border border-bvc-border bg-white lg:col-span-7">
+          <div className="flex flex-col overflow-hidden rounded-[18px] border border-bvc-border bg-white lg:col-span-6">
             <div className="flex flex-col gap-3 border-b border-bvc-border p-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="flex size-[32px] items-center justify-center rounded-[8px] bg-bvc-surface text-bvc-ink">
@@ -202,33 +216,37 @@ export function CategoriesAdminPage() {
                     className="h-[36px] w-[180px] rounded-[10px] border border-bvc-border-strong bg-white pl-8 pr-7 text-[13px] text-bvc-ink placeholder:text-bvc-faint transition-colors focus:border-bvc-ink focus:outline-none"
                   />
                   {categorySearch && (
-                    <button
-                      type="button"
-                      onClick={() => setCategorySearch("")}
-                      className="absolute right-2 cursor-pointer text-bvc-muted hover:text-bvc-ink"
-                    >
-                      <X size={13} />
-                    </button>
+                    <ActionTooltip content="Xóa tìm kiếm">
+                      <button
+                        type="button"
+                        onClick={() => setCategorySearch("")}
+                        className="absolute right-2 cursor-pointer text-bvc-muted hover:text-bvc-ink"
+                      >
+                        <X size={13} />
+                      </button>
+                    </ActionTooltip>
                   )}
                 </div>
 
                 <div className="flex items-center rounded-[9px] border border-bvc-border bg-bvc-surface/60 p-0.5">
-                  <button
-                    type="button"
-                    onClick={expandAll}
-                    title="Mở rộng tất cả"
-                    className="cursor-pointer rounded-[7px] px-2 py-1 text-[11.5px] font-semibold text-bvc-muted transition-colors hover:text-bvc-ink"
-                  >
-                    Mở rộng
-                  </button>
-                  <button
-                    type="button"
-                    onClick={collapseAll}
-                    title="Thu gọn tất cả"
-                    className="cursor-pointer rounded-[7px] px-2 py-1 text-[11.5px] font-semibold text-bvc-muted transition-colors hover:text-bvc-ink"
-                  >
-                    Thu gọn
-                  </button>
+                  <ActionTooltip content="Mở rộng tất cả các nhánh danh mục">
+                    <button
+                      type="button"
+                      onClick={expandAll}
+                      className="cursor-pointer rounded-[7px] px-2 py-1 text-[11.5px] font-semibold text-bvc-muted transition-colors hover:text-bvc-ink"
+                    >
+                      Mở rộng
+                    </button>
+                  </ActionTooltip>
+                  <ActionTooltip content="Thu gọn tất cả các nhánh danh mục">
+                    <button
+                      type="button"
+                      onClick={collapseAll}
+                      className="cursor-pointer rounded-[7px] px-2 py-1 text-[11.5px] font-semibold text-bvc-muted transition-colors hover:text-bvc-ink"
+                    >
+                      Thu gọn
+                    </button>
+                  </ActionTooltip>
                 </div>
               </div>
             </div>
@@ -260,14 +278,16 @@ export function CategoriesAdminPage() {
                         >
                           <div className="flex items-center justify-between gap-3 p-3">
                             <div className="flex min-w-0 items-center gap-2.5">
-                              <button
-                                type="button"
-                                onClick={() => toggleExpand(category.id)}
-                                aria-label={expanded ? "Thu gọn danh mục" : "Mở rộng danh mục"}
-                                className="flex size-[28px] cursor-pointer items-center justify-center rounded-[7px] text-bvc-muted transition-colors hover:bg-bvc-surface hover:text-bvc-ink"
-                              >
-                                {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                              </button>
+                              <ActionTooltip content={expanded ? "Thu gọn danh mục" : "Mở rộng danh mục"}>
+                                <button
+                                  type="button"
+                                  onClick={() => toggleExpand(category.id)}
+                                  aria-label={expanded ? "Thu gọn danh mục" : "Mở rộng danh mục"}
+                                  className="flex size-[28px] cursor-pointer items-center justify-center rounded-[7px] text-bvc-muted transition-colors hover:bg-bvc-surface hover:text-bvc-ink"
+                                >
+                                  {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                                </button>
+                              </ActionTooltip>
 
                               <Folder size={17} className="shrink-0 text-bvc-ink" />
 
@@ -285,35 +305,38 @@ export function CategoriesAdminPage() {
                             </div>
 
                             <div className="flex items-center gap-1">
-                              <button
-                                type="button"
-                                onClick={() => openCategoryForm(null, category.id)}
-                                title={`Thêm nhánh con cho ${category.name}`}
-                                className="flex h-[30px] cursor-pointer items-center gap-1 rounded-[8px] border border-bvc-border bg-bvc-surface/60 px-2 text-[12px] font-medium text-bvc-ink transition-colors hover:border-bvc-border-strong hover:bg-white"
-                              >
-                                <Plus size={13} />
-                                <span className="hidden sm:inline">Thêm con</span>
-                              </button>
+                              <ActionTooltip content={`Thêm nhánh con cho ${category.name}`}>
+                                <button
+                                  type="button"
+                                  onClick={() => openCategoryForm(null, category.id)}
+                                  className="flex h-[30px] cursor-pointer items-center gap-1 rounded-[8px] border border-bvc-border bg-bvc-surface/60 px-2 text-[12px] font-medium text-bvc-ink transition-colors hover:border-bvc-border-strong hover:bg-white"
+                                >
+                                  <Plus size={13} />
+                                  <span className="hidden sm:inline">Thêm nhánh</span>
+                                </button>
+                              </ActionTooltip>
 
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  openCategoryForm({ id: category.id, name: category.name, parentId: null })
-                                }
-                                title={`Đổi tên ${category.name}`}
-                                className="flex size-[30px] cursor-pointer items-center justify-center rounded-[8px] text-bvc-muted transition-colors hover:bg-bvc-surface hover:text-bvc-ink"
-                              >
-                                <Pencil size={14} />
-                              </button>
+                              <ActionTooltip content={`Đổi tên ${category.name}`}>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    openCategoryForm({ id: category.id, name: category.name, parentId: null })
+                                  }
+                                  className="flex size-[30px] cursor-pointer items-center justify-center rounded-[8px] text-bvc-muted transition-colors hover:bg-bvc-surface hover:text-bvc-ink"
+                                >
+                                  <Pencil size={14} />
+                                </button>
+                              </ActionTooltip>
 
-                              <button
-                                type="button"
-                                onClick={() => setDeleteTarget({ id: category.id, name: category.name })}
-                                title={`Xóa ${category.name}`}
-                                className="flex size-[30px] cursor-pointer items-center justify-center rounded-[8px] text-bvc-muted transition-colors hover:bg-bvc-surface hover:text-bvc-error"
-                              >
-                                <Trash2 size={14} />
-                              </button>
+                              <ActionTooltip content={`Xóa ${category.name}`}>
+                                <button
+                                  type="button"
+                                  onClick={() => setDeleteTarget({ id: category.id, name: category.name })}
+                                  className="flex size-[30px] cursor-pointer items-center justify-center rounded-[8px] text-bvc-muted transition-colors hover:bg-bvc-surface hover:text-bvc-error"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </ActionTooltip>
                             </div>
                           </div>
 
@@ -334,28 +357,30 @@ export function CategoriesAdminPage() {
                                     </div>
 
                                     <div className="flex items-center gap-1">
-                                      <button
-                                        type="button"
-                                        onClick={() =>
-                                          openCategoryForm({
-                                            id: child.id,
-                                            name: child.name,
-                                            parentId: category.id,
-                                          })
-                                        }
-                                        title={`Sửa ${child.name}`}
-                                        className="flex size-[28px] cursor-pointer items-center justify-center rounded-[6px] text-bvc-muted transition-colors hover:bg-bvc-surface hover:text-bvc-ink"
-                                      >
-                                        <Pencil size={13} />
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => setDeleteTarget({ id: child.id, name: child.name })}
-                                        title={`Xóa ${child.name}`}
-                                        className="flex size-[28px] cursor-pointer items-center justify-center rounded-[6px] text-bvc-muted transition-colors hover:bg-bvc-surface hover:text-bvc-error"
-                                      >
-                                        <Trash2 size={13} />
-                                      </button>
+                                      <ActionTooltip content={`Sửa ${child.name}`}>
+                                        <button
+                                          type="button"
+                                          onClick={() =>
+                                            openCategoryForm({
+                                              id: child.id,
+                                              name: child.name,
+                                              parentId: category.id,
+                                            })
+                                          }
+                                          className="flex size-[28px] cursor-pointer items-center justify-center rounded-[6px] text-bvc-muted transition-colors hover:bg-bvc-surface hover:text-bvc-ink"
+                                        >
+                                          <Pencil size={13} />
+                                        </button>
+                                      </ActionTooltip>
+                                      <ActionTooltip content={`Xóa ${child.name}`}>
+                                        <button
+                                          type="button"
+                                          onClick={() => setDeleteTarget({ id: child.id, name: child.name })}
+                                          className="flex size-[28px] cursor-pointer items-center justify-center rounded-[6px] text-bvc-muted transition-colors hover:bg-bvc-surface hover:text-bvc-error"
+                                        >
+                                          <Trash2 size={13} />
+                                        </button>
+                                      </ActionTooltip>
                                     </div>
                                   </div>
                                 ))}
@@ -377,7 +402,7 @@ export function CategoriesAdminPage() {
             </div>
           </div>
 
-          <div className="flex flex-col overflow-hidden rounded-[18px] border border-bvc-border bg-white lg:col-span-5">
+          <div className="flex flex-col overflow-hidden rounded-[18px] border border-bvc-border bg-white lg:col-span-6">
             <div className="flex flex-col gap-3 border-b border-bvc-border p-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="flex size-[32px] items-center justify-center rounded-[8px] bg-bvc-surface text-bvc-ink">
@@ -393,14 +418,16 @@ export function CategoriesAdminPage() {
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={() => openInstrumentForm(null)}
-                className="flex h-[36px] cursor-pointer items-center gap-1.5 rounded-[10px] bg-bvc-ink px-3 text-[13px] font-semibold text-white transition-colors hover:bg-black"
-              >
-                <Plus size={14} />
-                <span>Thêm nhạc cụ</span>
-              </button>
+              <ActionTooltip content="Thêm nhạc cụ mới vào hệ thống">
+                <button
+                  type="button"
+                  onClick={() => openInstrumentForm(null)}
+                  className="flex h-[36px] cursor-pointer items-center gap-1.5 rounded-[10px] bg-bvc-ink px-3 text-[13px] font-semibold text-white transition-colors hover:bg-black"
+                >
+                  <Plus size={14} />
+                  <span>Thêm nhạc cụ</span>
+                </button>
+              </ActionTooltip>
             </div>
 
             <div className="border-b border-bvc-line bg-bvc-surface/30 p-3">
@@ -414,13 +441,15 @@ export function CategoriesAdminPage() {
                   className="h-[36px] w-full rounded-[10px] border border-bvc-border bg-white pl-8 pr-7 text-[13px] text-bvc-ink placeholder:text-bvc-faint transition-colors focus:border-bvc-ink focus:outline-none"
                 />
                 {instrumentSearch && (
-                  <button
-                    type="button"
-                    onClick={() => setInstrumentSearch("")}
-                    className="absolute right-2.5 cursor-pointer text-bvc-muted hover:text-bvc-ink"
-                  >
-                    <X size={13} />
-                  </button>
+                  <ActionTooltip content="Xóa lọc nhạc cụ">
+                    <button
+                      type="button"
+                      onClick={() => setInstrumentSearch("")}
+                      className="absolute right-2.5 cursor-pointer text-bvc-muted hover:text-bvc-ink"
+                    >
+                      <X size={13} />
+                    </button>
+                  </ActionTooltip>
                 )}
               </div>
             </div>
@@ -451,6 +480,17 @@ export function CategoriesAdminPage() {
                               {instrument.code}
                             </span>
                             <span className="truncate text-[13.5px] font-bold text-bvc-ink">{instrument.name}</span>
+                            <ActionTooltip content="Số lượng dây / nốt cơ bản đã cấu hình">
+                              <span
+                                className={`inline-flex items-center rounded-md border px-1.5 py-0.5 text-[11px] font-medium ${
+                                  (instrument.tunesCount ?? 0) > 0
+                                    ? "border-bvc-border bg-bvc-surface/80 text-bvc-ink"
+                                    : "border-dashed border-bvc-border text-bvc-muted"
+                                }`}
+                              >
+                                {(instrument.tunesCount ?? 0) > 0 ? `${instrument.tunesCount} dây/nốt` : "Chưa có dây"}
+                              </span>
+                            </ActionTooltip>
                           </div>
 
                           {instrument.description && (
@@ -458,48 +498,47 @@ export function CategoriesAdminPage() {
                           )}
                         </div>
 
-                        <div className="flex items-center gap-2">
-                          <span
-                            className="flex items-center gap-1.5 text-[12px] font-medium"
-                            title={instrument.isActive ? "Đang hoạt động trong các bài tập" : "Đã tạm dừng"}
-                          >
-                            <span
-                              className={`size-[7px] shrink-0 rounded-full ${
-                                instrument.isActive ? "bg-bvc-ok" : "bg-bvc-bar-strong"
-                              }`}
-                            />
-                            <span className={instrument.isActive ? "text-bvc-ink" : "text-bvc-muted"}>
-                              {instrument.isActive ? "Hoạt động" : "Ngừng"}
-                            </span>
-                          </span>
+                        <div className="flex shrink-0 items-center gap-1.5">
+                          <ActionTooltip content={`Cấu hình dây / nốt chuẩn cho ${instrument.name}`}>
+                            <button
+                              type="button"
+                              onClick={() => openTunesDialog(instrument)}
+                              className="flex h-[30px] cursor-pointer items-center gap-1.5 rounded-[8px] border border-bvc-border bg-bvc-surface/60 px-2.5 text-[12px] font-semibold text-bvc-ink transition-colors hover:border-bvc-border-strong hover:bg-white"
+                            >
+                              <SlidersHorizontal size={13} className="text-bvc-muted" />
+                              <span>Dây</span>
+                            </button>
+                          </ActionTooltip>
 
-                          <div className="flex items-center gap-1 pl-1">
+                          <ActionTooltip content={`Chỉnh sửa thông tin ${instrument.name}`}>
                             <button
                               type="button"
                               onClick={() => openInstrumentForm(instrument)}
-                              title={`Chỉnh sửa ${instrument.name}`}
                               className="flex size-[30px] cursor-pointer items-center justify-center rounded-[8px] text-bvc-muted transition-colors hover:bg-white hover:text-bvc-ink"
                             >
                               <Pencil size={14} />
                             </button>
+                          </ActionTooltip>
 
-                            <button
-                              type="button"
-                              onClick={() => void instruments.toggleActive(instrument)}
-                              title={
-                                instrument.isActive
-                                  ? `Tạm dừng hoạt động ${instrument.name}`
-                                  : `Kích hoạt lại ${instrument.name}`
-                              }
-                              className={`flex size-[30px] cursor-pointer items-center justify-center rounded-[8px] transition-colors hover:bg-white ${
-                                instrument.isActive
-                                  ? "text-bvc-muted hover:text-bvc-error"
-                                  : "text-bvc-ok hover:text-bvc-ok"
-                              }`}
-                            >
-                              <Power size={14} />
-                            </button>
-                          </div>
+                          <div className="mx-1 h-3.5 w-px bg-bvc-border" />
+
+                          <ActionTooltip
+                            content={
+                              instrument.isActive
+                                ? "Đang hoạt động · Bấm để tạm dừng"
+                                : "Đã tạm dừng · Bấm để kích hoạt"
+                            }
+                          >
+                            <div className="flex items-center">
+                              <Switch
+                                size="sm"
+                                checked={instrument.isActive}
+                                onCheckedChange={() => void instruments.toggleActive(instrument)}
+                                aria-label={instrument.isActive ? `Tạm dừng ${instrument.name}` : `Kích hoạt ${instrument.name}`}
+                                className="cursor-pointer data-checked:bg-bvc-ok"
+                              />
+                            </div>
+                          </ActionTooltip>
                         </div>
                       </div>
                     ))}
@@ -525,6 +564,12 @@ export function CategoriesAdminPage() {
         instrument={instrumentTarget}
         onOpenChange={setIsInstrumentFormOpen}
         onSubmit={(values) => instruments.saveInstrument(instrumentTarget?.id ?? null, values)}
+      />
+      <InstrumentTunesDialog
+        isOpen={isTunesDialogOpen}
+        instrument={tunesTarget}
+        onOpenChange={setIsTunesDialogOpen}
+        onSaved={instruments.reload}
       />
     </main>
   );
