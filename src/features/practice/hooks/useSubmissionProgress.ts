@@ -3,7 +3,6 @@ import { isAxiosError } from "axios";
 import { practiceSubmissionApi } from "@/features/practice/api/practiceSubmissionApi";
 import {
   MSG,
-  PROGRESS_BACKSTOP_MS,
   PROGRESS_POLL_MAX_MS,
   PROGRESS_POLL_MS,
 } from "@/features/practice/constants/practiceConstants";
@@ -23,16 +22,11 @@ export function useSubmissionProgress(submissionId: string) {
   useEffect(() => {
     if (!submissionId) return;
     const controller = new AbortController();
-    const started = Date.now();
     let timer: ReturnType<typeof setTimeout> | undefined;
     let delay = PROGRESS_POLL_MS;
     let failures = 0;
 
     const schedule = () => {
-      if (Date.now() - started >= PROGRESS_BACKSTOP_MS) {
-        setPaused(true);
-        return;
-      }
       timer = setTimeout(() => void poll(), delay);
     };
 
