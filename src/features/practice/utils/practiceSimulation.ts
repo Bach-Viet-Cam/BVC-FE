@@ -1,4 +1,4 @@
-import { SAMPLE, STRINGS } from "@/features/practice/constants/practiceConstants";
+import { PRACTICE_DEFAULTS, STRINGS } from "@/features/practice/constants/practiceConstants";
 import type { MappedNote } from "@/features/practice/types/practiceTypes";
 
 // Bản đồ nốt: lặp mẫu 4 ô nhịp phủ toàn bài ở BPM mục tiêu
@@ -43,7 +43,7 @@ export function buildNoteMap(bpm: number, len: number): MappedNote[] {
   return notes;
 }
 
-export const NOTE_MAP = buildNoteMap(SAMPLE.targetBpm, SAMPLE.pieceLen);
+export const NOTE_MAP = buildNoteMap(PRACTICE_DEFAULTS.targetBpm, PRACTICE_DEFAULTS.pieceLen);
 
 export function noteAt(t: number): MappedNote {
   for (let i = NOTE_MAP.length - 1; i >= 0; i--) {
@@ -61,7 +61,7 @@ export function simCents(t: number): number {
 }
 
 export function simBpm(t: number): number {
-  let b = SAMPLE.targetBpm + 1.8 * Math.sin(t * 0.9) + 1.2 * Math.sin(t * 2.3 + 2);
+  let b = PRACTICE_DEFAULTS.targetBpm + 1.8 * Math.sin(t * 0.9) + 1.2 * Math.sin(t * 2.3 + 2);
   const k = Math.floor(t / 17);
   const ph = t - k * 17;
   if (ph > 12 && ph < 14.5) b += (k % 2 === 0 ? 7 : -8) * Math.sin((Math.PI * (ph - 12)) / 2.5);

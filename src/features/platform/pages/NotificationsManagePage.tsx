@@ -75,8 +75,8 @@ export function NotificationsManagePage() {
         }
       />
 
-      <div className="flex flex-1 gap-[20px] overflow-hidden p-[22px_32px_26px]">
-        <div className="flex flex-1 flex-col overflow-y-auto">
+      <div className="flex flex-1 flex-col gap-[20px] p-[16px_18px_24px] md:p-[22px_32px_26px] lg:flex-row lg:overflow-hidden">
+        <div className="flex min-w-0 flex-1 flex-col lg:overflow-y-auto">
           <div className="mb-4 flex gap-2">
             {NOTIFICATION_FILTER_CHIPS.map((chip) => (
               <button
@@ -126,7 +126,7 @@ export function NotificationsManagePage() {
           </PageStatus>
         </div>
 
-        <div className="flex w-[400px] shrink-0 flex-col overflow-y-auto rounded-[20px] border border-bvc-border p-[20px]">
+        <div className="flex w-full shrink-0 flex-col rounded-[20px] border border-bvc-border p-[16px] md:p-[20px] lg:w-[400px] lg:overflow-y-auto">
           <NotificationForm
             key={`${selected?.id ?? "new"}-${selected?.status ?? ""}-${selected ? "" : presetType}`}
             item={selected}

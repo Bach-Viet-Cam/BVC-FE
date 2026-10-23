@@ -10,6 +10,9 @@ vi.mock("@/features/platform/api/myNotificationApi", () => ({
   myNotificationApi: { list: vi.fn(), countUnread: vi.fn(), markRead: vi.fn(), markAllRead: vi.fn() },
 }));
 vi.mock("@/shared/components/ui/toast", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
+vi.mock("@/shared/context/AuthContext", () => ({
+  useAuth: () => ({ user: { userId: "u1", username: "Tuấn Anh", email: "sv@example.com", role: 1 } }),
+}));
 
 const item = (id: string, overrides: Partial<MyNotificationItem> = {}): MyNotificationItem => ({
   id,
@@ -42,6 +45,8 @@ describe("NotificationsPage", () => {
   beforeEach(() => {
     vi.mocked(myNotificationApi.list).mockReset();
     vi.mocked(myNotificationApi.markRead).mockResolvedValue({} as never);
+    // Chuông thông báo trên thanh trên của StudentShell
+    vi.mocked(myNotificationApi.countUnread).mockResolvedValue({ data: { data: { count: 0 } } } as never);
   });
 
   it("groups today and earlier, opening one marks it read and follows its link", async () => {

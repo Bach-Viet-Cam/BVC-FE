@@ -2,7 +2,6 @@ import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { MetronomeView } from "@/features/practice/components/MetronomeView";
 import { PracticeFrame } from "@/features/practice/components/PracticeFrame";
 import { PracticeTopBar } from "@/features/practice/components/PracticeTopBar";
-import { SAMPLE } from "@/features/practice/constants/practiceConstants";
 import { useIsMobile } from "@/shared/hooks/use-mobile";
 
 export function MetronomePage() {
@@ -18,7 +17,7 @@ export function MetronomePage() {
       <PracticeTopBar
         variant="close"
         title="Metronome"
-        subtitle={`${SAMPLE.piece} · tốc độ yêu cầu ${SAMPLE.targetBpm} BPM`}
+        subtitle="Chỉnh tốc độ, số chỉ nhịp và phân phách khi luyện"
         onBack={() => navigate(-1)}
       />
       <MetronomeView />

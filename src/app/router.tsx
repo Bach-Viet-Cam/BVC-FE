@@ -1,5 +1,5 @@
 import { AudioAnalysisTestPage } from "@/features/practice/pages/AudioAnalysisTestPage";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 // Mobile — practice (M01 Smart Practice Studio)
 import { PracticeDemoProvider } from "@/features/practice/context/PracticeDemoContext";
@@ -34,20 +34,16 @@ import { SongUploadPage } from "@/features/music-library/pages/SongUploadPage";
 import { AssignmentPage } from "@/features/classes/pages/AssignmentPage";
 import { MyAssignmentsPage } from "@/features/classes/pages/MyAssignmentsPage";
 
-// Mobile - ensemble & rental
+// Mobile - ensemble & platform
 import { EnsemblePage } from "@/features/ensemble/pages/EnsemblePage";
 import { EnsemblePlaybackPage } from "@/features/ensemble/pages/EnsemblePlaybackPage";
-import { RentalPage } from "@/features/platform/pages/RentalPage";
 import { NotificationsPage } from "@/features/platform/pages/NotificationsPage";
 import { HelpCenterPage } from "@/features/platform/pages/HelpCenterPage";
-import { RentalMarketplacePage } from "@/features/platform/pages/RentalMarketplacePage";
 
 // Desktop - teacher / classes
-import { TeacherPage } from "@/features/classes/pages/TeacherPage";
 import { TeacherHomePage } from "@/features/classes/pages/TeacherHomePage";
 import { ClassListPage } from "@/features/classes/pages/ClassListPage";
 import { ClassFormPage } from "@/features/classes/pages/ClassFormPage";
-import { EnsembleAssignPage } from "@/features/classes/pages/EnsembleAssignPage";
 import { RoadmapPage } from "@/features/classes/pages/RoadmapPage";
 import { ReviewPage } from "@/features/classes/pages/ReviewPage";
 import { StudentProgressPage } from "@/features/classes/pages/StudentProgressPage";
@@ -68,7 +64,6 @@ import { SheetManagePage } from "@/features/music-library/pages/SheetManagePage"
 // Desktop - platform
 import { AdminPage } from "@/features/platform/pages/AdminPage";
 import { CategoriesPage } from "@/features/platform/pages/CategoriesPage";
-import { RentalProviderPage } from "@/features/platform/pages/RentalProviderPage";
 import { StudentReviewPage } from "@/features/platform/pages/StudentReviewPage";
 import { ContentApprovalPage } from "@/features/platform/pages/ContentApprovalPage";
 import { UserManagePage } from "@/features/platform/pages/UserManagePage";
@@ -87,7 +82,6 @@ import { ChallengesPage } from "@/features/community/pages/ChallengesPage";
 import { ChallengeDetailPage } from "@/features/community/pages/ChallengeDetailPage";
 
 // Community - desktop
-import { BonusFormPage } from "@/features/community/pages/BonusFormPage";
 import { VerifiedContentPage } from "@/features/community/pages/VerifiedContentPage";
 import { ChallengeFormPage } from "@/features/community/pages/ChallengeFormPage";
 import { AssignmentListPage } from "@/features/classes/pages/AssignmentListPage";
@@ -128,17 +122,8 @@ export function AppRouter() {
           <Route path="/community/bonus" element={<BonusListPage />} />
           <Route path="/community/bonus/:bonusId" element={<BonusDetailPage />} />
 
-          {/* Hòa tấu tự dựng khung responsive (EnsembleFrame), không dùng MobileLayout */}
+          {/* Hòa tấu tự dựng khung responsive (EnsembleFrame) */}
           <Route path="/ensemble/new" element={<EnsemblePage />} />
-
-          {/* M01 — tiến trình xử lý chạy nền nên các màn luyện tập dùng chung một provider */}
-          <Route element={<PracticeDemoProvider />}>
-            <Route path="/practice/:songId/record" element={<RecordPage />} />
-            <Route path="/practice/:songId/tuner" element={<TunerPage />} />
-            <Route path="/practice/:songId/metronome" element={<MetronomePage />} />
-            <Route path="/practice/:songId/processing" element={<ProcessingPage />} />
-            <Route path="/practice/:songId/results" element={<ResultsPage />} />
-          </Route>
 
           {/* M01 — tiến trình xử lý chạy nền nên các màn luyện tập dùng chung một provider */}
           <Route element={<PracticeDemoProvider />}>
@@ -154,8 +139,6 @@ export function AppRouter() {
           <Route path="/saved" element={<SavedPage />} />
 
           <Route path="/ensemble/:sessionId/playback" element={<EnsemblePlaybackPage />} />
-          <Route path="/rental" element={<RentalPage />} />
-          <Route path="/rental/marketplace" element={<RentalMarketplacePage />} />
 
           <Route path="/community/bonus/:bonusId/submit" element={<BonusSubmitPage />} />
           <Route path="/community/leaderboard" element={<LeaderboardPage />} />
@@ -166,7 +149,7 @@ export function AppRouter() {
         {/* Giảng viên - màn hình desktop */}
         <Route element={<ProtectedRoute allowedRoles={[ROLES.TEACHER]} />}>
           <Route element={<DesktopLayout />}>
-            <Route path="/teacher" element={<TeacherPage />} />
+            <Route path="/teacher" element={<Navigate to="/teacher/home" replace />} />
             <Route path="/teacher/home" element={<TeacherHomePage />} />
             <Route path="/teacher/classes" element={<ClassListPage />} />
             <Route path="/teacher/roadmap" element={<RoadmapPage />} />
@@ -186,10 +169,9 @@ export function AppRouter() {
             <Route path="/teacher/assignments/:assignmentId/edit" element={<AssignmentFormPage />} />
             <Route path="/teacher/assignments/:assignmentId" element={<TeacherAssignmentDetailPage />} />
             <Route path="/teacher/assignments/:assignmentId/students/:studentId" element={<StudentSubmissionsPage />} />
+            <Route path="/teacher/review" element={<ReviewPage />} />
+            <Route path="/teacher/student-review" element={<StudentReviewPage />} />
           </Route>
-          <Route path="/teacher/classes/:classId/assign" element={<EnsembleAssignPage />} />
-          <Route path="/teacher/review" element={<ReviewPage />} />
-          <Route path="/teacher/student-review" element={<StudentReviewPage />} />
 
           {/* M02 - quản lý bài hát (trang tự bọc TeacherShell) */}
           <Route path="/songs" element={<SongManagePage />} />
@@ -198,7 +180,8 @@ export function AppRouter() {
           <Route path="/songs/:songId/sheets" element={<SheetManagePage />} />
 
           {/* Community - desktop */}
-          <Route path="/community/bonus/new" element={<BonusFormPage />} />
+          {/* Bonus tạo bằng form bài tập chung (chọn loại Bonus) */}
+          <Route path="/community/bonus/new" element={<Navigate to="/teacher/assignments/new" replace />} />
         </Route>
 
         {/* Quản trị viên - màn hình desktop */}
@@ -211,11 +194,10 @@ export function AppRouter() {
             <Route path="/admin/monitoring" element={<MonitoringPage />} />
             <Route path="/admin/notifications" element={<NotificationsManagePage />} />
             <Route path="/community/approval" element={<ContentApprovalPage />} />
+            {/* M03 roadmap & grading - System Admin */}
+            <Route path="/admin/roadmaps" element={<AdminRoadmapPage />} />
+            <Route path="/admin/grading-settings" element={<GradingSettingsPage />} />
           </Route>
-          <Route path="/rental/provider" element={<RentalProviderPage />} />
-          {/* M03 roadmap & grading - System Admin */}
-          <Route path="/admin/roadmaps" element={<AdminRoadmapPage />} />
-          <Route path="/admin/grading-settings" element={<GradingSettingsPage />} />
         </Route>
 
         {/* Giảng viên và quản trị viên */}

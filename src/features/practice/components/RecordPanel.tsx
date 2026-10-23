@@ -1,5 +1,5 @@
 import { Download, Trash2, Volume2 } from "lucide-react";
-import { COUNT_IN_BEATS, SAMPLE } from "@/features/practice/constants/practiceConstants";
+import { COUNT_IN_BEATS, PRACTICE_DEFAULTS } from "@/features/practice/constants/practiceConstants";
 import { NoticeBanner } from "@/features/practice/components/NoticeBanner";
 import { PlaybackBar } from "@/shared/components/bvc/PlaybackBar";
 import { LiveWaveform } from "@/shared/components/bvc/LiveWaveform";
@@ -168,7 +168,7 @@ export function RecordPanel({
             <>
               <div className="flex items-center gap-2">
                 <Volume2 size={18} strokeWidth={1.9} className="text-bvc-ink" />
-                <span className="text-sm font-bold text-bvc-ink">Đếm nhịp · {SAMPLE.targetBpm} BPM</span>
+                <span className="text-sm font-bold text-bvc-ink">Đếm nhịp · {PRACTICE_DEFAULTS.targetBpm} BPM</span>
               </div>
               <div className="grid grid-cols-4 gap-1.5">
                 {Array.from({ length: COUNT_IN_BEATS }).map((_, i) => (
@@ -197,7 +197,7 @@ export function RecordPanel({
                   Đang ghi
                 </span>
                 <span className="text-[15px] font-semibold text-bvc-ink">
-                  {fmtTime(elapsed)} / {fmtTime(SAMPLE.pieceLen)}
+                  {fmtTime(elapsed)} / {fmtTime(PRACTICE_DEFAULTS.pieceLen)}
                 </span>
               </div>
               <LiveWaveform analyser={analyser} active height={96} />

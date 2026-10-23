@@ -34,9 +34,9 @@ function OverviewContent({ overview, onOpenConfig }: { overview: AdminOverview; 
   const totalSubmissions = counts.reduce((sum, count) => sum + count, 0);
 
   return (
-    <div className="flex flex-1 gap-[20px] overflow-hidden p-[20px_32px_24px]">
+    <div className="flex flex-1 flex-col gap-[20px] p-[16px_18px_24px] md:p-[20px_32px_24px] xl:flex-row xl:overflow-hidden">
       <div className="flex min-w-0 flex-1 flex-col gap-[18px]">
-        <div className="grid grid-cols-4 gap-[12px]">
+        <div className="grid grid-cols-2 gap-[12px] lg:grid-cols-4">
           <StatCard label="Đang hoạt động (7 ngày)" value={overview.activeUsers7d} />
           <StatCard label="Bản thu 7 ngày qua" value={overview.submissions7d} />
           <StatCard label="Dung lượng đã dùng" value={formatPercent(overview.storage.usedPercent)} variant="surface" />
@@ -67,35 +67,38 @@ function OverviewContent({ overview, onOpenConfig }: { overview: AdminOverview; 
           <div className="shrink-0 border-b border-bvc-border px-[18px] py-[15px] text-[15px] font-bold">
             Người dùng mới nhất
           </div>
-          <div className="grid shrink-0 grid-cols-[2fr_2fr_1.2fr_1fr] gap-[12px] border-b border-bvc-border px-[18px] py-[10px] text-[12px] font-bold uppercase tracking-[0.08em] text-bvc-muted">
-            <span>Họ tên</span>
-            <span>Email</span>
-            <span>Vai trò</span>
-            <span>Trạng thái</span>
-          </div>
-          <div className="overflow-y-auto">
-            {overview.recentUsers.length === 0 && (
-              <div className="px-[18px] py-[16px] text-[13.5px] text-bvc-muted">Chưa có người dùng nào.</div>
-            )}
-            {overview.recentUsers.map((user) => (
-              <div
-                key={user.id}
-                className="grid grid-cols-[2fr_2fr_1.2fr_1fr] items-center gap-[12px] border-b border-bvc-line px-[18px] py-[12px] text-[14px] last:border-b-0"
-              >
-                <span>{user.username}</span>
-                <span className="truncate text-bvc-muted">{user.email}</span>
-                <span className="text-bvc-muted">{USER_ROLE_LABELS[user.role] ?? "-"}</span>
-                <span className="flex items-center gap-[6px] text-[13.5px]">
-                  <span className={`size-[8px] shrink-0 rounded-full ${USER_STATUS_DOT[user.status]}`} />
-                  {getStatusLabel(user.status)}
-                </span>
-              </div>
-            ))}
+          {/* Bảng 4 cột: trên điện thoại cuộn ngang trong thẻ thay vì bóp chữ */}
+          <div className="flex min-h-0 flex-1 flex-col overflow-x-auto">
+            <div className="grid min-w-[560px] shrink-0 grid-cols-[2fr_2fr_1.2fr_1fr] gap-[12px] border-b border-bvc-border px-[18px] py-[10px] text-[12px] font-bold uppercase tracking-[0.08em] text-bvc-muted">
+              <span>Họ tên</span>
+              <span>Email</span>
+              <span>Vai trò</span>
+              <span>Trạng thái</span>
+            </div>
+            <div className="min-w-[560px] overflow-y-auto">
+              {overview.recentUsers.length === 0 && (
+                <div className="px-[18px] py-[16px] text-[13.5px] text-bvc-muted">Chưa có người dùng nào.</div>
+              )}
+              {overview.recentUsers.map((user) => (
+                <div
+                  key={user.id}
+                  className="grid grid-cols-[2fr_2fr_1.2fr_1fr] items-center gap-[12px] border-b border-bvc-line px-[18px] py-[12px] text-[14px] last:border-b-0"
+                >
+                  <span>{user.username}</span>
+                  <span className="truncate text-bvc-muted">{user.email}</span>
+                  <span className="text-bvc-muted">{USER_ROLE_LABELS[user.role] ?? "-"}</span>
+                  <span className="flex items-center gap-[6px] text-[13.5px]">
+                    <span className={`size-[8px] shrink-0 rounded-full ${USER_STATUS_DOT[user.status]}`} />
+                    {getStatusLabel(user.status)}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="flex w-[306px] shrink-0 flex-col gap-[14px]">
+      <div className="flex w-full shrink-0 flex-col gap-[14px] xl:w-[306px]">
         <div className="flex flex-col gap-[12px] rounded-[20px] border border-[#F9D2C2] bg-bvc-accent-tint p-[16px]">
           <div className="flex items-center gap-[8px]">
             <span className="text-bvc-accent-text">

@@ -1,4 +1,4 @@
-import { NOTES, SAMPLE } from "@/features/practice/constants/practiceConstants";
+import { NOTES, PRACTICE_DEFAULTS } from "@/features/practice/constants/practiceConstants";
 import { NOTE_MAP } from "@/features/practice/utils/practiceSimulation";
 import type { PracticeSessionConfig } from "@/features/practice/types/practiceAudioTypes";
 
@@ -11,12 +11,12 @@ function hzToNearestMidi(hz: number): number {
 }
 
 // TODO(BE): thay bằng dữ liệu assignment + file phân tích (GBR-10, GBR-47, GBR-48) khi BE có API
-// TODO(BE): TempoCard còn đọc SAMPLE.targetBpm; chuyển sang session.targetBpm khi BE trả dữ liệu thật
+// TODO(BE): TempoCard còn đọc PRACTICE_DEFAULTS.targetBpm; chuyển sang session.targetBpm khi BE trả dữ liệu thật
 export function buildDemoSession(noPitch: boolean): PracticeSessionConfig {
   return {
-    targetBpm: SAMPLE.targetBpm,
+    targetBpm: PRACTICE_DEFAULTS.targetBpm,
     beatsPerBar: 4,
-    pieceLenSec: SAMPLE.pieceLen,
+    pieceLenSec: PRACTICE_DEFAULTS.pieceLen,
     hasPitch: !noPitch,
     fminHz: DEFAULT_FMIN_HZ,
     fmaxHz: DEFAULT_FMAX_HZ,
