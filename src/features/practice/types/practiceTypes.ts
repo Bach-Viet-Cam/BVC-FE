@@ -10,8 +10,6 @@ export type BeatAccent = "strong" | "soft" | "off";
 
 export type SubdivisionKey = "white" | "black" | "half" | "quarter";
 
-export type AiFailureMode = "none" | "once" | "always";
-
 export type StageState = "pending" | "active" | "done" | "fail";
 
 export interface RecordingFile {
@@ -47,31 +45,11 @@ export interface MappedNote {
   dur: number;
 }
 
-export interface Submission {
-  id: number;
-  file: RecordingFile;
-  status: SubmissionStatus;
-  stage: number;
-  stageStart: number;
-  fails: number;
-  retriesUsed: number;
-  exhausted: boolean;
-  retryAt: number;
-  reason: string;
-  doneAt: number;
-  notified: boolean;
-}
-
 export interface DemoFlags {
   expired: boolean;
   micDenied: boolean;
   otherProc: boolean;
   noPitch: boolean;
   invalid: "none" | "format" | "size" | "duration";
-  weakNet: boolean;
-  qcFail: boolean;
-  leaveProc: boolean;
   autoStop: boolean;
-  aiMode: AiFailureMode;
-  failJob: number;
 }

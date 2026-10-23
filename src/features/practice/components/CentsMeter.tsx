@@ -29,7 +29,7 @@ export function CentsMeter({ cents, live, size = "compact" }: CentsMeterProps) {
         />
         {live && (
           <span
-            className="absolute rounded-full"
+            className="absolute rounded-full transition-[left,width] duration-200 ease-out"
             style={{
               height: fillH,
               top: (trackH - fillH) / 2,
@@ -40,7 +40,7 @@ export function CentsMeter({ cents, live, size = "compact" }: CentsMeterProps) {
           />
         )}
         <span
-          className="absolute rounded-[2px]"
+          className="absolute rounded-[2px] transition-[left] duration-200 ease-out"
           style={{
             left: `${pct}%`,
             top: (trackH - markH) / 2,

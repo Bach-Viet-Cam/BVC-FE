@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Mic, Minus, Plus } from "lucide-react";
 import { StudentShell } from "@/shared/components/bvc/StudentShell";
 import { EmptyState } from "@/shared/components/bvc/EmptyState";
@@ -25,6 +25,7 @@ const headerButtonSize = "min-h-11 rounded-bvc-md px-4 text-sm";
 
 export function SheetPage() {
   const { songId = "", sheetId = "" } = useParams();
+  const assignmentId = useSearchParams()[0].get("assignmentId");
   const { viewer, error, isLoading, setSheetSaved } = useSheetViewer(songId, sheetId);
   const role = useViewerRole();
   const save = useSaveToggle();
@@ -68,7 +69,7 @@ export function SheetPage() {
   const zoomBase = zoom ?? SHEET_ZOOM.initial;
 
   // Màn luyện tập chỉ dành cho sinh viên; khách đăng nhập xong quay lại đúng bản này
-  const practicePath = `/practice/${song.id}/record?sheetId=${sheet.id}`;
+  const practicePath = `/practice/${song.id}/record?sheetId=${sheet.id}${assignmentId ? `&assignmentId=${encodeURIComponent(assignmentId)}` : ""}`;
   const practiceClass = actionButtonClass(
     "primary",
     "md",

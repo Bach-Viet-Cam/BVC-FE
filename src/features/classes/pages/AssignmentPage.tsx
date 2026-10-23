@@ -216,7 +216,7 @@ function AttemptTimeline({ assignment }: { assignment: AssignmentDetail }) {
 
 interface AssignmentStudioBoxProps {
   assignment: AssignmentDetail;
-  recordingTarget: string;
+  recordingTarget: string | null;
   ensembleTarget: string;
   onNavigate: (to: string) => void;
 }
@@ -261,8 +261,8 @@ function AssignmentStudioBox({
 
           <button
             type="button"
-            disabled={!assignment.canSubmit}
-            onClick={() => onNavigate(recordingTarget)}
+            disabled={!assignment.canSubmit || !recordingTarget}
+            onClick={() => recordingTarget && onNavigate(recordingTarget)}
             className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl bg-bvc-accent px-4.5 text-[13px] font-bold text-white shadow-2xs transition-all hover:bg-bvc-ink active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Mic size={16} strokeWidth={2.2} />
@@ -318,7 +318,8 @@ export function AssignmentPage() {
   }
 
   const urgency = getDeadlineUrgency(assignment.deadline);
-  const recordingTarget = `/practice/${assignment.pieceId ?? assignment.id}/record`;
+  // Học viên chọn bản nhạc (nhạc cụ) trên trang bài nhạc trước khi thu âm; bài tập không có bài nhạc thì không nộp qua M01
+  const recordingTarget = assignment.pieceId ? `/library/${assignment.pieceId}?assignmentId=${assignment.id}` : null;
   const ensembleTarget = `/ensemble/new?pieceId=${assignment.pieceId}&assignmentId=${assignment.id}`;
 
   return (
@@ -473,8 +474,8 @@ export function AssignmentPage() {
         )}
         <button
           type="button"
-          disabled={!assignment.canSubmit}
-          onClick={() => navigate(recordingTarget)}
+          disabled={!assignment.canSubmit || !recordingTarget}
+          onClick={() => recordingTarget && navigate(recordingTarget)}
           className="flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-bvc-accent text-[14px] font-bold text-white shadow-sm transition-all hover:bg-bvc-ink active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
         >
           <Mic size={17} strokeWidth={2.2} />

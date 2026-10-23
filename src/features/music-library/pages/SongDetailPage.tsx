@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { ChevronLeft, Plus, Users } from "lucide-react";
 import { StudentShell } from "@/shared/components/bvc/StudentShell";
 import { Chip } from "@/shared/components/bvc/Chip";
@@ -35,6 +35,7 @@ function DetailSkeleton() {
 
 export function SongDetailPage() {
   const { songId = "" } = useParams();
+  const assignmentId = useSearchParams()[0].get("assignmentId") ?? undefined;
   const role = useViewerRole();
   const { song, error, isLoading, setSongSaved } = useSongDetail(songId);
   const save = useSaveToggle();
@@ -185,11 +186,11 @@ export function SongDetailPage() {
 
         {featured ? (
           <>
-            <FeaturedSheetCard sheet={featured} viewerHref={sheetViewerHref(song.id, featured.id)} />
+            <FeaturedSheetCard sheet={featured} viewerHref={sheetViewerHref(song.id, featured.id, assignmentId)} />
             <SheetVersionList
               title="Bản khác theo độ khó"
               sheets={others}
-              hrefOf={(sheet) => sheetViewerHref(song.id, sheet.id)}
+              hrefOf={(sheet) => sheetViewerHref(song.id, sheet.id, assignmentId)}
             />
           </>
         ) : (

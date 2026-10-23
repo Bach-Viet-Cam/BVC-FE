@@ -42,3 +42,10 @@ export interface CapturedTake {
   durationSec: number;
   peaks: number[]; // 0..1, dùng cho Waveform ở preview
 }
+
+export interface PitchFrame {
+  time: number; // = AnalysisFrame.endTime (giây, đồng hồ AudioContext)
+  hz: number | null; // null khi khung không đạt bộ lọc, hoặc không tính pitch
+  clarity: number;
+  hopRms: number;
+}

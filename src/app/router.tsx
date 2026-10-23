@@ -140,6 +140,15 @@ export function AppRouter() {
             <Route path="/practice/:songId/results" element={<ResultsPage />} />
           </Route>
 
+          {/* M01 — tiến trình xử lý chạy nền nên các màn luyện tập dùng chung một provider */}
+          <Route element={<PracticeDemoProvider />}>
+            <Route path="/practice/:songId/record" element={<RecordPage />} />
+            <Route path="/practice/:songId/tuner" element={<TunerPage />} />
+            <Route path="/practice/:songId/metronome" element={<MetronomePage />} />
+            <Route path="/practice/:songId/processing" element={<ProcessingPage />} />
+            <Route path="/practice/:songId/results" element={<ResultsPage />} />
+          </Route>
+
           {/* Library */}
           <Route path="/library/upload" element={<SongUploadPage />} />
           <Route path="/saved" element={<SavedPage />} />

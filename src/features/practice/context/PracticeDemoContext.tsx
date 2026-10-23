@@ -1,16 +1,17 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Outlet } from "react-router-dom";
-import {
-  MAX_RETRIES,
-  MSG,
-  REJECT_REASON,
-  RETRY_DELAY_FIRST_S,
-  RETRY_DELAY_LATER_S,
-  SAMPLE,
-  STAGE_SECONDS,
-} from "@/features/practice/constants/practiceConstants";
-import type { DemoFlags, RecordingFile, Submission } from "@/features/practice/types/practiceTypes";
+import { audioAnalysisApi } from "@/features/practice/api/audioAnalysisApi";
+import { practiceSubmissionApi } from "@/features/practice/api/practiceSubmissionApi";
+import { MSG } from "@/features/practice/constants/practiceConstants";
+import type { DemoFlags } from "@/features/practice/types/practiceTypes";
+import type { PracticeSubmission, PracticeSubmitTarget } from "@/features/practice/types/practiceSubmissionTypes";
+import { isSlowUpload, isWeakConnection } from "@/features/practice/utils/networkQuality";
+import { rememberSubmission } from "@/features/practice/utils/submissionStorage";
 import { toast } from "@/shared/components/ui/toast";
+import { useAuth } from "@/shared/context/AuthContext";
+import { getApiErrorMessage } from "@/shared/utils/getApiErrorMessage";
+
+const WEAK_CHECK_MS = 1000;
 
 function freshDemo(): DemoFlags {
   return {
@@ -19,13 +20,13 @@ function freshDemo(): DemoFlags {
     otherProc: false,
     noPitch: false,
     invalid: "none",
-    weakNet: false,
-    qcFail: false,
-    leaveProc: false,
     autoStop: false,
-    aiMode: "none",
-    failJob: 1,
   };
+}
+
+interface SubmittedFile {
+  submissionId: string;
+  file: File;
 }
 
 interface PracticeDemoValue {
@@ -33,13 +34,11 @@ interface PracticeDemoValue {
   setDemoFlag: <K extends keyof DemoFlags>(key: K, value: DemoFlags[K]) => void;
   toggleDemoFlag: (key: keyof DemoFlags) => void;
   resetDemo: () => void;
-  submission: Submission | null;
-  left: number;
   blocked: boolean;
-  submit: (file: RecordingFile) => void;
-  retry: () => void;
-  clearSubmission: () => void;
+  submit: (file: File, target: PracticeSubmitTarget) => Promise<PracticeSubmission | null>;
   uploading: boolean;
+  uploadWeak: boolean;
+  lastSubmitted: SubmittedFile | null;
   bannerVisible: boolean;
   dismissBanner: () => void;
 }
@@ -53,102 +52,61 @@ export function usePracticeDemo() {
 }
 
 export function PracticeDemoProvider() {
+  const { user } = useAuth();
+  const userId = user?.userId ?? "guest";
   const [demo, setDemo] = useState<DemoFlags>(freshDemo);
-  const [submission, setSubmission] = useState<Submission | null>(null);
-  const [left, setLeft] = useState(SAMPLE.submissionsLeft);
   const [uploading, setUploading] = useState(false);
+  const [uploadWeak, setUploadWeak] = useState(false);
+  const [lastSubmitted, setLastSubmitted] = useState<SubmittedFile | null>(null);
   const [bannerVisible, setBannerVisible] = useState(false);
+  const uploadingRef = useRef(false);
+  const progress = useRef({ startedAt: 0, percent: 0, totalBytes: 0 });
 
-  const demoRef = useRef(demo);
-
+  // MSG-17: kiểm tra mạng yếu cả khi tải lên bị treo, không chờ sự kiện tiến độ
   useEffect(() => {
-    demoRef.current = demo;
-  }, [demo]);
-
-  const commit = useCallback((sub: Submission) => {
-    setSubmission(sub);
-    setUploading(false);
-    setBannerVisible(false);
-    toast.success(MSG.sent); // MSG-18
-  }, []);
-
-  const submit = useCallback(
-    (file: RecordingFile) => {
-      const now = Date.now();
-      const sub: Submission = {
-        id: now,
-        file,
-        status: "Đang xử lý",
-        stage: 0,
-        stageStart: now,
-        fails: 0,
-        retriesUsed: 0,
-        exhausted: false,
-        retryAt: 0,
-        reason: "",
-        doneAt: 0,
-        notified: false,
-      };
-      if (demoRef.current.weakNet) {
-        setUploading(true);
-        setTimeout(() => commit({ ...sub, stageStart: Date.now() }), 2600);
-        return;
-      }
-      commit(sub);
-    },
-    [commit]
-  );
-
-  // GBR-63: chạy lại từ bước bị lỗi
-  const retry = useCallback(() => {
-    setSubmission((sub) => {
-      const now = Date.now();
-      if (!sub || sub.status !== "Lỗi xử lý" || sub.exhausted || now < sub.retryAt) return sub;
-      toast.info(MSG.retrying); // MSG-24
-      return { ...sub, status: "Đang xử lý", stageStart: now, retriesUsed: sub.retriesUsed + 1 };
-    });
-  }, []);
-
-  // Bốn bước xử lý chạy nền ở mọi màn hình
-  useEffect(() => {
-    if (!submission || submission.status !== "Đang xử lý") return;
-
+    if (!uploading) return;
     const timer = setInterval(() => {
-      setSubmission((sub) => {
-        if (!sub || sub.status !== "Đang xử lý") return sub;
-        const now = Date.now();
-        if ((now - sub.stageStart) / 1000 < STAGE_SECONDS) return sub;
-
-        const flags = demoRef.current;
-
-        if (sub.stage === 0) {
-          if (flags.qcFail) return { ...sub, status: "Từ chối", reason: REJECT_REASON }; // GBR-12
-          return { ...sub, stage: 1, stageStart: now };
-        }
-
-        // GBR-65: một bước lỗi. GBR-59: lần đầu chờ 5 giây, các lần sau 10 giây
-        const failHere =
-          flags.aiMode !== "none" && sub.stage === flags.failJob && (flags.aiMode === "always" || sub.fails === 0);
-        if (failHere) {
-          const delay = sub.fails === 0 ? RETRY_DELAY_FIRST_S : RETRY_DELAY_LATER_S;
-          return {
-            ...sub,
-            status: "Lỗi xử lý",
-            fails: sub.fails + 1,
-            retryAt: now + delay * 1000,
-            exhausted: sub.retriesUsed >= MAX_RETRIES,
-          };
-        }
-
-        if (sub.stage < 3) return { ...sub, stage: sub.stage + 1, stageStart: now };
-
-        setLeft((value) => Math.max(0, value - 1));
-        return { ...sub, stage: 4, status: "Hoàn tất", doneAt: now, notified: false };
-      });
-    }, 120);
-
+      const { startedAt, percent, totalBytes } = progress.current;
+      setUploadWeak(isWeakConnection() || isSlowUpload(totalBytes, percent, Date.now() - startedAt));
+    }, WEAK_CHECK_MS);
     return () => clearInterval(timer);
-  }, [submission]);
+  }, [uploading]);
+
+  // Tải file lên rồi tạo Submission "Đang xử lý" (UC-01 steps 10-11, MSG-18)
+  const submit = useCallback(
+    async (file: File, target: PracticeSubmitTarget): Promise<PracticeSubmission | null> => {
+      if (uploadingRef.current) return null;
+      uploadingRef.current = true;
+      progress.current = { startedAt: Date.now(), percent: 0, totalBytes: file.size };
+      setUploading(true);
+      setUploadWeak(isWeakConnection());
+      try {
+        const controller = new AbortController();
+        const uploaded = await audioAnalysisApi.upload(file, controller.signal, (percent) => {
+          progress.current.percent = percent;
+        });
+        const response = await practiceSubmissionApi.create({
+          ...target,
+          studentUploadId: uploaded.data.data.fileId,
+        });
+        const submission = response.data.data;
+        setLastSubmitted({ submissionId: submission.id, file });
+        rememberSubmission(userId, target.pieceId, submission.id);
+        setBannerVisible(false);
+        toast.success(MSG.sent); // MSG-18
+        return submission;
+      } catch (reason) {
+        // 409 (GBR-49) trả về đúng thông báo "Bản nộp trước đang được xử lý..."
+        toast.error(getApiErrorMessage(reason, MSG.submitFailed));
+        return null;
+      } finally {
+        uploadingRef.current = false;
+        setUploading(false);
+        setUploadWeak(false);
+      }
+    },
+    [userId]
+  );
 
   const setDemoFlag = useCallback<PracticeDemoValue["setDemoFlag"]>((key, value) => {
     setDemo((flags) => ({ ...flags, [key]: value }));
@@ -160,9 +118,6 @@ export function PracticeDemoProvider() {
 
   const resetDemo = useCallback(() => {
     setDemo(freshDemo());
-    setSubmission(null);
-    setLeft(SAMPLE.submissionsLeft);
-    setUploading(false);
     setBannerVisible(false);
   }, []);
 
@@ -172,17 +127,15 @@ export function PracticeDemoProvider() {
       setDemoFlag,
       toggleDemoFlag,
       resetDemo,
-      submission,
-      left,
-      blocked: Boolean(demo.expired || left <= 0 || demo.otherProc || submission?.status === "Đang xử lý"),
+      blocked: Boolean(demo.expired || demo.otherProc),
       submit,
-      retry,
-      clearSubmission: () => setSubmission(null),
       uploading,
+      uploadWeak,
+      lastSubmitted,
       bannerVisible,
       dismissBanner: () => setBannerVisible(false),
     }),
-    [demo, setDemoFlag, toggleDemoFlag, resetDemo, submission, left, submit, retry, uploading, bannerVisible]
+    [demo, setDemoFlag, toggleDemoFlag, resetDemo, submit, uploading, uploadWeak, lastSubmitted, bannerVisible]
   );
 
   return (

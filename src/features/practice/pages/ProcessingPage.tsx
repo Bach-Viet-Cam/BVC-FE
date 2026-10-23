@@ -1,66 +1,97 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { PracticeFrame } from "@/features/practice/components/PracticeFrame";
 import { PracticeTopBar } from "@/features/practice/components/PracticeTopBar";
 import { StageTracker } from "@/features/practice/components/StageTracker";
-import { DemoPanel } from "@/features/practice/components/DemoPanel";
-import { MAX_RETRIES, MSG, SAMPLE } from "@/features/practice/constants/practiceConstants";
+import { MSG, RESULT_REDIRECT_MS, SAMPLE } from "@/features/practice/constants/practiceConstants";
 import { usePracticeDemo } from "@/features/practice/context/PracticeDemoContext";
-import { fmtTime, mbText } from "@/features/practice/utils/practiceFormat";
+import { useSubmissionProgress } from "@/features/practice/hooks/useSubmissionProgress";
+import { mbText } from "@/features/practice/utils/practiceFormat";
+import {
+  isRetryExhausted,
+  secondsUntil,
+  toStageIndex,
+  toStatusLabel,
+} from "@/features/practice/utils/submissionStatus";
+import { forgetSubmission, recallSubmission } from "@/features/practice/utils/submissionStorage";
 import { toast } from "@/shared/components/ui/toast";
+import { useAuth } from "@/shared/context/AuthContext";
 import { cn } from "@/shared/utils/cn";
+
+const PRIMARY_BUTTON =
+  "flex min-h-13 w-full cursor-pointer items-center justify-center rounded-[15px] bg-bvc-ink text-[15px] font-semibold text-white";
+const WARN_BOX =
+  "rounded-bvc-md border border-bvc-warn/50 bg-bvc-accent-tint px-3.5 py-3 text-[13px] leading-normal text-bvc-accent-text md:border-bvc-notice-border md:px-4.5 md:py-3.75 md:text-sm";
+
+// Đếm ngược tới lúc nút "Thử lại" mở (GBR-59)
+function useSecondsUntil(iso: string | null) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!iso) return;
+    const timer = setInterval(() => setNow(Date.now()), 250);
+    return () => clearInterval(timer);
+  }, [iso]);
+  return secondsUntil(iso, now);
+}
 
 export function ProcessingPage() {
   const navigate = useNavigate();
-  const { songId } = useParams();
-  const { submission, demo, retry, clearSubmission } = usePracticeDemo();
-  const [retrySec, setRetrySec] = useState(0);
+  const { songId = "" } = useParams();
+  const [searchParams] = useSearchParams();
+  const { user } = useAuth();
+  const userId = user?.userId ?? "guest";
+  const submissionId = searchParams.get("submissionId") || recallSubmission(userId, songId);
+  const { lastSubmitted } = usePracticeDemo();
+  const { submission, error, paused, retrying, resume, retry } = useSubmissionProgress(submissionId);
+  const retrySec = useSecondsUntil(submission?.status === "FAILED" ? submission.retryAvailableAt : null);
 
-  const status = submission?.status;
+  const status = submission ? toStatusLabel(submission.status) : null;
 
-  // GBR-52: mở kết quả 1.5 giây sau khi xong
+  // GBR-52: vẫn ở màn tiến trình thì tự mở kết quả sau MSG-21
   useEffect(() => {
-    if (status !== "Hoàn tất") return;
-    const timer = setTimeout(() => navigate(`/practice/${songId}/results`), 1500);
+    if (submission?.status !== "COMPLETED") return;
+    const timer = setTimeout(
+      () => navigate(`/practice/${songId}/results?submissionId=${submission.id}`),
+      RESULT_REDIRECT_MS
+    );
     return () => clearTimeout(timer);
-  }, [status, navigate, songId]);
+  }, [submission?.status, submission?.id, navigate, songId]);
 
-  // Minh hoạ xử lý nền: tự rời màn hình sau 1 giây
-  useEffect(() => {
-    if (!demo.leaveProc || status !== "Đang xử lý") return;
-    const timer = setTimeout(() => navigate(`/practice/${songId}/record`), 1000);
-    return () => clearTimeout(timer);
-  }, [demo.leaveProc, status, navigate, songId]);
-
-  useEffect(() => {
-    if (status !== "Lỗi xử lý" || !submission) return;
-    const timer = setInterval(() => {
-      setRetrySec(Math.max(0, Math.ceil((submission.retryAt - Date.now()) / 1000)));
-    }, 200);
-    return () => clearInterval(timer);
-  }, [status, submission]);
-
-  if (!submission) {
+  if (!submissionId) {
     return (
       <PracticeFrame>
         <PracticeTopBar title={SAMPLE.piece} subtitle="Chưa có bản nộp nào" />
         <p className="px-3.5 text-sm text-bvc-muted md:mx-auto md:w-full md:max-w-170 md:px-8 md:pt-8">
-          Bạn chưa gửi bản thu nào. Quay lại màn ghi âm để nộp bài.
+          {MSG.noSubmission}
         </p>
       </PracticeFrame>
     );
   }
 
-  const { file, stage, reason, retriesUsed, exhausted } = submission;
-  const warnTone = status === "Từ chối" || status === "Lỗi xử lý";
+  const localFile = lastSubmitted?.submissionId === submissionId ? lastSubmitted.file : null;
+  const exhausted = submission ? isRetryExhausted(submission) : false;
+  const warnTone = submission?.status === "REJECTED" || submission?.status === "FAILED";
+
+  function recordAgain() {
+    forgetSubmission(userId, songId);
+    navigate(-1);
+  }
+
+  // GBR-60: tải bản thu về để nộp lại sau; bản trên máy chủ đã bị xóa (GBR-62)
+  function downloadLocalFile() {
+    if (!localFile) return;
+    const url = URL.createObjectURL(localFile);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = localFile.name;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success(MSG.download);
+  }
 
   return (
     <PracticeFrame>
-      <PracticeTopBar
-        title={SAMPLE.piece}
-        subtitle={`${SAMPLE.className} · ${SAMPLE.instrument} · ${SAMPLE.lesson}`}
-        rightSlot={<DemoPanel />}
-      />
+      <PracticeTopBar title={SAMPLE.piece} subtitle={`${SAMPLE.className} · ${SAMPLE.instrument} · ${SAMPLE.lesson}`} />
 
       <div className="mx-auto w-full flex-1 overflow-y-auto px-3.5 pb-6 md:max-w-170 md:px-8 md:pt-8">
         <div className="flex items-center gap-2.5">
@@ -76,65 +107,68 @@ export function ProcessingPage() {
                 status === "Hoàn tất" ? "bg-bvc-ok" : warnTone ? "bg-bvc-warn" : "bg-bvc-accent"
               )}
             />
-            {status}
+            {status ?? "Đang tải tiến trình..."}
           </span>
         </div>
 
-        <p className="mt-2 text-[13px] text-bvc-muted">
-          {file.source === "record" ? "Bản thu" : file.name} · {mbText(file.mb)} · {fmtTime(file.dur)}
-        </p>
-
-        <div className="mt-3">
-          <StageTracker stage={stage} failed={status === "Lỗi xử lý" || status === "Từ chối"} />
-        </div>
-
-        {status === "Đang xử lý" && (
-          <p className="mt-3 text-[13px] leading-normal text-bvc-muted">
-            Bạn có thể rời màn hình này. Hệ thống vẫn xử lý và sẽ báo khi có kết quả.
+        {localFile && (
+          <p className="mt-2 text-[13px] text-bvc-muted">
+            {localFile.name} · {mbText(localFile.size / (1024 * 1024))}
           </p>
         )}
 
-        {status === "Hoàn tất" && (
-          <p className="mt-3 rounded-bvc-md border border-bvc-border bg-bvc-surface px-3.5 py-3 text-[13px] text-bvc-ink md:bg-bvc-panel md:text-sm">
-            Hoàn tất. Đang mở kết quả phân tích của bạn.
-          </p>
+        {submission && (
+          <div className="mt-3">
+            <StageTracker stage={toStageIndex(submission)} failed={warnTone} />
+          </div>
         )}
 
-        {status === "Từ chối" && (
+        {error && <p className="mt-3 text-[13px] text-bvc-muted">{error}</p>}
+
+        {submission?.status === "PROCESSING" && (
+          <p className="mt-3 text-[13px] leading-normal text-bvc-muted">{MSG.leaveHint}</p>
+        )}
+
+        {paused && submission?.status !== "COMPLETED" && (
           <div className="mt-3 flex flex-col gap-3">
-            <p className="rounded-bvc-md border border-bvc-warn/50 bg-bvc-accent-tint px-3.5 py-3 text-[13px] leading-normal text-bvc-accent-text md:border-bvc-notice-border md:px-4.5 md:py-3.75 md:text-sm">
-              Bản thu không đạt chất lượng: {reason}. Lượt này không bị tính vào số lần nộp. Bạn có thể ghi âm hoặc tải
-              file khác.
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                clearSubmission();
-                navigate(`/practice/${songId}/record`);
-              }}
-              className="flex min-h-13 w-full md:min-h-13 cursor-pointer items-center justify-center rounded-[15px] bg-bvc-ink text-[15px] font-semibold text-white"
-            >
+            <p className="text-[13px] text-bvc-muted">{MSG.progressPaused}</p>
+            <button type="button" onClick={resume} className={PRIMARY_BUTTON}>
+              Kiểm tra lại
+            </button>
+          </div>
+        )}
+
+        {submission?.status === "COMPLETED" && (
+          <p className="mt-3 rounded-bvc-md border border-bvc-border bg-bvc-surface px-3.5 py-3 text-[13px] text-bvc-ink md:bg-bvc-panel md:text-sm">
+            {MSG.done}
+          </p>
+        )}
+
+        {submission?.status === "REJECTED" && (
+          <div className="mt-3 flex flex-col gap-3">
+            <p className={WARN_BOX}>{MSG.rejected(submission.rejectReason ?? "")}</p>
+            <button type="button" onClick={recordAgain} className={PRIMARY_BUTTON}>
               Ghi âm lại
             </button>
           </div>
         )}
 
-        {status === "Lỗi xử lý" && !exhausted && (
+        {submission?.status === "FAILED" && !exhausted && (
           <div className="mt-3 flex flex-col gap-3">
-            <p className="rounded-bvc-md border border-bvc-warn/50 bg-bvc-accent-tint px-3.5 py-3 text-[13px] leading-normal text-bvc-accent-text md:border-bvc-notice-border md:px-4.5 md:py-3.75 md:text-sm">
-              Xử lý bản thu thất bại. File của bạn vẫn được giữ lại. Lượt này không bị tính vào số lần nộp.
-              {retrySec > 0 && ` Bạn có thể thử lại sau ${retrySec} giây.`}
+            <p className={WARN_BOX}>
+              {MSG.failed}
+              {retrySec > 0 && ` ${MSG.retryWait(retrySec)}`}
             </p>
             <p className="text-xs text-bvc-muted">
-              Đã thử lại {retriesUsed} / {MAX_RETRIES} lần
+              Đã thử lại {submission.retryCount} / {submission.maxRetries} lần
             </p>
             <button
               type="button"
-              disabled={retrySec > 0}
-              onClick={retry}
+              disabled={retrySec > 0 || retrying}
+              onClick={() => void retry()}
               className={cn(
-                "flex min-h-13 w-full md:min-h-13 items-center justify-center rounded-[15px] text-[15px] font-semibold",
-                retrySec > 0
+                "flex min-h-13 w-full items-center justify-center rounded-[15px] text-[15px] font-semibold",
+                retrySec > 0 || retrying
                   ? "cursor-not-allowed border border-bvc-border bg-bvc-surface text-bvc-faint"
                   : "cursor-pointer bg-bvc-ink text-white"
               )}
@@ -146,14 +180,13 @@ export function ProcessingPage() {
 
         {exhausted && (
           <div className="mt-3 flex flex-col gap-3">
-            <p className="rounded-bvc-md border border-bvc-warn/50 bg-bvc-accent-tint px-3.5 py-3 text-[13px] leading-normal text-bvc-accent-text md:border-bvc-notice-border md:px-4.5 md:py-3.75 md:text-sm">
-              Hệ thống vẫn chưa xử lý được sau 3 lần thử lại. File phân tích của bạn đã bị xóa khỏi máy chủ. Bạn có thể
-              tải bản thu về và nộp lại sau; bản nộp mới sẽ tính vào số lần nộp.
-            </p>
+            <p className={WARN_BOX}>{MSG.exhausted}</p>
+            {!localFile && <p className="text-xs text-bvc-muted">{MSG.noFileToDownload}</p>}
             <button
               type="button"
-              onClick={() => toast.success(MSG.download)}
-              className="flex min-h-13 w-full md:min-h-13 cursor-pointer items-center justify-center rounded-[15px] bg-bvc-ink text-[15px] font-semibold text-white"
+              disabled={!localFile}
+              onClick={downloadLocalFile}
+              className={cn(PRIMARY_BUTTON, !localFile && "cursor-not-allowed opacity-50")}
             >
               Tải file về
             </button>

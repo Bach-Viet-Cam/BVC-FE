@@ -12,8 +12,10 @@ const statusLabels: Record<AudioEvaluationStatus, string> = {
   published: "Đã gửi yêu cầu",
   queued: "Đang chờ xử lý",
   processing: "Đang phân tích audio",
+  waiting: "Đang chờ kiểm tra chất lượng",
   completed: "Phân tích hoàn tất",
   failed: "Phân tích thất bại",
+  rejected: "Bản thu không đạt chất lượng",
   publish_failed: "Gửi yêu cầu thất bại",
   publish_unknown: "Chưa xác định trạng thái gửi - đang kiểm tra lại",
 };

@@ -11,30 +11,14 @@ const TOGGLES_A: { key: keyof DemoFlags; label: string }[] = [
   { key: "noPitch", label: "Nhạc cụ không có cao độ" },
 ];
 
-const TOGGLES_B: { key: keyof DemoFlags; label: string }[] = [
-  { key: "weakNet", label: "Mạng yếu khi tải lên" },
-  { key: "qcFail", label: "Kiểm tra chất lượng thất bại" },
-  { key: "autoStop", label: "Tự dừng ở cuối bài" },
-  { key: "leaveProc", label: "Rời màn hình xử lý" },
-];
+// Mạng yếu, kiểm tra chất lượng và lỗi AI giờ đến từ hệ thống thật nên không còn công tắc demo
+const TOGGLES_B: { key: keyof DemoFlags; label: string }[] = [{ key: "autoStop", label: "Tự dừng ở cuối bài" }];
 
 const INVALID_OPTS = [
   { value: "none", label: "Không" },
   { value: "format", label: "Định dạng" },
   { value: "size", label: "Dung lượng" },
   { value: "duration", label: "Thời lượng" },
-] as const;
-
-const AI_OPTS = [
-  { value: "none", label: "Không" },
-  { value: "once", label: "Lỗi 1 lần" },
-  { value: "always", label: "Lỗi liên tục" },
-] as const;
-
-const JOB_OPTS = [
-  { value: 1, label: "Phân tích" },
-  { value: 2, label: "So sánh" },
-  { value: 3, label: "Tổng hợp" },
 ] as const;
 
 function Switch({ on }: { on: boolean }) {
@@ -165,20 +149,6 @@ export function DemoPanel() {
                   </button>
                 ))}
               </div>
-
-              <SegmentGroup
-                title="AI lỗi hoặc chạy quá 1 phút"
-                options={AI_OPTS}
-                value={demo.aiMode}
-                onPick={(value) => setDemoFlag("aiMode", value)}
-              />
-
-              <SegmentGroup
-                title="Bước bị lỗi"
-                options={JOB_OPTS}
-                value={demo.failJob}
-                onPick={(value) => setDemoFlag("failJob", value)}
-              />
             </div>
           </div>
         </>

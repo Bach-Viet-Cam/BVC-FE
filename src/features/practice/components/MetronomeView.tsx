@@ -1,4 +1,7 @@
 import { Pause, Play } from "lucide-react";
+import { InfoHint } from "@/features/practice/components/InfoHint";
+import { NoteIcon } from "@/features/practice/components/NoteIcon";
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
 import { BPM_MAX, BPM_MIN, SAMPLE, SIGS, SUBS } from "@/features/practice/constants/practiceConstants";
 import { useMetronome } from "@/features/practice/hooks/useMetronome";
 import type { SubdivisionKey } from "@/features/practice/types/practiceTypes";
@@ -12,19 +15,9 @@ const PRESETS = [
 
 const SUB_KEYS: SubdivisionKey[] = ["white", "black", "half", "quarter"];
 
-const SUB_TITLES: Record<SubdivisionKey, string> = {
-  white: "Nốt trắng",
-  black: "Nốt đen",
-  half: "Móc đơn",
-  quarter: "Móc kép",
-};
-
-const SUB_BEATS: Record<SubdivisionKey, string> = {
-  white: "2 phách",
-  black: "1 phách",
-  half: "1/2 phách",
-  quarter: "1/4 phách",
-};
+function isSubdivisionKey(value: unknown): value is SubdivisionKey {
+  return SUB_KEYS.some((key) => key === value);
+}
 
 const ACCENT_LABEL = { strong: "Mạnh", soft: "Nhẹ", off: "Bỏ" };
 
@@ -127,77 +120,92 @@ export function MetronomeView() {
           ))}
         </div>
 
-        <div className="mt-5 flex items-baseline justify-between">
+        <div className="mt-5 flex items-center justify-between gap-3">
           <span className="text-sm font-bold text-bvc-ink">Chia nhỏ phách</span>
-          <span className="text-[13px] text-bvc-muted">{SUBS[metronome.subdivision]}</span>
-        </div>
-        <div className="mt-2 grid grid-cols-4 gap-2">
-          {SUB_KEYS.map((key) => {
-            const active = metronome.subdivision === key;
-            return (
-              <button
-                key={key}
-                type="button"
-                onClick={() => metronome.setSubdivision(key)}
-                className={cn(
-                  "flex h-24 cursor-pointer flex-col items-center justify-center gap-1 rounded-bvc-lg",
-                  active
-                    ? "border-2 border-bvc-ink bg-bvc-surface md:bg-bvc-panel"
-                    : "border border-bvc-border bg-white"
-                )}
-              >
-                <span className="text-[13px] font-bold text-bvc-ink">{SUB_TITLES[key]}</span>
-                <span className="text-[11px] text-bvc-muted">{SUB_BEATS[key]}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        <button
-          type="button"
-          aria-pressed={metronome.vibrate}
-          onClick={metronome.toggleVibrate}
-          className="mt-5 flex min-h-12 w-full cursor-pointer items-center justify-between rounded-bvc-md border border-bvc-border-strong bg-white px-3.5 text-sm font-semibold text-bvc-ink"
-        >
-          Rung nhẹ theo phách mạnh
-          <span
-            className={cn(
-              "relative block h-[26px] w-11 shrink-0 rounded-[13px]",
-              metronome.vibrate ? "bg-bvc-accent" : "bg-bvc-border-strong"
-            )}
+          <Select
+            value={metronome.subdivision}
+            onValueChange={(value) => {
+              if (isSubdivisionKey(value)) metronome.setSubdivision(value);
+            }}
           >
-            <span
-              className="absolute top-[3px] size-5 rounded-full bg-white transition-[left]"
-              style={{ left: metronome.vibrate ? 21 : 3 }}
-            />
-          </span>
-        </button>
+            <SelectTrigger
+              aria-label="Chia nhỏ phách"
+              className="min-h-10 w-24 rounded-bvc-md border-bvc-border-strong"
+            >
+              <SelectValue>
+                {(value: SubdivisionKey) => <NoteIcon kind={value} className="size-7 text-bvc-ink" />}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectPopup positionerClassName="z-[90]">
+              {SUB_KEYS.map((key) => (
+                <SelectItem key={key} value={key} aria-label={SUBS[key]}>
+                  <NoteIcon kind={key} className="size-7" />
+                </SelectItem>
+              ))}
+            </SelectPopup>
+          </Select>
+        </div>
 
-        <p className="mt-3 text-xs leading-normal text-bvc-muted">
-          Chỉ để luyện thử. Tốc độ ở đây không làm đổi tốc độ yêu cầu của bài tập.
-        </p>
+        <div className="mt-5 flex items-center gap-1">
+          <button
+            type="button"
+            aria-pressed={metronome.vibrate}
+            onClick={metronome.toggleVibrate}
+            className="flex min-h-12 flex-1 cursor-pointer items-center justify-between rounded-bvc-md border border-bvc-border-strong bg-white px-3.5 text-sm font-semibold text-bvc-ink"
+          >
+            Rung nhẹ theo phách mạnh
+            <span
+              className={cn(
+                "relative block h-[26px] w-11 shrink-0 rounded-[13px]",
+                metronome.vibrate ? "bg-bvc-accent" : "bg-bvc-border-strong"
+              )}
+            >
+              <span
+                className="absolute top-[3px] size-5 rounded-full bg-white transition-[left]"
+                style={{ left: metronome.vibrate ? 21 : 3 }}
+              />
+            </span>
+          </button>
+          <InfoHint label="Giải thích Rung nhẹ theo phách mạnh">
+            <p>Chỉ để luyện thử. Tốc độ ở đây không làm đổi tốc độ yêu cầu của bài tập.</p>
+            <p className="mt-2">Chỉ hoạt động trên điện thoại hỗ trợ rung (chủ yếu Android).</p>
+          </InfoHint>
+        </div>
       </div>
 
-      <div className="flex shrink-0 items-center gap-2.5 px-3.5 pt-2.5 pb-6 md:border-t md:border-bvc-border-strong md:px-8 md:pt-4">
-        <button
-          type="button"
-          onClick={metronome.tapTempo}
-          className="flex min-h-13.5 flex-1 cursor-pointer items-center justify-center rounded-bvc-lg border border-bvc-border-strong bg-white text-[15px] font-semibold text-bvc-ink"
-        >
-          Gõ theo nhịp
-        </button>
-        <button
-          type="button"
-          aria-label={playing ? "Dừng metronome" : "Bắt đầu đếm nhịp"}
-          onClick={metronome.togglePlaying}
-          className="flex size-18 shrink-0 cursor-pointer items-center justify-center rounded-full bg-bvc-accent text-white"
-        >
-          {playing ? (
-            <Pause size={26} fill="currentColor" strokeWidth={0} />
-          ) : (
-            <Play size={26} fill="currentColor" strokeWidth={0} />
-          )}
-        </button>
+      <div className="flex shrink-0 items-center gap-3 px-3.5 pt-2.5 pb-6 md:border-t md:border-bvc-border-strong md:px-8 md:pt-4">
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={metronome.tapTempo}
+            className="flex min-h-11 cursor-pointer items-center justify-center rounded-bvc-md border border-bvc-border-strong bg-white px-4 text-[13px] font-semibold text-bvc-ink"
+          >
+            Gõ theo nhịp
+          </button>
+          <InfoHint label="Giải thích nút Gõ theo nhịp">
+            Gõ liên tục theo nhịp bạn muốn. Hệ thống tính BPM từ các lần gõ gần nhất rồi cập nhật tốc độ. Nút này không
+            phát tiếng.
+          </InfoHint>
+        </div>
+        <div className="flex flex-1 items-center gap-1">
+          <button
+            type="button"
+            aria-label={playing ? "Dừng metronome" : "Bắt đầu đếm nhịp"}
+            onClick={metronome.togglePlaying}
+            className="flex min-h-16 flex-1 cursor-pointer items-center justify-center gap-2.5 rounded-bvc-lg bg-bvc-accent text-base font-bold text-white"
+          >
+            {playing ? (
+              <Pause size={26} fill="currentColor" strokeWidth={0} />
+            ) : (
+              <Play size={26} fill="currentColor" strokeWidth={0} />
+            )}
+            {playing ? "Dừng" : "Bắt đầu"}
+          </button>
+          <InfoHint label="Giải thích nút Bắt đầu">
+            Bật hoặc tắt tiếng gõ nhịp theo tốc độ BPM đang chọn. Đổi BPM, loại nhịp hoặc phách mạnh nhẹ khi đang chạy
+            sẽ nghe thay đổi ngay.
+          </InfoHint>
+        </div>
       </div>
     </>
   );

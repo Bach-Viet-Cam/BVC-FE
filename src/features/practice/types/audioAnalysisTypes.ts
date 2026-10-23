@@ -1,5 +1,16 @@
 export type AudioEvaluationStatus =
-  "publishing" | "published" | "publish_failed" | "publish_unknown" | "queued" | "processing" | "completed" | "failed";
+  | "publishing"
+  | "published"
+  | "publish_failed"
+  | "publish_unknown"
+  | "queued"
+  | "processing"
+  | "waiting"
+  | "completed"
+  | "failed"
+  | "rejected";
+
+export type AudioJobCode = "quality_check" | "audio_analysis" | "comparison" | "feedback";
 
 export interface AudioUploadResult {
   fileId: string;
@@ -12,6 +23,8 @@ export interface AudioEvaluationInput {
 export interface AudioEvaluation {
   evaluationId: string;
   status: AudioEvaluationStatus;
+  stage?: AudioJobCode | null;
+  attempt?: number;
   result: {
     overallScore: number;
     pitchAccuracyPercent: number;
