@@ -118,6 +118,46 @@
       transform: none;
     }
   }
+
+  /* Popup tai nghe (màn hòa tấu): vẽ nét, kéo dây, cắm jack, sóng âm, dấu tích */
+  --animate-hp-draw: hp-draw 900ms ease-out both;
+  --animate-hp-cable: hp-cable 4.2s ease-in-out 900ms infinite both;
+  --animate-hp-plug: hp-plug 4.2s ease-in-out 900ms infinite both;
+  --animate-hp-screen: hp-screen 4.2s ease-in-out 900ms infinite both;
+  --animate-hp-wave: hp-wave 4.2s ease-out 900ms infinite both;
+  --animate-hp-wave-late: hp-wave 4.2s ease-out 1150ms infinite both;
+  --animate-hp-check: hp-check 4.2s cubic-bezier(0.34, 1.56, 0.64, 1) 900ms infinite both;
+  @keyframes hp-draw {
+    from { stroke-dashoffset: 1; }
+    to { stroke-dashoffset: 0; }
+  }
+  @keyframes hp-cable {
+    0% { stroke-dashoffset: 1; opacity: 1; }
+    35%, 85% { stroke-dashoffset: 0; opacity: 1; }
+    95%, 100% { stroke-dashoffset: 1; opacity: 0; }
+  }
+  @keyframes hp-plug {
+    0%, 22% { transform: translateY(22px); opacity: 0; }
+    30% { transform: translateY(22px); opacity: 1; }
+    42%, 85% { transform: translateY(0); opacity: 1; }
+    95%, 100% { transform: translateY(22px); opacity: 0; }
+  }
+  @keyframes hp-screen {
+    0%, 44% { opacity: 0; }
+    50%, 85% { opacity: 1; }
+    92%, 100% { opacity: 0; }
+  }
+  @keyframes hp-wave {
+    0%, 50% { opacity: 0; transform: scale(0.8); }
+    60% { opacity: 1; }
+    75%, 100% { opacity: 0; transform: scale(1.25); }
+  }
+  @keyframes hp-check {
+    0%, 52% { transform: scale(0); }
+    60% { transform: scale(1.15); }
+    66%, 86% { transform: scale(1); }
+    94%, 100% { transform: scale(0); }
+  }
 }
 
 :root {
