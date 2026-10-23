@@ -20,7 +20,6 @@ const NAV_ITEMS = [
   { label: "Luyện tập", to: "/practice/ly-ngua-o/record" },
   { label: "Thư viện", to: "/library" },
   { label: "Bài tập", to: "/assignments" },
-  { label: "Hòa tấu", to: "/ensemble/session-1" },
 ];
 
 // Giảng viên / quản trị viên chỉ ghé thư viện công khai, các mục sinh viên ở trên sẽ trả 403

@@ -17,7 +17,6 @@ import { DashboardPage } from "@/shared/pages/DashboardPage";
 import { ProtectedRoute } from "@/shared/components/ProtectedRoute";
 import { AppLayout } from "@/shared/components/AppLayout";
 import { DesktopLayout } from "@/shared/components/DesktopLayout";
-import { MobileLayout } from "@/shared/components/MobileLayout";
 import { ROLES } from "@/shared/constants/roles";
 
 // Mobile - home
@@ -124,13 +123,13 @@ export function AppRouter() {
         <Route element={<ProtectedRoute allowedRoles={[ROLES.STUDENT]} />}>
           <Route path="/home" element={<HomePage />} />
 
-          <Route element={<MobileLayout />}>
-            <Route path="/assignments" element={<MyAssignmentsPage />} />
-            <Route path="/assignment/:assignmentId" element={<AssignmentPage />} />
-            <Route path="/ensemble/new" element={<EnsemblePage />} />
-            <Route path="/community/bonus" element={<BonusListPage />} />
-            <Route path="/community/bonus/:bonusId" element={<BonusDetailPage />} />
-          </Route>
+          <Route path="/assignments" element={<MyAssignmentsPage />} />
+          <Route path="/assignment/:assignmentId" element={<AssignmentPage />} />
+          <Route path="/community/bonus" element={<BonusListPage />} />
+          <Route path="/community/bonus/:bonusId" element={<BonusDetailPage />} />
+
+          {/* Hòa tấu tự dựng khung responsive (EnsembleFrame), không dùng MobileLayout */}
+          <Route path="/ensemble/new" element={<EnsemblePage />} />
 
           {/* M01 — tiến trình xử lý chạy nền nên các màn luyện tập dùng chung một provider */}
           <Route element={<PracticeDemoProvider />}>

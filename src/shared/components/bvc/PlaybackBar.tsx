@@ -1,6 +1,4 @@
 import { Clock, Pause, Play, Volume1, Volume2, VolumeX } from "lucide-react";
-import { PLAYBACK_RATES } from "@/features/practice/constants/practiceConstants";
-import { fmtTime } from "@/features/practice/utils/practiceFormat";
 import { Waveform } from "@/shared/components/bvc/Waveform";
 import {
   DropdownMenu,
@@ -9,6 +7,13 @@ import {
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
 import { cn } from "@/shared/utils/cn";
+
+const PLAYBACK_RATES = [0.5, 0.75, 1, 1.25, 1.5, 2];
+
+function fmtTime(totalSeconds: number): string {
+  const seconds = Math.max(0, Math.floor(totalSeconds));
+  return `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
+}
 
 interface PlaybackBarProps {
   peaks: number[];

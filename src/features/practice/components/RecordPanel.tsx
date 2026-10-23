@@ -1,8 +1,8 @@
 import { Download, Trash2, Volume2 } from "lucide-react";
 import { COUNT_IN_BEATS, SAMPLE } from "@/features/practice/constants/practiceConstants";
 import { NoticeBanner } from "@/features/practice/components/NoticeBanner";
-import { PlaybackBar } from "@/features/practice/components/PlaybackBar";
-import { LiveWaveform } from "@/features/practice/components/LiveWaveform";
+import { PlaybackBar } from "@/shared/components/bvc/PlaybackBar";
+import { LiveWaveform } from "@/shared/components/bvc/LiveWaveform";
 import { RecordButton } from "@/features/practice/components/RecordButton";
 import { fmtTime } from "@/features/practice/utils/practiceFormat";
 import type { RecordState } from "@/features/practice/types/practiceTypes";

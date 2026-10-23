@@ -20,8 +20,8 @@ const STATUS_TONES: Record<SubmissionStatus, "ok" | "warn" | "muted"> = {
 
 export function MySubmissionList({ submissions }: MySubmissionListProps) {
   return (
-    <section className="mx-[14px] mt-3 rounded-[20px] border border-bvc-border p-[16px]">
-      <h3 className="text-[11px] font-bold uppercase tracking-[0.1em] text-bvc-muted">Bài nộp của bạn</h3>
+    <section className="rounded-2xl border border-bvc-border bg-white p-4 md:p-5 shadow-2xs">
+      <h3 className="text-[11px] font-extrabold uppercase tracking-wider text-bvc-muted">Bài nộp của bạn</h3>
       {submissions.length === 0 ? (
         <p className="mt-2 text-[13px] text-bvc-muted">Bạn chưa nộp bài này.</p>
       ) : (
@@ -29,7 +29,7 @@ export function MySubmissionList({ submissions }: MySubmissionListProps) {
           {submissions.map((submission) => (
             <li
               key={submission.id}
-              className="flex flex-col gap-[8px] border-b border-bvc-line py-[10px] last:border-0"
+              className="flex flex-col gap-2 border-b border-bvc-line py-2.5 last:border-0"
             >
               <div className="flex items-center justify-between gap-3 text-[13px]">
                 <span className="font-semibold text-bvc-ink">
@@ -37,7 +37,9 @@ export function MySubmissionList({ submissions }: MySubmissionListProps) {
                 </span>
                 <span className="flex items-center gap-3">
                   {submission.accuracy !== null && (
-                    <span className="font-mono text-[12.5px] text-bvc-ink">{formatPercent(submission.accuracy)}</span>
+                    <span className="font-bvc-mono text-[12.5px] font-bold text-bvc-ink">
+                      {formatPercent(submission.accuracy)}
+                    </span>
                   )}
                   <StatusLabel
                     label={SUBMISSION_STATUS_LABELS[submission.status]}
@@ -47,17 +49,17 @@ export function MySubmissionList({ submissions }: MySubmissionListProps) {
                 </span>
               </div>
               {submission.comment ? (
-                <div className="rounded-[14px] border border-bvc-border bg-bvc-surface px-[12px] py-[10px]">
-                  <p className="text-[12px] font-bold text-bvc-muted">Nhận xét của giảng viên</p>
-                  <p className="mt-1 whitespace-pre-line text-[13px] leading-relaxed text-bvc-ink">
+                <div className="rounded-lg border border-bvc-border bg-bvc-surface/60 px-3 py-2 text-[12.5px]">
+                  <p className="text-[11.5px] font-bold text-bvc-muted">Nhận xét của giảng viên</p>
+                  <p className="mt-1 whitespace-pre-line leading-relaxed text-bvc-ink">
                     {submission.comment.content}
                   </p>
-                  <p className="mt-1 text-right text-[11.5px] text-bvc-muted">
+                  <p className="mt-1 text-right text-[11px] text-bvc-faint">
                     Cập nhật {formatVietnamDateTime(submission.comment.updatedAt, false)}
                   </p>
                 </div>
               ) : (
-                <p className="text-[12px] text-bvc-muted">Chưa có nhận xét</p>
+                <p className="text-[12px] text-bvc-faint">Chưa có nhận xét</p>
               )}
             </li>
           ))}
@@ -66,3 +68,4 @@ export function MySubmissionList({ submissions }: MySubmissionListProps) {
     </section>
   );
 }
+
