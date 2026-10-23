@@ -14,14 +14,11 @@ import { useTakePlayback } from "@/features/ensemble/hooks/useTakePlayback";
 import { useTrackPeaks } from "@/features/ensemble/hooks/useTrackPeaks";
 import { type ListeningMode } from "@/features/ensemble/types/ensembleTypes";
 import { formatDate } from "@/features/ensemble/utils/formatClock";
-import { rememberSubmission } from "@/features/practice/utils/submissionStorage";
-import { useAuth } from "@/shared/context/AuthContext";
 
 const LEAVE_CONFIRM_MESSAGE = "Rời màn hình sẽ hủy bản thu đang thực hiện. Bạn có muốn rời đi?";
 
 export function EnsemblePage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const pieceId = searchParams.get("pieceId") ?? "";
   const assignmentId = searchParams.get("assignmentId") ?? undefined;
@@ -32,13 +29,8 @@ export function EnsemblePage() {
 
   const handleSubmit = useCallback(async () => {
     const submitted = await practice.submit();
-    if (submitted) {
-      rememberSubmission(user?.userId ?? "guest", pieceId, submitted.id);
-      navigate(
-        `/practice/${pieceId}/processing?submissionId=${submitted.id}${assignmentId ? `&assignmentId=${assignmentId}` : ""}`
-      );
-    }
-  }, [assignmentId, navigate, pieceId, practice, user?.userId]);
+    if (submitted) navigate(`/practice/submissions/${submitted.id}/processing`);
+  }, [navigate, practice]);
 
   const listening = useListeningSetup(Boolean(practice.tracksResult));
   const [isPromptForced, setIsPromptForced] = useState(false);

@@ -224,7 +224,7 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
     try {
       const file = new File([current.blob], "ban-thu-hoa-tau.wav", { type: "audio/wav" });
       const { data: upload } = await ensembleApi.uploadRecording(file, setUploadPercent);
-      const { data } = await ensembleApi.createSubmission({ pieceId, sheetMusicId, assignmentId, studentUploadId: upload.data.fileId });
+      const { data } = await ensembleApi.createSubmission({ sheetMusicId, assignmentId, studentUploadId: upload.data.fileId });
       setSubmission(data.data);
       toast.success("Đã nộp bản thu. Hệ thống đang phân tích.");
       if (assignmentId && data.data.assignmentId === null) {
@@ -237,7 +237,7 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
       changeStatus("preview"); // giữ bản thu để nộp lại
       return null;
     }
-  }, [assignmentId, changeStatus, pauseTracks, pieceId, tracksResult]);
+  }, [assignmentId, changeStatus, pauseTracks, tracksResult]);
 
   const stop = useCallback(async () => {
     const recorder = recorderRef.current;

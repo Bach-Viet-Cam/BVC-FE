@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { PracticeFrame } from "@/features/practice/components/PracticeFrame";
 import { PracticeTopBar } from "@/features/practice/components/PracticeTopBar";
 import { StageTracker } from "@/features/practice/components/StageTracker";
@@ -13,9 +13,7 @@ import {
   toStageIndex,
   toStatusLabel,
 } from "@/features/practice/utils/submissionStatus";
-import { forgetSubmission, recallSubmission } from "@/features/practice/utils/submissionStorage";
 import { toast } from "@/shared/components/ui/toast";
-import { useAuth } from "@/shared/context/AuthContext";
 import { cn } from "@/shared/utils/cn";
 
 const PRIMARY_BUTTON =
@@ -36,11 +34,7 @@ function useSecondsUntil(iso: string | null) {
 
 export function ProcessingPage() {
   const navigate = useNavigate();
-  const { songId = "" } = useParams();
-  const [searchParams] = useSearchParams();
-  const { user } = useAuth();
-  const userId = user?.userId ?? "guest";
-  const submissionId = searchParams.get("submissionId") || recallSubmission(userId, songId);
+  const { submissionId = "" } = useParams();
   const { lastSubmitted } = usePracticeDemo();
   const { submission, error, paused, retrying, resume, retry } = useSubmissionProgress(submissionId);
   const retrySec = useSecondsUntil(submission?.status === "FAILED" ? submission.retryAvailableAt : null);
@@ -50,12 +44,9 @@ export function ProcessingPage() {
   // GBR-52: vẫn ở màn tiến trình thì tự mở kết quả sau MSG-21
   useEffect(() => {
     if (submission?.status !== "COMPLETED") return;
-    const timer = setTimeout(
-      () => navigate(`/practice/${songId}/results?submissionId=${submission.id}`),
-      RESULT_REDIRECT_MS
-    );
+    const timer = setTimeout(() => navigate(`/practice/submissions/${submission.id}`), RESULT_REDIRECT_MS);
     return () => clearTimeout(timer);
-  }, [submission?.status, submission?.id, navigate, songId]);
+  }, [submission?.status, submission?.id, navigate]);
 
   if (!submissionId) {
     return (
@@ -73,7 +64,6 @@ export function ProcessingPage() {
   const warnTone = submission?.status === "REJECTED" || submission?.status === "FAILED";
 
   function recordAgain() {
-    forgetSubmission(userId, songId);
     navigate(-1);
   }
 

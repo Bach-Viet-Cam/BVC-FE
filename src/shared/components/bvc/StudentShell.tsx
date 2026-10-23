@@ -19,6 +19,7 @@ const NAV_ITEMS = [
   { label: "Hôm nay", to: "/home" },
   { label: "Thư viện", to: "/library" },
   { label: "Bài tập", to: "/assignments" },
+  { label: "Lịch sử", to: "/practice/submissions" },
 ];
 
 // Giảng viên / quản trị viên chỉ ghé thư viện công khai, các mục sinh viên ở trên sẽ trả 403

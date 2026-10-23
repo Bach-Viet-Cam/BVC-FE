@@ -8,6 +8,8 @@ import { TunerPage } from "@/features/practice/pages/TunerPage";
 import { MetronomePage } from "@/features/practice/pages/MetronomePage";
 import { ProcessingPage } from "@/features/practice/pages/ProcessingPage";
 import { ResultsPage } from "@/features/practice/pages/ResultsPage";
+import { SubmissionHistoryPage } from "@/features/practice/pages/SubmissionHistoryPage";
+import { SubmissionComparePage } from "@/features/practice/pages/SubmissionComparePage";
 
 import { LoginPage } from "@/features/auth/pages/LoginPage";
 import { ScrollToTop } from "@/shared/components/ScrollToTop";
@@ -127,11 +129,14 @@ export function AppRouter() {
 
           {/* M01 — tiến trình xử lý chạy nền nên các màn luyện tập dùng chung một provider */}
           <Route element={<PracticeDemoProvider />}>
-            <Route path="/practice/:songId/record" element={<RecordPage />} />
-            <Route path="/practice/:songId/tuner" element={<TunerPage />} />
-            <Route path="/practice/:songId/metronome" element={<MetronomePage />} />
-            <Route path="/practice/:songId/processing" element={<ProcessingPage />} />
-            <Route path="/practice/:songId/results" element={<ResultsPage />} />
+            <Route path="/practice/sheets/:sheetId/record" element={<RecordPage />} />
+            <Route path="/practice/sheets/:sheetId/tuner" element={<TunerPage />} />
+            <Route path="/practice/sheets/:sheetId/metronome" element={<MetronomePage />} />
+            <Route path="/practice/submissions/:submissionId/processing" element={<ProcessingPage />} />
+            <Route path="/practice/submissions/:submissionId" element={<ResultsPage />} />
+            {/* SCR-01, SCR-02 - lịch sử và so sánh bài nộp (mockup) */}
+            <Route path="/practice/submissions" element={<SubmissionHistoryPage />} />
+            <Route path="/practice/submissions/compare" element={<SubmissionComparePage />} />
           </Route>
 
           {/* Library */}

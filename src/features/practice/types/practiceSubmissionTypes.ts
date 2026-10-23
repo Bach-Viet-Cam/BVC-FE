@@ -22,14 +22,12 @@ export interface PracticeSubmission {
 }
 
 export interface CreatePracticeSubmissionInput {
-  pieceId: string;
   sheetMusicId: string;
   assignmentId?: string;
   studentUploadId: string;
 }
 
 export interface PracticeSubmitTarget {
-  pieceId: string;
   sheetMusicId: string;
   assignmentId?: string;
 }

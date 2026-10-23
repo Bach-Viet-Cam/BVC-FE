@@ -1,4 +1,4 @@
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
 import { PracticeFrame } from "@/features/practice/components/PracticeFrame";
 import { PracticeTopBar } from "@/features/practice/components/PracticeTopBar";
 import { TunerView } from "@/features/practice/components/TunerView";
@@ -8,13 +8,15 @@ import { useIsMobile } from "@/shared/hooks/use-mobile";
 
 export function TunerPage() {
   const navigate = useNavigate();
-  const { songId } = useParams();
+  const { sheetId } = useParams();
+  const { search } = useLocation();
   const isMobile = useIsMobile();
   // Laptop dùng micro của RecordPage nên ở đó không mở thêm micro
   const audio = usePracticeAudio({ micWanted: isMobile, fminHz: buildDemoSession(false).fminHz });
 
   // Laptop: lên dây là ngăn kéo của màn ghi âm, không có trang riêng
-  if (!isMobile) return <Navigate to={`/practice/${songId}/record`} state={{ drawer: "tuner" }} replace />;
+  if (!isMobile)
+    return <Navigate to={`/practice/sheets/${sheetId}/record${search}`} state={{ drawer: "tuner" }} replace />;
 
   return (
     <PracticeFrame>
