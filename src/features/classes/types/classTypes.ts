@@ -90,6 +90,15 @@ export interface MemberListResult {
   totalMembers: number;
 }
 
+// NEW = no account yet; STUDENT = existing student account that can be added.
+export type MemberLookupStatus = "NEW" | "STUDENT" | "NOT_STUDENT" | "ALREADY_IN_CLASS";
+
+export interface MemberLookup {
+  status: MemberLookupStatus;
+  fullName: string | null;
+  studentCode: string | null;
+}
+
 export interface StudentPayload {
   studentCode: string;
   fullName: string;
