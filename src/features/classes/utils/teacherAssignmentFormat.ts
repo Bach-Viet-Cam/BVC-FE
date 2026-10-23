@@ -5,6 +5,11 @@ import {
   type SubmissionStatus,
 } from "@/features/classes/types/teacherAssignmentTypes";
 
+// A piece has several sheets (per instrument / level), so the piece title alone is ambiguous.
+export function sheetMusicLabel(sheet: { pieceTitle: string; name: string }): string {
+  return `${sheet.pieceTitle} — ${sheet.name}`;
+}
+
 export const ASSIGNMENT_KIND_LABELS: Record<AssignmentKind, string> = {
   SOLO: "Độc tấu",
   ENSEMBLE: "Hòa tấu",

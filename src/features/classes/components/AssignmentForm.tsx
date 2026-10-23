@@ -3,10 +3,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ActionButton } from "@/features/classes/components/ActionButton";
 import { FooterActions } from "@/features/classes/components/FooterActions";
 import { FormField, INPUT_CLASSES } from "@/features/classes/components/FormField";
-import { useClassPieces } from "@/features/classes/hooks/useClassPieces";
+import { useClassSheetMusic } from "@/features/classes/hooks/useClassSheetMusic";
 import { type ApiFieldError } from "@/features/classes/types/classTypes";
-import { type AssignmentContentPayload, type AssignmentPiece } from "@/features/classes/types/teacherAssignmentTypes";
-import { ASSIGNMENT_KIND_LABELS } from "@/features/classes/utils/teacherAssignmentFormat";
+import { type AssignmentContentPayload, type AssignmentSheetMusic } from "@/features/classes/types/teacherAssignmentTypes";
+import { ASSIGNMENT_KIND_LABELS, sheetMusicLabel } from "@/features/classes/utils/teacherAssignmentFormat";
 import { applyFieldErrors } from "@/features/classes/utils/mapApiErrors";
 import {
   ASSIGNMENT_DESCRIPTION_MAX,
@@ -17,14 +17,14 @@ import {
 } from "@/features/classes/utils/validateAssignment";
 import { cn } from "@/shared/utils/cn";
 
-const FORM_FIELDS = ["classId", "title", "kind", "description", "pieceId", "requiredBpm"] as const;
+const FORM_FIELDS = ["classId", "title", "kind", "description", "sheetMusicId", "requiredBpm"] as const;
 
 interface AssignmentFormProps {
   mode: "create" | "edit";
   initialValues: AssignmentFormValues;
   classes: Array<{ id: string; name: string }>;
-  // Edit mode: the stored piece, shown even if it has since been hidden from the library.
-  currentPiece?: AssignmentPiece | null;
+  // Edit mode: the stored sheet music, shown even if it has since been hidden from the library.
+  currentSheetMusic?: AssignmentSheetMusic | null;
   isSaving: boolean;
   onCancel: () => void;
   onSubmit: (
@@ -37,7 +37,7 @@ export function AssignmentForm({
   mode,
   initialValues,
   classes,
-  currentPiece = null,
+  currentSheetMusic = null,
   isSaving,
   onCancel,
   onSubmit,
@@ -52,13 +52,13 @@ export function AssignmentForm({
     formState: { errors },
   } = useForm<AssignmentFormValues>({ resolver: zodResolver(assignmentFormSchema), defaultValues: initialValues });
   const classId = useWatch({ control, name: "classId" });
-  const pieceId = useWatch({ control, name: "pieceId" });
+  const sheetMusicId = useWatch({ control, name: "sheetMusicId" });
   const title = useWatch({ control, name: "title" }) ?? "";
   const description = useWatch({ control, name: "description" }) ?? "";
-  const { pieces } = useClassPieces(classId);
-  const selectedPiece = pieces.find((piece) => piece.id === pieceId);
-  const isCurrentPieceMissing = Boolean(currentPiece && !pieces.some((piece) => piece.id === currentPiece.id));
-  const pieceField = register("pieceId");
+  const { sheets } = useClassSheetMusic(classId);
+  const selectedSheet = sheets.find((sheet) => sheet.id === sheetMusicId);
+  const isCurrentSheetMissing = Boolean(currentSheetMusic && !sheets.some((sheet) => sheet.id === currentSheetMusic.id));
+  const sheetMusicField = register("sheetMusicId");
   const className = classes.find((item) => item.id === classId)?.name ?? "";
 
   const submitWith = (publish: boolean) =>
@@ -76,8 +76,8 @@ export function AssignmentForm({
           ) : (
             <select
               id="assignment-class"
-              // A piece belongs to one instrument: changing class clears it.
-              {...register("classId", { onChange: () => setValue("pieceId", "") })}
+              // A sheet music belongs to one instrument: changing class clears it.
+              {...register("classId", { onChange: () => setValue("sheetMusicId", "") })}
               aria-invalid={Boolean(errors.classId)}
               className={INPUT_CLASSES}
             >
@@ -133,24 +133,26 @@ export function AssignmentForm({
             className={cn(INPUT_CLASSES, "h-auto resize-y py-[11px] leading-[1.5]")}
           />
         </FormField>
-        <FormField id="assignment-piece" label="Bài nhạc" error={errors.pieceId?.message}>
+        <FormField id="assignment-sheet-music" label="Bài nhạc" error={errors.sheetMusicId?.message}>
           <select
-            id="assignment-piece"
+            id="assignment-sheet-music"
             // Controlled: options arrive after mount, so an uncontrolled select would fall back to "Không chọn".
-            {...pieceField}
-            value={pieceId}
-            aria-invalid={Boolean(errors.pieceId)}
+            {...sheetMusicField}
+            value={sheetMusicId}
+            aria-invalid={Boolean(errors.sheetMusicId)}
             className={INPUT_CLASSES}
           >
             <option value="">Không chọn</option>
-            {isCurrentPieceMissing && currentPiece && (
-              <option value={currentPiece.id}>
-                {currentPiece.isAvailable ? currentPiece.title : `${currentPiece.title} (Không còn khả dụng)`}
+            {isCurrentSheetMissing && currentSheetMusic && (
+              <option value={currentSheetMusic.id}>
+                {currentSheetMusic.isAvailable
+                  ? sheetMusicLabel(currentSheetMusic)
+                  : `${sheetMusicLabel(currentSheetMusic)} (Không còn khả dụng)`}
               </option>
             )}
-            {pieces.map((piece) => (
-              <option key={piece.id} value={piece.id}>
-                {piece.title}
+            {sheets.map((sheet) => (
+              <option key={sheet.id} value={sheet.id}>
+                {sheetMusicLabel(sheet)}
               </option>
             ))}
           </select>
@@ -165,7 +167,7 @@ export function AssignmentForm({
             id="assignment-bpm"
             inputMode="numeric"
             {...register("requiredBpm")}
-            placeholder={selectedPiece?.defaultBpm ? `Mặc định: ${selectedPiece.defaultBpm}` : undefined}
+            placeholder={selectedSheet?.defaultBpm ? `Mặc định: ${selectedSheet.defaultBpm}` : undefined}
             aria-invalid={Boolean(errors.requiredBpm)}
             className={cn(INPUT_CLASSES, "font-bvc-mono")}
           />

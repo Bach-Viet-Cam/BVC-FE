@@ -6,11 +6,11 @@ import { EMPTY_ASSIGNMENT_FORM } from "@/features/classes/utils/validateAssignme
 
 vi.mock("@/features/classes/api/assignmentsApi", () => ({
   assignmentsApi: {
-    listClassPieces: vi.fn().mockResolvedValue({
+    listClassSheetMusic: vi.fn().mockResolvedValue({
       data: {
         data: [
-          { id: "p1", title: "Lý ngựa ô", kind: "SONG", defaultBpm: 96 },
-          { id: "p2", title: "Luyện ngón - Vê", kind: "FINGER_EXERCISE", defaultBpm: null },
+          { id: "s1", name: "Bản chính", pieceId: "p1", pieceTitle: "Lý ngựa ô", kind: "SONG", defaultBpm: 96 },
+          { id: "s2", name: "Bản dễ", pieceId: "p2", pieceTitle: "Luyện ngón - Vê", kind: "FINGER_EXERCISE", defaultBpm: null },
         ],
       },
     }),
@@ -76,7 +76,7 @@ describe("AssignmentForm", () => {
     await fillRequired();
     await userEvent.click(screen.getByRole("button", { name: "Lưu nháp" }));
     expect(onSubmit).toHaveBeenLastCalledWith(
-      { classId: "c1", title: "Độc tấu Lý ngựa ô", description: null, kind: "SOLO", pieceId: null, requiredBpm: null },
+      { classId: "c1", title: "Độc tấu Lý ngựa ô", description: null, kind: "SOLO", sheetMusicId: null, requiredBpm: null },
       false
     );
     await userEvent.type(screen.getByLabelText(/BPM yêu cầu/), "90");
@@ -91,57 +91,63 @@ describe("AssignmentForm", () => {
     expect(screen.queryByRole("button", { name: "Lưu nháp" })).not.toBeInTheDocument();
   });
 
-  it("shows server MSG-48 under the piece field", async () => {
+  it("shows server MSG-48 under the sheet music field", async () => {
     const onSubmit = renderForm();
     onSubmit.mockResolvedValue([
       {
-        field: "pieceId",
+        field: "sheetMusicId",
         code: "MSG-48",
-        message: "Bài nhạc đã chọn không còn khả dụng trong thư viện. Vui lòng chọn mục khác.",
+        message: "Bản nhạc đã chọn không còn khả dụng trong thư viện. Vui lòng chọn mục khác.",
       },
     ]);
     await fillRequired();
     await userEvent.click(screen.getByRole("button", { name: "Lưu nháp" }));
     expect(
-      await screen.findByText("Bài nhạc đã chọn không còn khả dụng trong thư viện. Vui lòng chọn mục khác.")
+      await screen.findByText("Bản nhạc đã chọn không còn khả dụng trong thư viện. Vui lòng chọn mục khác.")
     ).toBeInTheDocument();
     expect(screen.getByLabelText(/Tiêu đề/)).toHaveValue("  Độc tấu Lý ngựa ô ");
   });
 
-  it("shows the piece default BPM as a hint", async () => {
+  it("lists sheet music as piece title and sheet name", async () => {
     renderForm();
-    await screen.findByRole("option", { name: "Lý ngựa ô" });
-    await userEvent.selectOptions(screen.getByLabelText(/Bài nhạc/), "p1");
+    expect(await screen.findByRole("option", { name: "Lý ngựa ô — Bản chính" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Luyện ngón - Vê — Bản dễ" })).toBeInTheDocument();
+  });
+
+  it("shows the sheet music default BPM as a hint", async () => {
+    renderForm();
+    await screen.findByRole("option", { name: "Lý ngựa ô — Bản chính" });
+    await userEvent.selectOptions(screen.getByLabelText(/Bài nhạc/), "s1");
     expect(screen.getByLabelText(/BPM yêu cầu/)).toHaveAttribute("placeholder", "Mặc định: 96");
   });
 
-  it("edit mode shows the stored piece as selected once pieces load", async () => {
+  it("edit mode shows the stored sheet music as selected once sheets load", async () => {
     renderForm({
       mode: "edit",
-      initialValues: { ...EMPTY_ASSIGNMENT_FORM, classId: "c1", title: "A", kind: "SOLO", pieceId: "p1" },
+      initialValues: { ...EMPTY_ASSIGNMENT_FORM, classId: "c1", title: "A", kind: "SOLO", sheetMusicId: "s1" },
     });
-    await screen.findByRole("option", { name: "Lý ngựa ô" });
-    expect(screen.getByLabelText(/Bài nhạc/)).toHaveValue("p1");
+    await screen.findByRole("option", { name: "Lý ngựa ô — Bản chính" });
+    expect(screen.getByLabelText(/Bài nhạc/)).toHaveValue("s1");
   });
 
-  it("keeps a hidden current piece visible as an option", async () => {
+  it("keeps a hidden current sheet music visible as an option", async () => {
     renderForm({
       mode: "edit",
-      initialValues: { ...EMPTY_ASSIGNMENT_FORM, classId: "c1", title: "A", kind: "SOLO", pieceId: "old" },
-      currentPiece: { id: "old", title: "Bản cũ", defaultBpm: null, isAvailable: false },
+      initialValues: { ...EMPTY_ASSIGNMENT_FORM, classId: "c1", title: "A", kind: "SOLO", sheetMusicId: "old" },
+      currentSheetMusic: { id: "old", name: "Bản cũ", pieceId: "p9", pieceTitle: "Bài cũ", defaultBpm: null, isAvailable: false },
     });
-    await screen.findByRole("option", { name: "Lý ngựa ô" });
-    expect(screen.getByRole("option", { name: "Bản cũ (Không còn khả dụng)" })).toBeInTheDocument();
+    await screen.findByRole("option", { name: "Lý ngựa ô — Bản chính" });
+    expect(screen.getByRole("option", { name: "Bài cũ — Bản cũ (Không còn khả dụng)" })).toBeInTheDocument();
     expect(screen.getByLabelText(/Bài nhạc/)).toHaveValue("old");
   });
 
-  it("clears the piece when the class changes", async () => {
+  it("clears the sheet music when the class changes", async () => {
     const onSubmit = renderForm({ classes: [...CLASSES, { id: "c2", name: "TRD401" }] });
-    await screen.findByRole("option", { name: "Lý ngựa ô" });
-    await userEvent.selectOptions(screen.getByLabelText(/Bài nhạc/), "p1");
+    await screen.findByRole("option", { name: "Lý ngựa ô — Bản chính" });
+    await userEvent.selectOptions(screen.getByLabelText(/Bài nhạc/), "s1");
     await userEvent.selectOptions(screen.getByLabelText(/^Lớp/), "c2");
     await fillRequired();
     await userEvent.click(screen.getByRole("button", { name: "Lưu nháp" }));
-    expect(onSubmit).toHaveBeenLastCalledWith(expect.objectContaining({ classId: "c2", pieceId: null }), false);
+    expect(onSubmit).toHaveBeenLastCalledWith(expect.objectContaining({ classId: "c2", sheetMusicId: null }), false);
   });
 });

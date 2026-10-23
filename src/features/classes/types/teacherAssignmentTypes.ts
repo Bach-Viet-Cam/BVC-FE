@@ -32,9 +32,11 @@ export interface AssignmentListResult {
   pagination: Pagination;
 }
 
-export interface AssignmentPiece {
+export interface AssignmentSheetMusic {
   id: string;
-  title: string;
+  name: string;
+  pieceId: string;
+  pieceTitle: string;
   defaultBpm: number | null;
   isAvailable: boolean;
 }
@@ -49,7 +51,7 @@ export interface AssignmentBase {
   title: string;
   description: string | null;
   kind: AssignmentKind;
-  piece: AssignmentPiece | null;
+  sheetMusic: AssignmentSheetMusic | null;
   requiredBpm: number | null;
   effectiveBpm: number | null;
   publishedAt: string | null;
@@ -94,9 +96,11 @@ export interface StudentSubmissions {
   submissions: StudentSubmission[];
 }
 
-export interface ClassPiece {
+export interface ClassSheetMusic {
   id: string;
-  title: string;
+  name: string;
+  pieceId: string;
+  pieceTitle: string;
   kind: "FINGER_EXERCISE" | "SONG";
   defaultBpm: number | null;
 }
@@ -105,7 +109,7 @@ export interface AssignmentContentPayload {
   title: string;
   description: string | null;
   kind: AssignmentKind;
-  pieceId: string | null;
+  sheetMusicId: string | null;
   requiredBpm: number | null;
 }
 

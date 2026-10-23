@@ -22,7 +22,7 @@ function buildAssignment(overrides: Partial<AssignmentDetail> = {}): AssignmentD
     title: "Độc tấu - Lý ngựa ô",
     description: "Tập chậm",
     kind: "SOLO",
-    piece: { id: "p1", title: "Lý ngựa ô", defaultBpm: 96, isAvailable: false },
+    sheetMusic: { id: "s1", name: "Bản chính", pieceId: "p1", pieceTitle: "Lý ngựa ô", defaultBpm: 96, isAvailable: false },
     requiredBpm: null,
     effectiveBpm: 96,
     publishedAt: "2026-10-15T02:00:00.000Z",
@@ -81,11 +81,12 @@ describe("Teacher assignment detail", () => {
     expect(buttonNames()).toEqual([]);
   });
 
-  it("shows version, kind, effective BPM and an unavailable piece", () => {
+  it("shows version, kind, effective BPM and an unavailable sheet music", () => {
     renderPanel(buildAssignment());
     expect(screen.getByText("Phiên bản v2")).toBeInTheDocument();
     expect(screen.getByText("Độc tấu")).toBeInTheDocument();
     expect(screen.getByText("96 BPM")).toBeInTheDocument();
+    expect(screen.getByText("Lý ngựa ô — Bản chính")).toBeInTheDocument();
     expect(screen.getByText("Không còn khả dụng")).toBeInTheDocument();
   });
 
