@@ -9,10 +9,17 @@ import type {
 export const TUNER_TOLERANCE_CENTS = 10;
 export const TEMPO_TOLERANCE_PERCENT = 5;
 export const COUNT_IN_BEATS = 4;
-export const STAGE_SECONDS = 2.5;
-export const RETRY_DELAY_FIRST_S = 5;
-export const RETRY_DELAY_LATER_S = 10;
-export const MAX_RETRIES = 3;
+// Tiến trình xử lý: hỏi BE mỗi 1,5 giây; bốn bước tối đa khoảng 1 phút nên dừng hỏi sau 90 giây không có kết quả
+export const PROGRESS_POLL_MS = 1500;
+export const PROGRESS_POLL_MAX_MS = 5000;
+export const PROGRESS_BACKSTOP_MS = 90_000;
+export const RESULT_REDIRECT_MS = 1500; // GBR-52
+// MSG-17: mạng yếu khi effectiveType chậm, downlink thấp hoặc tốc độ tải lên thực tế thấp
+export const WEAK_EFFECTIVE_TYPES = ["slow-2g", "2g", "3g"];
+export const WEAK_DOWNLINK_MBPS = 1;
+export const SLOW_UPLOAD_BYTES_PER_S = 50 * 1024;
+export const SLOW_UPLOAD_GRACE_MS = 3000;
+export const AUDIO_ACCEPT = ".mp3,.wav,.m4a,audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/x-m4a";
 export const FILE_FORMATS = ["mp3", "wav", "m4a"];
 export const FILE_MAX_MB = 20;
 export const FILE_MIN_S = 10;
@@ -48,6 +55,21 @@ export const MSG = {
   sent: "Đã gửi bản thu. Hệ thống đang xử lý.", // MSG-18
   autoStop: "Bản thu đã tự động dừng ở cuối bài.", // MSG-44
   retrying: "Đang xử lý lại bản thu...", // MSG-24
+  done: "Hoàn tất. Đang mở kết quả phân tích của bạn.", // MSG-21
+  rejected: (reason: string) =>
+    `Bản thu không đạt chất lượng: ${reason}. Lượt này không bị tính vào số lần nộp. Bạn có thể ghi âm hoặc tải file khác.`, // MSG-22
+  failed: "Xử lý bản thu thất bại. File của bạn vẫn được giữ lại. Lượt này không bị tính vào số lần nộp.", // MSG-23
+  retryWait: (seconds: number) => `Bạn có thể thử lại sau ${seconds} giây.`, // MSG-42
+  exhausted:
+    "Hệ thống vẫn chưa xử lý được sau 3 lần thử lại. File phân tích của bạn đã bị xóa khỏi máy chủ. Bạn có thể tải bản thu về và nộp lại sau; bản nộp mới sẽ tính vào số lần nộp.", // MSG-52
+  leaveHint: "Bạn có thể rời màn hình này. Hệ thống vẫn xử lý và sẽ báo khi có kết quả.",
+  submitFailed: "Chưa gửi được bản thu. Vui lòng kiểm tra kết nối rồi thử lại.",
+  retryFailed: "Chưa thể xử lý lại bản thu. Vui lòng thử lại sau.",
+  progressRetry: "Tạm thời chưa lấy được tiến trình. Hệ thống sẽ kiểm tra lại.",
+  progressPaused: "Chưa nhận được kết quả. Nhấn kiểm tra lại để cập nhật tiến trình.",
+  noFileToDownload: "Bản thu không còn trên thiết bị này nên chưa thể tải về.",
+  noSubmission: "Bạn chưa gửi bản thu nào. Quay lại màn ghi âm để nộp bài.",
+  chooseSheet: "Chọn bản nhạc (nhạc cụ) của bài trong thư viện để nộp bài và nhận phân tích.",
   analyzed: "Bản thu của bạn đã được phân tích xong. Nhấn để xem kết quả.", // MSG-43
   download: "Đã tải bản thu về máy.",
   refNote: "Đang phát nốt mẫu...",
@@ -95,8 +117,6 @@ export const STAGE_ACTIVE_LABELS = [
   "Đang so sánh với bản mẫu của giảng viên",
   "Đang tổng hợp lại kết quả",
 ];
-
-export const REJECT_REASON = "Âm lượng quá nhỏ"; // GBR-12
 
 export const AUDIO_HOP_SIZE = 512;
 export const COUNT_IN_LEAD_S = 0.15; // khoảng đệm trước phách đếm đầu tiên

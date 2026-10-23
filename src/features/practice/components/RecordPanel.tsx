@@ -19,7 +19,7 @@ interface RecordPanelProps {
   playPos: number;
   blocked: boolean;
   micDenied: boolean;
-  uploading: boolean;
+  weakNetwork: boolean; // MSG-17 trong lúc tải lên
   errorText: string;
   weakMessage: string;
   sendDisabled: boolean;
@@ -50,7 +50,7 @@ export function RecordPanel({
   playPos,
   blocked,
   micDenied,
-  uploading,
+  weakNetwork,
   errorText,
   weakMessage,
   sendDisabled,
@@ -131,7 +131,7 @@ export function RecordPanel({
         </div>
 
         {errorText && <NoticeBanner message={errorText} />}
-        {uploading && <NoticeBanner message={weakMessage} />}
+        {weakNetwork && <NoticeBanner message={weakMessage} />}
       </div>
     );
   }

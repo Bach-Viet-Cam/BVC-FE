@@ -41,7 +41,8 @@ export function AssignmentPage() {
   }
 
   const status = ASSIGNMENT_STATUS_META[assignment.status];
-  const recordingTarget = `/practice/${assignment.pieceId ?? assignment.id}/record`; // màn thu âm thuộc M01, dùng id bài nhạc nếu có
+  // Học viên chọn bản nhạc (nhạc cụ) trên trang bài nhạc trước khi thu âm; bài tập không có bài nhạc thì không nộp qua M01
+  const recordingTarget = assignment.pieceId ? `/library/${assignment.pieceId}?assignmentId=${assignment.id}` : null;
   const ensembleTarget = `/ensemble/new?pieceId=${assignment.pieceId}&assignmentId=${assignment.id}`;
 
   return (
@@ -107,8 +108,8 @@ export function AssignmentPage() {
         {!assignment.canSubmit && <p className="text-center text-[12.5px] text-bvc-error">{SUBMIT_BLOCKED_MESSAGE}</p>}
         <button
           type="button"
-          disabled={!assignment.canSubmit}
-          onClick={() => navigate(recordingTarget)}
+          disabled={!assignment.canSubmit || !recordingTarget}
+          onClick={() => recordingTarget && navigate(recordingTarget)}
           className="flex h-[54px] w-full cursor-pointer items-center justify-center rounded-[16px] bg-bvc-accent text-[16px] font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
         >
           Thu âm / Tải lên

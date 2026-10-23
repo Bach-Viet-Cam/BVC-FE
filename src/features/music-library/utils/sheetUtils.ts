@@ -26,8 +26,10 @@ export function groupSheetsByInstrument<T extends SheetVersion>(
   }));
 }
 
-export function sheetViewerHref(songId: string, sheetId: string) {
-  return `/library/${songId}/sheets/${sheetId}`;
+// assignmentId đi kèm khi học viên mở bài từ một bài tập, để bài nộp được tính cho bài tập đó
+export function sheetViewerHref(songId: string, sheetId: string, assignmentId?: string) {
+  const query = assignmentId ? `?assignmentId=${encodeURIComponent(assignmentId)}` : "";
+  return `/library/${songId}/sheets/${sheetId}${query}`;
 }
 
 export interface LecturerInstrumentGroup {

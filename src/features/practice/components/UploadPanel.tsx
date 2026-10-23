@@ -9,7 +9,7 @@ interface UploadPanelProps {
   playing: boolean;
   position: number;
   blocked: boolean;
-  uploading: boolean;
+  weakNetwork: boolean; // MSG-17 trong lúc tải lên
   errorText: string;
   weakMessage: string;
   sendDisabled: boolean;
@@ -25,7 +25,7 @@ export function UploadPanel({
   playing,
   position,
   blocked,
-  uploading,
+  weakNetwork,
   errorText,
   weakMessage,
   sendDisabled,
@@ -85,7 +85,7 @@ export function UploadPanel({
       </div>
 
       {errorText && <NoticeBanner message={errorText} />}
-      {uploading && <NoticeBanner message={weakMessage} />}
+      {weakNetwork && <NoticeBanner message={weakMessage} />}
 
       <div className="flex gap-2.5">
         <button

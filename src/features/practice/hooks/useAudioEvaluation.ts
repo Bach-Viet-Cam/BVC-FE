@@ -92,7 +92,7 @@ export function useAudioEvaluation() {
         setError("");
         delay = 3000;
         failures = 0;
-        if (["completed", "failed", "publish_failed"].includes(record.status)) {
+        if (["completed", "failed", "rejected", "publish_failed"].includes(record.status)) {
           setPolling(false);
           return;
         }
