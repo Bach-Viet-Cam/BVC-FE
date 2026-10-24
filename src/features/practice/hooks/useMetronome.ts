@@ -17,8 +17,9 @@ function clampBpm(value: number): number {
   return Math.max(BPM_MIN, Math.min(BPM_MAX, Math.round(value)));
 }
 
-export function useMetronome() {
-  const [bpm, setBpmValue] = useState(PRACTICE_DEFAULTS.targetBpm);
+// initialBpm: tốc độ mục tiêu của bản nhạc (BPM bài tập của lớp hoặc mặc định 60)
+export function useMetronome(initialBpm: number = PRACTICE_DEFAULTS.targetBpm) {
+  const [bpm, setBpmValue] = useState(() => clampBpm(initialBpm));
   const [sigIndex, setSigIndex] = useState(2);
   const [accents, setAccents] = useState<BeatAccent[]>(FRESH_ACCENTS);
   const [subdivision, setSubdivision] = useState<SubdivisionKey>("black");

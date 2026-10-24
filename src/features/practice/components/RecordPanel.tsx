@@ -40,6 +40,8 @@ interface RecordPanelProps {
   onSend: () => void;
   // Bản thu mẫu của bản nhạc, nghe được khi chưa ghi; null khi bản nhạc chưa có bản thu mẫu
   referenceAudio: { url: string; isFallback: boolean } | null;
+  // Tốc độ đếm nhịp: BPM bài tập của lớp hoặc mặc định 60
+  targetBpm: number;
 }
 
 export function RecordPanel({
@@ -72,6 +74,7 @@ export function RecordPanel({
   onDownload,
   onSend,
   referenceAudio,
+  targetBpm,
 }: RecordPanelProps) {
   if (rec === "preview") {
     return (
@@ -180,7 +183,7 @@ export function RecordPanel({
             <>
               <div className="flex items-center gap-2">
                 <Volume2 size={18} strokeWidth={1.9} className="text-bvc-ink" />
-                <span className="text-sm font-bold text-bvc-ink">Đếm nhịp · {PRACTICE_DEFAULTS.targetBpm} BPM</span>
+                <span className="text-sm font-bold text-bvc-ink">Đếm nhịp · {targetBpm} BPM</span>
               </div>
               <div className="grid grid-cols-4 gap-1.5">
                 {Array.from({ length: COUNT_IN_BEATS }).map((_, i) => (

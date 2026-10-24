@@ -22,8 +22,18 @@ export const BPM_MIN = 40;
 export const BPM_MAX = 208;
 
 // Giá trị mặc định khi bài nhạc chưa có tempo / độ dài từ BE
+// Nốt mẫu của màn lên dây: phát cao độ chuẩn của dây đang chọn trong 5 giây
+export const REFERENCE_TONE = {
+  seconds: 5,
+  volume: 0.25,
+  fadeInSec: 0.05,
+  fadeOutSec: 0.4,
+  overtoneLevel: 0.25,
+};
+
 export const PRACTICE_DEFAULTS = {
-  targetBpm: 96,
+  // Tốc độ mặc định khi bản nhạc không được giao cho lớp hoặc bài tập chưa đặt BPM (khớp PracticeConstant.defaultTargetBpm của BE)
+  targetBpm: 60,
   pieceLen: 120,
 };
 
@@ -56,12 +66,13 @@ export const MSG = {
   chooseSheet: "Chọn bản nhạc (nhạc cụ) của bài trong thư viện để nộp bài và nhận phân tích.",
   analyzed: "Bản thu của bạn đã được phân tích xong. Nhấn để xem kết quả.", // MSG-43
   download: "Đã tải bản thu về máy.",
-  refNote: "Đang phát nốt mẫu...",
   resultProcessing: "Bản thu đang được xử lý. Kết quả sẽ hiển thị khi phân tích hoàn tất.", // MSG-30
   pitchUnavailable: "Chưa có dữ liệu cao độ để hiển thị biểu đồ so sánh.", // MSG-26
   resultLoadFailed: "Tải kết quả phân tích thất bại. Vui lòng thử lại.", // MSG-09
   resultPartFailed: "Chưa tải được phần này. Vui lòng thử lại.",
   referencePlaybackFailed: "Phát bản thu mẫu thất bại. Vui lòng thử lại.", // MSG-09
+  noTunes: (instrument: string | null) =>
+    `${instrument ?? "Nhạc cụ này"} chưa được cấu hình dây chuẩn. Vui lòng liên hệ quản trị viên.`,
 };
 
 export const NOTES: Record<string, NoteInfo> = {

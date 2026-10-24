@@ -28,6 +28,8 @@ import { useLiveTuner } from "@/features/practice/hooks/useLiveTuner";
 import { usePitchStream } from "@/features/practice/hooks/usePitchStream";
 import { useRecorder } from "@/features/practice/hooks/useRecorder";
 import { usePracticeContext } from "@/features/practice/hooks/usePracticeContext";
+import { usePracticeTargetBpm } from "@/features/practice/hooks/usePracticeTargetBpm";
+import { useInstrumentTunes } from "@/features/practice/hooks/useInstrumentTunes";
 import { useActiveSubmission } from "@/features/practice/hooks/useActiveSubmission";
 import { useFilePreview } from "@/features/practice/hooks/useFilePreview";
 import { readAudioFile } from "@/features/practice/utils/readAudioFile";
@@ -76,7 +78,11 @@ export function RecordPage() {
   const fileInput = useRef<HTMLInputElement | null>(null);
   const preview = useFilePreview(pickedFile);
 
-  const session = useMemo(() => buildDemoSession(demo.noPitch), [demo.noPitch]);
+  // Tốc độ luyện: BPM bài tập của lớp nếu bản nhạc được giao, ngược lại mặc định 60
+  const { targetBpm } = usePracticeTargetBpm(sheetId, assignmentId);
+  // Dây chuẩn của nhạc cụ thuộc bản nhạc, cho ngăn lên dây (laptop)
+  const tunes = useInstrumentTunes(sheetId);
+  const session = useMemo(() => buildDemoSession(demo.noPitch, targetBpm), [demo.noPitch, targetBpm]);
   const audio = usePracticeAudio({ micWanted: mode === "record", fminHz: session.fminHz });
   const micDenied = demo.micDenied || audio.micState === "denied";
   const timelineOffsetSec = demo.autoStop ? Math.max(0, session.pieceLenSec - DEMO_AUTO_STOP_TAIL_S) : 0;
@@ -295,6 +301,7 @@ export function RecordPage() {
                   <TempoCard
                     open={tempoOpen}
                     onToggle={() => setTempoOpen((value) => !value)}
+                    targetBpm={targetBpm}
                     liveBpm={liveBpm}
                     bpmHint={bpmHint}
                     hintTone={hintTone}
@@ -390,6 +397,7 @@ export function RecordPage() {
                     onDownload={handleDownload}
                     onSend={() => void handleSend()}
                     referenceAudio={context?.sheet.referenceAudio ?? null}
+                    targetBpm={targetBpm}
                   />
                 ) : (
                   <UploadPanel
@@ -444,7 +452,12 @@ export function RecordPage() {
           }
           onClose={() => setDrawer(null)}
         >
-          {drawer === "tuner" ? <TunerView audio={audio} /> : <MetronomeView />}
+          {drawer === "tuner" ? (
+            <TunerView audio={audio} tunes={tunes} />
+          ) : (
+            // key: tốc độ mục tiêu tải xong sau khi mở thì metronome bắt đầu lại từ tốc độ đó
+            <MetronomeView key={targetBpm} targetBpm={targetBpm} />
+          )}
         </PracticeDrawer>
       )}
 

@@ -23,8 +23,13 @@ const ACCENT_LABEL = { strong: "Mạnh", soft: "Nhẹ", off: "Bỏ" };
 
 // Thân + chân màn metronome, dùng cho trang riêng (điện thoại) và ngăn kéo (laptop).
 // Cha phải là cột flex để phần thân cuộn được còn chân luôn ở dưới.
-export function MetronomeView() {
-  const metronome = useMetronome();
+interface MetronomeViewProps {
+  // Tốc độ mục tiêu làm điểm bắt đầu và gốc của các mức tốc độ gợi ý
+  targetBpm?: number;
+}
+
+export function MetronomeView({ targetBpm = PRACTICE_DEFAULTS.targetBpm }: MetronomeViewProps) {
+  const metronome = useMetronome(targetBpm);
   const { bpm, setBpm, sigIndex, setSig, beats, accents, cycleBeat, currentBeat, playing } = metronome;
 
   return (
@@ -57,7 +62,7 @@ export function MetronomeView() {
 
         <div className="mt-4 flex gap-2">
           {PRESETS.map((preset) => {
-            const value = Math.round(PRACTICE_DEFAULTS.targetBpm * preset.ratio);
+            const value = Math.round(targetBpm * preset.ratio);
             const active = bpm === value;
             return (
               <button
