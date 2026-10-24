@@ -7,7 +7,7 @@ import {
 import { SubmissionPageTitle } from "@/features/practice/components/SubmissionPageTitle";
 import { COMPARE_SEGMENTS, COMPARE_TOTAL_BARS, MSG_28 } from "@/features/practice/constants/submissionHistoryMockData";
 import { useSubmissionCompare } from "@/features/practice/hooks/useSubmissionCompare";
-import type { CompareSegment, SubmissionHistoryItem } from "@/features/practice/types/submissionHistoryTypes";
+import type { CompareSegment, SubmissionCompareItem } from "@/features/practice/types/submissionHistoryTypes";
 import { formatSubmittedDay } from "@/features/practice/utils/submissionHistory";
 import { StudentShell } from "@/shared/components/bvc/StudentShell";
 import { cn } from "@/shared/utils/cn";
@@ -16,7 +16,7 @@ const SEGMENT_ORDER: Record<CompareSegment["status"], number> = { REPEATED: 0, I
 
 interface SummaryCardProps {
   side: "older" | "newer";
-  item: SubmissionHistoryItem;
+  item: SubmissionCompareItem;
 }
 
 function SummaryCard({ side, item }: SummaryCardProps) {

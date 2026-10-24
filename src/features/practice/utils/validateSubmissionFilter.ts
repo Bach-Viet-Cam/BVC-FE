@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 const KIND_VALUES = ["PRACTICE", "BONUS", "SOLO", "ENSEMBLE"] as const;
-const SCOPE_VALUES = ["FULL", "PART"] as const;
 
 const accuracy = z.string().regex(/^(100|[1-9]?\d)?$/, "Nhập số từ 0 đến 100");
 
@@ -13,7 +12,6 @@ export const submissionFilterSchema = z
     minAccuracy: accuracy,
     maxAccuracy: accuracy,
     kinds: z.array(z.enum(KIND_VALUES)),
-    scopes: z.array(z.enum(SCOPE_VALUES)),
   })
   .refine((value) => !value.fromDate || !value.toDate || value.fromDate <= value.toDate, {
     path: ["toDate"],

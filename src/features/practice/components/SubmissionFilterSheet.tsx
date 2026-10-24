@@ -11,7 +11,6 @@ import {
   ADVANCED_ACCURACY_PRESETS,
   ADVANCED_DATE_PRESETS,
   ADVANCED_KIND_OPTIONS,
-  ADVANCED_SCOPE_OPTIONS,
   EMPTY_ADVANCED_FILTER,
 } from "@/features/practice/constants/submissionHistoryMockData";
 import type { SubmissionAdvancedFilter } from "@/features/practice/types/submissionHistoryTypes";
@@ -27,7 +26,7 @@ const FIELD_CLASS =
   "h-11 w-full min-w-0 rounded-[13px] border border-bvc-border-strong bg-white px-3 text-sm text-bvc-ink outline-none focus:border-bvc-ink";
 const MONO_FIELD_CLASS = cn(FIELD_CLASS, "font-bvc-mono");
 
-// Bật/tắt một lựa chọn trong nhóm chọn nhiều (loại bài, phạm vi)
+// Bật/tắt một lựa chọn trong nhóm chọn nhiều (loại bài)
 function toggleValue<T extends string>(current: T[], value: T): T[] {
   return current.includes(value) ? current.filter((item) => item !== value) : [...current, value];
 }
@@ -35,8 +34,6 @@ function toggleValue<T extends string>(current: T[], value: T): T[] {
 interface SubmissionFilterSheetProps {
   open: boolean;
   advanced: SubmissionAdvancedFilter;
-  // Số bài khớp với bộ lọc nâng cao đang nhập (đã tính cùng bộ lọc nhanh)
-  countMatches: (advanced: SubmissionAdvancedFilter) => number;
   onOpenChange: (open: boolean) => void;
   onApply: (advanced: SubmissionAdvancedFilter) => void;
 }
@@ -71,11 +68,10 @@ function FieldError({ message }: { message?: string }) {
 
 interface AdvancedFormProps {
   advanced: SubmissionAdvancedFilter;
-  countMatches: (advanced: SubmissionAdvancedFilter) => number;
   onApply: (advanced: SubmissionAdvancedFilter) => void;
 }
 
-function AdvancedForm({ advanced, countMatches, onApply }: AdvancedFormProps) {
+function AdvancedForm({ advanced, onApply }: AdvancedFormProps) {
   const {
     register,
     handleSubmit,
@@ -92,7 +88,6 @@ function AdvancedForm({ advanced, countMatches, onApply }: AdvancedFormProps) {
 
   // useWatch thay vì watch() để React Compiler vẫn memo được component
   const values = useWatch({ control });
-  const matchCount = countMatches({ ...EMPTY_ADVANCED_FILTER, ...values });
 
   function setDateRange(fromDate: string, toDate: string) {
     setValue("fromDate", fromDate, { shouldValidate: true });
@@ -256,19 +251,6 @@ function AdvancedForm({ advanced, countMatches, onApply }: AdvancedFormProps) {
           </div>
         </section>
 
-        <section className="flex flex-col gap-2">
-          <span className="text-[13px] font-bold text-bvc-muted">Phạm vi</span>
-          <div className="flex flex-wrap gap-[7px]">
-            {ADVANCED_SCOPE_OPTIONS.map((option) => (
-              <PresetChip
-                key={option.value}
-                label={option.label}
-                active={(values.scopes ?? []).includes(option.value)}
-                onClick={() => setValue("scopes", toggleValue(values.scopes ?? [], option.value), { shouldValidate: true })}
-              />
-            ))}
-          </div>
-        </section>
       </div>
 
       <div className="mt-3.5 shrink-0 border-t border-bvc-border-strong bg-white px-4 pt-3.5 pb-6">
@@ -276,7 +258,7 @@ function AdvancedForm({ advanced, countMatches, onApply }: AdvancedFormProps) {
           type="submit"
           className="flex min-h-12.5 w-full cursor-pointer items-center justify-center rounded-2xl bg-bvc-ink text-[15px] font-bold text-white"
         >
-          Áp dụng · {matchCount} bài nộp
+          Áp dụng
         </button>
       </div>
     </form>
@@ -284,16 +266,10 @@ function AdvancedForm({ advanced, countMatches, onApply }: AdvancedFormProps) {
 }
 
 // Popup lọc nâng cao: tên bài, khoảng ngày nộp, khoảng accuracy. Chạy cùng bộ lọc nhanh.
-export function SubmissionFilterSheet({
-  open,
-  advanced,
-  countMatches,
-  onOpenChange,
-  onApply,
-}: SubmissionFilterSheetProps) {
+export function SubmissionFilterSheet({ open, advanced, onOpenChange, onApply }: SubmissionFilterSheetProps) {
   return (
     <PracticeBottomSheet open={open} onOpenChange={onOpenChange} className="max-w-[428px]">
-      <AdvancedForm advanced={advanced} countMatches={countMatches} onApply={onApply} />
+      <AdvancedForm advanced={advanced} onApply={onApply} />
     </PracticeBottomSheet>
   );
 }
