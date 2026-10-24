@@ -1,12 +1,29 @@
 import { type SortDirection } from "@/shared/types/commonTypes";
 
+export interface InstrumentTune {
+  id: string;
+  instrumentId: string;
+  tuneName: string;
+  pitch: number;
+  displayOrder: number;
+}
+
+export interface InstrumentTuneInput {
+  tuneName: string;
+  pitch: number;
+  displayOrder?: number;
+}
+
 export interface InstrumentItem {
   id: string;
   code: string;
   name: string;
   description: string | null;
   isActive: boolean;
+  tunesCount?: number;
+  tunes?: InstrumentTune[];
 }
+
 
 export type InstrumentStatusFilter = "active" | "inactive" | "all";
 export type InstrumentSortKey = "code" | "name";
