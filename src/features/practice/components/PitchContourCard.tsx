@@ -93,7 +93,7 @@ function layoutChips(segments: PitchSegment[], xAt: (seconds: number) => number,
 function axisTicks(duration: number, segments: PitchSegment[], xAt: (seconds: number) => number, frame: Frame) {
   const zoneTicks: { seconds: number; color: string }[] = [];
   for (const segment of [...segments].sort((first, second) => first.startSec - second.startSec)) {
-    const last = zoneTicks.at(-1);
+    const last = zoneTicks[zoneTicks.length - 1];
     if (last && xAt(segment.startSec) - xAt(last.seconds) < MIN_TICK_GAP) continue;
     zoneTicks.push({ seconds: segment.startSec, color: SEGMENT_STYLE[segment.kind].tick });
   }

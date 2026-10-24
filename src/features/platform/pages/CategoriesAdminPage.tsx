@@ -51,14 +51,6 @@ export function CategoriesAdminPage() {
     setIsTunesDialogOpen(true);
   };
 
-  const totalRoots = items.length;
-  const totalChildren = useMemo(() => items.reduce((acc, cat) => acc + cat.children.length, 0), [items]);
-  const totalPieces = useMemo(() => items.reduce((acc, cat) => acc + cat.pieceCount, 0), [items]);
-  const activeInstrumentsCount = useMemo(
-    () => instruments.items.filter((item) => item.isActive).length,
-    [instruments.items]
-  );
-
   const toggleExpand = (id: string) => {
     setExpandedIds((prev) => ({
       ...prev,
