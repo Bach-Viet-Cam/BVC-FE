@@ -1,29 +1,56 @@
-export type SubmissionHistoryStatus = "COMPLETED" | "PROCESSING";
+export type SubmissionHistoryStatus = "COMPLETED" | "PROCESSING" | "REJECTED" | "FAILED";
 
 // Luyện tập tự do, bài bonus, bài tập độc tấu hoặc hòa tấu
 export type SubmissionKind = "PRACTICE" | "BONUS" | "SOLO" | "ENSEMBLE";
 
-// Đoạn đã luyện, tính bằng giây từ đầu bài
-export interface SubmissionSegment {
-  startSec: number;
-  endSec: number;
-}
-
+// Một dòng của GET /practice/submissions. Chưa có phạm vi (đoạn): mọi bài hiện "Cả bài".
 export interface SubmissionHistoryItem {
   id: string;
   // Bài hát được nộp; lịch sử gom bài nộp của mọi bài hát
   pieceId: string;
   pieceTitle: string;
   // Bản nhạc (sheet) đã nộp, dùng để luyện lại đoạn
-  sheetMusicId: string;
-  title: string;
+  sheetMusicId: string | null;
+  assignmentId: string | null;
   submittedAt: string;
   status: SubmissionHistoryStatus;
-  // null khi bài còn đang xử lý
+  // null khi chưa phân tích xong (đang xử lý, bị từ chối, lỗi)
   accuracy: number | null;
   kind: SubmissionKind;
-  // null = nộp cả bài
-  segment: SubmissionSegment | null;
+}
+
+// SCR-02 (mockup): bài nộp kèm nhãn "Tên bài #n" để hiện trên thẻ so sánh
+export interface SubmissionCompareItem extends SubmissionHistoryItem {
+  title: string;
+}
+
+// Số bài nộp của học viên theo trạng thái, không tính bộ lọc
+export interface SubmissionHistoryOverall {
+  total: number;
+  completed: number;
+  processing: number;
+  rejected: number;
+  failed: number;
+}
+
+export interface SubmissionHistoryPage {
+  items: SubmissionHistoryItem[];
+  pagination: { page: number; limit: number; total: number };
+  overall: SubmissionHistoryOverall;
+}
+
+// Query của GET /practice/submissions; danh sách gửi dạng "a,b"
+export interface SubmissionHistoryQuery {
+  pieceIds?: string;
+  fromDate?: string;
+  toDate?: string;
+  accuracyRanges?: string;
+  minAccuracy?: number;
+  maxAccuracy?: number;
+  title?: string;
+  kinds?: string;
+  page: number;
+  limit: number;
 }
 
 export interface SubmissionDayGroup {
@@ -38,9 +65,6 @@ export type SubmissionDatePreset = "TODAY" | "LAST_3_DAYS" | "LAST_7_DAYS" | "TH
 export type SubmissionAccuracyRange = "ABOVE_90" | "70_90" | "50_70" | "BELOW_50";
 
 // Bộ lọc nâng cao (popup): ngày yyyy-MM-dd, accuracy chuỗi số 0-100; chuỗi rỗng = không lọc
-// Phạm vi: cả bài hoặc một đoạn
-export type SubmissionScope = "FULL" | "PART";
-
 export interface SubmissionAdvancedFilter {
   title: string;
   fromDate: string;
@@ -48,7 +72,6 @@ export interface SubmissionAdvancedFilter {
   minAccuracy: string;
   maxAccuracy: string;
   kinds: SubmissionKind[];
-  scopes: SubmissionScope[];
 }
 
 // Bộ lọc nhanh và bộ lọc nâng cao cùng áp dụng (AND)

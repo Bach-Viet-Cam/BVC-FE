@@ -1,6 +1,7 @@
 import { ChevronRight } from "lucide-react";
 import type { SubmissionHistoryItem, SubmissionKind } from "@/features/practice/types/submissionHistoryTypes";
-import { SUBMISSION_KIND_LABEL, formatSegment, formatSubmittedAt } from "@/features/practice/utils/submissionHistory";
+import { FULL_PIECE_LABEL, SUBMISSION_KIND_LABEL, formatSubmittedAt } from "@/features/practice/utils/submissionHistory";
+import { toStatusLabel } from "@/features/practice/utils/submissionStatus";
 import { cn } from "@/shared/utils/cn";
 
 interface SubmissionRowProps {
@@ -27,10 +28,12 @@ function scoreClass(accuracy: number) {
   return "text-bvc-muted";
 }
 
-// Một dòng của bảng ngày: độ chính xác, tên bài hát, ngày giờ nộp, loại bài, cả bài hay đoạn nào.
+// Một dòng của bảng ngày: độ chính xác, tên bài hát, ngày giờ nộp, loại bài, phạm vi (hiện luôn là cả bài).
 // Cột cố định theo SubmissionDayTable nên các bảng của các ngày thẳng hàng với nhau.
 export function SubmissionRow({ item, isSelecting, isSelected, isSelectable, onOpen, onToggle }: SubmissionRowProps) {
   const isProcessing = item.status === "PROCESSING";
+  // Bị từ chối hoặc lỗi: chưa có accuracy, mở màn xử lý để xem lý do hoặc thử lại
+  const isUnscored = item.status === "REJECTED" || item.status === "FAILED";
   const isOpenable = !isSelecting && !isProcessing;
   const isClickable = isSelecting ? isSelectable : isOpenable;
 
@@ -71,6 +74,12 @@ export function SubmissionRow({ item, isSelecting, isSelected, isSelectable, onO
             Đang xử lý
           </span>
         )}
+        {isUnscored && (
+          <span className="mt-0.5 flex items-center gap-1 text-[11px] text-bvc-accent-text">
+            <span className="size-[7px] rounded-full bg-bvc-accent" aria-hidden />
+            {toStatusLabel(item.status)}
+          </span>
+        )}
       </td>
       <td className={cn(CELL, "text-xs whitespace-nowrap text-bvc-muted")}>{formatSubmittedAt(item.submittedAt)}</td>
       <td className={CELL}>
@@ -81,7 +90,7 @@ export function SubmissionRow({ item, isSelecting, isSelected, isSelectable, onO
         </span>
       </td>
       <td className={cn(CELL, "font-bvc-mono text-xs whitespace-nowrap text-bvc-muted")}>
-        {formatSegment(item.segment)}
+        {FULL_PIECE_LABEL}
       </td>
       <td className={cn(CELL, "text-center")}>
         {isSelecting ? (
@@ -91,7 +100,7 @@ export function SubmissionRow({ item, isSelecting, isSelected, isSelectable, onO
             disabled={!isSelectable}
             onClick={(event) => event.stopPropagation()}
             onChange={() => onToggle(item.id)}
-            aria-label={`Chọn ${item.title}`}
+            aria-label={`Chọn ${item.pieceTitle} ${formatSubmittedAt(item.submittedAt)}`}
             className="size-5 cursor-[inherit] align-middle accent-bvc-ink"
           />
         ) : (

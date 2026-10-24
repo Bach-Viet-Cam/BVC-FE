@@ -5,19 +5,17 @@ import type {
   SubmissionAccuracyRange,
   SubmissionDatePreset,
   SubmissionAdvancedFilter,
+  SubmissionCompareItem,
   SubmissionFilter,
-  SubmissionHistoryItem,
   SubmissionKind,
-  SubmissionScope,
 } from "@/features/practice/types/submissionHistoryTypes";
 
-// Chỉ là mockup: dữ liệu cố định, chưa nối API. "Hôm nay" của mockup là 09/10/2026
-export const MOCK_TODAY = "2026-10-09";
-
-export const SUBMISSION_HISTORY_MOCK: SubmissionHistoryItem[] = [
+// SCR-02 vẫn là mockup: cặp bài so sánh lấy từ dữ liệu cố định này, chưa nối API
+export const SUBMISSION_COMPARE_MOCK: SubmissionCompareItem[] = [
   {
     id: "5",
     pieceId: "ly-ngua-o",
+    assignmentId: null,
     sheetMusicId: "sheet-ly-ngua-o",
     pieceTitle: "Lý ngựa ô",
     title: "Lý ngựa ô #5",
@@ -25,11 +23,11 @@ export const SUBMISSION_HISTORY_MOCK: SubmissionHistoryItem[] = [
     status: "COMPLETED",
     accuracy: 88,
     kind: "SOLO",
-    segment: null,
   },
   {
     id: "6",
     pieceId: "mua-xuan-oi",
+    assignmentId: null,
     sheetMusicId: "sheet-mua-xuan-oi",
     pieceTitle: "Mùa xuân ơi",
     title: "Mùa xuân ơi #2",
@@ -37,11 +35,11 @@ export const SUBMISSION_HISTORY_MOCK: SubmissionHistoryItem[] = [
     status: "COMPLETED",
     accuracy: 91,
     kind: "PRACTICE",
-    segment: { startSec: 72, endSec: 105 },
   },
   {
     id: "4",
     pieceId: "ly-ngua-o",
+    assignmentId: null,
     sheetMusicId: "sheet-ly-ngua-o",
     pieceTitle: "Lý ngựa ô",
     title: "Lý ngựa ô #4",
@@ -49,11 +47,11 @@ export const SUBMISSION_HISTORY_MOCK: SubmissionHistoryItem[] = [
     status: "COMPLETED",
     accuracy: 82,
     kind: "PRACTICE",
-    segment: null,
   },
   {
     id: "3",
     pieceId: "ly-ngua-o",
+    assignmentId: null,
     sheetMusicId: "sheet-ly-ngua-o",
     pieceTitle: "Lý ngựa ô",
     title: "Lý ngựa ô #3",
@@ -61,11 +59,11 @@ export const SUBMISSION_HISTORY_MOCK: SubmissionHistoryItem[] = [
     status: "PROCESSING",
     accuracy: null,
     kind: "ENSEMBLE",
-    segment: null,
   },
   {
     id: "2",
     pieceId: "ly-ngua-o",
+    assignmentId: null,
     sheetMusicId: "sheet-ly-ngua-o",
     pieceTitle: "Lý ngựa ô",
     title: "Lý ngựa ô #2",
@@ -73,11 +71,11 @@ export const SUBMISSION_HISTORY_MOCK: SubmissionHistoryItem[] = [
     status: "COMPLETED",
     accuracy: 71,
     kind: "BONUS",
-    segment: null,
   },
   {
     id: "7",
     pieceId: "mua-xuan-oi",
+    assignmentId: null,
     sheetMusicId: "sheet-mua-xuan-oi",
     pieceTitle: "Mùa xuân ơi",
     title: "Mùa xuân ơi #1",
@@ -85,11 +83,11 @@ export const SUBMISSION_HISTORY_MOCK: SubmissionHistoryItem[] = [
     status: "COMPLETED",
     accuracy: 76,
     kind: "PRACTICE",
-    segment: null,
   },
   {
     id: "1",
     pieceId: "ly-ngua-o",
+    assignmentId: null,
     sheetMusicId: "sheet-ly-ngua-o",
     pieceTitle: "Lý ngựa ô",
     title: "Lý ngựa ô #1",
@@ -97,7 +95,6 @@ export const SUBMISSION_HISTORY_MOCK: SubmissionHistoryItem[] = [
     status: "COMPLETED",
     accuracy: 64,
     kind: "PRACTICE",
-    segment: { startSec: 72, endSec: 105 },
   },
 ];
 
@@ -108,7 +105,6 @@ export const EMPTY_ADVANCED_FILTER: SubmissionAdvancedFilter = {
   minAccuracy: "",
   maxAccuracy: "",
   kinds: [],
-  scopes: [],
 };
 
 export const EMPTY_SUBMISSION_FILTER: SubmissionFilter = {
@@ -123,11 +119,6 @@ export const ADVANCED_KIND_OPTIONS: { value: SubmissionKind; label: string }[] =
   { value: "BONUS", label: "Bonus" },
   { value: "SOLO", label: "Độc tấu" },
   { value: "ENSEMBLE", label: "Hòa tấu" },
-];
-
-export const ADVANCED_SCOPE_OPTIONS: { value: SubmissionScope; label: string }[] = [
-  { value: "FULL", label: "Cả bài" },
-  { value: "PART", label: "Một đoạn" },
 ];
 
 // Mốc nhanh trong popup lọc nâng cao

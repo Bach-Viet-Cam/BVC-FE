@@ -8,7 +8,7 @@ import { useSubmissionHistory } from "@/features/practice/hooks/useSubmissionHis
 import { cn } from "@/shared/utils/cn";
 import { StudentShell } from "@/shared/components/bvc/StudentShell";
 
-// SCR-01 Lịch sử bài nộp (UC 1.4). MOCKUP: dữ liệu mẫu cố định, chưa nối API.
+// SCR-01 Lịch sử bài nộp (UC 1.4): GET /practice/submissions, lọc phía BE, tải thêm theo trang.
 // Gồm chế độ xem, chế độ chọn 2 bài (MSG-25 khi chọn chưa đủ), lọc nâng cao (popup), kết quả lọc và trạng thái rỗng.
 export function SubmissionHistoryPage() {
   const history = useSubmissionHistory();
@@ -19,18 +19,24 @@ export function SubmissionHistoryPage() {
     summary,
     totalCount,
     visibleCount,
+    activeFilterCount,
     quickFilterCount,
     advancedFilterCount,
     isAdvancedOpen,
     setIsAdvancedOpen,
-    countMatches,
     applyAdvanced,
     clearQuickFilter,
+    isFirstLoad,
+    isLoading,
+    error,
+    hasMore,
     isSelecting,
     selectedIds,
     showInvalid,
   } = history;
-  const isEmpty = visibleCount === 0;
+  const isEmpty = !isLoading && !error && visibleCount === 0;
+  // Chưa nộp bài nào: khác với lọc không ra kết quả
+  const isNeverSubmitted = isEmpty && activeFilterCount === 0;
 
   return (
     <StudentShell>
@@ -51,7 +57,7 @@ export function SubmissionHistoryPage() {
           }
         />
 
-        <p className="shrink-0 text-[12.5px] text-bvc-muted">{summary}</p>
+        <p className="shrink-0 text-[12.5px] text-bvc-muted">{isFirstLoad ? "Đang tải bài nộp..." : summary}</p>
 
         <div className="flex shrink-0 flex-wrap items-center gap-2">
           <SubmissionFilterBar
@@ -86,20 +92,49 @@ export function SubmissionHistoryPage() {
           </button>
         </div>
 
+        {error && (
+          <div
+            role="alert"
+            className="flex flex-col items-center gap-3 rounded-[20px] border border-bvc-border bg-white px-5 py-7 text-center"
+          >
+            <p className="text-[15px] font-bold text-bvc-ink">{error}</p>
+            <button
+              type="button"
+              onClick={history.reload}
+              className="flex min-h-11 cursor-pointer items-center justify-center rounded-[14px] border border-bvc-border-strong bg-bvc-soft px-[18px] text-sm font-semibold text-bvc-ink"
+            >
+              Thử lại
+            </button>
+          </div>
+        )}
+
         {isEmpty ? (
           <div className="flex flex-col items-center gap-3 rounded-[20px] border border-bvc-border bg-white px-5 py-7 text-center">
             <span className="flex size-11 items-center justify-center rounded-bvc-md bg-bvc-soft text-bvc-muted">
               <Search className="size-[21px]" strokeWidth={1.7} aria-hidden />
             </span>
-            <p className="text-[15px] font-bold text-bvc-ink">Không có bài nộp nào khớp</p>
-            <p className="text-[13px] leading-normal text-bvc-muted">Thử mở rộng khoảng ngày hoặc hạ mức accuracy.</p>
-            <button
-              type="button"
-              onClick={history.clearFilter}
-              className="flex min-h-11 cursor-pointer items-center justify-center rounded-[14px] border border-bvc-border-strong bg-bvc-soft px-[18px] text-sm font-semibold text-bvc-ink"
-            >
-              Xóa bộ lọc
-            </button>
+            {isNeverSubmitted ? (
+              <>
+                <p className="text-[15px] font-bold text-bvc-ink">Chưa có bài nộp nào</p>
+                <p className="text-[13px] leading-normal text-bvc-muted">
+                  Bài bạn nộp khi luyện tập sẽ hiện ở đây.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-[15px] font-bold text-bvc-ink">Không có bài nộp nào khớp</p>
+                <p className="text-[13px] leading-normal text-bvc-muted">
+                  Thử mở rộng khoảng ngày hoặc hạ mức accuracy.
+                </p>
+                <button
+                  type="button"
+                  onClick={history.clearFilter}
+                  className="flex min-h-11 cursor-pointer items-center justify-center rounded-[14px] border border-bvc-border-strong bg-bvc-soft px-[18px] text-sm font-semibold text-bvc-ink"
+                >
+                  Xóa bộ lọc
+                </button>
+              </>
+            )}
           </div>
         ) : (
           groups.map((group) => (
@@ -113,6 +148,21 @@ export function SubmissionHistoryPage() {
               onToggle={history.toggleSelected}
             />
           ))
+        )}
+
+        {hasMore && (
+          <button
+            type="button"
+            onClick={history.loadMore}
+            className="flex min-h-11 shrink-0 cursor-pointer items-center justify-center self-center rounded-[14px] border border-bvc-border-strong bg-white px-[18px] text-sm font-semibold text-bvc-ink"
+          >
+            Xem thêm
+          </button>
+        )}
+        {isLoading && !isFirstLoad && (
+          <p className="shrink-0 text-center text-[12.5px] text-bvc-muted" aria-live="polite">
+            Đang tải...
+          </p>
         )}
       </div>
 
@@ -157,7 +207,6 @@ export function SubmissionHistoryPage() {
       <SubmissionFilterSheet
         open={isAdvancedOpen}
         advanced={filter.advanced}
-        countMatches={countMatches}
         onOpenChange={setIsAdvancedOpen}
         onApply={applyAdvanced}
       />

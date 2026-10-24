@@ -4,8 +4,20 @@ import type {
   CreatePracticeSubmissionInput,
   PracticeSubmission,
 } from "@/features/practice/types/practiceSubmissionTypes";
+import type {
+  SubmissionHistoryPage,
+  SubmissionHistoryQuery,
+  SubmissionPieceOption,
+} from "@/features/practice/types/submissionHistoryTypes";
 
 export const practiceSubmissionApi = {
+  listHistory: (params: SubmissionHistoryQuery, signal?: AbortSignal) =>
+    axiosClient.get<ApiResponse<SubmissionHistoryPage>>("/practice/submissions", { params, signal, timeout: 15_000 }),
+  listHistoryPieces: (signal?: AbortSignal) =>
+    axiosClient.get<ApiResponse<SubmissionPieceOption[]>>("/practice/submissions/piece-options", {
+      signal,
+      timeout: 15_000,
+    }),
   create: (body: CreatePracticeSubmissionInput, signal?: AbortSignal) =>
     axiosClient.post<ApiResponse<PracticeSubmission>>("/practice/submissions", body, { signal, timeout: 30_000 }),
   get: (id: string, signal?: AbortSignal) =>
