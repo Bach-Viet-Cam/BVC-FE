@@ -204,44 +204,68 @@ interface AssignmentStudioBoxProps {
 }
 
 function AssignmentStudioBox({ assignment, recordingTarget, ensembleTarget, onNavigate }: AssignmentStudioBoxProps) {
+  const isEnsemble = assignment.kind === "ENSEMBLE";
+
   return (
     <div className="rounded-2xl border border-bvc-border bg-white p-4.5 shadow-2xs sm:p-5">
       <div className="flex flex-col gap-3.5 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <div className="flex size-10.5 shrink-0 items-center justify-center rounded-xl bg-bvc-accent-tint text-bvc-accent">
-            <Mic size={20} strokeWidth={2.2} />
+            {isEnsemble ? <Music2 size={20} strokeWidth={2.2} /> : <Mic size={20} strokeWidth={2.2} />}
           </div>
           <div>
-            <h3 className="font-bvc-display text-[15px] font-bold text-bvc-ink">Thu âm diễn tấu</h3>
+            <h3 className="font-bvc-display text-[15px] font-bold text-bvc-ink">
+              {isEnsemble ? "Hòa tấu cùng bè ảo" : "Thu âm diễn tấu"}
+            </h3>
             <p className="text-[12px] text-bvc-muted">
-              {assignment.canSubmit
-                ? "Thu trực tiếp bằng micro hoặc tải lên bản thu (.wav, .m4a, .mp3)"
-                : "Bài nộp đã khóa hoặc bạn đã sử dụng hết số lượt quy định."}
+              {isEnsemble
+                ? !assignment.hasEnsembleTracks
+                  ? "Bài nhạc chưa có bè ảo cho các nhạc cụ khác."
+                  : assignment.canSubmit
+                    ? "Thu bè của bạn trong khi nghe các bè ảo; bản thu được chấm theo bản mẫu nhạc cụ của bạn."
+                    : "Bài nộp đã khóa hoặc bạn đã sử dụng hết số lượt quy định."
+                : assignment.canSubmit
+                  ? "Thu trực tiếp bằng micro hoặc tải lên bản thu (.wav, .m4a, .mp3)"
+                  : "Bài nộp đã khóa hoặc bạn đã sử dụng hết số lượt quy định."}
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap shrink-0">
-          {assignment.hasEnsembleTracks && assignment.pieceId && (
+          {isEnsemble ? (
             <button
               type="button"
+              disabled={!assignment.canSubmit || !assignment.pieceId || !assignment.hasEnsembleTracks}
               onClick={() => onNavigate(ensembleTarget)}
-              className="flex h-10 items-center justify-center gap-1.5 rounded-xl border border-bvc-border bg-white px-3.5 text-[12.5px] font-semibold text-bvc-ink transition-colors hover:bg-bvc-surface active:scale-[0.98]"
+              className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl bg-bvc-accent px-4.5 text-[13px] font-bold text-white shadow-2xs transition-all hover:bg-bvc-ink active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <Music2 size={15} strokeWidth={2.2} />
-              <span>Hòa tấu ảo</span>
+              <Music2 size={16} strokeWidth={2.2} />
+              <span>Luyện &amp; nộp hòa tấu</span>
             </button>
-          )}
+          ) : (
+            <>
+              {assignment.hasEnsembleTracks && assignment.pieceId && (
+                <button
+                  type="button"
+                  onClick={() => onNavigate(`/ensemble/new?pieceId=${assignment.pieceId}`)}
+                  className="flex h-10 items-center justify-center gap-1.5 rounded-xl border border-bvc-border bg-white px-3.5 text-[12.5px] font-semibold text-bvc-ink transition-colors hover:bg-bvc-surface active:scale-[0.98]"
+                >
+                  <Music2 size={15} strokeWidth={2.2} />
+                  <span>Luyện cùng bè ảo</span>
+                </button>
+              )}
 
-          <button
-            type="button"
-            disabled={!assignment.canSubmit || !recordingTarget}
-            onClick={() => recordingTarget && onNavigate(recordingTarget)}
-            className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl bg-bvc-accent px-4.5 text-[13px] font-bold text-white shadow-2xs transition-all hover:bg-bvc-ink active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <Mic size={16} strokeWidth={2.2} />
-            <span>Thu âm / Tải bản thu</span>
-          </button>
+              <button
+                type="button"
+                disabled={!assignment.canSubmit || !recordingTarget}
+                onClick={() => recordingTarget && onNavigate(recordingTarget)}
+                className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl bg-bvc-accent px-4.5 text-[13px] font-bold text-white shadow-2xs transition-all hover:bg-bvc-ink active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <Mic size={16} strokeWidth={2.2} />
+                <span>Thu âm / Tải bản thu</span>
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -419,25 +443,39 @@ export function AssignmentPage() {
         {!assignment.canSubmit && (
           <p className="text-center text-[12px] font-medium text-bvc-error">{SUBMIT_BLOCKED_MESSAGE}</p>
         )}
-        <button
-          type="button"
-          disabled={!assignment.canSubmit || !recordingTarget}
-          onClick={() => recordingTarget && navigate(recordingTarget)}
-          className="flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-bvc-accent text-[14px] font-bold text-white shadow-sm transition-all hover:bg-bvc-ink active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <Mic size={17} strokeWidth={2.2} />
-          <span>Thu âm / Tải lên</span>
-        </button>
-
-        {assignment.hasEnsembleTracks && assignment.pieceId && (
+        {assignment.kind === "ENSEMBLE" ? (
           <button
             type="button"
+            disabled={!assignment.canSubmit || !assignment.pieceId || !assignment.hasEnsembleTracks}
             onClick={() => navigate(ensembleTarget)}
-            className="flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-bvc-border bg-white text-[13px] font-semibold text-bvc-ink transition-colors hover:bg-bvc-surface"
+            className="flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-bvc-accent text-[14px] font-bold text-white shadow-sm transition-all hover:bg-bvc-ink active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <Music2 size={15} strokeWidth={2.2} />
-            <span>Luyện với hòa tấu</span>
+            <Music2 size={17} strokeWidth={2.2} />
+            <span>Luyện &amp; nộp hòa tấu</span>
           </button>
+        ) : (
+          <>
+            <button
+              type="button"
+              disabled={!assignment.canSubmit || !recordingTarget}
+              onClick={() => recordingTarget && navigate(recordingTarget)}
+              className="flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-bvc-accent text-[14px] font-bold text-white shadow-sm transition-all hover:bg-bvc-ink active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Mic size={17} strokeWidth={2.2} />
+              <span>Thu âm / Tải lên</span>
+            </button>
+
+            {assignment.hasEnsembleTracks && assignment.pieceId && (
+              <button
+                type="button"
+                onClick={() => navigate(`/ensemble/new?pieceId=${assignment.pieceId}`)}
+                className="flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-bvc-border bg-white text-[13px] font-semibold text-bvc-ink transition-colors hover:bg-bvc-surface"
+              >
+                <Music2 size={15} strokeWidth={2.2} />
+                <span>Luyện cùng bè ảo</span>
+              </button>
+            )}
+          </>
         )}
       </div>
     </StudentShell>

@@ -9,6 +9,7 @@ export interface AssignmentListItem {
   title: string;
   className: string;
   type: AssignmentType;
+  kind?: "SOLO" | "ENSEMBLE" | "BONUS" | "OTHER" | null;
   deadline: string;
   status: StudentAssignmentStatus;
   usedSubmissions: number;
