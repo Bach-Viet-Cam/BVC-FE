@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { TeacherShell } from "@/shared/components/bvc/TeacherShell";
 import { FocusHeader } from "@/shared/components/bvc/FocusHeader";
 import { EmptyState } from "@/shared/components/bvc/EmptyState";
 import { ConfirmDialog } from "@/shared/components/bvc/ConfirmDialog";
 import { ActionButton } from "@/shared/components/bvc/ActionButton";
+import { actionButtonClass } from "@/shared/components/bvc/actionButtonStyles";
 import { cn } from "@/shared/utils/cn";
 import { InstrumentSheetGroup } from "@/features/music-library/components/InstrumentSheetGroup";
 import { SheetFormPanel } from "@/features/music-library/components/SheetFormPanel";
@@ -13,6 +14,7 @@ import { useMusicCategories } from "@/features/music-library/hooks/useMusicCateg
 import { useSongSheets } from "@/features/music-library/hooks/useSongSheets";
 import { useVisibilityConfirm } from "@/features/music-library/hooks/useVisibilityConfirm";
 import type { LecturerSheetMusic } from "@/features/music-library/types/lecturerTypes";
+import { sheetViewerHref } from "@/features/music-library/utils/sheetUtils";
 import type { SheetFormValues } from "@/features/music-library/utils/validateSheet";
 
 type PanelState = { mode: "create"; instrumentId?: string } | { mode: "edit"; sheet: LecturerSheetMusic } | null;
@@ -41,6 +43,10 @@ export function SheetManagePage() {
 
   const { song, sheets, groups } = data;
   const pendingSheet = visibility.pending?.item;
+  // Trang xem của thư viện chỉ mở được nội dung đang công khai
+  const isSongViewable = song?.effectiveVisibility === "PUBLIC";
+  const previewHrefOf = (sheet: LecturerSheetMusic) =>
+    song && isSongViewable && sheet.effectiveVisibility === "PUBLIC" ? sheetViewerHref(song.id, sheet.id) : undefined;
 
   return (
     <TeacherShell className="lg:flex-row lg:overflow-hidden">
@@ -54,10 +60,17 @@ export function SheetManagePage() {
             `${sheets.length} bản · ${groups.length} nhạc cụ · mỗi nhạc cụ 1 bản chính`
           }
           actions={
-            <ActionButton onClick={() => setPanel({ mode: "create" })} disabled={!song}>
-              <Plus className="size-[18px]" aria-hidden />
-              Thêm bản nhạc
-            </ActionButton>
+            <>
+              {song && isSongViewable && (
+                <Link to={`/library/${song.id}`} className={actionButtonClass("secondary", "md", "hover:text-bvc-ink")}>
+                  Xem như sinh viên
+                </Link>
+              )}
+              <ActionButton onClick={() => setPanel({ mode: "create" })} disabled={!song}>
+                <Plus className="size-[18px]" aria-hidden />
+                Thêm bản nhạc
+              </ActionButton>
+            </>
           }
         />
 
@@ -88,6 +101,7 @@ export function SheetManagePage() {
                 sheets={group.sheets}
                 selectedSheetId={panel?.mode === "edit" ? panel.sheet.id : undefined}
                 busySheetId={data.busySheetId}
+                previewHrefOf={previewHrefOf}
                 onAdd={(instrumentId) => setPanel({ mode: "create", instrumentId })}
                 onEdit={(sheet) => setPanel({ mode: "edit", sheet })}
                 onReplaceFile={data.replaceFile}

@@ -9,6 +9,7 @@ interface InstrumentSheetGroupProps {
   sheets: LecturerSheetMusic[];
   selectedSheetId?: string;
   busySheetId: string | null;
+  previewHrefOf: (sheet: LecturerSheetMusic) => string | undefined;
   onAdd: (instrumentId: string) => void;
   onEdit: (sheet: LecturerSheetMusic) => void;
   onReplaceFile: (sheet: LecturerSheetMusic, slot: SheetFileSlot, file: File) => void;
@@ -20,6 +21,7 @@ export function InstrumentSheetGroup({
   sheets,
   selectedSheetId,
   busySheetId,
+  previewHrefOf,
   onAdd,
   ...itemHandlers
 }: InstrumentSheetGroupProps) {
@@ -52,6 +54,7 @@ export function InstrumentSheetGroup({
               sheet={sheet}
               isSelected={sheet.id === selectedSheetId}
               isBusy={sheet.id === busySheetId}
+              previewHref={previewHrefOf(sheet)}
               {...itemHandlers}
             />
           ))}
