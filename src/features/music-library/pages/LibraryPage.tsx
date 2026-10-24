@@ -16,7 +16,6 @@ import { useLibrarySongs } from "@/features/music-library/hooks/useLibrarySongs"
 import { useMusicCategories } from "@/features/music-library/hooks/useMusicCategories";
 import { useSaveToggle } from "@/features/music-library/hooks/useSaveToggle";
 import { KEYWORD_MAX_LENGTH, LIBRARY_MESSAGES } from "@/features/music-library/constants/musicLibraryConstants";
-import { libraryFilterHref } from "@/features/music-library/utils/libraryLinks";
 
 function describeNoResult(filterCount: number, hasKeyword: boolean) {
   const conditions = filterCount + (hasKeyword ? 1 : 0);
@@ -116,7 +115,6 @@ export function LibraryPage() {
               <SongCard
                 key={song.id}
                 song={{ ...song, isSaved: save.isSavedForViewer(song.isSaved) }}
-                levelFilterHref={libraryFilterHref({ levelId: song.level.id })}
                 showSave={save.canSave}
                 isSaving={save.isPending(song.id)}
                 onToggleSave={(target) =>

@@ -104,7 +104,6 @@ export function SavedPage() {
                       title={item.song.title}
                       subtitle={item.song.genre.name}
                       instruments={instrumentSummary(item.song.instruments.map((instrument) => instrument.name))}
-                      level={item.song.level.name}
                       savedAt={item.savedAt}
                       href={`/library/${item.song.id}`}
                       isAvailable={item.isAvailable}

@@ -124,9 +124,6 @@ export function SongDetailPage() {
                   {instrument.name}
                 </Chip>
               ))}
-              <Chip to={libraryFilterHref({ levelId: song.level.id })} title={`Lọc theo ${song.level.name}`}>
-                {song.level.name}
-              </Chip>
             </div>
             <div className="mt-1 flex flex-wrap items-center gap-2.5">
               {save.canSave && (

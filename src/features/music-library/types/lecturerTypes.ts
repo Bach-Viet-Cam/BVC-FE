@@ -32,7 +32,6 @@ export interface LecturerPiece {
   coverUrl: string | null;
   cover: StoredFile | null;
   genre: CategoryRef;
-  level: CategoryRef;
   instruments: CategoryRef[];
   visibility: EditableVisibility;
   moderation: Moderation;
@@ -72,7 +71,6 @@ export interface PieceRequest {
   composer: string | null;
   description: string | null;
   genreId: string;
-  levelId: string;
   visibility?: EditableVisibility;
   // Khi sửa: bỏ trống giữ ảnh cũ, null gỡ ảnh
   coverFileId?: string | null;

@@ -21,7 +21,7 @@ import { songSchema, type SongFormValues } from "@/features/music-library/utils/
 interface SongFormProps {
   formId: string;
   song?: LecturerPiece;
-  options: { genres: SelectOption[]; levels: SelectOption[] };
+  options: { genres: SelectOption[] };
   onSubmit: (values: SongFormValues) => Promise<FormFailure<keyof SongFormValues> | null>;
 }
 
@@ -31,7 +31,6 @@ function defaultValuesOf(song?: LecturerPiece): SongFormValues {
     composer: song?.composer ?? "",
     description: song?.description ?? "",
     genreId: song?.genre.id ?? "",
-    levelId: song?.level.id ?? "",
     // Bài mới mặc định ẩn
     visibility: song?.visibility ?? "HIDDEN",
     coverFile: null,
@@ -54,7 +53,6 @@ export function SongForm({ formId, song, options, onSubmit }: SongFormProps) {
   const selectOptions = useMemo(
     () => ({
       genres: withCurrentOptions(options.genres, song ? [song.genre] : []),
-      levels: withCurrentOptions(options.levels, song ? [song.level] : []),
     }),
     [options, song]
   );
@@ -160,26 +158,6 @@ export function SongForm({ formId, song, options, onSubmit }: SongFormProps) {
                 ? song.instruments.map((instrument) => <Chip key={instrument.id}>{instrument.name}</Chip>)
                 : "Chưa có bản nhạc nào"}
             </p>
-          </FormField>
-          <FormField
-            label="Trình độ"
-            htmlFor="song-level"
-            required
-            hint="Từ danh mục trình độ đang bật"
-            error={errors.levelId?.message}
-          >
-            <select
-              {...register("levelId")}
-              id="song-level"
-              className={fieldClass(Boolean(errors.levelId), "h-[46px]")}
-            >
-              <option value="">Chọn trình độ</option>
-              {selectOptions.levels.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
           </FormField>
         </section>
 

@@ -42,8 +42,10 @@ function toMediaFile(media: PlayableMediaDto | null, name: string): MediaFile | 
   return { name, url: media.url ?? undefined, durationSec: media.durationSec ?? undefined };
 }
 
-function toSong(piece: Pick<LibraryPieceCardDto, "id" | "title" | "composer" | "coverUrl" | "genre" | "level"> &
-  Partial<Pick<LibraryPieceCardDto, "instrumentCount" | "createdAt">>): Song {
+function toSong(
+  piece: Pick<LibraryPieceCardDto, "id" | "title" | "composer" | "coverUrl" | "genre"> &
+    Partial<Pick<LibraryPieceCardDto, "instrumentCount" | "createdAt">>
+): Song {
   const createdAt = piece.createdAt ?? "";
   return {
     id: piece.id,
@@ -51,7 +53,6 @@ function toSong(piece: Pick<LibraryPieceCardDto, "id" | "title" | "composer" | "
     composer: piece.composer ?? "",
     description: "",
     genre: piece.genre,
-    level: piece.level,
     instruments: [],
     instrumentCount: piece.instrumentCount ?? 0,
     coverUrl: piece.coverUrl ?? undefined,
@@ -68,7 +69,12 @@ interface SheetExtras {
   sheetFile?: LibrarySheet["sheetFile"];
 }
 
-function toSheet(card: LibrarySheetCardDto, songId: string, instrument: CategoryRef, extras: SheetExtras = {}): LibrarySheet {
+function toSheet(
+  card: LibrarySheetCardDto,
+  songId: string,
+  instrument: CategoryRef,
+  extras: SheetExtras = {}
+): LibrarySheet {
   // Bản không phải bản chính chỉ có cờ hasReferenceAudio, đủ để hiện biểu tượng + thời lượng
   const flaggedRecording = card.hasReferenceAudio
     ? { name: `${card.id}-audio`, durationSec: card.durationSec ?? undefined }
@@ -157,9 +163,7 @@ export const musicLibraryApi: MusicLibraryApi = {
   getLibrarySong: (songId) =>
     unwrap(axiosClient.get<ApiResponse<LibraryPieceDetailDto>>(`/library/pieces/${songId}`)).then(toSongDetail),
   getSheetViewer: (_songId, sheetId) =>
-    unwrap(axiosClient.get<ApiResponse<LibrarySheetViewerDto>>(`/library/sheet-music/${sheetId}`)).then(
-      toSheetViewer
-    ),
+    unwrap(axiosClient.get<ApiResponse<LibrarySheetViewerDto>>(`/library/sheet-music/${sheetId}`)).then(toSheetViewer),
   saveSong: (songId) => axiosClient.put(`/me/saved/pieces/${songId}`).then(ignoreData),
   unsaveSong: (songId) => axiosClient.delete(`/me/saved/pieces/${songId}`).then(ignoreData),
   saveSheet: (sheetId) => axiosClient.put(`/me/saved/sheet-music/${sheetId}`).then(ignoreData),
@@ -176,7 +180,12 @@ export const musicLibraryApi: MusicLibraryApi = {
           item.piece.id,
           item.sheetMusic.instrument
         ),
-        song: { id: item.piece.id, title: item.piece.title, coverUrl: item.piece.coverUrl ?? undefined, coverTone: coverToneOf(item.piece.id) },
+        song: {
+          id: item.piece.id,
+          title: item.piece.title,
+          coverUrl: item.piece.coverUrl ?? undefined,
+          coverTone: coverToneOf(item.piece.id),
+        },
         savedAt: item.savedAt,
         isAvailable: true,
       }))

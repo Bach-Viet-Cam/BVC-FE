@@ -12,7 +12,8 @@ interface SavedItemRowProps {
   title: string;
   subtitle: string;
   instruments: string;
-  level: string;
+  // Chỉ bản nhạc có trình độ, bài hát để trống
+  level?: string;
   savedAt: string;
   href: string;
   isAvailable: boolean;
@@ -70,7 +71,7 @@ export function SavedItemRow({
         {instruments}
       </span>
       <span className="hidden md:block">
-        {isAvailable ? <Chip>{level}</Chip> : <Chip variant="outline">Không khả dụng</Chip>}
+        {!isAvailable ? <Chip variant="outline">Không khả dụng</Chip> : level && <Chip>{level}</Chip>}
       </span>
       <span className="hidden font-bvc-mono text-[13px] text-bvc-muted md:block">{savedDate}</span>
       <span className="flex shrink-0 items-center justify-end gap-2">
