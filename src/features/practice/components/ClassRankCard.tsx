@@ -1,7 +1,7 @@
 import { ArrowUp, Lock } from "lucide-react";
 import { ChartTooltip } from "@/features/practice/components/ChartTooltip";
-import { RESULT_MOCK } from "@/features/practice/constants/resultsMockData";
 import { useChartPointer } from "@/features/practice/hooks/useChartPointer";
+import type { ClassRank } from "@/features/practice/types/practiceResultTypes";
 import { parseCubicPath, yAtX } from "@/features/practice/utils/bezierPath";
 
 const VIEW_WIDTH = 320;
@@ -22,10 +22,13 @@ function smoothPath(points: { x: number; y: number }[]) {
   }, "");
 }
 
-// Vị trí tương đối trong lớp: đường phân bố điểm của lớp, đánh dấu điểm trung bình và điểm của bạn (dữ liệu mẫu)
-export function ClassRankCard() {
-  const rank = RESULT_MOCK.classRank;
-  const maxCount = Math.max(...rank.distribution.map((bucket) => bucket.count));
+interface ClassRankCardProps {
+  rank: ClassRank;
+}
+
+// Vị trí tương đối trong lớp ở cùng bài tập: đường phân bố điểm tốt nhất của các bạn, đánh dấu điểm trung bình và điểm của bạn
+export function ClassRankCard({ rank }: ClassRankCardProps) {
+  const maxCount = Math.max(1, ...rank.distribution.map((bucket) => bucket.count));
   const yAt = (count: number) => CHART.bottom - (count / maxCount) * (CHART.bottom - CHART.top);
   const points = rank.distribution.map((bucket) => ({ x: xAt(bucket.score), y: yAt(bucket.count) }));
   const line = smoothPath(points);
@@ -54,7 +57,7 @@ export function ClassRankCard() {
               Top {rank.topPercent}%
             </span>
           </div>
-          <p className="mt-0.5 text-[11px] text-bvc-muted">Ẩn danh · Cùng bài nộp {rank.classCode}</p>
+          <p className="mt-0.5 text-[11px] text-bvc-muted">Ẩn danh · Cùng bài tập lớp {rank.className}</p>
         </div>
         <span className="flex shrink-0 items-center gap-1 rounded-full bg-bvc-surface px-2 py-0.5 text-[11px] font-semibold text-bvc-muted">
           <Lock className="size-3 text-bvc-faint" aria-hidden />
@@ -170,8 +173,8 @@ export function ClassRankCard() {
       </div>
 
       <p className="border-t border-bvc-border pt-2 text-[11px] leading-normal text-bvc-faint">
-        Dữ liệu tính trên các bài nộp đã hoàn tất phân tích trong lớp {rank.classCode}. Danh tính các sinh viên khác
-        được ẩn danh hoàn toàn.
+        Dữ liệu tính trên điểm cao nhất của {rank.peerCount} sinh viên đã hoàn tất phân tích bài tập này trong lớp{" "}
+        {rank.className}. Danh tính các sinh viên khác được ẩn danh hoàn toàn.
       </p>
     </section>
   );

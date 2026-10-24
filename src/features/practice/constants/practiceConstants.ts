@@ -57,6 +57,10 @@ export const MSG = {
   analyzed: "Bản thu của bạn đã được phân tích xong. Nhấn để xem kết quả.", // MSG-43
   download: "Đã tải bản thu về máy.",
   refNote: "Đang phát nốt mẫu...",
+  resultProcessing: "Bản thu đang được xử lý. Kết quả sẽ hiển thị khi phân tích hoàn tất.", // MSG-30
+  pitchUnavailable: "Chưa có dữ liệu cao độ để hiển thị biểu đồ so sánh.", // MSG-26
+  resultLoadFailed: "Tải kết quả phân tích thất bại. Vui lòng thử lại.", // MSG-09
+  resultPartFailed: "Chưa tải được phần này. Vui lòng thử lại.",
 };
 
 export const NOTES: Record<string, NoteInfo> = {

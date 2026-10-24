@@ -111,8 +111,7 @@ export function useSubmissionHistory() {
   const quickFilterCount = countQuickFilters(filter);
   const advancedFilterCount = countAdvancedFilters(filter.advanced);
 
-  const summary =
-    activeFilterCount > 0 ? `${visibleCount} trong ${stats.total} bài nộp khớp bộ lọc` : toSummary(stats);
+  const summary = activeFilterCount > 0 ? `${visibleCount} trong ${stats.total} bài nộp khớp bộ lọc` : toSummary(stats);
 
   // GBR-15: chỉ cho so sánh khi có từ 2 bài đã phân tích xong
   const canCompare = stats.completed >= REQUIRED_SELECTION;

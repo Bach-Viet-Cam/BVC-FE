@@ -44,9 +44,12 @@ export function hasActiveAccuracy(advanced: SubmissionAdvancedFilter) {
 
 // Số nhóm lọc nâng cao đang có giá trị (tên bài, ngày, accuracy, loại bài)
 export function countAdvancedFilters(advanced: SubmissionAdvancedFilter) {
-  return [hasActiveTitle(advanced), hasActiveDate(advanced), hasActiveAccuracy(advanced), advanced.kinds.length > 0].filter(
-    Boolean
-  ).length;
+  return [
+    hasActiveTitle(advanced),
+    hasActiveDate(advanced),
+    hasActiveAccuracy(advanced),
+    advanced.kinds.length > 0,
+  ].filter(Boolean).length;
 }
 
 // Số nhóm lọc nhanh đang chọn (bài hát, mốc ngày, khoảng accuracy)
