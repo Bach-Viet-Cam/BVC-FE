@@ -5,17 +5,26 @@ import {
   PracticeSheetDescription,
   PracticeSheetTitle,
 } from "@/features/practice/components/PracticeBottomSheet";
-import { RESULT_MOCK } from "@/features/practice/constants/resultsMockData";
 
 interface PracticeModeSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onFullSong: () => void;
   onSegment: () => void;
+  pieceTitle: string;
+  // Thời lượng bản thu, ví dụ "2 phút 41"; null khi BE không đo được
+  durationLabel: string | null;
 }
 
 // "Luyện tập lại": chọn luyện cả bài hay một đoạn (AI gợi ý đoạn)
-export function PracticeModeSheet({ open, onOpenChange, onFullSong, onSegment }: PracticeModeSheetProps) {
+export function PracticeModeSheet({
+  open,
+  onOpenChange,
+  onFullSong,
+  onSegment,
+  pieceTitle,
+  durationLabel,
+}: PracticeModeSheetProps) {
   return (
     <PracticeBottomSheet open={open} onOpenChange={onOpenChange}>
       <div className="flex flex-col gap-4 overflow-y-auto px-6 pt-4 pb-6">
@@ -25,7 +34,7 @@ export function PracticeModeSheet({ open, onOpenChange, onFullSong, onSegment }:
               Chọn chế độ luyện tập
             </PracticeSheetTitle>
             <PracticeSheetDescription className="mt-1 text-xs leading-relaxed text-bvc-muted">
-              Chọn cách bạn muốn ôn tập và cải thiện bài hát {RESULT_MOCK.pieceTitle}
+              Chọn cách bạn muốn ôn tập và cải thiện bài hát {pieceTitle}
             </PracticeSheetDescription>
           </div>
           <PracticeSheetClose
@@ -69,7 +78,7 @@ export function PracticeModeSheet({ open, onOpenChange, onFullSong, onSegment }:
             <span className="min-w-0 flex-1">
               <span className="block text-sm font-bold text-bvc-ink">Luyện tập toàn bộ bài hát</span>
               <span className="mt-0.5 block text-xs leading-snug text-bvc-muted">
-                Luyện từ đầu đến cuối ({RESULT_MOCK.durationLabel}) để kiểm tra độ ổn định
+                Luyện từ đầu đến cuối{durationLabel ? ` (${durationLabel})` : ""} để kiểm tra độ ổn định
               </span>
             </span>
             <ChevronRight className="size-5 shrink-0 text-bvc-faint" strokeWidth={2.5} aria-hidden />

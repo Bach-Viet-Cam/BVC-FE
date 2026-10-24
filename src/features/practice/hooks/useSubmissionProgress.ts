@@ -1,11 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { isAxiosError } from "axios";
 import { practiceSubmissionApi } from "@/features/practice/api/practiceSubmissionApi";
-import {
-  MSG,
-  PROGRESS_POLL_MAX_MS,
-  PROGRESS_POLL_MS,
-} from "@/features/practice/constants/practiceConstants";
+import { MSG, PROGRESS_POLL_MAX_MS, PROGRESS_POLL_MS } from "@/features/practice/constants/practiceConstants";
 import type { PracticeSubmission } from "@/features/practice/types/practiceSubmissionTypes";
 import { isFinalStatus } from "@/features/practice/utils/submissionStatus";
 import { toast } from "@/shared/components/ui/toast";

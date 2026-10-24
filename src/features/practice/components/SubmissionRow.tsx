@@ -1,6 +1,10 @@
 import { ChevronRight } from "lucide-react";
 import type { SubmissionHistoryItem, SubmissionKind } from "@/features/practice/types/submissionHistoryTypes";
-import { FULL_PIECE_LABEL, SUBMISSION_KIND_LABEL, formatSubmittedAt } from "@/features/practice/utils/submissionHistory";
+import {
+  FULL_PIECE_LABEL,
+  SUBMISSION_KIND_LABEL,
+  formatSubmittedAt,
+} from "@/features/practice/utils/submissionHistory";
 import { toStatusLabel } from "@/features/practice/utils/submissionStatus";
 import { cn } from "@/shared/utils/cn";
 
@@ -89,9 +93,7 @@ export function SubmissionRow({ item, isSelecting, isSelected, isSelectable, onO
           {SUBMISSION_KIND_LABEL[item.kind]}
         </span>
       </td>
-      <td className={cn(CELL, "font-bvc-mono text-xs whitespace-nowrap text-bvc-muted")}>
-        {FULL_PIECE_LABEL}
-      </td>
+      <td className={cn(CELL, "font-bvc-mono text-xs whitespace-nowrap text-bvc-muted")}>{FULL_PIECE_LABEL}</td>
       <td className={cn(CELL, "text-center")}>
         {isSelecting ? (
           <input

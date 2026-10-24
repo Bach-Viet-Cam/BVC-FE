@@ -245,12 +245,13 @@ function AdvancedForm({ advanced, onApply }: AdvancedFormProps) {
                 key={option.value}
                 label={option.label}
                 active={(values.kinds ?? []).includes(option.value)}
-                onClick={() => setValue("kinds", toggleValue(values.kinds ?? [], option.value), { shouldValidate: true })}
+                onClick={() =>
+                  setValue("kinds", toggleValue(values.kinds ?? [], option.value), { shouldValidate: true })
+                }
               />
             ))}
           </div>
         </section>
-
       </div>
 
       <div className="mt-3.5 shrink-0 border-t border-bvc-border-strong bg-white px-4 pt-3.5 pb-6">

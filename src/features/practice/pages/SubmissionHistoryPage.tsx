@@ -116,9 +116,7 @@ export function SubmissionHistoryPage() {
             {isNeverSubmitted ? (
               <>
                 <p className="text-[15px] font-bold text-bvc-ink">Chưa có bài nộp nào</p>
-                <p className="text-[13px] leading-normal text-bvc-muted">
-                  Bài bạn nộp khi luyện tập sẽ hiện ở đây.
-                </p>
+                <p className="text-[13px] leading-normal text-bvc-muted">Bài bạn nộp khi luyện tập sẽ hiện ở đây.</p>
               </>
             ) : (
               <>

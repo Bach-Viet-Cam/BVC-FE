@@ -1,4 +1,4 @@
-import { RESULT_MOCK } from "@/features/practice/constants/resultsMockData";
+import type { ResultScores } from "@/features/practice/types/practiceResultTypes";
 
 const RING_SIZE = 96;
 const RING_STROKE = 9;
@@ -9,9 +9,12 @@ const METRICS = [
   { key: "tempo", label: "Tempo", color: "var(--color-bvc-dot-warn)" },
 ] as const;
 
-// Điểm tổng + ba chỉ số thành phần (cao độ, nhịp / phách, tempo)
-export function ResultOverviewCard() {
-  const { scores } = RESULT_MOCK;
+interface ResultOverviewCardProps {
+  scores: ResultScores;
+}
+
+// Điểm tổng + ba chỉ số thành phần (cao độ, nhịp / phách, tempo). Tempo null: BE không đo được nhịp độ.
+export function ResultOverviewCard({ scores }: ResultOverviewCardProps) {
   const radius = (RING_SIZE - RING_STROKE) / 2;
   const circumference = 2 * Math.PI * radius;
 
@@ -54,12 +57,12 @@ export function ResultOverviewCard() {
           <div key={metric.key}>
             <div className="mb-1 flex items-baseline justify-between">
               <span className="text-[13px] font-semibold text-bvc-muted">{metric.label}</span>
-              <span className="text-sm font-bold text-bvc-ink">{scores[metric.key]}</span>
+              <span className="text-sm font-bold text-bvc-ink">{scores[metric.key] ?? "--"}</span>
             </div>
             <div className="h-2 w-full overflow-hidden rounded-full bg-bvc-surface">
               <div
                 className="h-full rounded-full"
-                style={{ width: `${scores[metric.key]}%`, backgroundColor: metric.color }}
+                style={{ width: `${scores[metric.key] ?? 0}%`, backgroundColor: metric.color }}
               />
             </div>
           </div>

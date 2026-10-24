@@ -1,25 +1,40 @@
-import { TrendingUp } from "lucide-react";
+import { TrendingDown, TrendingUp } from "lucide-react";
 import { ChartTooltip } from "@/features/practice/components/ChartTooltip";
-import { RESULT_MOCK } from "@/features/practice/constants/resultsMockData";
 import { useChartPointer } from "@/features/practice/hooks/useChartPointer";
+import type { ResultHistory } from "@/features/practice/types/practiceResultTypes";
+import { formatAttemptTime, growthLabel } from "@/features/practice/utils/resultFormat";
+import { cn } from "@/shared/utils/cn";
 
-const CHART = { width: 320, left: 32, right: 310, top: 15, bottom: 105, minScore: 50, maxScore: 100 };
-const GRID_SCORES = [100, 80, 65, 50];
+const CHART = { width: 320, left: 32, right: 310, top: 15, bottom: 105, maxScore: 100 };
+const GRID_LINES = 4;
 const FIRST_X = 65;
 const LAST_X = 265;
 
 const xAt = (index: number, total: number) => FIRST_X + (index * (LAST_X - FIRST_X)) / Math.max(1, total - 1);
-const yAt = (score: number) =>
-  CHART.bottom - ((score - CHART.minScore) / (CHART.maxScore - CHART.minScore)) * (CHART.bottom - CHART.top);
+// Trục tung bắt đầu dưới điểm thấp nhất một chút (làm tròn xuống bội 10), tối đa từ 50 để đường không bị dẹt
+const floorScore = (lowest: number) => Math.max(0, Math.min(50, Math.floor((lowest - 10) / 10) * 10));
 
-// Điểm của các lần nộp cùng bài hát, lần hiện tại nằm cuối (dữ liệu mẫu)
-export function ProgressHistoryCard() {
-  const { history } = RESULT_MOCK;
+interface ProgressHistoryCardProps {
+  history: ResultHistory;
+}
+
+// Điểm của các lần nộp cùng bài (cùng bản nhạc, cùng bài tập), lần hiện tại nằm cuối
+export function ProgressHistoryCard({ history }: ProgressHistoryCardProps) {
   const { x: pointerX, pointerProps } = useChartPointer(CHART.width);
+  const minScore = floorScore(Math.min(...history.attempts.map((attempt) => attempt.accuracyPercent)));
+  const yAt = (score: number) =>
+    CHART.bottom - ((score - minScore) / (CHART.maxScore - minScore)) * (CHART.bottom - CHART.top);
+  const gridScores = Array.from({ length: GRID_LINES }, (_, index) =>
+    Math.round(CHART.maxScore - (index * (CHART.maxScore - minScore)) / (GRID_LINES - 1))
+  );
   const points = history.attempts.map((attempt, index) => ({
-    ...attempt,
+    key: attempt.submissionId,
+    label: attempt.isCurrent ? `Lần ${attempt.attemptNo} (Hiện tại)` : `Lần ${attempt.attemptNo}`,
+    when: formatAttemptTime(attempt.submittedAt),
+    score: attempt.accuracyPercent,
+    isCurrent: attempt.isCurrent,
     x: xAt(index, history.attempts.length),
-    y: yAt(attempt.score),
+    y: yAt(attempt.accuracyPercent),
   }));
   const last = points[points.length - 1];
   const line = points.map((point, index) => `${index === 0 ? "M" : "L"}${point.x} ${point.y}`).join(" ");
@@ -31,18 +46,28 @@ export function ProgressHistoryCard() {
       : points.reduce((nearest, point) =>
           Math.abs(point.x - pointerX) < Math.abs(nearest.x - pointerX) ? point : nearest
         );
-  const best = Math.max(...points.map((point) => point.score));
+  const best = history.bestPercent;
+  const isDecline = (history.deltaPercent ?? 0) < 0;
 
   return (
     <section className="flex flex-col gap-3 rounded-bvc-xl border border-bvc-border bg-white p-4 md:rounded-[22px] md:p-5.5">
       <div className="flex items-center justify-between gap-2">
         <div>
           <h2 className="text-sm font-bold text-bvc-ink">Tiến trình qua các lần nộp</h2>
-          <p className="mt-0.5 text-[11px] text-bvc-muted">Cùng bài hát {history.songTitle}</p>
+          <p className="mt-0.5 text-[11px] text-bvc-muted">Cùng bài hát {history.pieceTitle}</p>
         </div>
-        <span className="flex shrink-0 items-center gap-1 rounded-full border border-bvc-ok/20 bg-bvc-soft px-2 py-0.5 text-[11px] font-bold text-bvc-ok">
-          <TrendingUp className="size-3" strokeWidth={2.5} aria-hidden />
-          {history.growthLabel}
+        <span
+          className={cn(
+            "flex shrink-0 items-center gap-1 rounded-full border bg-bvc-soft px-2 py-0.5 text-[11px] font-bold",
+            isDecline ? "border-bvc-border text-bvc-muted" : "border-bvc-ok/20 text-bvc-ok"
+          )}
+        >
+          {isDecline ? (
+            <TrendingDown className="size-3" strokeWidth={2.5} aria-hidden />
+          ) : (
+            <TrendingUp className="size-3" strokeWidth={2.5} aria-hidden />
+          )}
+          {growthLabel(history)}
         </span>
       </div>
 
@@ -62,7 +87,7 @@ export function ProgressHistoryCard() {
                 <stop offset="100%" stopColor="var(--color-bvc-ink)" stopOpacity="0.01" />
               </linearGradient>
             </defs>
-            {GRID_SCORES.map((score) => (
+            {gridScores.map((score) => (
               <g key={score}>
                 <line
                   x1={CHART.left}
@@ -92,10 +117,10 @@ export function ProgressHistoryCard() {
               strokeLinecap="round"
               strokeLinejoin="round"
             />
-            {points.map((point, index) => {
-              const isCurrent = index === points.length - 1;
+            {points.map((point) => {
+              const { isCurrent } = point;
               return (
-                <g key={point.label}>
+                <g key={point.key}>
                   <circle
                     cx={point.x}
                     cy={point.y}
@@ -165,7 +190,8 @@ export function ProgressHistoryCard() {
       </div>
 
       <p className="text-[11px] leading-normal text-bvc-faint">
-        * Ghi chú: Nếu là lần nộp đầu tiên, hệ thống sẽ hiển thị trạng thái &quot;Lần đầu tiên&quot;.
+        Tính các lần nộp đã phân tích xong của cùng bản nhạc
+        {history.attempts.length > 1 ? `, ${history.attempts.length} lần gần nhất` : ""}.
       </p>
     </section>
   );

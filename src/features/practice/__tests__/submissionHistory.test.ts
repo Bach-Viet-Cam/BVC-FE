@@ -71,7 +71,11 @@ describe("toHistoryQuery", () => {
 
   it("mốc nhanh và khoảng nâng cao gửi phần giao; không giao nhau thì trả null", () => {
     expect(
-      toHistoryQuery(withFilter({ datePreset: "THIS_MONTH" }, { fromDate: "2026-09-15", toDate: "2026-10-10" }), 1, today)
+      toHistoryQuery(
+        withFilter({ datePreset: "THIS_MONTH" }, { fromDate: "2026-09-15", toDate: "2026-10-10" }),
+        1,
+        today
+      )
     ).toMatchObject({ fromDate: "2026-10-01", toDate: "2026-10-10" });
     expect(toHistoryQuery(withFilter({ datePreset: "TODAY" }, { toDate: "2026-10-01" }), 1, today)).toBeNull();
   });
