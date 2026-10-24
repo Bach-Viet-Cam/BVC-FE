@@ -40,6 +40,7 @@ export function TempoCard({
   return (
     <CollapsibleCard
       label="Nhịp"
+      className="md:h-full"
       open={open}
       onToggle={onToggle}
       summary={<span className="text-xs text-bvc-muted">4/4 · {PRACTICE_DEFAULTS.targetBpm} BPM</span>}

@@ -1,7 +1,7 @@
-import { ArrowUp, Lock } from "lucide-react";
+import { ArrowUp, Lock, Users } from "lucide-react";
 import { ChartTooltip } from "@/features/practice/components/ChartTooltip";
 import { useChartPointer } from "@/features/practice/hooks/useChartPointer";
-import type { ClassRank } from "@/features/practice/types/practiceResultTypes";
+import type { ClassRank, RankedClassRank } from "@/features/practice/types/practiceResultTypes";
 import { parseCubicPath, yAtX } from "@/features/practice/utils/bezierPath";
 
 const VIEW_WIDTH = 320;
@@ -26,8 +26,43 @@ interface ClassRankCardProps {
   rank: ClassRank;
 }
 
-// Vị trí tương đối trong lớp ở cùng bài tập: đường phân bố điểm tốt nhất của các bạn, đánh dấu điểm trung bình và điểm của bạn
+function isRanked(rank: ClassRank): rank is RankedClassRank {
+  return (
+    rank.hasEnoughPeers && rank.classAverage !== null && rank.betterThanPercent !== null && rank.topPercent !== null
+  );
+}
+
+// Vị trí trong lớp ở cùng bài tập. Lớp chưa đủ bạn có kết quả thì chỉ hiện điểm của mình và lý do chưa xếp hạng.
 export function ClassRankCard({ rank }: ClassRankCardProps) {
+  return isRanked(rank) ? <RankedClassCard rank={rank} /> : <PendingClassCard rank={rank} />;
+}
+
+function PendingClassCard({ rank }: ClassRankCardProps) {
+  return (
+    <section className="flex flex-col gap-3 rounded-bvc-xl border border-bvc-border bg-white p-4 md:rounded-[22px] md:p-5.5">
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <h2 className="text-sm font-bold text-bvc-ink">Vị trí tương đối trong lớp</h2>
+          <p className="mt-0.5 text-[11px] text-bvc-muted">Ẩn danh · Cùng bài tập lớp {rank.className}</p>
+        </div>
+        <span className="flex shrink-0 items-center gap-1 rounded-full bg-bvc-surface px-2 py-0.5 text-[11px] font-semibold text-bvc-muted">
+          <Users className="size-3 text-bvc-faint" aria-hidden />
+          {rank.peerCount}/{rank.minPeers} bạn
+        </span>
+      </div>
+      <div className="flex items-center gap-3 rounded-xl border border-bvc-border bg-bvc-soft p-3.5">
+        <span className="font-bvc-display text-3xl leading-none font-extrabold text-bvc-ink">{rank.myScore}</span>
+        <p className="text-[12.5px] leading-snug text-bvc-muted">
+          Điểm của bạn đã được tính vào bài tập. Vị trí trong lớp sẽ hiện khi có ít nhất {rank.minPeers} bạn khác hoàn
+          tất phân tích bài này (hiện có {rank.peerCount}), để điểm của từng bạn luôn được ẩn danh.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+// Đường phân bố điểm tốt nhất của các bạn, đánh dấu điểm trung bình và điểm của bạn
+function RankedClassCard({ rank }: { rank: RankedClassRank }) {
   const maxCount = Math.max(1, ...rank.distribution.map((bucket) => bucket.count));
   const yAt = (count: number) => CHART.bottom - (count / maxCount) * (CHART.bottom - CHART.top);
   const points = rank.distribution.map((bucket) => ({ x: xAt(bucket.score), y: yAt(bucket.count) }));

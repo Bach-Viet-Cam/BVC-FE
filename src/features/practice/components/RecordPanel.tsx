@@ -4,6 +4,7 @@ import { NoticeBanner } from "@/features/practice/components/NoticeBanner";
 import { PlaybackBar } from "@/shared/components/bvc/PlaybackBar";
 import { LiveWaveform } from "@/shared/components/bvc/LiveWaveform";
 import { RecordButton } from "@/features/practice/components/RecordButton";
+import { ReferenceAudioPlayer } from "@/features/practice/components/ReferenceAudioPlayer";
 import { fmtTime } from "@/features/practice/utils/practiceFormat";
 import type { RecordState } from "@/features/practice/types/practiceTypes";
 import { cn } from "@/shared/utils/cn";
@@ -37,6 +38,8 @@ interface RecordPanelProps {
   onRerecord: () => void;
   onDownload: () => void;
   onSend: () => void;
+  // Bản thu mẫu của bản nhạc, nghe được khi chưa ghi; null khi bản nhạc chưa có bản thu mẫu
+  referenceAudio: { url: string; isFallback: boolean } | null;
 }
 
 export function RecordPanel({
@@ -68,6 +71,7 @@ export function RecordPanel({
   onRerecord,
   onDownload,
   onSend,
+  referenceAudio,
 }: RecordPanelProps) {
   if (rec === "preview") {
     return (
@@ -139,6 +143,14 @@ export function RecordPanel({
   return (
     <div className="mt-auto flex flex-col gap-3 md:mx-auto md:my-auto md:w-full md:min-w-0 md:max-w-[760px] xl:max-w-[920px]">
       {micDenied && <NoticeBanner message="Cần cho phép truy cập micro để dùng tính năng này." />}
+
+      {rec === "idle" && referenceAudio && (
+        <ReferenceAudioPlayer
+          key={referenceAudio.url}
+          url={referenceAudio.url}
+          isFallback={referenceAudio.isFallback}
+        />
+      )}
 
       <div className="flex items-center gap-3.5">
         <div className="flex min-w-0 flex-1 flex-col gap-[7px]">

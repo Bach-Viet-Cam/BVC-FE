@@ -27,10 +27,7 @@ export function MySubmissionList({ submissions }: MySubmissionListProps) {
       ) : (
         <ul className="mt-2 flex flex-col">
           {submissions.map((submission) => (
-            <li
-              key={submission.id}
-              className="flex flex-col gap-2 border-b border-bvc-line py-2.5 last:border-0"
-            >
+            <li key={submission.id} className="flex flex-col gap-2 border-b border-bvc-line py-2.5 last:border-0">
               <div className="flex items-center justify-between gap-3 text-[13px]">
                 <span className="font-semibold text-bvc-ink">
                   Lượt {submission.attemptNumber} · {formatVietnamDateTime(submission.submittedAt, false)}
@@ -51,9 +48,7 @@ export function MySubmissionList({ submissions }: MySubmissionListProps) {
               {submission.comment ? (
                 <div className="rounded-lg border border-bvc-border bg-bvc-surface/60 px-3 py-2 text-[12.5px]">
                   <p className="text-[11.5px] font-bold text-bvc-muted">Nhận xét của giảng viên</p>
-                  <p className="mt-1 whitespace-pre-line leading-relaxed text-bvc-ink">
-                    {submission.comment.content}
-                  </p>
+                  <p className="mt-1 whitespace-pre-line leading-relaxed text-bvc-ink">{submission.comment.content}</p>
                   <p className="mt-1 text-right text-[11px] text-bvc-faint">
                     Cập nhật {formatVietnamDateTime(submission.comment.updatedAt, false)}
                   </p>
@@ -68,4 +63,3 @@ export function MySubmissionList({ submissions }: MySubmissionListProps) {
     </section>
   );
 }
-

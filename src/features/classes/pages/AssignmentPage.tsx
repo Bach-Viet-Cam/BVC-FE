@@ -186,7 +186,7 @@ function AttemptTimeline({ assignment }: { assignment: AssignmentDetail }) {
                 <span className="text-[11.5px] font-bold">Lượt {attemptNumber}</span>
               </div>
               <span className="font-bvc-mono text-[12px] font-extrabold text-bvc-ink mt-0.5">
-                {sub && sub.accuracy !== null ? `${Math.round(sub.accuracy * 100)}%` : sub ? "Đã nộp" : "Chưa nộp"}
+                {sub && sub.accuracy !== null ? `${Math.round(sub.accuracy)}%` : sub ? "Đã nộp" : "Chưa nộp"}
               </span>
             </div>
           );
@@ -288,7 +288,10 @@ export function AssignmentPage() {
   }
 
   const urgency = getDeadlineUrgency(assignment.deadline);
-  const recordingTarget = assignment.pieceId ? `/library/${assignment.pieceId}?assignmentId=${assignment.id}` : null;
+  // Mở thẳng màn ghi âm của bản nhạc được giao, kèm assignmentId để bài nộp tính vào bài tập này
+  const recordingTarget = assignment.sheetMusicId
+    ? `/practice/sheets/${encodeURIComponent(assignment.sheetMusicId)}/record?assignmentId=${encodeURIComponent(assignment.id)}`
+    : null;
   const ensembleTarget = `/ensemble/new?pieceId=${assignment.pieceId}&assignmentId=${assignment.id}`;
 
   return (

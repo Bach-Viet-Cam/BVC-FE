@@ -10,7 +10,14 @@ vi.mock("@/features/classes/api/assignmentsApi", () => ({
       data: {
         data: [
           { id: "s1", name: "Bản chính", pieceId: "p1", pieceTitle: "Lý ngựa ô", kind: "SONG", defaultBpm: 96 },
-          { id: "s2", name: "Bản dễ", pieceId: "p2", pieceTitle: "Luyện ngón - Vê", kind: "FINGER_EXERCISE", defaultBpm: null },
+          {
+            id: "s2",
+            name: "Bản dễ",
+            pieceId: "p2",
+            pieceTitle: "Luyện ngón - Vê",
+            kind: "FINGER_EXERCISE",
+            defaultBpm: null,
+          },
         ],
       },
     }),
@@ -76,7 +83,14 @@ describe("AssignmentForm", () => {
     await fillRequired();
     await userEvent.click(screen.getByRole("button", { name: "Lưu nháp" }));
     expect(onSubmit).toHaveBeenLastCalledWith(
-      { classId: "c1", title: "Độc tấu Lý ngựa ô", description: null, kind: "SOLO", sheetMusicId: null, requiredBpm: null },
+      {
+        classId: "c1",
+        title: "Độc tấu Lý ngựa ô",
+        description: null,
+        kind: "SOLO",
+        sheetMusicId: null,
+        requiredBpm: null,
+      },
       false
     );
     await userEvent.type(screen.getByLabelText(/BPM yêu cầu/), "90");
@@ -134,7 +148,14 @@ describe("AssignmentForm", () => {
     renderForm({
       mode: "edit",
       initialValues: { ...EMPTY_ASSIGNMENT_FORM, classId: "c1", title: "A", kind: "SOLO", sheetMusicId: "old" },
-      currentSheetMusic: { id: "old", name: "Bản cũ", pieceId: "p9", pieceTitle: "Bài cũ", defaultBpm: null, isAvailable: false },
+      currentSheetMusic: {
+        id: "old",
+        name: "Bản cũ",
+        pieceId: "p9",
+        pieceTitle: "Bài cũ",
+        defaultBpm: null,
+        isAvailable: false,
+      },
     });
     await screen.findByRole("option", { name: "Lý ngựa ô — Bản chính" });
     expect(screen.getByRole("option", { name: "Bài cũ — Bản cũ (Không còn khả dụng)" })).toBeInTheDocument();

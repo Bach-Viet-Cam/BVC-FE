@@ -24,6 +24,8 @@ export interface PracticeContext {
     instrument: { id: string; name: string };
     level: { id: string; name: string };
     practice: { isAvailable: boolean; reason: string | null };
+    // Bản thu mẫu để nghe trước khi ghi; isFallback: bản nhạc không có bản thu riêng nên dùng của bản chính
+    referenceAudio: { url: string; isFallback: boolean } | null;
   };
   enrollment: "NO_CLASS" | "IN_CLASS";
   classRecord: { id: string; name: string } | null;
