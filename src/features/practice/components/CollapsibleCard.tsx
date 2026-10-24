@@ -13,7 +13,12 @@ interface CollapsibleCardProps {
 
 export function CollapsibleCard({ label, summary, open, onToggle, children, className }: CollapsibleCardProps) {
   return (
-    <section className={cn("shrink-0 rounded-[18px] border border-bvc-border bg-white md:rounded-[22px]", className)}>
+    <section
+      className={cn(
+        "flex shrink-0 flex-col rounded-[18px] border border-bvc-border bg-white md:rounded-[22px]",
+        className
+      )}
+    >
       <div className="flex min-h-11 items-center gap-2 pr-1.5 pl-3.5 md:min-h-14 md:pl-6">
         <span className="text-[11.5px] font-bold tracking-[0.12em] text-bvc-muted uppercase">{label}</span>
         <span className="flex-1" />
@@ -29,7 +34,10 @@ export function CollapsibleCard({ label, summary, open, onToggle, children, clas
         </button>
       </div>
 
-      {open && <div className="flex flex-col gap-[11px] px-3.5 pb-3.5 md:gap-4.5 md:px-6 md:pb-6">{children}</div>}
+      {/* flex-1: khi thẻ được kéo cao bằng thẻ bên cạnh, phần nội dung giãn theo */}
+      {open && (
+        <div className="flex flex-1 flex-col gap-[11px] px-3.5 pb-3.5 md:gap-4.5 md:px-6 md:pb-6">{children}</div>
+      )}
     </section>
   );
 }

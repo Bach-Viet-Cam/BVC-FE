@@ -15,10 +15,7 @@ import {
 } from "lucide-react";
 import { StudentShell } from "@/shared/components/bvc/StudentShell";
 import { useMyAssignments } from "@/features/classes/hooks/useMyAssignments";
-import {
-  ASSIGNMENT_TYPE_LABELS,
-  formatShortDeadline,
-} from "@/features/classes/utils/assignmentFormat";
+import { ASSIGNMENT_TYPE_LABELS, formatShortDeadline } from "@/features/classes/utils/assignmentFormat";
 import { type AssignmentListItem, type AssignmentType } from "@/features/classes/types/assignmentTypes";
 import { cn } from "@/shared/utils/cn";
 
@@ -72,7 +69,6 @@ export function MyAssignmentsPage() {
       OVERDUE: scoped.filter((item) => item.status === "OVERDUE").length,
     };
   }, [items, classFilter]);
-
 
   // Tabs gạch chân thanh lịch, loại bỏ hoàn toàn giao diện bong bóng pills
   const statusTabs = [
@@ -194,7 +190,9 @@ export function MyAssignmentsPage() {
                   aria-label="Xem dạng lưới"
                   className={cn(
                     "flex size-8.5 items-center justify-center rounded-lg transition-colors",
-                    viewMode === "grid" ? "bg-white text-bvc-ink shadow-2xs font-bold" : "text-bvc-muted hover:text-bvc-ink"
+                    viewMode === "grid"
+                      ? "bg-white text-bvc-ink shadow-2xs font-bold"
+                      : "text-bvc-muted hover:text-bvc-ink"
                   )}
                 >
                   <LayoutGrid size={15} />
@@ -205,7 +203,9 @@ export function MyAssignmentsPage() {
                   aria-label="Xem dạng danh sách"
                   className={cn(
                     "flex size-8.5 items-center justify-center rounded-lg transition-colors",
-                    viewMode === "list" ? "bg-white text-bvc-ink shadow-2xs font-bold" : "text-bvc-muted hover:text-bvc-ink"
+                    viewMode === "list"
+                      ? "bg-white text-bvc-ink shadow-2xs font-bold"
+                      : "text-bvc-muted hover:text-bvc-ink"
                   )}
                 >
                   <ListIcon size={15} />
@@ -237,9 +237,7 @@ export function MyAssignmentsPage() {
                   >
                     {tab.count}
                   </span>
-                  {isActive && (
-                    <span className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full bg-bvc-accent" />
-                  )}
+                  {isActive && <span className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full bg-bvc-accent" />}
                 </button>
               );
             })}
@@ -265,7 +263,9 @@ export function MyAssignmentsPage() {
             <div className="flex flex-col items-center justify-center rounded-3xl border border-bvc-border bg-white py-20 text-center shadow-2xs">
               <BookOpen size={40} className="text-bvc-faint mb-3" strokeWidth={1.5} />
               <p className="font-bvc-display text-[18px] font-bold text-bvc-ink">Bạn chưa có bài tập nào</p>
-              <p className="mt-1 text-[13px] text-bvc-muted">Các bài luyện ngón, tiết tấu và thu âm giảng viên giao sẽ hiện ở đây.</p>
+              <p className="mt-1 text-[13px] text-bvc-muted">
+                Các bài luyện ngón, tiết tấu và thu âm giảng viên giao sẽ hiện ở đây.
+              </p>
             </div>
           )}
 
@@ -344,7 +344,12 @@ function AssignmentCard({ assignment, onSelect }: AssignmentCardProps) {
         <div className="flex items-center justify-between gap-2 text-[12px]">
           {/* Eyebrow: Lớp & Loại bài */}
           <div className="flex items-center gap-1.5 text-bvc-muted">
-            <AssignmentTypeIcon type={assignment.type} size={13} className="text-bvc-accent shrink-0" strokeWidth={2.2} />
+            <AssignmentTypeIcon
+              type={assignment.type}
+              size={13}
+              className="text-bvc-accent shrink-0"
+              strokeWidth={2.2}
+            />
             <span className="font-semibold text-bvc-ink/90">{assignment.className}</span>
             <span className="text-bvc-line">·</span>
             <span>{ASSIGNMENT_TYPE_LABELS[assignment.type] || "Bài tập"}</span>
@@ -413,12 +418,7 @@ function AssignmentCard({ assignment, onSelect }: AssignmentCardProps) {
       {/* Chân thẻ: Hạn nộp & Tương tác */}
       <div className="mt-4 border-t border-bvc-line/70 pt-3">
         <div className="flex items-center justify-between text-[12px]">
-          <span
-            className={cn(
-              "font-medium",
-              isOverdue ? "font-semibold text-bvc-error" : "text-bvc-muted"
-            )}
-          >
+          <span className={cn("font-medium", isOverdue ? "font-semibold text-bvc-error" : "text-bvc-muted")}>
             Hạn: {formatShortDeadline(assignment.deadline)}
           </span>
 
@@ -509,7 +509,10 @@ function AssignmentListItemRow({ assignment, onSelect }: AssignmentListItemRowPr
           )}
         </div>
 
-        <ArrowRight size={14} className="text-bvc-muted opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block" />
+        <ArrowRight
+          size={14}
+          className="text-bvc-muted opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block"
+        />
       </div>
     </button>
   );

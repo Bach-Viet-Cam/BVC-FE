@@ -10,11 +10,14 @@ function hzToNearestMidi(hz: number): number {
   return Math.round(69 + 12 * Math.log2(hz / 440));
 }
 
-// TODO(BE): thay bằng dữ liệu assignment + file phân tích (GBR-10, GBR-47, GBR-48) khi BE có API
-// TODO(BE): TempoCard còn đọc PRACTICE_DEFAULTS.targetBpm; chuyển sang session.targetBpm khi BE trả dữ liệu thật
-export function buildDemoSession(noPitch: boolean): PracticeSessionConfig {
+// targetBpm lấy từ GET /practice/target-bpm (BPM bài tập của lớp hoặc mặc định 60).
+// TODO(BE): độ dài bài và nốt kỳ vọng vẫn là dữ liệu mô phỏng (GBR-10, GBR-47, GBR-48)
+export function buildDemoSession(
+  noPitch: boolean,
+  targetBpm: number = PRACTICE_DEFAULTS.targetBpm
+): PracticeSessionConfig {
   return {
-    targetBpm: PRACTICE_DEFAULTS.targetBpm,
+    targetBpm,
     beatsPerBar: 4,
     pieceLenSec: PRACTICE_DEFAULTS.pieceLen,
     hasPitch: !noPitch,

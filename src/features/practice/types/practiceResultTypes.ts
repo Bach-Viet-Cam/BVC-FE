@@ -67,14 +67,23 @@ export interface ResultHistory {
   attempts: ResultAttempt[];
 }
 
+// hasEnoughPeers = false: lớp chưa đủ minPeers bạn có kết quả nên chỉ có điểm của mình, chưa xếp hạng (GBR-53)
 export interface ClassRank {
   className: string;
   peerCount: number;
+  minPeers: number;
+  hasEnoughPeers: boolean;
   myScore: number;
+  classAverage: number | null;
+  betterThanPercent: number | null;
+  topPercent: number | null;
+  distribution: { score: number; count: number }[];
+}
+
+export interface RankedClassRank extends ClassRank {
   classAverage: number;
   betterThanPercent: number;
   topPercent: number;
-  distribution: { score: number; count: number }[];
 }
 
 // [giây theo bản mẫu, Hz bản mẫu, Hz bản thu]; null = khoảng lặng

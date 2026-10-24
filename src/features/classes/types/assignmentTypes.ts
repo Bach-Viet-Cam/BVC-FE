@@ -31,6 +31,8 @@ export interface AssignmentDetail extends AssignmentListItem {
   description: string;
   weekNo: number | null;
   targetBpm: number | null;
+  // Bản nhạc được giao; nút "Thu âm / Tải bản thu" mở thẳng màn ghi âm của bản này
+  sheetMusicId: string | null;
   pieceId: string | null;
   pieceTitle: string | null;
   rubric: { name: string; weight: number }[];

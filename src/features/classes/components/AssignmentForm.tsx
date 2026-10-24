@@ -5,7 +5,10 @@ import { FooterActions } from "@/features/classes/components/FooterActions";
 import { FormField, INPUT_CLASSES } from "@/features/classes/components/FormField";
 import { useClassSheetMusic } from "@/features/classes/hooks/useClassSheetMusic";
 import { type ApiFieldError } from "@/features/classes/types/classTypes";
-import { type AssignmentContentPayload, type AssignmentSheetMusic } from "@/features/classes/types/teacherAssignmentTypes";
+import {
+  type AssignmentContentPayload,
+  type AssignmentSheetMusic,
+} from "@/features/classes/types/teacherAssignmentTypes";
 import { ASSIGNMENT_KIND_LABELS, sheetMusicLabel } from "@/features/classes/utils/teacherAssignmentFormat";
 import { applyFieldErrors } from "@/features/classes/utils/mapApiErrors";
 import {
@@ -57,7 +60,9 @@ export function AssignmentForm({
   const description = useWatch({ control, name: "description" }) ?? "";
   const { sheets } = useClassSheetMusic(classId);
   const selectedSheet = sheets.find((sheet) => sheet.id === sheetMusicId);
-  const isCurrentSheetMissing = Boolean(currentSheetMusic && !sheets.some((sheet) => sheet.id === currentSheetMusic.id));
+  const isCurrentSheetMissing = Boolean(
+    currentSheetMusic && !sheets.some((sheet) => sheet.id === currentSheetMusic.id)
+  );
   const sheetMusicField = register("sheetMusicId");
   const className = classes.find((item) => item.id === classId)?.name ?? "";
 

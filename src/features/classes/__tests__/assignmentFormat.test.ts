@@ -48,9 +48,8 @@ describe("assignmentFormat", () => {
   });
 
   it("handles student assignment type labels and deadline urgency", async () => {
-    const { ASSIGNMENT_TYPE_LABELS, getDeadlineUrgency, describeTimeLeft } = await import(
-      "@/features/classes/utils/assignmentFormat"
-    );
+    const { ASSIGNMENT_TYPE_LABELS, getDeadlineUrgency, describeTimeLeft } =
+      await import("@/features/classes/utils/assignmentFormat");
     expect(ASSIGNMENT_TYPE_LABELS.PRACTICE).toBe("Luyện ngón");
     expect(ASSIGNMENT_TYPE_LABELS.RHYTHM).toBe("Luyện rhythm");
     expect(ASSIGNMENT_TYPE_LABELS.RECORDING).toBe("Thu âm");

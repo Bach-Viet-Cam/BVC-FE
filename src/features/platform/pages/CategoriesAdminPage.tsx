@@ -51,7 +51,6 @@ export function CategoriesAdminPage() {
     setIsTunesDialogOpen(true);
   };
 
-
   const toggleExpand = (id: string) => {
     setExpandedIds((prev) => ({
       ...prev,

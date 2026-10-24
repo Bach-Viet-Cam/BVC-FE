@@ -1,12 +1,14 @@
 import { ChevronRight } from "lucide-react";
 import { CollapsibleCard } from "@/features/practice/components/CollapsibleCard";
 import { NoticeBanner } from "@/features/practice/components/NoticeBanner";
-import { COUNT_IN_BEATS, MSG, PRACTICE_DEFAULTS } from "@/features/practice/constants/practiceConstants";
+import { COUNT_IN_BEATS, MSG } from "@/features/practice/constants/practiceConstants";
 import { cn } from "@/shared/utils/cn";
 
 interface TempoCardProps {
   open: boolean;
   onToggle: () => void;
+  // Tốc độ mục tiêu: BPM bài tập của lớp hoặc mặc định 60
+  targetBpm: number;
   liveBpm: number | null;
   bpmHint: string;
   hintTone: "ok" | "warn" | "idle";
@@ -27,6 +29,7 @@ const TONE_CLASS = {
 export function TempoCard({
   open,
   onToggle,
+  targetBpm,
   liveBpm,
   bpmHint,
   hintTone,
@@ -40,9 +43,10 @@ export function TempoCard({
   return (
     <CollapsibleCard
       label="Nhịp"
+      className="md:h-full"
       open={open}
       onToggle={onToggle}
-      summary={<span className="text-xs text-bvc-muted">4/4 · {PRACTICE_DEFAULTS.targetBpm} BPM</span>}
+      summary={<span className="text-xs text-bvc-muted">4/4 · {targetBpm} BPM</span>}
     >
       <button
         type="button"
@@ -57,9 +61,7 @@ export function TempoCard({
         <span className="flex min-w-[92px] flex-col gap-0.5">
           <span className="text-[11px] font-bold tracking-[0.1em] text-bvc-faint uppercase">Mục tiêu</span>
           <span className="flex items-baseline gap-[5px]">
-            <span className="text-[30px] leading-[1.1] font-semibold text-bvc-ink md:text-[72px]">
-              {PRACTICE_DEFAULTS.targetBpm}
-            </span>
+            <span className="text-[30px] leading-[1.1] font-semibold text-bvc-ink md:text-[72px]">{targetBpm}</span>
             <span className="text-xs text-bvc-muted">BPM</span>
           </span>
         </span>
