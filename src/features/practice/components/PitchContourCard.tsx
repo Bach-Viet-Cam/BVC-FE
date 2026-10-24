@@ -289,27 +289,31 @@ function PitchContourPlot({ chart, width, mode }: { chart: PitchChart; width: nu
   const xAt = (seconds: number) => frame.xStart + ((seconds - view.t0) / (view.t1 - view.t0)) * plotWidth;
   const secondsAt = (x: number) => view.t0 + ((x - frame.xStart) / plotWidth) * (view.t1 - view.t0);
   const yAtMidi = (midi: number) => PITCH_BOTTOM - ((midi - view.m0) / (view.m1 - view.m0)) * plotHeight;
-  const midiAt = (y: number) => view.m0 + ((PITCH_BOTTOM - y) / plotHeight) * (view.m1 - view.m0);
   const yAt = (hz: number) => yAtMidi(hzToMidiFloat(hz));
 
   // Ctrl + cuộn (hoặc chụm touchpad) phóng quanh con trỏ; cuộn thường vẫn cuộn trang
-  const wheelZoom = useRef<(event: WheelEvent) => void>(() => undefined);
-  wheelZoom.current = (event: WheelEvent) => {
-    if (!event.ctrlKey && !event.metaKey) return;
-    event.preventDefault();
-    const box = (event.currentTarget as SVGSVGElement).getBoundingClientRect();
-    const x = ((event.clientX - box.left) / box.width) * width;
-    const y = event.clientY - box.top;
-    const anchor = { seconds: secondsAt(x), midi: midiAt(Math.min(PITCH_BOTTOM, Math.max(PITCH_TOP, y))) };
-    setView((current) => zoomView(current, Math.exp(-event.deltaY * WHEEL_ZOOM_PER_PIXEL), anchor, bounds));
-  };
+  // Điểm neo tính từ khung đang xem ngay trong hàm cập nhật state, nên listener không cần đọc giá trị của lần render
   useEffect(() => {
     const svg = pointerProps.ref.current;
     if (!svg) return;
-    const listener = (event: WheelEvent) => wheelZoom.current(event);
+    const listener = (event: WheelEvent) => {
+      if (!event.ctrlKey && !event.metaKey) return;
+      event.preventDefault();
+      const box = svg.getBoundingClientRect();
+      const x = ((event.clientX - box.left) / box.width) * width;
+      const y = Math.min(PITCH_BOTTOM, Math.max(PITCH_TOP, event.clientY - box.top));
+      const plotSpan = width - RIGHT - LEFT;
+      setView((current) => {
+        const anchor = {
+          seconds: current.t0 + ((x - LEFT) / plotSpan) * (current.t1 - current.t0),
+          midi: current.m0 + ((PITCH_BOTTOM - y) / (PITCH_BOTTOM - PITCH_TOP)) * (current.m1 - current.m0),
+        };
+        return zoomView(current, Math.exp(-event.deltaY * WHEEL_ZOOM_PER_PIXEL), anchor, bounds);
+      });
+    };
     svg.addEventListener("wheel", listener, { passive: false });
     return () => svg.removeEventListener("wheel", listener);
-  }, [pointerProps.ref]);
+  }, [pointerProps.ref, width, bounds]);
 
   const zoomCenter = (factor: number) =>
     setView((current) =>
