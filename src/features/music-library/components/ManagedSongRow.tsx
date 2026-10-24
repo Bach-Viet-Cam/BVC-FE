@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { Chip } from "@/shared/components/bvc/Chip";
 import { actionButtonClass } from "@/shared/components/bvc/actionButtonStyles";
 import { formatDate } from "@/shared/utils/formatDate";
 import { CoverArt } from "@/features/music-library/components/CoverArt";
@@ -15,12 +14,14 @@ interface ManagedSongRowProps {
 }
 
 export const MANAGED_GRID_COLUMNS =
-  "xl:grid xl:grid-cols-[56px_minmax(0,1.6fr)_minmax(0,1.3fr)_120px_80px_150px_80px_200px] xl:items-center xl:gap-4";
+  "xl:grid xl:grid-cols-[56px_minmax(0,1.6fr)_minmax(0,1.3fr)_80px_150px_80px_250px] xl:items-center xl:gap-4";
 
 export function ManagedSongRow({ song, isUpdating, onRequestVisibility }: ManagedSongRowProps) {
   const instrumentNames = song.instruments.map((instrument) => instrument.name).join(", ");
   const editHref = `/songs/${song.id}/edit`;
   const sheetsHref = `/songs/${song.id}/sheets`;
+  // Thư viện chỉ mở bài đang công khai, bài ẩn thì sinh viên (và cả trang xem) chưa thấy được
+  const isViewable = song.effectiveVisibility === "PUBLIC";
 
   return (
     <li className={`flex flex-col gap-3 border-t border-bvc-border px-3.5 py-4 xl:py-2.5 ${MANAGED_GRID_COLUMNS}`}>
@@ -41,9 +42,6 @@ export function ManagedSongRow({ song, isUpdating, onRequestVisibility }: Manage
       </div>
 
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 xl:contents">
-        <span>
-          <Chip>{song.level.name}</Chip>
-        </span>
         <span className="font-bvc-mono text-[13px] text-bvc-ink">
           {song.sheetMusicCount}
           <span className="font-bvc-sans text-bvc-muted xl:hidden"> bản</span>
@@ -63,6 +61,15 @@ export function ManagedSongRow({ song, isUpdating, onRequestVisibility }: Manage
           <Link to={sheetsHref} className={actionButtonClass("secondary", "sm", "hover:text-bvc-ink")}>
             Bản nhạc
           </Link>
+          {isViewable && (
+            <Link
+              to={`/library/${song.id}`}
+              title="Xem chi tiết bài hát như sinh viên"
+              className={actionButtonClass("ghost", "sm", "hover:text-bvc-accent-text")}
+            >
+              Xem
+            </Link>
+          )}
         </span>
       </div>
 

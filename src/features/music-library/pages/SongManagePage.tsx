@@ -30,7 +30,7 @@ const VISIBILITY_OPTIONS = (Object.keys(VISIBILITY_LABELS) as Visibility[]).map(
   label: VISIBILITY_LABELS[value],
 }));
 
-const COLUMN_HEADERS = ["", "Tiêu đề", "Nhạc cụ", "Trình độ", "Bản nhạc", "Hiển thị", "Cập nhật", ""];
+const COLUMN_HEADERS = ["", "Tiêu đề", "Nhạc cụ", "Bản nhạc", "Hiển thị", "Cập nhật", ""];
 
 export function SongManagePage() {
   const { options } = useMusicCategories("lecturer");
@@ -98,7 +98,7 @@ export function SongManagePage() {
             onChange={(instrumentId) => songs.updateQuery({ instrumentId })}
           />
           <FilterPill
-            label="Trình độ"
+            label="Trình độ bản nhạc"
             value={query.levelId}
             options={options.levels}
             onChange={(levelId) => songs.updateQuery({ levelId })}

@@ -1,5 +1,7 @@
+import { Link } from "react-router-dom";
 import { AudioLines, FileText, Video } from "lucide-react";
 import { ActionButton } from "@/shared/components/bvc/ActionButton";
+import { actionButtonClass } from "@/shared/components/bvc/actionButtonStyles";
 import { cn } from "@/shared/utils/cn";
 import { AssetRow } from "@/features/music-library/components/AssetRow";
 import { SheetBadges } from "@/features/music-library/components/SheetBadges";
@@ -12,6 +14,8 @@ interface ManagedSheetItemProps {
   sheet: LecturerSheetMusic;
   isSelected: boolean;
   isBusy: boolean;
+  // Có khi bài hát và bản nhạc đều đang công khai, mở trang xem bản nhạc như sinh viên
+  previewHref?: string;
   onEdit: (sheet: LecturerSheetMusic) => void;
   onReplaceFile: (sheet: LecturerSheetMusic, slot: SheetFileSlot, file: File) => void;
   onRequestVisibility: (sheet: LecturerSheetMusic, nextVisible: boolean) => void;
@@ -35,6 +39,7 @@ export function ManagedSheetItem({
   sheet,
   isSelected,
   isBusy,
+  previewHref,
   onEdit,
   onReplaceFile,
   onRequestVisibility,
@@ -64,6 +69,15 @@ export function ManagedSheetItem({
             disabled={isBusy || !sheet.canChangeVisibility || cannotPublish}
             onRequestChange={(nextVisible) => onRequestVisibility(sheet, nextVisible)}
           />
+          {previewHref && (
+            <Link
+              to={previewHref}
+              title="Xem bản nhạc như sinh viên"
+              className={actionButtonClass("ghost", "sm", "hover:text-bvc-accent-text")}
+            >
+              Xem
+            </Link>
+          )}
           {sheet.canManage ? (
             <ActionButton variant="secondary" size="sm" onClick={() => onEdit(sheet)} disabled={isBusy}>
               Sửa

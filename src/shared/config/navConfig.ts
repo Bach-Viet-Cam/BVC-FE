@@ -9,6 +9,7 @@ import {
   FolderTree,
   GraduationCap,
   LayoutDashboard,
+  LibraryBig,
   Megaphone,
   Music2,
   Route,
@@ -38,6 +39,8 @@ export const TEACHER_NAV: NavItem[] = [
   { label: "Duyệt bài nộp", to: "/teacher/review", icon: ClipboardCheck },
   { label: "Đánh giá sinh viên", to: "/teacher/student-review", icon: UserCheck },
   { label: "Thư viện bài hát", to: "/songs", icon: Music2 },
+  // Thư viện công khai, xem bài hát và bản nhạc giống sinh viên
+  { label: "Thư viện công khai", to: "/library", icon: LibraryBig },
   { label: "Phân loại nội dung", to: "/categories", icon: FolderTree },
   { label: "Nội dung đã xác minh", to: "/community/verified", icon: BadgeCheck },
   { label: "Bảng xếp hạng", to: "/leaderboard", icon: Trophy },

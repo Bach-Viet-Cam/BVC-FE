@@ -15,6 +15,7 @@ export interface EnsembleTracksResult {
   myInstrumentId: string;
   myInstrumentName: string;
   mySheetMusicId: string | null;
+  isAssignmentCounted: boolean;
   tracks: EnsembleTrack[];
 }
 

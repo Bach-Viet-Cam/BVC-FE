@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { ChevronLeft, Plus, Users } from "lucide-react";
-import { StudentShell } from "@/shared/components/bvc/StudentShell";
 import { Chip } from "@/shared/components/bvc/Chip";
 import { EmptyState } from "@/shared/components/bvc/EmptyState";
 import { PillTabs } from "@/shared/components/bvc/PillTabs";
@@ -10,6 +9,7 @@ import { useViewerRole } from "@/shared/hooks/useViewerRole";
 import { CoverArt } from "@/features/music-library/components/CoverArt";
 import { FeaturedSheetCard } from "@/features/music-library/components/FeaturedSheetCard";
 import { GuestSaveDialog } from "@/features/music-library/components/GuestSaveDialog";
+import { LibraryShell } from "@/features/music-library/components/LibraryShell";
 import { SaveToggleButton } from "@/features/music-library/components/SaveToggleButton";
 import { SheetVersionList } from "@/features/music-library/components/SheetVersionList";
 import { useSaveToggle } from "@/features/music-library/hooks/useSaveToggle";
@@ -43,15 +43,15 @@ export function SongDetailPage() {
 
   if (isLoading) {
     return (
-      <StudentShell>
+      <LibraryShell>
         <DetailSkeleton />
-      </StudentShell>
+      </LibraryShell>
     );
   }
 
   if (error || !song) {
     return (
-      <StudentShell>
+      <LibraryShell>
         <div className="px-[18px] py-10 md:px-14">
           <EmptyState
             title="Không mở được bài hát"
@@ -63,7 +63,7 @@ export function SongDetailPage() {
             }
           />
         </div>
-      </StudentShell>
+      </LibraryShell>
     );
   }
 
@@ -74,7 +74,7 @@ export function SongDetailPage() {
   const others = activeGroup?.sheets.slice(1) ?? [];
 
   return (
-    <StudentShell>
+    <LibraryShell>
       <section className="flex shrink-0 flex-col gap-[18px] bg-bvc-surface px-[18px] pt-5 pb-7 md:px-14 md:pt-[22px] md:pb-[30px]">
         <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[13.5px] text-bvc-muted">
           <Link to="/library" className="flex items-center gap-1 text-bvc-muted hover:text-bvc-ink">
@@ -124,9 +124,6 @@ export function SongDetailPage() {
                   {instrument.name}
                 </Chip>
               ))}
-              <Chip to={libraryFilterHref({ levelId: song.level.id })} title={`Lọc theo ${song.level.name}`}>
-                {song.level.name}
-              </Chip>
             </div>
             <div className="mt-1 flex flex-wrap items-center gap-2.5">
               {save.canSave && (
@@ -218,6 +215,6 @@ export function SongDetailPage() {
       </section>
 
       <GuestSaveDialog open={save.isGuestPromptOpen} onOpenChange={save.setGuestPromptOpen} />
-    </StudentShell>
+    </LibraryShell>
   );
 }

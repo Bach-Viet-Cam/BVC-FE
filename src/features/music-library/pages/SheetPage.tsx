@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Mic, Minus, Plus } from "lucide-react";
-import { StudentShell } from "@/shared/components/bvc/StudentShell";
 import { EmptyState } from "@/shared/components/bvc/EmptyState";
 import { PillTabs } from "@/shared/components/bvc/PillTabs";
 import { StepperControl } from "@/shared/components/bvc/StepperControl";
@@ -10,6 +9,7 @@ import { useViewerRole } from "@/shared/hooks/useViewerRole";
 import { cn } from "@/shared/utils/cn";
 import { CoverArt } from "@/features/music-library/components/CoverArt";
 import { GuestSaveDialog } from "@/features/music-library/components/GuestSaveDialog";
+import { LibraryShell } from "@/features/music-library/components/LibraryShell";
 import { ReferencePlayer } from "@/features/music-library/components/ReferencePlayer";
 import { SaveToggleButton } from "@/features/music-library/components/SaveToggleButton";
 import { SheetCanvas } from "@/features/music-library/components/SheetCanvas";
@@ -38,15 +38,15 @@ export function SheetPage() {
 
   if (isLoading) {
     return (
-      <StudentShell>
+      <LibraryShell>
         <div aria-hidden className="m-[18px] flex-1 animate-pulse rounded-bvc-xl bg-bvc-surface md:mx-14 md:my-6" />
-      </StudentShell>
+      </LibraryShell>
     );
   }
 
   if (error || !viewer) {
     return (
-      <StudentShell>
+      <LibraryShell>
         <div className="px-[18px] py-10 md:px-14">
           <EmptyState
             title="Không mở được bản nhạc"
@@ -58,7 +58,7 @@ export function SheetPage() {
             }
           />
         </div>
-      </StudentShell>
+      </LibraryShell>
     );
   }
 
@@ -78,7 +78,7 @@ export function SheetPage() {
   const practiceIcon = <Mic className="size-[18px]" strokeWidth={1.8} aria-hidden />;
 
   return (
-    <StudentShell className="lg:flex-row lg:overflow-hidden">
+    <LibraryShell className="lg:flex-row lg:overflow-hidden">
       <section
         aria-label="Bản nhạc"
         className="flex min-w-0 flex-1 flex-col gap-3.5 px-[18px] pt-4 pb-4 md:px-8 md:pl-14 lg:pb-6"
@@ -125,6 +125,19 @@ export function SheetPage() {
               <Link to={practicePath} className={practiceClass}>
                 {practiceIcon}
                 Luyện tập
+              </Link>
+            )}
+
+            {role === "teacher" && (
+              <Link
+                to={`/songs/${song.id}/sheets`}
+                className={actionButtonClass(
+                  "secondary",
+                  "md",
+                  cn(headerButtonSize, "flex-1 hover:text-bvc-ink sm:flex-none")
+                )}
+              >
+                Quản lý bản nhạc
               </Link>
             )}
 
@@ -234,6 +247,6 @@ export function SheetPage() {
         description={LIBRARY_MESSAGES.guestPracticeBody}
         redirectTo={practicePath}
       />
-    </StudentShell>
+    </LibraryShell>
   );
 }

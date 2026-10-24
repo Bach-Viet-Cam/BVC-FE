@@ -105,11 +105,16 @@ export function EnsemblePage() {
   const submitBlockedReason = !practice.tracksResult?.mySheetMusicId
     ? "Nhạc cụ của bạn chưa có bản mẫu cho bài này nên chưa nộp để chấm được. Bạn vẫn có thể luyện và nghe lại."
     : null;
-  const quotaNote = assignment && !assignment.canSubmit
-    ? "Bài tập đã đóng hoặc hết lượt nộp — bản thu sẽ chỉ lưu làm bài luyện tập."
-    : assignment
-      ? `Đã dùng ${assignment.usedSubmissions}/${assignment.maxSubmissions} lượt nộp.`
-      : null;
+  const isCounted = practice.tracksResult?.isAssignmentCounted ?? false;
+  const quotaNote = !assignmentId
+    ? "Buổi luyện tập tự do: bản thu được phân tích nhưng không tính vào bài tập nào."
+    : !isCounted
+      ? "Bài tập này không phải bài Hòa tấu (hoặc đã đóng) nên bản thu chỉ lưu làm bài luyện tập."
+      : assignment && !assignment.canSubmit
+        ? "Bài tập đã hết lượt nộp — bản thu sẽ chỉ lưu làm bài luyện tập."
+        : assignment
+          ? `Đã dùng ${assignment.usedSubmissions}/${assignment.maxSubmissions} lượt nộp.`
+          : null;
 
   useEffect(() => {
     if (!isBusy && !hasUnsavedTake) return;
@@ -181,7 +186,7 @@ export function EnsemblePage() {
       <EnsembleHeader
         title={tracksResult.pieceTitle}
         subtitle={subtitle}
-        deadline={assignment ? formatDate(assignment.deadline) : null}
+        deadline={isCounted && assignment ? formatDate(assignment.deadline) : null}
         onClose={leave}
       />
 
@@ -225,6 +230,7 @@ export function EnsemblePage() {
               backLabel={assignmentId ? "Về bài tập" : "Về danh sách bài tập"}
               uploadPercent={practice.uploadPercent}
               submitBlockedReason={submitBlockedReason}
+              submitLabel={!isCounted ? "Gửi phân tích" : undefined}
             />
 
             {quotaNote && (status === "ready" || status === "preview") && (

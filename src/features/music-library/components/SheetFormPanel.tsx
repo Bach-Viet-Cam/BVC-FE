@@ -91,7 +91,7 @@ export function SheetFormPanel({
       name: editing?.name ?? "",
       description: editing?.description ?? "",
       instrumentId: initialInstrumentId,
-      levelId: editing?.level.id ?? song.level.id,
+      levelId: editing?.level.id ?? "",
       isMain: editing?.isMain ?? mainRuleFor(initialInstrumentId, sheets).canBeMain,
       visibility: editing?.visibility ?? "HIDDEN",
       sheetFile: null,

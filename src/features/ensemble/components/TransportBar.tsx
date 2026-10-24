@@ -48,6 +48,7 @@ interface TransportBarProps {
   backLabel: string;
   uploadPercent: number;
   submitBlockedReason: string | null;
+  submitLabel?: string;
 }
 
 export function TransportBar(props: TransportBarProps) {
@@ -234,7 +235,7 @@ export function TransportBar(props: TransportBarProps) {
                 className="flex h-11 cursor-pointer items-center justify-center gap-2 rounded-xl bg-bvc-ink text-[13.5px] font-bold text-white shadow-md transition-all hover:bg-emerald-950 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <Sparkles size={16} strokeWidth={2} />
-                <span>Nộp bản thu (S)</span>
+                <span>{props.submitLabel ?? "Nộp bản thu"} (S)</span>
               </button>
             </div>
             {props.submitBlockedReason !== null && (

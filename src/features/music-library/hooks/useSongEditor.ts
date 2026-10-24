@@ -16,7 +16,6 @@ const FIELD_MAP: Partial<Record<string, keyof SongFormValues>> = {
   composer: "composer",
   description: "description",
   genreId: "genreId",
-  levelId: "levelId",
   visibility: "visibility",
   coverFileId: "coverFile",
 };
@@ -44,7 +43,6 @@ export function useSongEditor(songId?: string) {
         composer: values.composer || null,
         description: values.description || null,
         genreId: values.genreId,
-        levelId: values.levelId,
         // Admin đã ẩn thì không gửi để BE giữ nguyên (GBR-45)
         visibility: data?.canChangeVisibility === false ? undefined : values.visibility,
         coverFileId: cover ? cover.id : values.removeCover ? null : undefined,

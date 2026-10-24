@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { SearchX } from "lucide-react";
-import { StudentShell } from "@/shared/components/bvc/StudentShell";
 import { SearchField } from "@/shared/components/bvc/SearchField";
 import { Pagination } from "@/shared/components/bvc/Pagination";
 import { EmptyState } from "@/shared/components/bvc/EmptyState";
@@ -8,6 +7,7 @@ import { ActionButton } from "@/shared/components/bvc/ActionButton";
 import { useDebouncedCallback } from "@/shared/hooks/useDebouncedCallback";
 import { cn } from "@/shared/utils/cn";
 import { LibraryFilterBar } from "@/features/music-library/components/LibraryFilterBar";
+import { LibraryShell } from "@/features/music-library/components/LibraryShell";
 import { SongCard } from "@/features/music-library/components/SongCard";
 import { SongGridSkeleton } from "@/features/music-library/components/SongGridSkeleton";
 import { GuestSaveDialog } from "@/features/music-library/components/GuestSaveDialog";
@@ -16,7 +16,6 @@ import { useLibrarySongs } from "@/features/music-library/hooks/useLibrarySongs"
 import { useMusicCategories } from "@/features/music-library/hooks/useMusicCategories";
 import { useSaveToggle } from "@/features/music-library/hooks/useSaveToggle";
 import { KEYWORD_MAX_LENGTH, LIBRARY_MESSAGES } from "@/features/music-library/constants/musicLibraryConstants";
-import { libraryFilterHref } from "@/features/music-library/utils/libraryLinks";
 
 function describeNoResult(filterCount: number, hasKeyword: boolean) {
   const conditions = filterCount + (hasKeyword ? 1 : 0);
@@ -49,7 +48,7 @@ export function LibraryPage() {
   const songs = result?.data ?? [];
 
   return (
-    <StudentShell>
+    <LibraryShell>
       <div className="mx-auto flex w-full max-w-[1440px] flex-1 flex-col gap-4 px-[18px] pt-3.5 pb-6 md:gap-6 md:px-14 md:pt-8 md:pb-7">
         <div className="flex flex-col gap-1">
           <h1 className="text-[27px] leading-tight font-extrabold tracking-[-0.025em] text-bvc-ink md:text-[40px] md:tracking-[-0.03em]">
@@ -116,7 +115,6 @@ export function LibraryPage() {
               <SongCard
                 key={song.id}
                 song={{ ...song, isSaved: save.isSavedForViewer(song.isSaved) }}
-                levelFilterHref={libraryFilterHref({ levelId: song.level.id })}
                 showSave={save.canSave}
                 isSaving={save.isPending(song.id)}
                 onToggleSave={(target) =>
@@ -146,6 +144,6 @@ export function LibraryPage() {
       </div>
 
       <GuestSaveDialog open={save.isGuestPromptOpen} onOpenChange={save.setGuestPromptOpen} />
-    </StudentShell>
+    </LibraryShell>
   );
 }

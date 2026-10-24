@@ -39,7 +39,6 @@ export interface Song {
   // Danh sách thư viện chỉ có số nhạc cụ; trang chi tiết mới có tên từng nhạc cụ
   instruments: CategoryRef[];
   instrumentCount: number;
-  level: CategoryRef;
   coverUrl?: string;
   coverTone: CoverTone;
   visibility: Visibility;
@@ -160,7 +159,6 @@ export interface LibraryPieceCardDto {
   composer: string | null;
   coverUrl: string | null;
   genre: CategoryRef;
-  level: CategoryRef;
   instrumentCount: number;
   isSaved: boolean;
   createdAt: string;
@@ -208,7 +206,7 @@ export interface LibrarySheetViewerDto {
 
 export interface SavedPieceDto {
   savedAt: string;
-  piece: Pick<LibraryPieceCardDto, "id" | "title" | "composer" | "coverUrl" | "genre" | "level">;
+  piece: Pick<LibraryPieceCardDto, "id" | "title" | "composer" | "coverUrl" | "genre">;
 }
 
 export interface SavedSheetMusicDto {
