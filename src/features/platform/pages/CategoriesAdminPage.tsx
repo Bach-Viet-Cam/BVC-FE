@@ -162,37 +162,6 @@ export function CategoriesAdminPage() {
       />
 
       <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-6 md:px-8">
-        <div className="flex flex-wrap items-center justify-between gap-4 rounded-[16px] border border-bvc-border bg-white px-5 py-3">
-          <div className="flex flex-wrap items-center gap-6 text-[13px]">
-            <div className="flex items-center gap-2">
-              <span className="text-bvc-muted">Danh mục:</span>
-              <span className="font-mono font-bold text-bvc-ink">{totalRoots}</span>
-              <span className="text-[12px] text-bvc-muted">gốc</span>
-              <span className="text-bvc-faint">/</span>
-              <span className="font-mono font-bold text-bvc-ink">{totalChildren}</span>
-              <span className="text-[12px] text-bvc-muted">nhánh con</span>
-            </div>
-
-            <div className="h-3.5 w-px bg-bvc-border" />
-
-            <div className="flex items-center gap-2">
-              <span className="text-bvc-muted">Bài nhạc đã gán:</span>
-              <span className="font-mono font-bold text-bvc-ink">{totalPieces}</span>
-              <span className="text-[12px] text-bvc-muted">tác phẩm</span>
-            </div>
-
-            <div className="h-3.5 w-px bg-bvc-border" />
-
-            <div className="flex items-center gap-2">
-              <span className="text-bvc-muted">Nhạc cụ hệ thống:</span>
-              <span className="font-mono font-bold text-bvc-ink">{activeInstrumentsCount}</span>
-              <span className="text-[12px] text-bvc-muted">/ {instruments.items.length} đang kích hoạt</span>
-            </div>
-          </div>
-
-          <p className="text-[12px] text-bvc-muted">Cấu trúc phân loại 2 cấp phục vụ thư viện, tìm kiếm và bài tập</p>
-        </div>
-
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
           <div className="flex flex-col overflow-hidden rounded-[18px] border border-bvc-border bg-white lg:col-span-6">
             <div className="flex flex-col gap-3 border-b border-bvc-border p-4 sm:flex-row sm:items-center sm:justify-between">

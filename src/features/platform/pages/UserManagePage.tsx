@@ -22,7 +22,9 @@ import {
   ShieldCheck,
   Unlock,
   UserPlus,
+  Users,
   X,
+  type LucideIcon,
 } from "lucide-react";
 import { DesktopPageHeader } from "@/shared/components/bvc";
 import { Button } from "@/shared/components/ui/button";
@@ -46,11 +48,11 @@ import { formatDateTime } from "@/shared/utils/formatDate";
 import { getInitials } from "@/shared/utils/getInitials";
 import { cn } from "@/shared/utils/cn";
 
-const ROLE_TABS: { value?: number; label: string }[] = [
-  { value: undefined, label: "Tất cả vai trò" },
-  { value: ROLES.STUDENT, label: "Sinh viên" },
-  { value: ROLES.TEACHER, label: "Giảng viên" },
-  { value: ROLES.SYSTEM_ADMIN, label: "Quản trị viên" },
+const ROLE_TABS: { value?: number; label: string; icon: LucideIcon }[] = [
+  { value: undefined, label: "Tất cả vai trò", icon: Users },
+  { value: ROLES.STUDENT, label: "Sinh viên", icon: BookOpen },
+  { value: ROLES.TEACHER, label: "Giảng viên", icon: GraduationCap },
+  { value: ROLES.SYSTEM_ADMIN, label: "Quản trị viên", icon: ShieldCheck },
 ];
 
 const STATUS_LABELS: Record<UserStatus, string> = Object.fromEntries(
@@ -162,17 +164,19 @@ export function UserManagePage() {
             <div className="inline-flex flex-wrap items-center rounded-[12px] border border-bvc-border/80 bg-bvc-surface/60 p-1">
               {ROLE_TABS.map((tab) => {
                 const isActive = filters.role === tab.value;
+                const Icon = tab.icon;
                 return (
                   <button
                     key={tab.value ?? "all"}
                     type="button"
                     onClick={() => updateFilters({ role: tab.value })}
                     className={cn(
-                      "cursor-pointer rounded-[9px] px-3.5 py-1.5 text-[13px] font-semibold transition-all select-none",
+                      "flex cursor-pointer items-center gap-1.5 rounded-[9px] px-3.5 py-1.5 text-[13px] font-semibold transition-all select-none",
                       isActive ? "bg-white text-bvc-ink shadow-xs" : "text-bvc-muted hover:text-bvc-ink"
                     )}
                   >
-                    {tab.label}
+                    {Icon && <Icon size={14} className={isActive ? "text-bvc-ink" : "text-bvc-faint"} />}
+                    <span>{tab.label}</span>
                   </button>
                 );
               })}
@@ -266,7 +270,7 @@ export function UserManagePage() {
                         onClick={() => toggleSort("email")}
                         className="flex cursor-pointer items-center gap-1.5 text-left transition-colors hover:text-bvc-ink uppercase"
                       >
-                        <span>Email Google</span>
+                        <span>Email</span>
                         {filters.sortBy === "email" ? (
                           filters.sortDir === "asc" ? (
                             <ArrowUp size={13} className="text-bvc-ink" />
@@ -636,14 +640,6 @@ export function UserManagePage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5 rounded-[12px] border border-bvc-border bg-white p-3 text-[12.5px] text-bvc-muted shadow-none">
-            <Info size={16} className="shrink-0 text-bvc-muted" />
-            <span>
-              Tài khoản ở trạng thái <strong>“Chờ kích hoạt”</strong> sẽ tự động chuyển sang{" "}
-              <strong>“Hoạt động”</strong> ngay khi người dùng đăng nhập bằng Google lần đầu tiên qua đúng địa chỉ email
-              đã đăng ký.
-            </span>
-          </div>
         </div>
       </main>
 

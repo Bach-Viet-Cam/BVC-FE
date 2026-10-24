@@ -1,14 +1,15 @@
+import { type LucideIcon, FileText, Target, GraduationCap } from "lucide-react";
 import { type ConfigGroup, type InstrumentStatusFilter } from "@/features/platform/types/configTypes";
 
-export const CONFIG_GROUP_OPTIONS: { value: ConfigGroup; label: string }[] = [
-  { value: "FILE_LIMIT", label: "Giới hạn file" },
-  { value: "SCORING", label: "Chấm điểm" },
-  { value: "PRACTICE_RULE", label: "Quy tắc luyện tập" },
+export const CONFIG_GROUP_OPTIONS: { value: ConfigGroup; label: string; icon: LucideIcon }[] = [
+  { value: "FILE_LIMIT", label: "Giới hạn file", icon: FileText },
+  { value: "SCORING", label: "Ngưỡng chấm", icon: Target },
+  { value: "PRACTICE_RULE", label: "Quy tắc luyện tập", icon: GraduationCap },
 ];
 
 export const CONFIG_GROUP_LABELS: Record<ConfigGroup, string> = {
   FILE_LIMIT: "Giới hạn file",
-  SCORING: "Chấm điểm",
+  SCORING: "Ngưỡng chấm",
   PRACTICE_RULE: "Quy tắc luyện tập",
 };
 
