@@ -4,6 +4,7 @@ import {
   ArrowUp,
   ArrowUpDown,
   Info,
+  Layers,
   Music2,
   Pencil,
   Plus,
@@ -11,11 +12,14 @@ import {
   RotateCw,
   Search,
   Sliders,
+  SlidersHorizontal,
   X,
 } from "lucide-react";
 import { DesktopPageHeader } from "@/shared/components/bvc";
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@/shared/components/ui/tabs";
+import { cn } from "@/shared/utils/cn";
 import { InstrumentFormDialog } from "@/features/platform/components/InstrumentFormDialog";
+import { InstrumentTunesDialog } from "@/features/platform/components/InstrumentTunesDialog";
 import { formatConfigDate, parseSemesters, SEMESTERS_CONFIG_KEY } from "@/features/platform/utils/configValue";
 import { SettingFormDialog } from "@/features/platform/components/SettingFormDialog";
 import {
@@ -83,6 +87,8 @@ function InstrumentsTab() {
   const [searchText, setSearchText] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [formTarget, setFormTarget] = useState<InstrumentItem | null>(null);
+  const [isTunesDialogOpen, setIsTunesDialogOpen] = useState(false);
+  const [tunesTarget, setTunesTarget] = useState<InstrumentItem | null>(null);
   const appliedQuery = filters.q;
 
   useEffect(() => {
@@ -95,6 +101,11 @@ function InstrumentsTab() {
   const openForm = (instrument: InstrumentItem | null) => {
     setFormTarget(instrument);
     setIsFormOpen(true);
+  };
+
+  const openTunesDialog = (instrument: InstrumentItem) => {
+    setTunesTarget(instrument);
+    setIsTunesDialogOpen(true);
   };
 
   const toggleSort = (key: InstrumentSortKey) => {
@@ -188,10 +199,10 @@ function InstrumentsTab() {
 
       <div className="flex flex-col overflow-hidden rounded-[18px] border border-bvc-border bg-white shadow-none">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[860px] border-collapse text-left text-[13px]">
+          <table className="w-full min-w-[960px] border-collapse text-left text-[13px]">
             <thead>
               <tr className="border-b border-bvc-border bg-bvc-surface/50 text-[11.5px] font-bold uppercase tracking-[0.06em] text-bvc-muted">
-                <th className="px-5 py-3.5 w-[200px]">
+                <th className="px-5 py-3.5 w-[180px]">
                   <SortHeader
                     label="Mã nhạc cụ (Slug)"
                     isActive={filters.sortBy === "code"}
@@ -199,7 +210,7 @@ function InstrumentsTab() {
                     onClick={() => toggleSort("code")}
                   />
                 </th>
-                <th className="px-5 py-3.5 w-[240px]">
+                <th className="px-5 py-3.5 w-[200px]">
                   <SortHeader
                     label="Tên hiển thị"
                     isActive={filters.sortBy === "name"}
@@ -208,7 +219,8 @@ function InstrumentsTab() {
                   />
                 </th>
                 <th className="px-5 py-3.5">Mô tả</th>
-                <th className="px-5 py-3.5 w-[180px]">Trạng thái</th>
+                <th className="px-5 py-3.5 w-[160px]">Cấu hình dây</th>
+                <th className="px-5 py-3.5 w-[160px]">Trạng thái</th>
                 <th className="px-5 py-3.5 w-[160px] text-right">Thao tác</th>
               </tr>
             </thead>
@@ -216,7 +228,7 @@ function InstrumentsTab() {
             <tbody className="divide-y divide-bvc-line">
               {isLoading && (
                 <tr>
-                  <td colSpan={5} className="px-5 py-10 text-center text-[13.5px] text-bvc-muted">
+                  <td colSpan={6} className="px-5 py-10 text-center text-[13.5px] text-bvc-muted">
                     Đang tải dữ liệu nhạc cụ...
                   </td>
                 </tr>
@@ -224,7 +236,7 @@ function InstrumentsTab() {
 
               {!isLoading && error && (
                 <tr>
-                  <td colSpan={5} className="px-5 py-10 text-center text-[13.5px] text-bvc-error">
+                  <td colSpan={6} className="px-5 py-10 text-center text-[13.5px] text-bvc-error">
                     {error}
                   </td>
                 </tr>
@@ -232,7 +244,7 @@ function InstrumentsTab() {
 
               {!isLoading && !error && items.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-5 py-12 text-center">
+                  <td colSpan={6} className="px-5 py-12 text-center">
                     <p className="text-[14px] font-bold text-bvc-ink">Không tìm thấy nhạc cụ phù hợp</p>
                     <p className="mt-1 text-[12.5px] text-bvc-muted">
                       {hasActiveFilters
@@ -256,6 +268,17 @@ function InstrumentsTab() {
                     <td className="px-5 py-3.5 font-bold text-bvc-ink text-[13.5px]">{instrument.name}</td>
 
                     <td className="px-5 py-3.5 text-bvc-muted">{instrument.description || "-"}</td>
+
+                    <td className="px-5 py-3.5">
+                      <button
+                        type="button"
+                        onClick={() => openTunesDialog(instrument)}
+                        className="flex h-[32px] cursor-pointer items-center gap-1.5 rounded-[8px] border border-bvc-border bg-bvc-surface/60 px-3 text-[12.5px] font-semibold text-bvc-ink transition-all hover:border-bvc-ink hover:bg-white hover:shadow-2xs"
+                      >
+                        <SlidersHorizontal size={13} className="text-bvc-muted" />
+                        <span>Cấu hình dây</span>
+                      </button>
+                    </td>
 
                     <td className="px-5 py-3.5">
                       <span className="inline-flex items-center gap-2">
@@ -320,6 +343,13 @@ function InstrumentsTab() {
         onOpenChange={setIsFormOpen}
         onSubmit={(values) => saveInstrument(formTarget?.id ?? null, values)}
       />
+
+      <InstrumentTunesDialog
+        isOpen={isTunesDialogOpen}
+        instrument={tunesTarget}
+        onOpenChange={setIsTunesDialogOpen}
+        onSaved={reload}
+      />
     </div>
   );
 }
@@ -351,24 +381,29 @@ function SettingsTab() {
           <button
             type="button"
             onClick={() => updateFilters({ group: undefined })}
-            className={`cursor-pointer rounded-[9px] px-3.5 py-1.5 text-[13px] font-semibold transition-all select-none ${
+            className={cn(
+              "flex cursor-pointer items-center gap-1.5 rounded-[9px] px-3.5 py-1.5 text-[13px] font-semibold transition-all select-none",
               filters.group === undefined ? "bg-white text-bvc-ink shadow-xs" : "text-bvc-muted hover:text-bvc-ink"
-            }`}
+            )}
           >
-            Tất cả nhóm
+            <Layers size={14} className={filters.group === undefined ? "text-bvc-ink" : "text-bvc-faint"} />
+            <span>Tất cả nhóm</span>
           </button>
           {CONFIG_GROUP_OPTIONS.map((opt) => {
             const isActive = filters.group === opt.value;
+            const Icon = opt.icon;
             return (
               <button
                 key={opt.value}
                 type="button"
                 onClick={() => updateFilters({ group: opt.value })}
-                className={`cursor-pointer rounded-[9px] px-3.5 py-1.5 text-[13px] font-semibold transition-all select-none ${
+                className={cn(
+                  "flex cursor-pointer items-center gap-1.5 rounded-[9px] px-3.5 py-1.5 text-[13px] font-semibold transition-all select-none",
                   isActive ? "bg-white text-bvc-ink shadow-xs" : "text-bvc-muted hover:text-bvc-ink"
-                }`}
+                )}
               >
-                {opt.label}
+                {Icon && <Icon size={14} className={isActive ? "text-bvc-ink" : "text-bvc-faint"} />}
+                <span>{opt.label}</span>
               </button>
             );
           })}
@@ -581,7 +616,7 @@ function SettingsTab() {
         <div className="flex items-start gap-2.5 border-t border-bvc-border bg-bvc-surface/40 px-5 py-3 text-[12px] leading-relaxed text-bvc-muted">
           <Info size={15} className="mt-0.5 shrink-0 text-bvc-ink" />
           <p>
-            Các tham số chấm điểm (Accuracy tối thiểu, biên Nguy cơ) trực tiếp điều khiển thuật toán đánh giá ở module
+            Các tham số ngưỡng chấm (Accuracy tối thiểu, biên Nguy cơ) trực tiếp điều khiển thuật toán đánh giá ở module
             Thu âm và màn Theo dõi tiến độ sinh viên. Thay đổi tham số chỉ áp dụng cho các lượt thu âm hoặc tác vụ phát
             sinh sau thời điểm cập nhật.
           </p>
@@ -600,62 +635,89 @@ function SettingsTab() {
 export function SystemConfigPage() {
   const instruments = useInstruments();
   const configs = useSystemConfigs();
+  const [activeTab, setActiveTab] = useState<"settings" | "instruments">("settings");
+
+  const isSettingsActive = activeTab === "settings";
+  const isInstrumentsActive = activeTab === "instruments";
 
   return (
     <main className="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#FAF9F7]">
       <DesktopPageHeader breadcrumb="Quản trị" title="Cấu hình hệ thống" />
 
       <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-6 md:px-8">
-        <div className="flex flex-wrap items-center justify-between gap-4 rounded-[16px] border border-bvc-border bg-white px-5 py-3">
-          <div className="flex flex-wrap items-center gap-6 text-[13px]">
-            <div className="flex items-center gap-2">
-              <Sliders size={16} className="text-bvc-ink" />
-              <span className="text-bvc-muted">Tham số hệ thống:</span>
-              <span className="font-mono font-bold text-bvc-ink">{configs.items.length}</span>
-              <span className="text-[12px] text-bvc-muted">chỉ số</span>
-            </div>
-
-            <div className="h-3.5 w-px bg-bvc-border" />
-
-            <div className="flex items-center gap-2">
-              <Music2 size={16} className="text-bvc-ink" />
-              <span className="text-bvc-muted">Nhạc cụ chuẩn hóa:</span>
-              <span className="font-mono font-bold text-bvc-ink">{instruments.items.length}</span>
-              <span className="text-[12px] text-bvc-muted">loại</span>
-            </div>
-          </div>
-
-          <p className="text-[12px] text-bvc-muted">
-            Quản lý quy chuẩn kỹ thuật cho toàn bộ môi trường luyện tập và thư viện âm nhạc
-          </p>
-        </div>
-
-        <Tabs defaultValue="settings" className="flex flex-1 flex-col gap-4">
-          <div className="inline-flex self-start rounded-[12px] border border-bvc-border/80 bg-bvc-surface/60 p-1">
-            <TabsList className="bg-transparent p-0 gap-1">
+        <Tabs
+          value={activeTab}
+          onValueChange={(val) => setActiveTab(val as "settings" | "instruments")}
+          className="flex flex-1 flex-col gap-4"
+        >
+          <div className="inline-flex self-start rounded-[16px] border border-bvc-border bg-white/95 p-1.5 shadow-2xs backdrop-blur-md">
+            <TabsList className="bg-transparent p-0 gap-1.5">
               <TabsTab
                 value="settings"
-                className="cursor-pointer rounded-[9px] px-4 py-2 text-[13.5px] font-semibold text-bvc-muted transition-all data-[selected]:bg-white data-[selected]:text-bvc-ink data-[selected]:shadow-xs"
+                className={cn(
+                  "group relative flex cursor-pointer items-center gap-2.5 rounded-[12px] px-4 py-2.5 text-[13.5px] transition-all duration-150 select-none",
+                  "hover:bg-bvc-surface/80 hover:text-bvc-ink",
+                  "data-selected:bg-bvc-ink data-selected:text-white data-selected:shadow-sm data-selected:ring-1 data-selected:ring-black/5",
+                  isSettingsActive
+                    ? "bg-bvc-ink font-bold text-white shadow-sm ring-1 ring-black/5"
+                    : "font-semibold text-bvc-muted"
+                )}
               >
-                <div className="flex items-center gap-2">
-                  <Sliders size={14} />
-                  <span>Tham số hệ thống</span>
-                  <span className="font-mono text-[11px] text-bvc-muted bg-bvc-surface px-1.5 py-0.5 rounded-[5px]">
-                    {configs.items.length}
-                  </span>
+                <div
+                  className={cn(
+                    "flex size-7 items-center justify-center rounded-[8px] transition-all duration-150",
+                    isSettingsActive
+                      ? "bg-white/15 text-emerald-300 shadow-2xs"
+                      : "bg-bvc-surface text-bvc-muted group-hover:bg-bvc-border group-hover:text-bvc-ink"
+                  )}
+                >
+                  <Sliders size={15} strokeWidth={isSettingsActive ? 2.3 : 1.9} />
                 </div>
+                <span className="tracking-[-0.01em]">Tham số hệ thống</span>
+                <span
+                  className={cn(
+                    "flex h-[22px] min-w-[24px] items-center justify-center rounded-full px-2 text-[11.5px] font-bold font-mono tracking-tight transition-all duration-150",
+                    isSettingsActive
+                      ? "border border-white/15 bg-white/20 text-white shadow-2xs"
+                      : "border border-bvc-border bg-bvc-surface text-bvc-muted group-hover:border-bvc-border-strong group-hover:text-bvc-ink"
+                  )}
+                >
+                  {configs.items.length}
+                </span>
               </TabsTab>
+
               <TabsTab
                 value="instruments"
-                className="cursor-pointer rounded-[9px] px-4 py-2 text-[13.5px] font-semibold text-bvc-muted transition-all data-[selected]:bg-white data-[selected]:text-bvc-ink data-[selected]:shadow-xs"
+                className={cn(
+                  "group relative flex cursor-pointer items-center gap-2.5 rounded-[12px] px-4 py-2.5 text-[13.5px] transition-all duration-150 select-none",
+                  "hover:bg-bvc-surface/80 hover:text-bvc-ink",
+                  "data-selected:bg-bvc-ink data-selected:text-white data-selected:shadow-sm data-selected:ring-1 data-selected:ring-black/5",
+                  isInstrumentsActive
+                    ? "bg-bvc-ink font-bold text-white shadow-sm ring-1 ring-black/5"
+                    : "font-semibold text-bvc-muted"
+                )}
               >
-                <div className="flex items-center gap-2">
-                  <Music2 size={14} />
-                  <span>Nhạc cụ truyền thống</span>
-                  <span className="font-mono text-[11px] text-bvc-muted bg-bvc-surface px-1.5 py-0.5 rounded-[5px]">
-                    {instruments.items.length}
-                  </span>
+                <div
+                  className={cn(
+                    "flex size-7 items-center justify-center rounded-[8px] transition-all duration-150",
+                    isInstrumentsActive
+                      ? "bg-white/15 text-emerald-300 shadow-2xs"
+                      : "bg-bvc-surface text-bvc-muted group-hover:bg-bvc-border group-hover:text-bvc-ink"
+                  )}
+                >
+                  <Music2 size={15} strokeWidth={isInstrumentsActive ? 2.3 : 1.9} />
                 </div>
+                <span className="tracking-[-0.01em]">Nhạc cụ truyền thống</span>
+                <span
+                  className={cn(
+                    "flex h-[22px] min-w-[24px] items-center justify-center rounded-full px-2 text-[11.5px] font-bold font-mono tracking-tight transition-all duration-150",
+                    isInstrumentsActive
+                      ? "border border-white/15 bg-white/20 text-white shadow-2xs"
+                      : "border border-bvc-border bg-bvc-surface text-bvc-muted group-hover:border-bvc-border-strong group-hover:text-bvc-ink"
+                  )}
+                >
+                  {instruments.items.length}
+                </span>
               </TabsTab>
             </TabsList>
           </div>
