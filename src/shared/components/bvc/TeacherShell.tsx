@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 import { ChevronDown, LogOut, Music2 } from "lucide-react";
 import { NotificationBell } from "@/shared/components/bvc/NotificationBell";
 import { useAuth } from "@/shared/context/AuthContext";
+import { useNewNotificationToast } from "@/shared/hooks/useNewNotificationToast";
 import {
   NAV_BY_ROLE,
   TEACHER_NAV,
@@ -125,6 +126,7 @@ function SidebarGroup({ group, allItems, pathname }: SidebarGroupProps) {
 export function TeacherShell({ children, className, navItems, roleLabel }: TeacherShellProps) {
   const { user, logout } = useAuth();
   const location = useLocation();
+  useNewNotificationToast(user?.role === ROLES.TEACHER);
   const effectiveRoleLabel = roleLabel ?? (user?.role === ROLES.SYSTEM_ADMIN ? "Quản trị viên" : "Giảng viên");
   const effectiveNavItems = navItems ?? (user?.role && NAV_BY_ROLE[user.role] ? NAV_BY_ROLE[user.role] : TEACHER_NAV);
   const flatItems = flattenNav(effectiveNavItems);
