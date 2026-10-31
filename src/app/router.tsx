@@ -55,6 +55,9 @@ import { AddStudentPage } from "@/features/classes/pages/AddStudentPage";
 import { ImportStudentsPage } from "@/features/classes/pages/ImportStudentsPage";
 import { AdminRoadmapPage } from "@/features/classes/pages/AdminRoadmapPage";
 import { TeacherAssignmentDetailPage } from "@/features/classes/pages/TeacherAssignmentDetailPage";
+import { StudentHistoryPage } from "@/features/classes/pages/StudentHistoryPage";
+import { AttentionStudentsPage } from "@/features/classes/pages/AttentionStudentsPage";
+import { TodaySubmissionsPage } from "@/features/classes/pages/TodaySubmissionsPage";
 import { StudentSubmissionsPage } from "@/features/classes/pages/StudentSubmissionsPage";
 import { GradingSettingsPage } from "@/features/platform/pages/GradingSettingsPage";
 
@@ -156,6 +159,8 @@ export function AppRouter() {
           <Route element={<DesktopLayout />}>
             <Route path="/teacher" element={<Navigate to="/teacher/home" replace />} />
             <Route path="/teacher/home" element={<TeacherHomePage />} />
+            <Route path="/teacher/attention-students" element={<AttentionStudentsPage />} />
+            <Route path="/teacher/today-submissions" element={<TodaySubmissionsPage />} />
             <Route path="/teacher/classes" element={<ClassListPage />} />
             <Route path="/teacher/roadmap" element={<RoadmapPage />} />
             <Route path="/teacher/progress" element={<StudentProgressPage />} />
@@ -170,6 +175,7 @@ export function AppRouter() {
             <Route path="/teacher/classes/:classId/edit" element={<ClassFormPage />} />
             <Route path="/teacher/classes/:classId/members/new" element={<AddStudentPage />} />
             <Route path="/teacher/classes/:classId/import" element={<ImportStudentsPage />} />
+            <Route path="/teacher/classes/:classId/students/:studentId" element={<StudentHistoryPage />} />
             <Route path="/teacher/assignments/new" element={<AssignmentFormPage />} />
             <Route path="/teacher/assignments/:assignmentId/edit" element={<AssignmentFormPage />} />
             <Route path="/teacher/assignments/:assignmentId" element={<TeacherAssignmentDetailPage />} />

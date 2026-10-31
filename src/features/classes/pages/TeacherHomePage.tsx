@@ -1,12 +1,15 @@
 import { useNavigate } from "react-router-dom";
+import { AttentionStudentsCard } from "@/features/classes/components/AttentionStudentsCard";
 import { ListState } from "@/features/classes/components/ListState";
+import { TodaySubmissionsCard } from "@/features/classes/components/TodaySubmissionsCard";
 import { useTeacherHome } from "@/features/classes/hooks/useTeacherHome";
-import { buildHomeTasks, countAttention } from "@/features/classes/utils/teacherHomeFormat";
+import { buildHomeTasks } from "@/features/classes/utils/teacherHomeFormat";
 import { DesktopPageHeader, StatCard } from "@/shared/components/bvc";
 
 export function TeacherHomePage() {
   const navigate = useNavigate();
-  const { classes, publishedCount, draftCount, isLoading, error, reload } = useTeacherHome();
+  const { classes, attentionStudents, todaySubmissions, publishedCount, draftCount, isLoading, error, reload } =
+    useTeacherHome();
   const tasks = buildHomeTasks(classes, draftCount);
 
   return (
@@ -28,7 +31,7 @@ export function TeacherHomePage() {
 
         <div className="flex flex-1 flex-col gap-[18px] overflow-y-auto p-[22px_32px_26px]">
           <ListState isLoading={isLoading} error={error} isEmpty={false} emptyMessage="" onRetry={reload}>
-            <div className="grid grid-cols-3 gap-[12px]">
+            <div className="grid grid-cols-2 gap-[12px]">
               <StatCard label="Lớp đang dạy" value={classes.length} />
               <div className="flex flex-col gap-[5px] rounded-[18px] border border-bvc-accent bg-bvc-accent-tint p-[15px_16px]">
                 <span className="text-[12.5px] font-semibold text-bvc-accent-text">Bài tập đang mở</span>
@@ -36,15 +39,18 @@ export function TeacherHomePage() {
                   {publishedCount}
                 </span>
               </div>
-              <div className="flex flex-col gap-[5px] rounded-[18px] border border-bvc-border p-[15px_16px]">
-                <span className="flex items-center gap-[7px] text-[12.5px] text-bvc-muted">
-                  <span className="size-[7px] shrink-0 rounded-full bg-bvc-warn" />
-                  Sinh viên cần chú ý
-                </span>
-                <span className="font-mono text-[29px] font-semibold leading-none text-bvc-ink">
-                  {countAttention(classes)}
-                </span>
-              </div>
+            </div>
+
+            <div className="grid grid-cols-1 items-start gap-[14px] xl:grid-cols-2">
+              <AttentionStudentsCard
+                students={attentionStudents}
+                onOpenStudent={(student) => navigate(`/teacher/classes/${student.classId}/students/${student.userId}`)}
+                onShowAll={() => navigate("/teacher/attention-students")}
+              />
+              <TodaySubmissionsCard
+                classes={todaySubmissions}
+                onShowAll={() => navigate("/teacher/today-submissions")}
+              />
             </div>
 
             <div className="flex flex-col gap-[14px]">
