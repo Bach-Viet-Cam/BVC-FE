@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   buildHomeTasks,
-  countAttention,
+  countTodaySubmitters,
   formatWeekLabel,
+  rankAttentionStudents,
   type HomeClass,
 } from "@/features/classes/utils/teacherHomeFormat";
 
@@ -19,9 +20,26 @@ const CLASS_A: HomeClass = {
 const CLASS_B: HomeClass = { ...CLASS_A, id: "b", name: "TRD401", onTrack: 10, atRisk: 0, behind: 0 };
 
 describe("teacherHomeFormat", () => {
-  it("counts students at risk or behind across classes", () => {
-    expect(countAttention([CLASS_A, CLASS_B])).toBe(5);
-    expect(countAttention([])).toBe(0);
+  it("ranks students to watch: behind first, then the lowest accuracy, without accuracy last", () => {
+    const base = { username: "SV", studentCode: null, classId: "a", className: "TRD301" };
+    const ranked = rankAttentionStudents([
+      { ...base, userId: "ok", status: "ON_TRACK", averageAccuracy: 90 },
+      { ...base, userId: "risk-60", status: "AT_RISK", averageAccuracy: 60 },
+      { ...base, userId: "behind-none", status: "BEHIND", averageAccuracy: null },
+      { ...base, userId: "behind-40", status: "BEHIND", averageAccuracy: 40 },
+      { ...base, userId: "unknown", status: null, averageAccuracy: null },
+    ]);
+    expect(ranked.map((item) => item.userId)).toEqual(["behind-40", "behind-none", "risk-60"]);
+  });
+
+  it("counts the students whose last submission is today", () => {
+    const now = new Date(2026, 9, 31, 15, 0);
+    const students = [
+      { lastSubmittedAt: new Date(2026, 9, 31, 8, 0).toISOString() },
+      { lastSubmittedAt: new Date(2026, 9, 30, 23, 0).toISOString() },
+      { lastSubmittedAt: null },
+    ];
+    expect(countTodaySubmitters(students, now)).toBe(1);
   });
 
   it("labels the week or says the class has not started", () => {

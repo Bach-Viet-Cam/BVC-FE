@@ -88,7 +88,7 @@ export function StudentShell({ children, className }: StudentShellProps) {
               </Link>
             )}
             {role === "teacher" && (
-              <Link to="/songs" aria-label="Thư viện bài hát của tôi" className={iconLinkClass}>
+              <Link to="/songs" aria-label="Thư viện của tôi" className={iconLinkClass}>
                 <LibraryBig className="size-[19px]" strokeWidth={1.6} />
               </Link>
             )}

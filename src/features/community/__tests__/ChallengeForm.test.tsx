@@ -21,8 +21,8 @@ vi.mock("react-router-dom", async (importOriginal) => ({
 }));
 
 const INSTRUMENTS = [
-  { id: "i1", name: "Đàn tranh", isActive: true },
-  { id: "i2", name: "Đàn bầu", isActive: true },
+  { id: "i1", code: "DTR", name: "Đàn tranh", isActive: true },
+  { id: "i2", code: "DBA", name: "Đàn bầu", isActive: true },
 ];
 
 function makeClass(id: string, name: string, instrumentId: string, status: "ACTIVE" | "ENDED"): ClassSummary {

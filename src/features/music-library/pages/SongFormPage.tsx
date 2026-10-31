@@ -23,7 +23,7 @@ export function SongFormPage() {
     <TeacherShell>
       <FocusHeader
         backTo="/songs"
-        backLabel="Quay lại thư viện bài hát của tôi"
+        backLabel="Quay lại thư viện của tôi"
         title={title}
         actions={
           <>

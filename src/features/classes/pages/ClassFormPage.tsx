@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, useParams } from "react-router-dom";
@@ -14,9 +15,19 @@ import {
   type Instrument,
   type Semester,
 } from "@/features/classes/types/classTypes";
+import {
+  buildClassDescription,
+  CLASS_CODE_EXAMPLE,
+  findInstrumentBySubject,
+  parseClassCode,
+} from "@/features/classes/utils/classCode";
 import { formatIsoDate } from "@/features/classes/utils/classFormat";
 import { applyFieldErrors } from "@/features/classes/utils/mapApiErrors";
-import { classFormSchema, type ClassFormValues } from "@/features/classes/utils/validateClassForm";
+import {
+  classFormSchema,
+  createClassFormSchema,
+  type ClassFormValues,
+} from "@/features/classes/utils/validateClassForm";
 import { toast } from "@/shared/components/ui/toast";
 import { cn } from "@/shared/utils/cn";
 
@@ -95,14 +106,16 @@ function ClassDesktopForm({
     handleSubmit,
     control,
     setError,
-    formState: { errors },
+    setValue,
+    getValues,
+    formState: { errors, isSubmitted },
   } = useForm<ClassFormValues>({
-    resolver: zodResolver(classFormSchema),
+    resolver: zodResolver(isCreate ? createClassFormSchema : classFormSchema),
     defaultValues: toFormValues(classDetail, defaultSemesterName),
   });
   const instrumentOptions =
     classDetail && !instruments.some((item) => item.id === classDetail.instrument.id)
-      ? [...instruments, { ...classDetail.instrument, isActive: false }]
+      ? [...instruments, { ...classDetail.instrument, code: "", isActive: false }]
       : instruments;
   // A class created before semesters were configured keeps its own cohort and dates.
   const semesterOptions =
@@ -111,6 +124,49 @@ function ClassDesktopForm({
       : semesters;
   const selectedCohort = useWatch({ control, name: "cohort" });
   const selectedSemester = semesterOptions.find((item) => item.name === selectedCohort);
+
+  // Create flow: the subject comes from the instrument code in the class code (DNH103.M2.H1 -> DNH).
+  const enteredName = useWatch({ control, name: "name" });
+  const parsedCode = isCreate ? parseClassCode(enteredName) : null;
+  const matchedInstrument = parsedCode ? findInstrumentBySubject(instruments, parsedCode.subject) : null;
+  const autoDescription =
+    matchedInstrument && parsedCode && selectedCohort
+      ? buildClassDescription(matchedInstrument.name, parsedCode)
+      : null;
+  const lastAutoDescription = useRef("");
+
+  useEffect(() => {
+    if (!isCreate) return;
+    setValue("instrumentId", matchedInstrument?.id ?? "", { shouldValidate: isSubmitted });
+  }, [isCreate, matchedInstrument?.id, isSubmitted, setValue]);
+
+  useEffect(() => {
+    if (!autoDescription) return;
+    // Only overwrite a description the user has not typed themselves.
+    const current = getValues("description");
+    if (current === "" || current === lastAutoDescription.current) {
+      setValue("description", autoDescription, { shouldValidate: isSubmitted });
+    }
+    lastAutoDescription.current = autoDescription;
+  }, [autoDescription, isSubmitted, getValues, setValue]);
+
+  const instrumentHint = isLocked
+    ? "Đã khóa vì lớp đã bắt đầu"
+    : isCreate
+      ? parsedCode && !matchedInstrument
+        ? `Không có nhạc cụ nào có mã khớp với môn ${parsedCode.subject}. Nếu lệch loại đàn, hãy sửa mã môn.`
+        : "Tự động theo mã môn trong mã lớp. Nếu lệch loại đàn, hãy sửa mã môn."
+      : undefined;
+
+  // Class codes are upper case; convert while typing and keep the caret where it was.
+  const nameField = register("name");
+  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const input = event.target;
+    const { selectionStart, selectionEnd } = input;
+    input.value = input.value.toUpperCase();
+    input.setSelectionRange(selectionStart, selectionEnd);
+    void nameField.onChange(event);
+  };
 
   const submit = handleSubmit(async (values) => {
     const payload: Partial<ClassPayload> = {
@@ -177,15 +233,20 @@ function ClassDesktopForm({
               id="class-name"
               label="Mã lớp"
               isRequired
-              hint="Tối đa 100 ký tự, không trùng trong cùng học kỳ"
+              hint={
+                isCreate
+                  ? `Dạng Môn.Slot.Half, ví dụ ${CLASS_CODE_EXAMPLE} (M2 = slot 2 buổi sáng, H1 = half 1)`
+                  : "Tối đa 100 ký tự, không trùng trong cùng học kỳ"
+              }
               error={errors.name?.message}
             >
               <input
                 id="class-name"
                 type="text"
-                {...register("name")}
+                {...nameField}
+                onChange={handleNameChange}
                 maxLength={100}
-                placeholder="TRD301"
+                placeholder={isCreate ? CLASS_CODE_EXAMPLE : "TRD301"}
                 aria-invalid={Boolean(errors.name)}
                 className={INPUT_CLASSES}
               />
@@ -195,10 +256,22 @@ function ClassDesktopForm({
               id="class-instrument"
               label="Tên môn học"
               isRequired
-              hint={isLocked ? "Đã khóa vì lớp đã bắt đầu" : undefined}
+              hint={instrumentHint}
               error={errors.instrumentId?.message}
             >
-              {isLocked ? (
+              {isCreate ? (
+                <>
+                  <input type="hidden" {...register("instrumentId")} />
+                  <input
+                    id="class-instrument"
+                    value={matchedInstrument?.name ?? ""}
+                    placeholder="Tự động theo mã lớp"
+                    readOnly
+                    aria-invalid={Boolean(errors.instrumentId)}
+                    className={INPUT_CLASSES}
+                  />
+                </>
+              ) : isLocked ? (
                 // Not registered: the locked value stays in defaultValues and is never sent.
                 <input
                   id="class-instrument"
@@ -304,6 +377,10 @@ function ClassDesktopForm({
           <div className="flex flex-col gap-[10px] rounded-[20px] border border-bvc-border bg-white p-[18px]">
             <span className="text-[14px] font-bold text-bvc-ink">Lưu ý</span>
             <ul className="flex flex-col gap-[8px]">
+              <li className="flex items-start gap-[8px] text-[13px] text-bvc-muted">
+                <Music size={14} className="mt-[2px] shrink-0 text-bvc-muted" />
+                Môn học lấy theo mã môn trong mã lớp; nếu lệch loại đàn, hãy sửa mã môn
+              </li>
               <li className="flex items-start gap-[8px] text-[13px] text-bvc-muted">
                 <Music size={14} className="mt-[2px] shrink-0 text-bvc-muted" />
                 Môn học và học kỳ bị khóa sau khi lớp bắt đầu

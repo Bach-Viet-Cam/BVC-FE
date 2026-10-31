@@ -59,7 +59,7 @@ export function SongManagePage() {
       <header className="flex shrink-0 flex-wrap items-end justify-between gap-4 px-[18px] pt-5 pb-4 md:px-8 md:pt-7">
         <div className="flex flex-col gap-1">
           <h1 className="text-[27px] leading-tight font-extrabold tracking-[-0.03em] text-bvc-ink md:text-[34px]">
-            Thư viện bài hát của tôi
+            Thư viện của tôi
           </h1>
           <span className="text-sm text-bvc-muted">
             {result ? `${result.total} bài · ` : ""}

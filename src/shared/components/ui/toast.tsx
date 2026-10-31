@@ -8,6 +8,7 @@ interface ToastOptions {
   title: React.ReactNode;
   description?: React.ReactNode;
   type?: "success" | "error" | "info";
+  timeout?: number;
 }
 
 export const toast = {
