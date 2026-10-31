@@ -3,6 +3,7 @@ import {
   Activity,
   BadgeCheck,
   BookOpen,
+  ClipboardCheck,
   ClipboardList,
   Flame,
   FolderTree,
@@ -15,6 +16,7 @@ import {
   Settings2,
   SlidersHorizontal,
   Trophy,
+  UserCheck,
   Users,
 } from "lucide-react";
 import { ROLES } from "@/shared/constants/roles";
@@ -44,14 +46,22 @@ export function flattenNav(entries: NavEntry[]): NavItem[] {
 }
 
 // Menu duy nhất của giảng viên, TeacherShell render cho mọi trang có sidebar.
-// Lộ trình, bài tập, tiến độ, đánh giá bài nộp nằm trong tab của trang chi tiết lớp.
+// Lộ trình, bài tập, tiến độ nằm trong tab của trang chi tiết lớp.
 export const TEACHER_NAV: NavEntry[] = [
   { label: "Trang chủ", to: "/teacher/home", icon: LayoutDashboard },
   {
     label: "Lớp học",
-    to: "/teacher/classes",
     icon: GraduationCap,
-    activePrefixes: ["/teacher/assignments", "/teacher/roadmap", "/teacher/progress", "/teacher/review"],
+    children: [
+      {
+        label: "Danh sách lớp",
+        to: "/teacher/classes",
+        icon: Users,
+        activePrefixes: ["/teacher/assignments", "/teacher/roadmap", "/teacher/progress"],
+      },
+      { label: "Duyệt bài nộp", to: "/teacher/review", icon: ClipboardCheck },
+      { label: "Đánh giá sinh viên", to: "/teacher/student-review", icon: UserCheck },
+    ],
   },
   {
     label: "Thử thách",

@@ -66,6 +66,7 @@ import { SheetManagePage } from "@/features/music-library/pages/SheetManagePage"
 // Desktop - platform
 import { AdminPage } from "@/features/platform/pages/AdminPage";
 import { CategoriesPage } from "@/features/platform/pages/CategoriesPage";
+import { StudentReviewPage } from "@/features/platform/pages/StudentReviewPage";
 import { ContentApprovalPage } from "@/features/platform/pages/ContentApprovalPage";
 import { UserManagePage } from "@/features/platform/pages/UserManagePage";
 import { SystemConfigPage } from "@/features/platform/pages/SystemConfigPage";
@@ -174,7 +175,7 @@ export function AppRouter() {
             <Route path="/teacher/assignments/:assignmentId" element={<TeacherAssignmentDetailPage />} />
             <Route path="/teacher/assignments/:assignmentId/students/:studentId" element={<StudentSubmissionsPage />} />
             <Route path="/teacher/review" element={<ReviewPage />} />
-            <Route path="/teacher/student-review" element={<Navigate to="/teacher/classes" replace />} />
+            <Route path="/teacher/student-review" element={<StudentReviewPage />} />
           </Route>
 
           {/* M02 - quản lý bài hát (trang tự bọc TeacherShell) */}

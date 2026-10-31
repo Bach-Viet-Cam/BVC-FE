@@ -10,12 +10,11 @@ import { MembersTab } from "@/features/classes/components/MembersTab";
 import { RoadmapTab } from "@/features/classes/components/RoadmapTab";
 import { useClassActions } from "@/features/classes/hooks/useClassActions";
 import { useClassDetail } from "@/features/classes/hooks/useClassDetail";
-import { ReviewWorkspace } from "@/features/classes/components/ReviewWorkspace";
 import { TeacherPageHeader } from "@/shared/components/bvc/TeacherPageHeader";
 import { TeacherScreen } from "@/shared/components/bvc/TeacherScreen";
 import { toast } from "@/shared/components/ui/toast";
 
-const TAB_KEYS: ClassTabKey[] = ["members", "roadmap", "assignments", "progress", "review"];
+const TAB_KEYS: ClassTabKey[] = ["members", "roadmap", "assignments", "progress"];
 
 export function ClassDetailPage() {
   const navigate = useNavigate();
@@ -75,7 +74,6 @@ export function ClassDetailPage() {
                 <ClassProgressBoard classId={classDetail.id} />
               </div>
             )}
-            {activeTab === "review" && <ReviewWorkspace classId={classDetail.id} />}
             <div className="mt-auto shrink-0 border-t border-bvc-border px-[18px] pb-[24px] pt-[12px] text-[12.5px] leading-[1.5] text-bvc-muted lg:px-[32px]">
               Cả lớp học {classDetail.instrument.name.toLowerCase()}, không chia nhóm.
             </div>

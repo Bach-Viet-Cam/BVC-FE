@@ -25,7 +25,7 @@ describe("TeacherShell menu", () => {
     const nav = within(sidebar);
 
     expect(nav.getByRole("link", { name: "Trang chủ" })).toBeInTheDocument();
-    expect(nav.getByRole("link", { name: "Lớp học" })).toBeInTheDocument();
+    expect(nav.getByRole("button", { name: "Lớp học" })).toHaveAttribute("aria-expanded", "false");
     expect(nav.getByRole("button", { name: "Thử thách" })).toHaveAttribute("aria-expanded", "false");
     expect(nav.getByRole("button", { name: "Thư viện học liệu" })).toHaveAttribute("aria-expanded", "false");
     expect(nav.queryByRole("link", { name: "Bài tập" })).not.toBeInTheDocument();
@@ -44,9 +44,13 @@ describe("TeacherShell menu", () => {
     expect(nav.getByRole("link", { name: "Bảng xếp hạng" })).toBeInTheDocument();
   });
 
-  it("keeps Lớp học active on class sub-pages", () => {
+  it("keeps Danh sách lớp active on class sub-pages, review pages are separate items", () => {
     const [sidebar] = renderAt("/teacher/assignments/a1");
-    expect(within(sidebar).getByRole("link", { name: "Lớp học" })).toHaveClass("bg-bvc-ink");
+    const nav = within(sidebar);
+    expect(nav.getByRole("button", { name: "Lớp học" })).toHaveAttribute("aria-expanded", "true");
+    expect(nav.getByRole("link", { name: "Danh sách lớp" })).toHaveClass("bg-bvc-ink");
+    expect(nav.getByRole("link", { name: "Duyệt bài nộp" })).not.toHaveClass("bg-bvc-ink");
+    expect(nav.getByRole("link", { name: "Đánh giá sinh viên" })).not.toHaveClass("bg-bvc-ink");
   });
 
   it("flattens groups in the mobile nav", () => {
@@ -56,7 +60,9 @@ describe("TeacherShell menu", () => {
       .map((link) => link.textContent);
     expect(labels).toEqual([
       "Trang chủ",
-      "Lớp học",
+      "Danh sách lớp",
+      "Duyệt bài nộp",
+      "Đánh giá sinh viên",
       "Quản lý thử thách",
       "Bảng xếp hạng",
       "Thư viện của tôi",
