@@ -1,6 +1,6 @@
 import { cn } from "@/shared/utils/cn";
 
-export type ClassTabKey = "members" | "roadmap" | "assignments" | "progress";
+export type ClassTabKey = "members" | "roadmap" | "assignments" | "progress" | "review";
 
 interface ClassTabsProps {
   activeTab: ClassTabKey;
@@ -12,6 +12,7 @@ const TABS: Array<{ key: ClassTabKey; label: string }> = [
   { key: "roadmap", label: "Lộ trình" },
   { key: "assignments", label: "Bài tập" },
   { key: "progress", label: "Tiến độ" },
+  { key: "review", label: "Đánh giá bài nộp" },
 ];
 
 export function ClassTabs({ activeTab, onChange }: ClassTabsProps) {

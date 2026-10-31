@@ -152,7 +152,7 @@ export function TeacherHomePage() {
                 onClick={() => navigate("/songs")}
                 className="flex min-h-[44px] cursor-pointer items-center rounded-[14px] border border-bvc-border-strong bg-white px-[18px] text-[14px] font-semibold text-bvc-ink"
               >
-                Thư viện bài nhạc
+                Thư viện của tôi
               </button>
             </div>
           </ListState>
