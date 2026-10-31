@@ -116,7 +116,7 @@ function DesktopClassList({
               </div>
 
               {classes.map((cls) => (
-                <div key={cls.id} className={`${ROW_GRID} h-[54px] border-b border-bvc-line text-[14px] last:border-0`}>
+                <div key={cls.id} className={`${ROW_GRID} h-[54px] border-b border-bvc-line text-[14px] transition-colors last:border-0 hover:bg-bvc-surface`}>
                   <span className="truncate font-semibold text-bvc-ink">{cls.name}</span>
                   <span className="text-bvc-ink">{cls.instrument.name}</span>
                   <span className="text-bvc-muted">{cls.cohort}</span>
