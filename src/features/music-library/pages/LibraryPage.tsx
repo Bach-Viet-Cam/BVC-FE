@@ -15,6 +15,8 @@ import { useLibraryQuery } from "@/features/music-library/hooks/useLibraryQuery"
 import { useLibrarySongs } from "@/features/music-library/hooks/useLibrarySongs";
 import { useMusicCategories } from "@/features/music-library/hooks/useMusicCategories";
 import { useSaveToggle } from "@/features/music-library/hooks/useSaveToggle";
+import { useTrendingSongs } from "@/features/music-library/hooks/useTrendingSongs";
+import { TrendingCarousel } from "@/features/music-library/components/TrendingCarousel";
 import { KEYWORD_MAX_LENGTH, LIBRARY_MESSAGES } from "@/features/music-library/constants/musicLibraryConstants";
 
 function describeNoResult(filterCount: number, hasKeyword: boolean) {
@@ -31,6 +33,9 @@ export function LibraryPage() {
   const { options } = useMusicCategories();
   const { result, error, isLoading, isFirstLoad, reload, setSongSaved } = useLibrarySongs(query);
   const save = useSaveToggle();
+  const trending = useTrendingSongs();
+  // Banner chỉ hiện ở trang đầu khi chưa tìm / lọc, để kết quả tìm kiếm luôn nằm ngay dưới ô tìm
+  const showTrending = query.page === 1 && activeFilterCount === 0 && !query.keyword;
   const [keyword, setKeyword] = useState(query.keyword);
   const debouncedSearch = useDebouncedCallback((value: string) => update({ keyword: value.trim() }));
 
@@ -56,6 +61,8 @@ export function LibraryPage() {
           </h1>
           <p className="hidden text-[15px] text-bvc-muted md:block">Bài hát và bản nhạc giảng viên đã công khai.</p>
         </div>
+
+        {showTrending && <TrendingCarousel songs={trending.songs} />}
 
         <div className="flex flex-col gap-2.5 md:gap-3.5">
           <SearchField

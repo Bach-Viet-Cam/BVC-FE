@@ -1,5 +1,6 @@
 import { ChevronDown } from "lucide-react";
 import { FilterPill } from "@/shared/components/bvc/FilterPill";
+import { MultiFilterPill } from "@/shared/components/bvc/MultiFilterPill";
 import type { SelectOption } from "@/shared/types/commonTypes";
 import { LIBRARY_SORT_OPTIONS } from "@/features/music-library/constants/musicLibraryConstants";
 import type { LibrarySongQuery, LibrarySort } from "@/features/music-library/types/musicLibraryTypes";
@@ -34,11 +35,11 @@ export function LibraryFilterBar({
           options={options.genres}
           onChange={(genreId) => onChange({ genreId })}
         />
-        <FilterPill
+        <MultiFilterPill
           label="Nhạc cụ"
-          value={query.instrumentId}
+          values={query.instrumentIds}
           options={options.instruments}
-          onChange={(instrumentId) => onChange({ instrumentId })}
+          onChange={(instrumentIds) => onChange({ instrumentIds })}
         />
         <FilterPill
           label="Trình độ"

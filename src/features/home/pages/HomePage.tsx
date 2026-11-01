@@ -1,13 +1,20 @@
 import { Link } from "react-router-dom";
-import { Bookmark, ClipboardList, LibraryBig, Trophy } from "lucide-react";
+import { Bookmark, ClipboardList, LibraryBig, Music2, Trophy, Users } from "lucide-react";
 import { StudentShell } from "@/shared/components/bvc/StudentShell";
+import { StatCard } from "@/shared/components/bvc/StatCard";
 import { EmptyState } from "@/shared/components/bvc/EmptyState";
-import { TagBadge } from "@/shared/components/bvc/TagBadge";
-import { actionButtonClass } from "@/shared/components/bvc/actionButtonStyles";
+import { ActionButton } from "@/shared/components/bvc/ActionButton";
 import { useAuth } from "@/shared/context/AuthContext";
 import { formatDate } from "@/shared/utils/formatDate";
 import { useMyAssignments } from "@/features/classes/hooks/useMyAssignments";
-import { ASSIGNMENT_STATUS_META, formatShortDeadline } from "@/features/classes/utils/assignmentFormat";
+import { AccuracyTrendCard } from "@/features/home/components/AccuracyTrendCard";
+import { ActivityChart } from "@/features/home/components/ActivityChart";
+import { AssignmentHighlights } from "@/features/home/components/AssignmentHighlights";
+import { LibrarySuggestions } from "@/features/home/components/LibrarySuggestions";
+import { RecentSubmissionsCard } from "@/features/home/components/RecentSubmissionsCard";
+import { UpcomingAssignments } from "@/features/home/components/UpcomingAssignments";
+import { useStudentDashboard } from "@/features/home/hooks/useStudentDashboard";
+import { formatPercent, summarizeAssignments } from "@/features/home/utils/homeFormat";
 
 const UPCOMING_LIMIT = 3;
 
@@ -18,15 +25,25 @@ const QUICK_LINKS = [
   { label: "Bảng xếp hạng", description: "Thứ hạng của bạn trong học kỳ", to: "/community/leaderboard", icon: Trophy },
 ];
 
-// Trang chủ sinh viên: chỉ hiện dữ liệu BE đã có (bài tập); tiến độ luyện / chuỗi ngày chờ API M01
+const SECTION_HEADING = "text-xl font-extrabold tracking-[-0.02em] text-bvc-ink md:text-2xl";
+
+// Trang "Hôm nay" của sinh viên: số liệu luyện tập trong ngày, lần nộp gần nhất, bài tập sắp đến hạn
+// và tổng hợp tiến bộ. Tài khoản chưa nộp bài nào thì thay phần số liệu bằng gợi ý từ thư viện.
 export function HomePage() {
   const { user } = useAuth();
-  const { items, isLoading, error } = useMyAssignments("NON_BONUS");
-  const upcoming = items.filter((item) => item.status === "NOT_SUBMITTED").slice(0, UPCOMING_LIMIT);
+  const assignments = useMyAssignments("NON_BONUS");
+  const { dashboard, isLoading, error, reload, recentSubmissions, isRecentLoading, recentError } =
+    useStudentDashboard();
+  const upcoming = assignments.items.filter((item) => item.status === "NOT_SUBMITTED").slice(0, UPCOMING_LIMIT);
+  const hasActivity = (dashboard?.totalSubmissions ?? 0) > 0;
+
+  const upcomingSection = (
+    <UpcomingAssignments items={upcoming} isLoading={assignments.isLoading} error={assignments.error} />
+  );
 
   return (
     <StudentShell>
-      <div className="mx-auto flex w-full max-w-[1200px] flex-1 flex-col gap-7 px-[18px] pt-4 pb-8 md:px-14 md:pt-8">
+      <div className="mx-auto flex w-full max-w-[1200px] flex-1 flex-col gap-8 px-[18px] pt-4 pb-8 md:px-14 md:pt-8">
         <div className="flex flex-col gap-1">
           <p className="text-[12px] font-semibold tracking-[0.12em] text-bvc-muted uppercase">
             Hôm nay · {formatDate(new Date().toISOString(), "EEEE, dd/MM")}
@@ -36,54 +53,77 @@ export function HomePage() {
           </h1>
         </div>
 
-        <section aria-labelledby="upcoming-heading" className="flex flex-col gap-3">
-          <div className="flex items-center justify-between gap-3">
-            <h2 id="upcoming-heading" className="text-xl font-extrabold tracking-[-0.02em] text-bvc-ink md:text-2xl">
-              Bài tập sắp đến hạn
-            </h2>
-            <Link to="/assignments" className="text-[13.5px] font-semibold text-bvc-accent-text">
-              Xem tất cả
-            </Link>
-          </div>
-          {isLoading ? (
-            <p className="text-[14px] text-bvc-muted">Đang tải...</p>
-          ) : error ? (
-            <p role="alert" className="text-[14px] text-bvc-error">
-              {error}
-            </p>
-          ) : upcoming.length === 0 ? (
-            <EmptyState title="Không có bài tập cần nộp" description="Bài tập giảng viên giao sẽ hiện ở đây." />
-          ) : (
-            <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-              {upcoming.map((item) => {
-                const status = ASSIGNMENT_STATUS_META[item.status];
-                return (
-                  <li key={item.id}>
-                    <Link
-                      to={`/assignment/${item.id}`}
-                      className="flex h-full flex-col gap-2 rounded-bvc-xl border border-bvc-border p-4 text-bvc-ink hover:bg-bvc-surface hover:text-bvc-ink"
-                    >
-                      <span className="flex items-start justify-between gap-2">
-                        <span className="text-[15px] font-bold">{item.title}</span>
-                        <TagBadge label={status.label} variant={status.variant} />
-                      </span>
-                      <span className="text-[13px] text-bvc-muted">{item.className}</span>
-                      <span className="mt-auto text-[12.5px] font-semibold text-bvc-warn">
-                        Hạn: {formatShortDeadline(item.deadline)}
-                      </span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </section>
+        {isLoading ? (
+          <p className="text-[14px] text-bvc-muted">Đang tải số liệu luyện tập...</p>
+        ) : error ? (
+          <EmptyState
+            title="Không tải được số liệu luyện tập"
+            description={error}
+            actions={<ActionButton onClick={reload}>Thử lại</ActionButton>}
+          />
+        ) : !dashboard || !hasActivity ? (
+          <>
+            {upcomingSection}
+            <LibrarySuggestions />
+          </>
+        ) : (
+          <>
+            <section aria-labelledby="today-heading" className="flex flex-col gap-3">
+              <h2 id="today-heading" className={SECTION_HEADING}>
+                Luyện tập hôm nay
+              </h2>
+              <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
+                <div className="grid grid-cols-2 gap-3">
+                  <StatCard label="Lượt nộp" value={dashboard.today.submitted} />
+                  <StatCard label="Đã chấm xong" value={dashboard.today.completed} />
+                  <StatCard
+                    label="Điểm cao nhất"
+                    value={formatPercent(dashboard.today.bestAccuracy)}
+                    variant={dashboard.today.bestAccuracy === null ? "default" : "ok"}
+                  />
+                  <StatCard label="Điểm trung bình" value={formatPercent(dashboard.today.averageAccuracy)} />
+                </div>
+                <ActivityChart days={dashboard.recentDays} />
+              </div>
+            </section>
+
+            <div className="grid gap-8 lg:grid-cols-2 lg:gap-6">
+              <RecentSubmissionsCard items={recentSubmissions} isLoading={isRecentLoading} error={recentError} />
+              {upcomingSection}
+            </div>
+
+            <section aria-labelledby="summary-heading" className="flex flex-col gap-3">
+              <h2 id="summary-heading" className={SECTION_HEADING}>
+                Tổng hợp bài tập
+              </h2>
+              <AssignmentHighlights
+                summary={summarizeAssignments(assignments.items)}
+                mostSubmitted={dashboard.mostSubmittedAssignment}
+                mostImproved={dashboard.mostImprovedAssignment}
+              />
+              <div className="grid gap-3 md:grid-cols-2">
+                <AccuracyTrendCard
+                  title="Tiến bộ độc tấu"
+                  icon={<Music2 className="size-4" aria-hidden />}
+                  progress={dashboard.solo}
+                  emptyText="Chưa có bài độc tấu nào được chấm."
+                />
+                <AccuracyTrendCard
+                  title="Tiến bộ hòa tấu"
+                  icon={<Users className="size-4" aria-hidden />}
+                  progress={dashboard.ensemble}
+                  emptyText="Chưa có bài hòa tấu nào được chấm. Mở một bài trong thư viện và chọn Luyện hòa tấu."
+                />
+              </div>
+            </section>
+          </>
+        )}
 
         <section aria-labelledby="quick-heading" className="flex flex-col gap-3">
-          <h2 id="quick-heading" className="text-xl font-extrabold tracking-[-0.02em] text-bvc-ink md:text-2xl">
+          <h2 id="quick-heading" className={SECTION_HEADING}>
             Truy cập nhanh
           </h2>
-          <ul className="grid gap-3 sm:grid-cols-2">
+          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {QUICK_LINKS.map(({ label, description, to, icon: Icon }) => (
               <li key={to}>
                 <Link
@@ -100,10 +140,6 @@ export function HomePage() {
             ))}
           </ul>
         </section>
-
-        <Link to="/library" className={actionButtonClass("primary", "lg", "self-start hover:text-white")}>
-          Bắt đầu luyện tập
-        </Link>
       </div>
     </StudentShell>
   );
