@@ -60,7 +60,7 @@ export function NotificationsManagePage() {
   const presetType = parseType(searchParams.get("type"));
 
   return (
-    <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
+    <div className="flex min-w-0 flex-1 flex-col">
       <DesktopPageHeader
         breadcrumb="Quản trị"
         title="Quản lý thông báo"
@@ -150,6 +150,6 @@ export function NotificationsManagePage() {
           return isRemoved;
         }}
       />
-    </main>
+    </div>
   );
 }

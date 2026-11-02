@@ -53,13 +53,11 @@ import { AssignmentFormPage } from "@/features/classes/pages/AssignmentFormPage"
 import { ClassDetailPage } from "@/features/classes/pages/ClassDetailPage";
 import { AddStudentPage } from "@/features/classes/pages/AddStudentPage";
 import { ImportStudentsPage } from "@/features/classes/pages/ImportStudentsPage";
-import { AdminRoadmapPage } from "@/features/classes/pages/AdminRoadmapPage";
 import { TeacherAssignmentDetailPage } from "@/features/classes/pages/TeacherAssignmentDetailPage";
 import { StudentHistoryPage } from "@/features/classes/pages/StudentHistoryPage";
 import { AttentionStudentsPage } from "@/features/classes/pages/AttentionStudentsPage";
 import { TodaySubmissionsPage } from "@/features/classes/pages/TodaySubmissionsPage";
 import { StudentSubmissionsPage } from "@/features/classes/pages/StudentSubmissionsPage";
-import { GradingSettingsPage } from "@/features/platform/pages/GradingSettingsPage";
 
 // Desktop - library management
 import { SongManagePage } from "@/features/music-library/pages/SongManagePage";
@@ -73,6 +71,7 @@ import { StudentReviewPage } from "@/features/platform/pages/StudentReviewPage";
 import { ContentApprovalPage } from "@/features/platform/pages/ContentApprovalPage";
 import { UserManagePage } from "@/features/platform/pages/UserManagePage";
 import { SystemConfigPage } from "@/features/platform/pages/SystemConfigPage";
+import { InstrumentConfigPage } from "@/features/platform/pages/InstrumentConfigPage";
 import { CategoriesAdminPage } from "@/features/platform/pages/CategoriesAdminPage";
 import { MonitoringPage } from "@/features/platform/pages/MonitoringPage";
 import { NotificationsManagePage } from "@/features/platform/pages/NotificationsManagePage";
@@ -201,13 +200,14 @@ export function AppRouter() {
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/admin/users" element={<UserManagePage />} />
             <Route path="/admin/config" element={<SystemConfigPage />} />
+            <Route path="/admin/instruments" element={<InstrumentConfigPage />} />
             <Route path="/admin/categories" element={<CategoriesAdminPage />} />
             <Route path="/admin/monitoring" element={<MonitoringPage />} />
             <Route path="/admin/notifications" element={<NotificationsManagePage />} />
             <Route path="/community/approval" element={<ContentApprovalPage />} />
             {/* M03 roadmap & grading - System Admin */}
-            <Route path="/admin/roadmaps" element={<AdminRoadmapPage />} />
-            <Route path="/admin/grading-settings" element={<GradingSettingsPage />} />
+            <Route path="/admin/roadmaps" element={<Navigate to="/admin/instruments?tab=roadmap" replace />} />
+            <Route path="/admin/grading-settings" element={<Navigate to="/admin/config" replace />} />
           </Route>
         </Route>
 

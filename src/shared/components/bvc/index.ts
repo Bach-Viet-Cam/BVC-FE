@@ -7,3 +7,4 @@ export { ScoreRing } from "./ScoreRing";
 export { ScoreBar } from "./ScoreBar";
 export { TagBadge } from "./TagBadge";
 export { FilterChips } from "./FilterChips";
+export { SegmentedTabs, type SegmentedTabOption, type SegmentedTabsProps } from "./SegmentedTabs";
