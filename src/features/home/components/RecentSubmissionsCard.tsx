@@ -4,6 +4,7 @@ import type { SubmissionHistoryItem } from "@/features/practice/types/submission
 import { SUBMISSION_KIND_LABEL, formatSubmittedAt } from "@/features/practice/utils/submissionHistory";
 import { toStatusLabel } from "@/features/practice/utils/submissionStatus";
 import { formatPercent, submissionHref } from "@/features/home/utils/homeFormat";
+import { SectionTitle } from "@/shared/components/bvc/SectionTitle";
 
 interface RecentSubmissionsCardProps {
   items: SubmissionHistoryItem[];
@@ -16,10 +17,8 @@ export function RecentSubmissionsCard({ items, isLoading, error }: RecentSubmiss
   return (
     <section aria-labelledby="recent-heading" className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-3">
-        <h2 id="recent-heading" className="text-xl font-extrabold tracking-[-0.02em] text-bvc-ink md:text-2xl">
-          Lần nộp gần nhất
-        </h2>
-        <Link to="/practice/submissions" className="text-[13.5px] font-semibold text-bvc-accent-text">
+        <SectionTitle id="recent-heading">Lần nộp gần nhất</SectionTitle>
+        <Link to="/practice/submissions" className="text-[13.5px] font-medium text-bvc-accent-text">
           Xem tất cả
         </Link>
       </div>
@@ -37,11 +36,11 @@ export function RecentSubmissionsCard({ items, isLoading, error }: RecentSubmiss
                 to={submissionHref(item)}
                 className="flex items-center gap-3 px-4 py-3 text-bvc-ink hover:bg-bvc-soft hover:text-bvc-ink"
               >
-                <span className="w-14 shrink-0 text-center font-bvc-mono text-[15px] font-bold">
+                <span className="w-14 shrink-0 text-center font-bvc-mono text-[15px] font-semibold">
                   {item.status === "COMPLETED" ? formatPercent(item.accuracy) : "-"}
                 </span>
                 <span className="flex min-w-0 flex-1 flex-col">
-                  <span className="truncate text-[14.5px] font-bold">{item.pieceTitle}</span>
+                  <span className="truncate text-[14.5px] font-semibold">{item.pieceTitle}</span>
                   <span className="truncate text-[12.5px] text-bvc-muted">
                     {SUBMISSION_KIND_LABEL[item.kind]} · {formatSubmittedAt(item.submittedAt)}
                     {item.status !== "COMPLETED" && ` · ${toStatusLabel(item.status)}`}

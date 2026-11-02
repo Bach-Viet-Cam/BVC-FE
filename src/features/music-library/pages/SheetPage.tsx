@@ -18,6 +18,7 @@ import { TutorialVideoCard } from "@/features/music-library/components/TutorialV
 import { LIBRARY_MESSAGES, SHEET_ZOOM } from "@/features/music-library/constants/musicLibraryConstants";
 import { useSaveToggle } from "@/features/music-library/hooks/useSaveToggle";
 import { useSheetViewer } from "@/features/music-library/hooks/useSheetViewer";
+import { PageTitle } from "@/shared/components/bvc/PageTitle";
 
 type SidePanel = "recording" | "video";
 
@@ -87,7 +88,7 @@ export function SheetPage() {
           <Link
             to={`/library/${song.id}`}
             aria-label="Quay lại bài hát"
-            className="flex size-11 shrink-0 items-center justify-center rounded-bvc-md border border-bvc-border text-bvc-ink hover:bg-bvc-surface hover:text-bvc-ink"
+            className="flex size-11 shrink-0 items-center justify-center rounded-full border border-bvc-border text-bvc-ink hover:bg-bvc-surface hover:text-bvc-ink"
           >
             <ChevronLeft className="size-5" />
           </Link>
@@ -99,9 +100,7 @@ export function SheetPage() {
             className="hidden sm:flex"
           />
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-            <h1 className="truncate text-lg font-extrabold tracking-[-0.02em] text-bvc-ink md:text-[22px]">
-              {sheet.name}
-            </h1>
+            <PageTitle size="compact">{sheet.name}</PageTitle>
             <span className="truncate text-[13px] text-bvc-muted">
               {song.title} · {sheet.instrument.name} · {sheet.level.name}
               {sheet.isMain && " · bản của giảng viên"}
@@ -214,7 +213,7 @@ export function SheetPage() {
         />
 
         <div className={cn("flex flex-col gap-3", panel !== "recording" && "hidden", "lg:flex")}>
-          <span className="text-[15px] font-bold text-bvc-ink">Bản thu mẫu · {sheet.instrument.name}</span>
+          <span className="text-[15px] font-semibold text-bvc-ink">Bản thu mẫu · {sheet.instrument.name}</span>
           {recording ? (
             <>
               <ReferencePlayer

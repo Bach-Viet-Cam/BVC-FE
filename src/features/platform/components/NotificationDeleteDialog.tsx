@@ -22,8 +22,8 @@ export function NotificationDeleteDialog({ target, onClose, onConfirm }: Notific
 
   return (
     <Dialog open={target !== null} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogPopup className="max-w-[460px] rounded-[18px] border-bvc-border p-6">
-        <DialogTitle className="text-[17px] font-bold text-bvc-ink">Xóa thông báo “{target?.title}”?</DialogTitle>
+      <DialogPopup className="max-w-[460px] rounded-bvc-xl border-bvc-border p-6">
+        <DialogTitle className="text-[17px] font-semibold text-bvc-ink">Xóa thông báo “{target?.title}”?</DialogTitle>
         <DialogDescription className="text-[13px] leading-relaxed text-bvc-muted">
           Chỉ xóa được thông báo nháp hoặc đang hẹn giờ. Thao tác này không thể hoàn tác.
         </DialogDescription>

@@ -1,7 +1,8 @@
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ActionButton } from "@/features/classes/components/ActionButton";
-import { FormField, INPUT_CLASSES } from "@/features/classes/components/FormField";
+import { ActionButton } from "@/shared/components/bvc/ActionButton";
+import { FormField } from "@/shared/components/bvc/FormField";
+import { INPUT_CLASSES } from "@/shared/components/bvc/fieldStyles";
 import { type ApiFieldError } from "@/features/classes/types/classTypes";
 import { applyFieldErrors } from "@/features/classes/utils/mapApiErrors";
 import { type GradingSettings, type GradingSettingsPayload } from "@/features/platform/types/settingsTypes";
@@ -46,11 +47,16 @@ export function GradingSettingsForm({ settings, isSaving, onSubmit }: GradingSet
     <form
       onSubmit={submit}
       noValidate
-      className="flex max-w-[560px] flex-col gap-[16px] rounded-[18px] border border-bvc-border p-[16px]"
+      className="flex max-w-[560px] flex-col gap-[16px] rounded-bvc-xl border border-bvc-border p-[16px]"
     >
-      <h2 className="m-0 text-[15px] font-extrabold tracking-[-0.01em]">Ngưỡng tiến độ</h2>
+      <h2 className="m-0 text-[15px] font-semibold tracking-[-0.01em]">Ngưỡng tiến độ</h2>
       <div className="grid grid-cols-2 gap-[12px]">
-        <FormField id="grading-min" label="Độ chính xác tối thiểu (%)" isRequired error={errors.minAccuracy?.message}>
+        <FormField
+          htmlFor="grading-min"
+          label="Độ chính xác tối thiểu (%)"
+          required
+          error={errors.minAccuracy?.message}
+        >
           <input
             id="grading-min"
             inputMode="numeric"
@@ -59,7 +65,7 @@ export function GradingSettingsForm({ settings, isSaving, onSubmit }: GradingSet
             className={cn(INPUT_CLASSES, "font-bvc-mono")}
           />
         </FormField>
-        <FormField id="grading-margin" label="Biên có nguy cơ (%)" isRequired error={errors.atRiskMargin?.message}>
+        <FormField htmlFor="grading-margin" label="Biên có nguy cơ (%)" required error={errors.atRiskMargin?.message}>
           <input
             id="grading-margin"
             inputMode="numeric"

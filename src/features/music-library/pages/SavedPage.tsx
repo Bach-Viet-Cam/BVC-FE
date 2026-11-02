@@ -10,6 +10,7 @@ import { CoverArt } from "@/features/music-library/components/CoverArt";
 import { SAVED_GRID_COLUMNS, SavedItemRow } from "@/features/music-library/components/SavedItemRow";
 import { useSavedContent } from "@/features/music-library/hooks/useSavedContent";
 import { sheetViewerHref } from "@/features/music-library/utils/sheetUtils";
+import { PageTitle } from "@/shared/components/bvc/PageTitle";
 
 type SavedTab = "songs" | "sheets";
 
@@ -36,9 +37,7 @@ export function SavedPage() {
     <StudentShell>
       <div className="mx-auto flex w-full max-w-[1200px] flex-1 flex-col gap-5 px-[18px] pt-4 pb-8 md:px-14 md:pt-8">
         <div className="flex flex-col gap-1">
-          <h1 className="text-[27px] leading-tight font-extrabold tracking-[-0.025em] text-bvc-ink md:text-[40px] md:tracking-[-0.03em]">
-            Nội dung đã lưu
-          </h1>
+          <PageTitle>Nội dung đã lưu</PageTitle>
           <p className="text-sm text-bvc-muted md:text-[15px]">Mới lưu nằm trên cùng.</p>
         </div>
 
@@ -79,10 +78,7 @@ export function SavedPage() {
           <div>
             <div
               aria-hidden
-              className={cn(
-                "hidden px-3.5 pb-2.5 text-xs font-bold tracking-[0.06em] text-bvc-muted uppercase",
-                SAVED_GRID_COLUMNS
-              )}
+              className={cn("hidden px-3.5 pb-2.5 text-xs font-semibold text-bvc-muted", SAVED_GRID_COLUMNS)}
             >
               {COLUMN_HEADERS[tab].map((header, index) => (
                 <span key={index}>{header}</span>

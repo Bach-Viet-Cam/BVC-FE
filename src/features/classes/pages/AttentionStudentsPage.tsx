@@ -70,7 +70,7 @@ export function AttentionStudentsPage() {
           onRetry={reload}
         >
           <span className="text-[13px] text-bvc-muted">{students.length} sinh viên</span>
-          <ul className="m-0 list-none rounded-[20px] border border-bvc-border bg-white p-0">
+          <ul className="m-0 list-none rounded-bvc-xl border border-bvc-border bg-white p-0">
             {students.map((student) => (
               <AttentionStudentRow
                 key={`${student.classId}:${student.userId}`}

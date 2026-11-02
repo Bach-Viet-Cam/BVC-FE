@@ -17,7 +17,10 @@ import { StudentShell } from "@/shared/components/bvc/StudentShell";
 import { useMyAssignments } from "@/features/classes/hooks/useMyAssignments";
 import { ASSIGNMENT_TYPE_LABELS, formatShortDeadline } from "@/features/classes/utils/assignmentFormat";
 import { type AssignmentListItem, type AssignmentType } from "@/features/classes/types/assignmentTypes";
+import { Eyebrow } from "@/shared/components/bvc/SectionIntro";
 import { cn } from "@/shared/utils/cn";
+import { PageTitle } from "@/shared/components/bvc/PageTitle";
+import { ActionButton } from "@/shared/components/bvc/ActionButton";
 
 // Icon đại diện cho từng phân loại bài học âm nhạc
 function AssignmentTypeIcon({
@@ -97,33 +100,21 @@ export function MyAssignmentsPage() {
   return (
     <StudentShell>
       <div className="mx-auto flex w-full max-w-[1220px] flex-1 flex-col gap-5 px-3.5 py-4 sm:px-6 md:gap-6 md:px-10 md:py-8">
-        {/* ── HEADER KHÔNG GIAN BÀI HỌC ── */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <div className="flex items-center gap-2 text-[12px] font-medium text-bvc-accent">
-              <span>Học kỳ TRD301</span>
-              <span className="text-bvc-line">·</span>
-              <span>Khoa Nhạc cụ truyền thống</span>
-            </div>
-
-            <h1 className="mt-1 font-bvc-display text-[26px] font-black tracking-tight text-bvc-ink sm:text-[30px]">
-              Bài tập của tôi
-            </h1>
+          <div className="flex flex-col">
+            <Eyebrow>Bài tập</Eyebrow>
+            <PageTitle className="mt-1">Bài tập của tôi</PageTitle>
             <p className="mt-1 text-[13.5px] text-bvc-muted">
               Theo dõi hạn nộp, luyện tập và hoàn thành các bài tập được giao.
             </p>
           </div>
 
           {/* Nút Bài Bonus nổi bật theo màu thương hiệu BVC */}
-          <button
-            type="button"
-            onClick={() => navigate("/community/bonus")}
-            className="group inline-flex shrink-0 items-center gap-2 self-start rounded-xl bg-bvc-accent px-4 py-2.5 text-[13px] font-bold text-white shadow-2xs transition-all hover:bg-bvc-ink hover:shadow-xs active:scale-[0.98]"
-          >
+          <ActionButton onClick={() => navigate("/community/bonus")}>
             <Award size={16} strokeWidth={2.2} className="text-white/90" />
             <span>Bài bonus</span>
             <ChevronRight size={14} className="text-white/80 transition-transform group-hover:translate-x-0.5" />
-          </button>
+          </ActionButton>
         </div>
 
         {/* ── BÀN ĐIỀU KHIỂN & BỘ LỌC (SEARCH & UNDERLINE TABS) ── */}
@@ -158,7 +149,7 @@ export function MyAssignmentsPage() {
                   aria-label="Lớp học"
                   value={classFilter}
                   onChange={(event) => setClassFilter(event.target.value)}
-                  className="h-9.5 cursor-pointer rounded-xl border border-bvc-border bg-bvc-surface/40 px-3 text-[12.5px] font-semibold text-bvc-ink focus:border-bvc-accent focus:bg-white focus:outline-none"
+                  className="h-9.5 cursor-pointer rounded-full border border-bvc-border bg-bvc-surface/40 px-3 text-[12.5px] font-medium text-bvc-ink focus:border-bvc-accent focus:bg-white focus:outline-none"
                 >
                   <option value="all">Tất cả lớp</option>
                   {classes.map(([id, name]) => (
@@ -173,7 +164,7 @@ export function MyAssignmentsPage() {
                 aria-label="Phân loại bài tập"
                 value={typeFilter}
                 onChange={(event) => setTypeFilter(event.target.value)}
-                className="h-9.5 cursor-pointer rounded-xl border border-bvc-border bg-bvc-surface/40 px-3 text-[12.5px] font-semibold text-bvc-ink focus:border-bvc-accent focus:bg-white focus:outline-none"
+                className="h-9.5 cursor-pointer rounded-full border border-bvc-border bg-bvc-surface/40 px-3 text-[12.5px] font-medium text-bvc-ink focus:border-bvc-accent focus:bg-white focus:outline-none"
               >
                 {typeFilters.map((tf) => (
                   <option key={tf.value} value={tf.value}>
@@ -183,15 +174,15 @@ export function MyAssignmentsPage() {
               </select>
 
               {/* Chuyển View Mode Grid / List */}
-              <div className="flex items-center rounded-xl border border-bvc-border bg-bvc-surface/60 p-0.5">
+              <div className="flex items-center rounded-full border border-bvc-border bg-bvc-surface/60 p-0.5">
                 <button
                   type="button"
                   onClick={() => setViewMode("grid")}
                   aria-label="Xem dạng lưới"
                   className={cn(
-                    "flex size-8.5 items-center justify-center rounded-lg transition-colors",
+                    "flex size-8.5 items-center justify-center rounded-full transition-colors",
                     viewMode === "grid"
-                      ? "bg-white text-bvc-ink shadow-2xs font-bold"
+                      ? "bg-white text-bvc-ink shadow-2xs font-semibold"
                       : "text-bvc-muted hover:text-bvc-ink"
                   )}
                 >
@@ -202,9 +193,9 @@ export function MyAssignmentsPage() {
                   onClick={() => setViewMode("list")}
                   aria-label="Xem dạng danh sách"
                   className={cn(
-                    "flex size-8.5 items-center justify-center rounded-lg transition-colors",
+                    "flex size-8.5 items-center justify-center rounded-full transition-colors",
                     viewMode === "list"
-                      ? "bg-white text-bvc-ink shadow-2xs font-bold"
+                      ? "bg-white text-bvc-ink shadow-2xs font-semibold"
                       : "text-bvc-muted hover:text-bvc-ink"
                   )}
                 >
@@ -225,14 +216,14 @@ export function MyAssignmentsPage() {
                   onClick={() => setStatusFilter(tab.value)}
                   className={cn(
                     "group relative flex shrink-0 items-center gap-1.5 pb-2 pt-0.5 text-[13px] font-medium transition-colors",
-                    isActive ? "text-bvc-ink font-bold" : "text-bvc-muted hover:text-bvc-ink"
+                    isActive ? "text-bvc-ink font-semibold" : "text-bvc-muted hover:text-bvc-ink"
                   )}
                 >
                   <span>{tab.label}</span>
                   <span
                     className={cn(
                       "font-bvc-mono text-[11px]",
-                      isActive ? "text-bvc-accent font-bold" : "text-bvc-faint group-hover:text-bvc-muted"
+                      isActive ? "text-bvc-accent font-semibold" : "text-bvc-faint group-hover:text-bvc-muted"
                     )}
                   >
                     {tab.count}
@@ -249,12 +240,12 @@ export function MyAssignmentsPage() {
           {isLoading && (
             <div className="flex flex-col items-center justify-center py-20 text-center text-bvc-muted">
               <span className="size-6 animate-spin rounded-full border-2 border-bvc-accent border-t-transparent" />
-              <p className="mt-3 font-semibold text-[14px]">Đang tải danh sách bài tập...</p>
+              <p className="mt-3 font-medium text-[14px]">Đang tải danh sách bài tập...</p>
             </div>
           )}
 
           {!isLoading && error && (
-            <div className="rounded-2xl border border-bvc-border bg-bvc-surface/60 p-6 text-center text-[14px] font-semibold text-bvc-error">
+            <div className="rounded-2xl border border-bvc-border bg-bvc-surface/60 p-6 text-center text-[14px] font-medium text-bvc-error">
               {error}
             </div>
           )}
@@ -262,7 +253,7 @@ export function MyAssignmentsPage() {
           {!isLoading && !error && items.length === 0 && (
             <div className="flex flex-col items-center justify-center rounded-3xl border border-bvc-border bg-white py-20 text-center shadow-2xs">
               <BookOpen size={40} className="text-bvc-faint mb-3" strokeWidth={1.5} />
-              <p className="font-bvc-display text-[18px] font-bold text-bvc-ink">Bạn chưa có bài tập nào</p>
+              <p className="font-bvc-display text-[18px] font-semibold text-bvc-ink">Bạn chưa có bài tập nào</p>
               <p className="mt-1 text-[13px] text-bvc-muted">
                 Các bài luyện ngón, tiết tấu và thu âm giảng viên giao sẽ hiện ở đây.
               </p>
@@ -272,7 +263,7 @@ export function MyAssignmentsPage() {
           {!isLoading && !error && items.length > 0 && visible.length === 0 && (
             <div className="flex flex-col items-center justify-center rounded-3xl border border-bvc-border bg-white py-16 text-center shadow-2xs">
               <Search size={36} className="text-bvc-faint mb-2.5" strokeWidth={1.5} />
-              <p className="font-bvc-display text-[17px] font-bold text-bvc-ink">Không tìm thấy bài tập phù hợp</p>
+              <p className="font-bvc-display text-[17px] font-semibold text-bvc-ink">Không tìm thấy bài tập phù hợp</p>
               <p className="mt-1 text-[13px] text-bvc-muted">Thử thay đổi từ khóa hoặc bộ lọc trạng thái phía trên.</p>
             </div>
           )}
@@ -350,7 +341,7 @@ function AssignmentCard({ assignment, onSelect }: AssignmentCardProps) {
               className="text-bvc-accent shrink-0"
               strokeWidth={2.2}
             />
-            <span className="font-semibold text-bvc-ink/90">{assignment.className}</span>
+            <span className="font-medium text-bvc-ink/90">{assignment.className}</span>
             <span className="text-bvc-line">·</span>
             <span>{ASSIGNMENT_TYPE_LABELS[assignment.type] || "Bài tập"}</span>
           </div>
@@ -358,7 +349,7 @@ function AssignmentCard({ assignment, onSelect }: AssignmentCardProps) {
           {/* Trạng thái hiển thị bằng chấm màu tinh tế (Chấm + Chữ, không đóng khung Pill) */}
           <div className="flex items-center gap-1.5 shrink-0 text-[11.5px] font-medium">
             {isOverdue && (
-              <span className="flex items-center gap-1 font-semibold text-bvc-error">
+              <span className="flex items-center gap-1 font-medium text-bvc-error">
                 <span className="size-1.5 rounded-full bg-bvc-error" />
                 <span>Quá hạn</span>
               </span>
@@ -370,13 +361,13 @@ function AssignmentCard({ assignment, onSelect }: AssignmentCardProps) {
               </span>
             )}
             {isSubmitted && (
-              <span className="flex items-center gap-1 font-semibold text-bvc-accent">
+              <span className="flex items-center gap-1 font-medium text-bvc-accent">
                 <span className="size-1.5 rounded-full bg-bvc-accent" />
                 <span>Đã nộp</span>
               </span>
             )}
             {isPassed && (
-              <span className="flex items-center gap-1 font-semibold text-bvc-ok">
+              <span className="flex items-center gap-1 font-medium text-bvc-ok">
                 <span className="size-1.5 rounded-full bg-bvc-ok" />
                 <span>Đạt</span>
               </span>
@@ -385,7 +376,7 @@ function AssignmentCard({ assignment, onSelect }: AssignmentCardProps) {
         </div>
 
         {/* Tiêu đề bài tập */}
-        <h2 className="mt-3 font-bvc-display text-[16px] font-bold leading-snug text-bvc-ink transition-colors group-hover:text-bvc-accent line-clamp-2">
+        <h2 className="mt-3 font-bvc-display text-[16px] font-semibold leading-snug text-bvc-ink transition-colors group-hover:text-bvc-accent line-clamp-2">
           {assignment.title}
         </h2>
 
@@ -393,7 +384,7 @@ function AssignmentCard({ assignment, onSelect }: AssignmentCardProps) {
         <div className="mt-4">
           <div className="flex items-center justify-between text-[11.5px] text-bvc-muted">
             <span>
-              Chuẩn đạt: <strong className="font-semibold text-bvc-ink">≥ {assignment.minAccuracy}%</strong>
+              Chuẩn đạt: <strong className="font-medium text-bvc-ink">≥ {assignment.minAccuracy}%</strong>
             </span>
             <span className="font-bvc-mono text-bvc-muted">
               {assignment.usedSubmissions}/{assignment.maxSubmissions} lượt nộp
@@ -418,11 +409,11 @@ function AssignmentCard({ assignment, onSelect }: AssignmentCardProps) {
       {/* Chân thẻ: Hạn nộp & Tương tác */}
       <div className="mt-4 border-t border-bvc-line/70 pt-3">
         <div className="flex items-center justify-between text-[12px]">
-          <span className={cn("font-medium", isOverdue ? "font-semibold text-bvc-error" : "text-bvc-muted")}>
+          <span className={cn("font-medium", isOverdue ? "font-medium text-bvc-error" : "text-bvc-muted")}>
             Hạn: {formatShortDeadline(assignment.deadline)}
           </span>
 
-          <span className="flex items-center gap-1 text-[11.5px] font-bold text-bvc-accent transition-transform group-hover:translate-x-0.5">
+          <span className="flex items-center gap-1 text-[11.5px] font-semibold text-bvc-accent transition-transform group-hover:translate-x-0.5">
             <span>Luyện bài</span>
             <ArrowRight size={12} />
           </span>
@@ -459,7 +450,7 @@ function AssignmentListItemRow({ assignment, onSelect }: AssignmentListItemRowPr
 
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <span className="truncate font-bvc-display text-[15px] font-bold text-bvc-ink group-hover:text-bvc-accent transition-colors">
+            <span className="truncate font-bvc-display text-[15px] font-semibold text-bvc-ink group-hover:text-bvc-accent transition-colors">
               {assignment.title}
             </span>
           </div>
@@ -474,7 +465,7 @@ function AssignmentListItemRow({ assignment, onSelect }: AssignmentListItemRowPr
       </div>
 
       <div className="flex items-center justify-between sm:justify-end gap-5 shrink-0 mt-1 sm:mt-0 text-[12px]">
-        <span className={cn("font-medium", isOverdue ? "font-semibold text-bvc-error" : "text-bvc-muted")}>
+        <span className={cn("font-medium", isOverdue ? "font-medium text-bvc-error" : "text-bvc-muted")}>
           Hạn {formatShortDeadline(assignment.deadline)}
         </span>
 
@@ -484,7 +475,7 @@ function AssignmentListItemRow({ assignment, onSelect }: AssignmentListItemRowPr
 
         <div className="flex items-center gap-1.5 min-w-[70px] justify-end text-[11.5px] font-medium">
           {isOverdue && (
-            <span className="flex items-center gap-1 font-semibold text-bvc-error">
+            <span className="flex items-center gap-1 font-medium text-bvc-error">
               <span className="size-1.5 rounded-full bg-bvc-error" />
               <span>Quá hạn</span>
             </span>
@@ -496,13 +487,13 @@ function AssignmentListItemRow({ assignment, onSelect }: AssignmentListItemRowPr
             </span>
           )}
           {isSubmitted && (
-            <span className="flex items-center gap-1 font-semibold text-bvc-accent">
+            <span className="flex items-center gap-1 font-medium text-bvc-accent">
               <span className="size-1.5 rounded-full bg-bvc-accent" />
               <span>Đã nộp</span>
             </span>
           )}
           {isPassed && (
-            <span className="flex items-center gap-1 font-semibold text-bvc-ok">
+            <span className="flex items-center gap-1 font-medium text-bvc-ok">
               <span className="size-1.5 rounded-full bg-bvc-ok" />
               <span>Đạt</span>
             </span>

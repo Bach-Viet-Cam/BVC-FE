@@ -50,15 +50,15 @@ export function ProgressHistoryCard({ history }: ProgressHistoryCardProps) {
   const isDecline = (history.deltaPercent ?? 0) < 0;
 
   return (
-    <section className="flex flex-col gap-3 rounded-bvc-xl border border-bvc-border bg-white p-4 md:rounded-[22px] md:p-5.5">
+    <section className="flex flex-col gap-3 rounded-bvc-xl border border-bvc-border bg-white p-4 md:rounded-bvc-xl md:p-5.5">
       <div className="flex items-center justify-between gap-2">
         <div>
-          <h2 className="text-sm font-bold text-bvc-ink">Tiến trình qua các lần nộp</h2>
+          <h2 className="text-sm font-semibold text-bvc-ink">Tiến trình qua các lần nộp</h2>
           <p className="mt-0.5 text-[11px] text-bvc-muted">Cùng bài hát {history.pieceTitle}</p>
         </div>
         <span
           className={cn(
-            "flex shrink-0 items-center gap-1 rounded-full border bg-bvc-soft px-2 py-0.5 text-[11px] font-bold",
+            "flex shrink-0 items-center gap-1 rounded-full border bg-bvc-soft px-2 py-0.5 text-[11px] font-semibold",
             isDecline ? "border-bvc-border text-bvc-muted" : "border-bvc-ok/20 text-bvc-ok"
           )}
         >
@@ -102,7 +102,7 @@ export function ProgressHistoryCard({ history }: ProgressHistoryCardProps) {
                   y={yAt(score) + 3}
                   fontSize="8"
                   fill="#94a3b8"
-                  fontWeight="600"
+                  fontWeight="500"
                   textAnchor="end"
                 >
                   {score}%
@@ -135,7 +135,7 @@ export function ProgressHistoryCard({ history }: ProgressHistoryCardProps) {
                       y={point.y - 10}
                       fontSize="9"
                       fill="var(--color-bvc-muted)"
-                      fontWeight="700"
+                      fontWeight="600"
                       textAnchor="middle"
                     >
                       {point.score}%
@@ -146,7 +146,7 @@ export function ProgressHistoryCard({ history }: ProgressHistoryCardProps) {
                     y="119"
                     fontSize="9"
                     fill={isCurrent ? "var(--color-bvc-ink)" : "#475569"}
-                    fontWeight={isCurrent ? 800 : 700}
+                    fontWeight={isCurrent ? 600 : 500}
                     textAnchor="middle"
                   >
                     {point.label}
@@ -159,7 +159,7 @@ export function ProgressHistoryCard({ history }: ProgressHistoryCardProps) {
             })}
             <g transform={`translate(${last.x - 40}, ${last.y - 32})`}>
               <rect width="80" height="18" rx="9" fill="var(--color-bvc-ink)" />
-              <text x="40" y="12" fontSize="8.5" fill="#fff" fontWeight="700" textAnchor="middle">
+              <text x="40" y="12" fontSize="8.5" fill="#fff" fontWeight="600" textAnchor="middle">
                 {best}% · Cao nhất
               </text>
             </g>
@@ -181,7 +181,7 @@ export function ProgressHistoryCard({ history }: ProgressHistoryCardProps) {
           </svg>
           {hover && (
             <ChartTooltip percent={(hover.x / CHART.width) * 100}>
-              <div className="font-bold">{hover.label}</div>
+              <div className="font-semibold">{hover.label}</div>
               <div className="text-bvc-muted">{hover.when}</div>
               <div>Điểm: {hover.score}%</div>
             </ChartTooltip>

@@ -9,7 +9,7 @@ interface SearchInputProps {
 
 export function SearchInput({ id, label, value, onChange }: SearchInputProps) {
   return (
-    <div className="flex min-w-0 grow items-center gap-[10px] rounded-[22px] border border-bvc-border-strong px-[14px] focus-within:border-bvc-accent">
+    <div className="flex min-w-0 grow items-center gap-[10px] rounded-bvc-xl border border-bvc-border-strong px-[14px] focus-within:border-bvc-accent">
       <Search size={18} strokeWidth={1.7} className="shrink-0 text-bvc-muted" aria-hidden="true" />
       <label htmlFor={id} className="sr-only">
         {label}

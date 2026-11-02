@@ -4,6 +4,8 @@ import { StudentShell } from "@/shared/components/bvc/StudentShell";
 import { StatCard } from "@/shared/components/bvc/StatCard";
 import { EmptyState } from "@/shared/components/bvc/EmptyState";
 import { ActionButton } from "@/shared/components/bvc/ActionButton";
+import { PageHero } from "@/shared/components/bvc/PageHero";
+import { PillLink } from "@/shared/components/bvc/PillLink";
 import { useAuth } from "@/shared/context/AuthContext";
 import { formatDate } from "@/shared/utils/formatDate";
 import { useMyAssignments } from "@/features/classes/hooks/useMyAssignments";
@@ -15,6 +17,7 @@ import { RecentSubmissionsCard } from "@/features/home/components/RecentSubmissi
 import { UpcomingAssignments } from "@/features/home/components/UpcomingAssignments";
 import { useStudentDashboard } from "@/features/home/hooks/useStudentDashboard";
 import { formatPercent, summarizeAssignments } from "@/features/home/utils/homeFormat";
+import { SectionTitle } from "@/shared/components/bvc/SectionTitle";
 
 const UPCOMING_LIMIT = 3;
 
@@ -24,8 +27,6 @@ const QUICK_LINKS = [
   { label: "Đã lưu", description: "Bài hát và bản nhạc đã lưu", to: "/saved", icon: Bookmark },
   { label: "Bảng xếp hạng", description: "Thứ hạng của bạn trong học kỳ", to: "/community/leaderboard", icon: Trophy },
 ];
-
-const SECTION_HEADING = "text-xl font-extrabold tracking-[-0.02em] text-bvc-ink md:text-2xl";
 
 // Trang "Hôm nay" của sinh viên: số liệu luyện tập trong ngày, lần nộp gần nhất, bài tập sắp đến hạn
 // và tổng hợp tiến bộ. Tài khoản chưa nộp bài nào thì thay phần số liệu bằng gợi ý từ thư viện.
@@ -44,14 +45,17 @@ export function HomePage() {
   return (
     <StudentShell>
       <div className="mx-auto flex w-full max-w-[1200px] flex-1 flex-col gap-8 px-[18px] pt-4 pb-8 md:px-14 md:pt-8">
-        <div className="flex flex-col gap-1">
-          <p className="text-[12px] font-semibold tracking-[0.12em] text-bvc-muted uppercase">
-            Hôm nay · {formatDate(new Date().toISOString(), "EEEE, dd/MM")}
-          </p>
-          <h1 className="text-[27px] leading-tight font-extrabold tracking-[-0.025em] text-bvc-ink md:text-[40px] md:tracking-[-0.03em]">
-            Xin chào, {user?.username}
-          </h1>
-        </div>
+        <PageHero
+          eyebrow={`Hôm nay · ${formatDate(new Date().toISOString(), "EEEE, dd/MM")}`}
+          title={`Xin chào, ${user?.username ?? "bạn"}`}
+          description="Luyện một bài mỗi ngày, nộp bản thu và theo dõi sự tiến bộ của bạn ngay tại đây."
+          actions={
+            <>
+              <PillLink to="/library" label="Luyện tập ngay" variant="light" size="md" />
+              <PillLink to="/assignments" label="Bài tập" variant="glass" size="md" />
+            </>
+          }
+        />
 
         {isLoading ? (
           <p className="text-[14px] text-bvc-muted">Đang tải số liệu luyện tập...</p>
@@ -69,9 +73,7 @@ export function HomePage() {
         ) : (
           <>
             <section aria-labelledby="today-heading" className="flex flex-col gap-3">
-              <h2 id="today-heading" className={SECTION_HEADING}>
-                Luyện tập hôm nay
-              </h2>
+              <SectionTitle id="today-heading">Luyện tập hôm nay</SectionTitle>
               <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
                 <div className="grid grid-cols-2 gap-3">
                   <StatCard label="Lượt nộp" value={dashboard.today.submitted} />
@@ -93,9 +95,7 @@ export function HomePage() {
             </div>
 
             <section aria-labelledby="summary-heading" className="flex flex-col gap-3">
-              <h2 id="summary-heading" className={SECTION_HEADING}>
-                Tổng hợp bài tập
-              </h2>
+              <SectionTitle id="summary-heading">Tổng hợp bài tập</SectionTitle>
               <AssignmentHighlights
                 summary={summarizeAssignments(assignments.items)}
                 mostSubmitted={dashboard.mostSubmittedAssignment}
@@ -120,9 +120,7 @@ export function HomePage() {
         )}
 
         <section aria-labelledby="quick-heading" className="flex flex-col gap-3">
-          <h2 id="quick-heading" className={SECTION_HEADING}>
-            Truy cập nhanh
-          </h2>
+          <SectionTitle id="quick-heading">Truy cập nhanh</SectionTitle>
           <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {QUICK_LINKS.map(({ label, description, to, icon: Icon }) => (
               <li key={to}>
@@ -132,7 +130,7 @@ export function HomePage() {
                 >
                   <Icon className="size-5 shrink-0 text-bvc-accent-text" strokeWidth={1.8} aria-hidden />
                   <span className="flex min-w-0 flex-col">
-                    <span className="text-[14.5px] font-bold">{label}</span>
+                    <span className="text-[14.5px] font-semibold">{label}</span>
                     <span className="text-[12.5px] text-bvc-muted">{description}</span>
                   </span>
                 </Link>

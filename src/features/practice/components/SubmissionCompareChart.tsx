@@ -102,7 +102,7 @@ export function SubmissionCompareChart() {
               y="16.8"
               textAnchor="middle"
               fontSize="10.5"
-              fontWeight="700"
+              fontWeight="600"
               fill={badge.text}
             >
               {badge.label}

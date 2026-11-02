@@ -26,6 +26,7 @@ import { type CategoryFormTarget } from "@/features/platform/types/categoryTypes
 import { type InstrumentItem } from "@/features/platform/types/configTypes";
 import { ActionTooltip } from "@/shared/components/ui/tooltip";
 import { Switch } from "@/shared/components/ui/switch";
+import { ActionButton } from "@/shared/components/bvc/ActionButton";
 
 export function CategoriesAdminPage() {
   const { items, error, isLoading, reload, saveCategory, removeCategory } = useContentCategories();
@@ -133,21 +134,17 @@ export function CategoriesAdminPage() {
                   void instruments.reload();
                 }}
                 disabled={isLoading || instruments.isLoading}
-                className="flex size-[42px] cursor-pointer items-center justify-center rounded-[12px] border border-bvc-border bg-white text-bvc-muted transition-colors hover:border-bvc-border-strong hover:text-bvc-ink disabled:opacity-50"
+                className="flex size-[42px] cursor-pointer items-center justify-center rounded-full border border-bvc-border bg-white text-bvc-muted transition-colors hover:border-bvc-border-strong hover:text-bvc-ink disabled:opacity-50"
               >
                 <RotateCw size={16} className={isLoading || instruments.isLoading ? "animate-spin text-bvc-ink" : ""} />
               </button>
             </ActionTooltip>
 
             <ActionTooltip content="Tạo một danh mục gốc mới">
-              <button
-                type="button"
-                onClick={() => openCategoryForm(null)}
-                className="flex min-h-[42px] cursor-pointer items-center gap-2 rounded-[12px] bg-bvc-ink px-4 text-[13.5px] font-semibold text-white transition-colors hover:bg-black"
-              >
+              <ActionButton onClick={() => openCategoryForm(null)}>
                 <FolderPlus size={16} />
                 <span>Thêm danh mục gốc</span>
-              </button>
+              </ActionButton>
             </ActionTooltip>
           </div>
         }
@@ -155,14 +152,14 @@ export function CategoriesAdminPage() {
 
       <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-6 md:px-8">
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
-          <div className="flex flex-col overflow-hidden rounded-[18px] border border-bvc-border bg-white lg:col-span-6">
+          <div className="flex flex-col overflow-hidden rounded-bvc-xl border border-bvc-border bg-white lg:col-span-6">
             <div className="flex flex-col gap-3 border-b border-bvc-border p-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="flex size-[32px] items-center justify-center rounded-[8px] bg-bvc-surface text-bvc-ink">
                   <FolderTree size={16} />
                 </div>
                 <div>
-                  <h2 className="text-[15px] font-extrabold tracking-[-0.02em] text-bvc-ink">Cây danh mục nội dung</h2>
+                  <h2 className="text-[15px] font-semibold tracking-[-0.02em] text-bvc-ink">Cây danh mục nội dung</h2>
                 </div>
               </div>
 
@@ -194,7 +191,7 @@ export function CategoriesAdminPage() {
                     <button
                       type="button"
                       onClick={expandAll}
-                      className="cursor-pointer rounded-[7px] px-2 py-1 text-[11.5px] font-semibold text-bvc-muted transition-colors hover:text-bvc-ink"
+                      className="cursor-pointer rounded-full px-2 py-1 text-[11.5px] font-medium text-bvc-muted transition-colors hover:text-bvc-ink"
                     >
                       Mở rộng
                     </button>
@@ -203,7 +200,7 @@ export function CategoriesAdminPage() {
                     <button
                       type="button"
                       onClick={collapseAll}
-                      className="cursor-pointer rounded-[7px] px-2 py-1 text-[11.5px] font-semibold text-bvc-muted transition-colors hover:text-bvc-ink"
+                      className="cursor-pointer rounded-full px-2 py-1 text-[11.5px] font-medium text-bvc-muted transition-colors hover:text-bvc-ink"
                     >
                       Thu gọn
                     </button>
@@ -219,7 +216,7 @@ export function CategoriesAdminPage() {
                     <div className="flex size-[44px] items-center justify-center rounded-[12px] bg-bvc-surface text-bvc-muted">
                       <Folder size={20} />
                     </div>
-                    <p className="mt-3 text-[14px] font-bold text-bvc-ink">
+                    <p className="mt-3 text-[14px] font-semibold text-bvc-ink">
                       {categorySearch ? "Không tìm thấy danh mục phù hợp" : "Chưa có danh mục nội dung"}
                     </p>
                     <p className="mt-1 text-[12.5px] text-bvc-muted">
@@ -252,7 +249,7 @@ export function CategoriesAdminPage() {
 
                               <Folder size={17} className="shrink-0 text-bvc-ink" />
 
-                              <span className="truncate text-[14px] font-bold text-bvc-ink">{category.name}</span>
+                              <span className="truncate text-[14px] font-semibold text-bvc-ink">{category.name}</span>
 
                               <span className="font-mono text-[11.5px] font-medium text-bvc-muted bg-bvc-surface border border-bvc-border px-2 py-0.5 rounded-[6px]">
                                 {category.pieceCount} bài
@@ -267,14 +264,10 @@ export function CategoriesAdminPage() {
 
                             <div className="flex items-center gap-1">
                               <ActionTooltip content={`Thêm nhánh con cho ${category.name}`}>
-                                <button
-                                  type="button"
-                                  onClick={() => openCategoryForm(null, category.id)}
-                                  className="flex h-[30px] cursor-pointer items-center gap-1 rounded-[8px] border border-bvc-border bg-bvc-surface/60 px-2 text-[12px] font-medium text-bvc-ink transition-colors hover:border-bvc-border-strong hover:bg-white"
-                                >
+                                <ActionButton variant="secondary" onClick={() => openCategoryForm(null, category.id)}>
                                   <Plus size={13} />
                                   <span className="hidden sm:inline">Thêm nhánh</span>
-                                </button>
+                                </ActionButton>
                               </ActionTooltip>
 
                               <ActionTooltip content={`Đổi tên ${category.name}`}>
@@ -283,7 +276,7 @@ export function CategoriesAdminPage() {
                                   onClick={() =>
                                     openCategoryForm({ id: category.id, name: category.name, parentId: null })
                                   }
-                                  className="flex size-[30px] cursor-pointer items-center justify-center rounded-[8px] text-bvc-muted transition-colors hover:bg-bvc-surface hover:text-bvc-ink"
+                                  className="flex size-[30px] cursor-pointer items-center justify-center rounded-full text-bvc-muted transition-colors hover:bg-bvc-surface hover:text-bvc-ink"
                                 >
                                   <Pencil size={14} />
                                 </button>
@@ -293,7 +286,7 @@ export function CategoriesAdminPage() {
                                 <button
                                   type="button"
                                   onClick={() => setDeleteTarget({ id: category.id, name: category.name })}
-                                  className="flex size-[30px] cursor-pointer items-center justify-center rounded-[8px] text-bvc-muted transition-colors hover:bg-bvc-surface hover:text-bvc-error"
+                                  className="flex size-[30px] cursor-pointer items-center justify-center rounded-full text-bvc-muted transition-colors hover:bg-bvc-surface hover:text-bvc-error"
                                 >
                                   <Trash2 size={14} />
                                 </button>
@@ -363,7 +356,7 @@ export function CategoriesAdminPage() {
             </div>
           </div>
 
-          <div className="flex flex-col overflow-hidden rounded-[18px] border border-bvc-border bg-white lg:col-span-6">
+          <div className="flex flex-col overflow-hidden rounded-bvc-xl border border-bvc-border bg-white lg:col-span-6">
             <div className="flex flex-col gap-3 border-b border-bvc-border p-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="flex size-[32px] items-center justify-center rounded-[8px] bg-bvc-surface text-bvc-ink">
@@ -371,8 +364,8 @@ export function CategoriesAdminPage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="text-[15px] font-extrabold tracking-[-0.02em] text-bvc-ink">Nhạc cụ</h2>
-                    <span className="rounded-[6px] border border-bvc-border bg-bvc-surface px-1.5 py-0.5 text-[10.5px] font-bold text-bvc-muted uppercase">
+                    <h2 className="text-[15px] font-semibold tracking-[-0.02em] text-bvc-ink">Nhạc cụ</h2>
+                    <span className="rounded-[6px] border border-bvc-border bg-bvc-surface px-1.5 py-0.5 text-[10.5px] font-semibold text-bvc-muted">
                       Chỉ Admin
                     </span>
                   </div>
@@ -380,14 +373,10 @@ export function CategoriesAdminPage() {
               </div>
 
               <ActionTooltip content="Thêm nhạc cụ mới vào hệ thống">
-                <button
-                  type="button"
-                  onClick={() => openInstrumentForm(null)}
-                  className="flex h-[36px] cursor-pointer items-center gap-1.5 rounded-[10px] bg-bvc-ink px-3 text-[13px] font-semibold text-white transition-colors hover:bg-black"
-                >
+                <ActionButton size="sm" onClick={() => openInstrumentForm(null)}>
                   <Plus size={14} />
                   <span>Thêm nhạc cụ</span>
-                </button>
+                </ActionButton>
               </ActionTooltip>
             </div>
 
@@ -419,7 +408,7 @@ export function CategoriesAdminPage() {
               <PageStatus isLoading={instruments.isLoading} error={instruments.error} onRetry={instruments.reload}>
                 {filteredInstruments.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-10 text-center">
-                    <p className="text-[13.5px] font-semibold text-bvc-ink">
+                    <p className="text-[13.5px] font-medium text-bvc-ink">
                       {instrumentSearch ? "Không có nhạc cụ phù hợp" : "Chưa có nhạc cụ nào"}
                     </p>
                     <p className="mt-1 text-[12px] text-bvc-muted">
@@ -437,10 +426,10 @@ export function CategoriesAdminPage() {
                       >
                         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                           <div className="flex items-center gap-2">
-                            <span className="font-mono text-[12px] font-semibold text-bvc-ink bg-bvc-surface border border-bvc-border px-2 py-0.5 rounded-[6px]">
+                            <span className="font-mono text-[12px] font-medium text-bvc-ink bg-bvc-surface border border-bvc-border px-2 py-0.5 rounded-[6px]">
                               {instrument.code}
                             </span>
-                            <span className="truncate text-[13.5px] font-bold text-bvc-ink">{instrument.name}</span>
+                            <span className="truncate text-[13.5px] font-semibold text-bvc-ink">{instrument.name}</span>
                             <ActionTooltip content="Số lượng dây / nốt cơ bản đã cấu hình">
                               <span
                                 className={`inline-flex items-center rounded-md border px-1.5 py-0.5 text-[11px] font-medium ${
@@ -461,21 +450,17 @@ export function CategoriesAdminPage() {
 
                         <div className="flex shrink-0 items-center gap-1.5">
                           <ActionTooltip content={`Cấu hình dây / nốt chuẩn cho ${instrument.name}`}>
-                            <button
-                              type="button"
-                              onClick={() => openTunesDialog(instrument)}
-                              className="flex h-[30px] cursor-pointer items-center gap-1.5 rounded-[8px] border border-bvc-border bg-bvc-surface/60 px-2.5 text-[12px] font-semibold text-bvc-ink transition-colors hover:border-bvc-border-strong hover:bg-white"
-                            >
+                            <ActionButton variant="secondary" onClick={() => openTunesDialog(instrument)}>
                               <SlidersHorizontal size={13} className="text-bvc-muted" />
                               <span>Dây</span>
-                            </button>
+                            </ActionButton>
                           </ActionTooltip>
 
                           <ActionTooltip content={`Chỉnh sửa thông tin ${instrument.name}`}>
                             <button
                               type="button"
                               onClick={() => openInstrumentForm(instrument)}
-                              className="flex size-[30px] cursor-pointer items-center justify-center rounded-[8px] text-bvc-muted transition-colors hover:bg-white hover:text-bvc-ink"
+                              className="flex size-[30px] cursor-pointer items-center justify-center rounded-full text-bvc-muted transition-colors hover:bg-white hover:text-bvc-ink"
                             >
                               <Pencil size={14} />
                             </button>
@@ -495,7 +480,9 @@ export function CategoriesAdminPage() {
                                 size="sm"
                                 checked={instrument.isActive}
                                 onCheckedChange={() => void instruments.toggleActive(instrument)}
-                                aria-label={instrument.isActive ? `Tạm dừng ${instrument.name}` : `Kích hoạt ${instrument.name}`}
+                                aria-label={
+                                  instrument.isActive ? `Tạm dừng ${instrument.name}` : `Kích hoạt ${instrument.name}`
+                                }
                                 className="cursor-pointer data-checked:bg-bvc-ok"
                               />
                             </div>

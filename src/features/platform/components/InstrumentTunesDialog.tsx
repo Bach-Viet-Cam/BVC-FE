@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Loader2, Plus, SlidersHorizontal, Sparkles, Trash2 } from "lucide-react";
+import { Info, Loader2, Plus, SlidersHorizontal, Trash2 } from "lucide-react";
 import { Dialog, DialogDescription, DialogPopup, DialogTitle } from "@/shared/components/ui/dialog";
 import { type InstrumentItem, type InstrumentTuneInput } from "@/features/platform/types/configTypes";
 import { instrumentApi } from "@/features/platform/api/instrumentApi";
@@ -138,9 +138,7 @@ export function InstrumentTunesDialog({ isOpen, instrument, onOpenChange, onSave
   };
 
   const updateRow = (index: number, field: "tuneName" | "pitchText", value: string) => {
-    setTunes((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
-    );
+    setTunes((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
   };
 
   const applyPreset = (presetKey: string) => {
@@ -203,17 +201,18 @@ export function InstrumentTunesDialog({ isOpen, instrument, onOpenChange, onSave
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogPopup className="max-w-[560px] rounded-[22px] border border-bvc-border bg-white p-6 shadow-none">
+      <DialogPopup className="max-w-[560px] rounded-bvc-xl border border-bvc-border bg-white p-6 shadow-none">
         <div className="flex items-center gap-3">
           <div className="flex size-[40px] items-center justify-center rounded-[12px] bg-bvc-surface text-bvc-ink">
             <SlidersHorizontal size={20} />
           </div>
           <div className="min-w-0 flex-1">
-            <DialogTitle className="truncate text-[17px] font-extrabold tracking-[-0.02em] text-bvc-ink">
+            <DialogTitle className="truncate text-[17px] font-semibold tracking-[-0.02em] text-bvc-ink">
               Cấu hình dây / nốt chuẩn
             </DialogTitle>
             <DialogDescription className="truncate text-[13px] text-bvc-muted">
-              {instrument ? `${instrument.name} (${instrument.code})` : "Nhạc cụ"} · Định nghĩa các dây/nốt và tần số chuẩn (Hz)
+              {instrument ? `${instrument.name} (${instrument.code})` : "Nhạc cụ"} · Định nghĩa các dây/nốt và tần số
+              chuẩn (Hz)
             </DialogDescription>
           </div>
         </div>
@@ -221,13 +220,15 @@ export function InstrumentTunesDialog({ isOpen, instrument, onOpenChange, onSave
         {currentPreset && (
           <div className="mt-3 flex items-center justify-between rounded-[10px] bg-bvc-surface/60 px-3 py-2 text-[12.5px]">
             <span className="flex items-center gap-1.5 text-bvc-muted">
-              <Sparkles size={14} className="text-bvc-accent-text" />
-              <span>Gợi ý mẫu: <strong>{currentPreset.label}</strong></span>
+              <Info size={14} className="text-bvc-accent-text" />
+              <span>
+                Gợi ý mẫu: <strong>{currentPreset.label}</strong>
+              </span>
             </span>
             <button
               type="button"
               onClick={() => instrument && applyPreset(instrument.code.toUpperCase())}
-              className="cursor-pointer font-semibold text-bvc-accent-text hover:underline"
+              className="cursor-pointer font-medium text-bvc-accent-text hover:underline"
             >
               Áp dụng
             </button>
@@ -243,7 +244,7 @@ export function InstrumentTunesDialog({ isOpen, instrument, onOpenChange, onSave
           <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-3">
             <div className="max-h-[340px] overflow-y-auto pr-1">
               <div className="flex flex-col gap-2">
-                <div className="grid grid-cols-[36px_1fr_120px_36px] items-center gap-2 px-1 text-[11.5px] font-bold text-bvc-muted uppercase">
+                <div className="grid grid-cols-[36px_1fr_120px_36px] items-center gap-2 px-1 text-[11.5px] font-semibold text-bvc-muted">
                   <span>STT</span>
                   <span>Tên dây / Nốt</span>
                   <span>Tần số (Hz)</span>
@@ -255,16 +256,14 @@ export function InstrumentTunesDialog({ isOpen, instrument, onOpenChange, onSave
                     key={tune.tempId}
                     className="grid grid-cols-[36px_1fr_120px_36px] items-center gap-2 rounded-[10px] border border-bvc-border/80 bg-bvc-surface/20 p-1.5 transition-colors focus-within:border-bvc-ink focus-within:bg-white"
                   >
-                    <span className="text-center font-mono text-[12px] font-bold text-bvc-muted">
-                      {index + 1}
-                    </span>
+                    <span className="text-center font-mono text-[12px] font-semibold text-bvc-muted">{index + 1}</span>
 
                     <input
                       type="text"
                       value={tune.tuneName}
                       onChange={(e) => updateRow(index, "tuneName", e.target.value)}
                       placeholder="vd: Dây 1 (Sol 4)"
-                      className="h-[34px] w-full rounded-[8px] border border-bvc-border bg-white px-2.5 text-[13px] font-semibold text-bvc-ink placeholder:font-normal placeholder:text-bvc-faint focus:border-bvc-ink focus:outline-none"
+                      className="h-[34px] w-full rounded-[8px] border border-bvc-border bg-white px-2.5 text-[13px] font-medium text-bvc-ink placeholder:font-normal placeholder:text-bvc-faint focus:border-bvc-ink focus:outline-none"
                     />
 
                     <div className="relative flex items-center">
@@ -278,7 +277,7 @@ export function InstrumentTunesDialog({ isOpen, instrument, onOpenChange, onSave
                         placeholder="440"
                         className="h-[34px] w-full rounded-[8px] border border-bvc-border bg-white pl-2.5 pr-6 font-mono text-[13px] text-bvc-ink placeholder:text-bvc-faint focus:border-bvc-ink focus:outline-none"
                       />
-                      <span className="pointer-events-none absolute right-2 text-[10.5px] font-bold text-bvc-muted">
+                      <span className="pointer-events-none absolute right-2 text-[10.5px] font-semibold text-bvc-muted">
                         Hz
                       </span>
                     </div>
@@ -288,7 +287,7 @@ export function InstrumentTunesDialog({ isOpen, instrument, onOpenChange, onSave
                       onClick={() => removeRow(index)}
                       title="Xóa dây/nốt này"
                       disabled={tunes.length <= 1}
-                      className="flex size-[32px] cursor-pointer items-center justify-center rounded-[8px] text-bvc-muted transition-colors hover:bg-red-50 hover:text-bvc-error disabled:cursor-not-allowed disabled:opacity-30"
+                      className="flex size-[32px] cursor-pointer items-center justify-center rounded-full text-bvc-muted transition-colors hover:bg-red-50 hover:text-bvc-error disabled:cursor-not-allowed disabled:opacity-30"
                     >
                       <Trash2 size={14} />
                     </button>
@@ -301,7 +300,7 @@ export function InstrumentTunesDialog({ isOpen, instrument, onOpenChange, onSave
               <button
                 type="button"
                 onClick={addRow}
-                className="inline-flex h-[34px] cursor-pointer items-center gap-1.5 rounded-[10px] border border-dashed border-bvc-border-strong px-3 text-[12.5px] font-semibold text-bvc-ink transition-colors hover:border-bvc-ink hover:bg-bvc-surface"
+                className="inline-flex h-[34px] cursor-pointer items-center gap-1.5 rounded-full border border-dashed border-bvc-border-strong px-3 text-[12.5px] font-medium text-bvc-ink transition-colors hover:border-bvc-ink hover:bg-bvc-surface"
               >
                 <Plus size={14} />
                 <span>Thêm dây / nốt</span>
@@ -316,14 +315,14 @@ export function InstrumentTunesDialog({ isOpen, instrument, onOpenChange, onSave
               <button
                 type="button"
                 onClick={() => onOpenChange(false)}
-                className="min-h-[40px] cursor-pointer rounded-[12px] border border-bvc-border-strong bg-white px-4 text-[13.5px] font-semibold text-bvc-ink transition-colors hover:border-bvc-ink hover:bg-bvc-surface/40"
+                className="min-h-[40px] cursor-pointer rounded-full border border-bvc-border-strong bg-white px-4 text-[13.5px] font-medium text-bvc-ink transition-colors hover:border-bvc-ink hover:bg-bvc-surface/40"
               >
                 Đóng
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting || isLoading}
-                className="inline-flex min-h-[40px] cursor-pointer items-center justify-center gap-2 rounded-[12px] bg-bvc-ink px-5 text-[13.5px] font-bold text-white transition-colors hover:bg-black disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex min-h-[40px] cursor-pointer items-center justify-center gap-2 rounded-full bg-bvc-ink px-5 text-[13.5px] font-semibold text-white transition-colors hover:bg-black disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isSubmitting && <Loader2 size={16} className="animate-spin" />}
                 <span>{isSubmitting ? "Đang lưu..." : "Lưu cấu hình"}</span>

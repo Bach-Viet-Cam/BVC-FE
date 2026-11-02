@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* BVC brand fonts: tiêu đề lớn dùng Hanken Grotesk, mọi chữ khác (kể cả số, tên file) dùng Nunito */
-  --font-bvc-display: "Hanken Grotesk", "Nunito", "Inter", system-ui, sans-serif;
-  --font-bvc-sans: "Nunito", "Inter", ui-rounded, system-ui, sans-serif;
-  /* Giữ tên token cũ cho số liệu / tên file nhưng không dùng font monospace nữa */
-  --font-bvc-mono: "Nunito", "Inter", ui-rounded, system-ui, sans-serif;
-  --font-mono: "Nunito", "Inter", ui-rounded, system-ui, sans-serif;
-  /* Font mặc định của Tailwind (thẻ html, code, pre, kbd...) cũng về Nunito */
-  --default-font-family: "Nunito", "Inter", ui-rounded, system-ui, sans-serif;
-  --default-mono-font-family: "Nunito", "Inter", ui-rounded, system-ui, sans-serif;
+  /* Một font duy nhất cho cả ứng dụng: Be Vietnam Pro (thiết kế cho tiếng Việt, dấu đặt chuẩn).
+     Tiêu đề chỉ khác về độ đậm / cỡ chữ; các token cũ giữ tên để không phải sửa class ở từng màn */
+  --font-bvc-display: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-bvc-sans: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Số liệu / tên file: cùng font, dùng chữ số đều độ rộng (xem .font-bvc-mono bên dưới) */
+  --font-bvc-mono: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --default-font-family: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --default-mono-font-family: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", sans-serif;
 
   /* BVC brand colors */
   --color-bvc-accent: #2f7a62;
@@ -38,9 +38,9 @@
   --radius-bvc-sm: 11px;
   --radius-bvc-md: 14px;
   --radius-bvc-lg: 17px;
-  --radius-bvc-xl: 20px;
+  --radius-bvc-xl: 24px;
 
-  --font-sans: "Nunito", "Inter", ui-rounded, system-ui, sans-serif;
+  --font-sans: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", sans-serif;
 
   --radius: 0.5rem;
   --radius-sm: 0.25rem;
@@ -128,35 +128,95 @@
   --animate-hp-wave-late: hp-wave 4.2s ease-out 1150ms infinite both;
   --animate-hp-check: hp-check 4.2s cubic-bezier(0.34, 1.56, 0.64, 1) 900ms infinite both;
   @keyframes hp-draw {
-    from { stroke-dashoffset: 1; }
-    to { stroke-dashoffset: 0; }
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
   }
   @keyframes hp-cable {
-    0% { stroke-dashoffset: 1; opacity: 1; }
-    35%, 85% { stroke-dashoffset: 0; opacity: 1; }
-    95%, 100% { stroke-dashoffset: 1; opacity: 0; }
+    0% {
+      stroke-dashoffset: 1;
+      opacity: 1;
+    }
+    35%,
+    85% {
+      stroke-dashoffset: 0;
+      opacity: 1;
+    }
+    95%,
+    100% {
+      stroke-dashoffset: 1;
+      opacity: 0;
+    }
   }
   @keyframes hp-plug {
-    0%, 22% { transform: translateY(22px); opacity: 0; }
-    30% { transform: translateY(22px); opacity: 1; }
-    42%, 85% { transform: translateY(0); opacity: 1; }
-    95%, 100% { transform: translateY(22px); opacity: 0; }
+    0%,
+    22% {
+      transform: translateY(22px);
+      opacity: 0;
+    }
+    30% {
+      transform: translateY(22px);
+      opacity: 1;
+    }
+    42%,
+    85% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    95%,
+    100% {
+      transform: translateY(22px);
+      opacity: 0;
+    }
   }
   @keyframes hp-screen {
-    0%, 44% { opacity: 0; }
-    50%, 85% { opacity: 1; }
-    92%, 100% { opacity: 0; }
+    0%,
+    44% {
+      opacity: 0;
+    }
+    50%,
+    85% {
+      opacity: 1;
+    }
+    92%,
+    100% {
+      opacity: 0;
+    }
   }
   @keyframes hp-wave {
-    0%, 50% { opacity: 0; transform: scale(0.8); }
-    60% { opacity: 1; }
-    75%, 100% { opacity: 0; transform: scale(1.25); }
+    0%,
+    50% {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    60% {
+      opacity: 1;
+    }
+    75%,
+    100% {
+      opacity: 0;
+      transform: scale(1.25);
+    }
   }
   @keyframes hp-check {
-    0%, 52% { transform: scale(0); }
-    60% { transform: scale(1.15); }
-    66%, 86% { transform: scale(1); }
-    94%, 100% { transform: scale(0); }
+    0%,
+    52% {
+      transform: scale(0);
+    }
+    60% {
+      transform: scale(1.15);
+    }
+    66%,
+    86% {
+      transform: scale(1);
+    }
+    94%,
+    100% {
+      transform: scale(0);
+    }
   }
 }
 
@@ -256,7 +316,7 @@
     font-family: var(--font-bvc-display);
   }
 
-  /* Trước đây số liệu dùng font monospace; Nunito dùng chữ số đều độ rộng để cột số vẫn thẳng */
+  /* Số liệu dùng cùng font Be Vietnam Pro với chữ số đều độ rộng để cột số vẫn thẳng */
   .font-bvc-mono,
   .font-mono {
     font-variant-numeric: tabular-nums;
@@ -264,13 +324,13 @@
 
   h1 {
     font-size: 48px;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1.2;
     letter-spacing: -0.02em;
   }
   h2 {
     font-size: 36px;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1.2;
     letter-spacing: -0.02em;
   }

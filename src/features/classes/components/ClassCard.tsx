@@ -8,17 +8,17 @@ interface ClassCardProps {
 }
 
 const LINK_BUTTON_CLASSES =
-  "inline-flex min-h-[44px] items-center justify-center rounded-[12px] border border-bvc-border-strong bg-white px-[12px] text-[13px] font-semibold text-bvc-ink";
+  "inline-flex min-h-[44px] items-center justify-center rounded-[12px] border border-bvc-border-strong bg-white px-[12px] text-[13px] font-medium text-bvc-ink";
 
 export function ClassCard({ classSummary }: ClassCardProps) {
   const detailPath = `/teacher/classes/${classSummary.id}`;
   const isActive = classSummary.status === "ACTIVE";
 
   return (
-    <article className="flex flex-col gap-[10px] rounded-[18px] border border-bvc-border p-[15px]">
+    <article className="flex flex-col gap-[10px] rounded-bvc-xl border border-bvc-border p-[15px]">
       <Link to={detailPath} className="flex flex-col gap-[7px] text-bvc-ink">
         <span className="flex justify-between gap-[10px]">
-          <span className="text-[16px] font-bold">{classSummary.name}</span>
+          <span className="text-[16px] font-semibold">{classSummary.name}</span>
           <StatusLabel label={CLASS_STATUS_LABELS[classSummary.status]} tone={isActive ? "ok" : "muted"} />
         </span>
         <span className="flex flex-wrap items-center gap-[10px] text-[12.5px] text-bvc-muted">

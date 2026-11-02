@@ -20,7 +20,7 @@ export function CardHeader({ className, ...props }: CardProps) {
 }
 
 export function CardTitle({ className, ...props }: CardProps) {
-  return <h3 {...props} className={cn("text-xl font-semibold text-on-surface", className)} />;
+  return <h3 {...props} className={cn("text-xl font-medium text-on-surface", className)} />;
 }
 
 export function CardContent({ className, ...props }: CardProps) {

@@ -18,7 +18,7 @@ function visiblePages(page: number, totalPages: number): (number | "gap")[] {
 }
 
 const squareClass =
-  "flex size-10 cursor-pointer items-center justify-center rounded-xl border border-bvc-border bg-white text-bvc-ink disabled:cursor-not-allowed disabled:text-bvc-faint";
+  "flex size-10 cursor-pointer items-center justify-center rounded-full border border-bvc-border bg-white text-bvc-ink disabled:cursor-not-allowed disabled:text-bvc-faint";
 
 export function Pagination({ page, totalPages, onChange, className }: PaginationProps) {
   if (totalPages <= 1) return null;
@@ -46,7 +46,7 @@ export function Pagination({ page, totalPages, onChange, className }: Pagination
             aria-current={item === page ? "page" : undefined}
             onClick={() => onChange(item)}
             className={cn(
-              "flex h-10 min-w-10 cursor-pointer items-center justify-center rounded-xl px-2 font-bvc-mono text-[13px]",
+              "flex h-10 min-w-10 cursor-pointer items-center justify-center rounded-full px-2 font-bvc-mono text-[13px]",
               item === page
                 ? "bg-bvc-ink text-white"
                 : "border border-bvc-border bg-white text-bvc-ink hover:bg-bvc-surface"

@@ -23,7 +23,7 @@ const TILE_CLASS = "flex h-full flex-col gap-2 rounded-bvc-xl border border-bvc-
 function HighlightTile({ icon, label, to, children }: HighlightTileProps) {
   const content = (
     <>
-      <span className="flex items-center gap-2 text-[12.5px] font-semibold text-bvc-muted">
+      <span className="flex items-center gap-2 text-[12.5px] font-medium text-bvc-muted">
         <span className="text-bvc-accent-text">{icon}</span>
         {label}
       </span>
@@ -48,7 +48,7 @@ export function AssignmentHighlights({ summary, mostSubmitted, mostImproved }: A
           label="Bài tập hiện tại"
           to="/assignments"
         >
-          <span className="font-bvc-mono text-[29px] leading-none font-semibold">{summary.total}</span>
+          <span className="font-bvc-mono text-[29px] leading-none font-medium">{summary.total}</span>
           <span className="text-[12.5px] text-bvc-muted">
             {summary.passed} đạt · {summary.submitted} đã nộp · {summary.notSubmitted} chưa nộp
             {summary.overdue > 0 && ` · ${summary.overdue} quá hạn`}
@@ -63,7 +63,7 @@ export function AssignmentHighlights({ summary, mostSubmitted, mostImproved }: A
         >
           {mostSubmitted ? (
             <>
-              <span className="line-clamp-2 text-[15px] font-bold">{mostSubmitted.title}</span>
+              <span className="line-clamp-2 text-[15px] font-semibold">{mostSubmitted.title}</span>
               <span className="mt-auto font-bvc-mono text-[13px] text-bvc-muted">
                 {mostSubmitted.submissionCount} lần nộp
               </span>
@@ -81,9 +81,9 @@ export function AssignmentHighlights({ summary, mostSubmitted, mostImproved }: A
         >
           {mostImproved && mostImproved.deltaPercent !== null ? (
             <>
-              <span className="line-clamp-2 text-[15px] font-bold">{mostImproved.title}</span>
+              <span className="line-clamp-2 text-[15px] font-semibold">{mostImproved.title}</span>
               <span className="mt-auto flex items-baseline gap-2 font-bvc-mono text-[13px]">
-                <span className="font-bold text-bvc-ok">{formatDelta(mostImproved.deltaPercent)}</span>
+                <span className="font-semibold text-bvc-ok">{formatDelta(mostImproved.deltaPercent)}</span>
                 <span className="text-bvc-muted">
                   {formatPercent(mostImproved.firstAccuracy)} → {formatPercent(mostImproved.latestAccuracy)}
                 </span>

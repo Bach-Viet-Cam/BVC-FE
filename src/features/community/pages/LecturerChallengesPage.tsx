@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { ActionButton } from "@/features/classes/components/ActionButton";
-import { ConfirmDialog } from "@/features/classes/components/ConfirmDialog";
+import { ActionButton } from "@/shared/components/bvc/ActionButton";
+import { ConfirmDialog } from "@/shared/components/bvc/ConfirmDialog";
 import { ListState } from "@/features/classes/components/ListState";
+import { ChallengeCreateDialog } from "@/features/community/components/ChallengeCreateDialog";
 import { ChallengeStatusBadge } from "@/features/community/components/ChallengeStatusBadge";
 import { useLecturerChallenges } from "@/features/community/hooks/useLecturerChallenges";
 import { type Challenge } from "@/features/community/types/challenge";
@@ -13,8 +14,7 @@ import { Pagination } from "@/shared/components/bvc/Pagination";
 import { TeacherPageHeader } from "@/shared/components/bvc/TeacherPageHeader";
 import { TeacherScreen } from "@/shared/components/bvc/TeacherScreen";
 import { toast } from "@/shared/components/ui/toast";
-
-const NEW_PATH = "/teacher/challenges/new";
+import { useCreateDialog } from "@/shared/hooks/useCreateDialog";
 
 interface ChallengeRowProps {
   challenge: Challenge;
@@ -29,9 +29,9 @@ function ChallengeRow({ challenge, onEdit, onDelete }: ChallengeRowProps) {
   const scope = challenge.classes.length > 0 ? challenge.classes.map((item) => item.name).join(", ") : "Chưa chọn lớp";
 
   return (
-    <li className="flex flex-col gap-[10px] rounded-[18px] border border-bvc-border p-[15px] lg:flex-row lg:items-center lg:gap-[16px]">
+    <li className="flex flex-col gap-[10px] rounded-bvc-xl border border-bvc-border p-[15px] lg:flex-row lg:items-center lg:gap-[16px]">
       <div className="flex min-w-0 flex-1 flex-col gap-[3px]">
-        <span className="truncate text-[15px] font-bold text-bvc-ink">{challenge.title}</span>
+        <span className="truncate text-[15px] font-semibold text-bvc-ink">{challenge.title}</span>
         <span className="text-[13px] text-bvc-muted">{challenge.instrument?.name ?? "Chưa chọn nhạc cụ"}</span>
       </div>
       <span className="font-mono text-[13px] text-bvc-muted lg:w-[170px]">{week}</span>
@@ -41,8 +41,12 @@ function ChallengeRow({ challenge, onEdit, onDelete }: ChallengeRowProps) {
       </span>
       {isDraft && (
         <div className="flex gap-[8px]">
-          <ActionButton onClick={() => onEdit(challenge)}>Sửa</ActionButton>
-          <ActionButton onClick={() => onDelete(challenge)}>Xóa</ActionButton>
+          <ActionButton variant="secondary" onClick={() => onEdit(challenge)}>
+            Sửa
+          </ActionButton>
+          <ActionButton variant="secondary" onClick={() => onDelete(challenge)}>
+            Xóa
+          </ActionButton>
         </div>
       )}
     </li>
@@ -53,6 +57,7 @@ export function LecturerChallengesPage() {
   const navigate = useNavigate();
   const { items, page, totalPages, setPage, isLoading, isWorking, error, reload, remove } = useLecturerChallenges();
   const [pendingDelete, setPendingDelete] = useState<Challenge | null>(null);
+  const createDialog = useCreateDialog("challenge");
 
   const confirmDelete = async () => {
     if (!pendingDelete) return;
@@ -69,7 +74,7 @@ export function LecturerChallengesPage() {
         subtitle="Thử thách hằng tuần"
         onBack={() => navigate("/teacher/home")}
         actions={
-          <ActionButton variant="primary" onClick={() => navigate(NEW_PATH)}>
+          <ActionButton onClick={() => createDialog.open()}>
             <Plus size={16} strokeWidth={2} aria-hidden="true" />
             Tạo thử thách
           </ActionButton>
@@ -95,14 +100,15 @@ export function LecturerChallengesPage() {
         <Pagination page={page} totalPages={totalPages} onChange={setPage} />
       </div>
       <ConfirmDialog
-        isOpen={pendingDelete !== null}
+        open={pendingDelete !== null}
         title="Xóa thử thách?"
         description="Thử thách bản nháp sẽ bị xóa vĩnh viễn và không thể khôi phục."
         confirmLabel="Xóa"
-        isConfirming={isWorking}
+        isLoading={isWorking}
         onConfirm={confirmDelete}
-        onCancel={() => setPendingDelete(null)}
+        onOpenChange={(open) => !open && setPendingDelete(null)}
       />
+      <ChallengeCreateDialog open={createDialog.isOpen} onClose={createDialog.close} onSaved={reload} />
     </TeacherScreen>
   );
 }

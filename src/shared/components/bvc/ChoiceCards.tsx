@@ -34,7 +34,7 @@ export function ChoiceCards<T extends string>({
             className={cn(
               "flex min-h-[46px] flex-1 items-center gap-2.5 rounded-[13px] px-[13px] text-sm",
               isChecked
-                ? "border-2 border-bvc-ink font-semibold text-bvc-ink"
+                ? "border-2 border-bvc-ink font-medium text-bvc-ink"
                 : "border border-bvc-border-strong text-bvc-ink",
               isDisabled && !isChecked && "border-bvc-border bg-bvc-surface text-bvc-muted",
               isDisabled ? "cursor-not-allowed" : "cursor-pointer"

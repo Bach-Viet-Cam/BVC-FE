@@ -23,7 +23,7 @@ export function ActivityChart({ days }: ActivityChartProps) {
   return (
     <section className="flex flex-col gap-3 rounded-bvc-xl border border-bvc-border bg-white p-4 md:p-5">
       <div className="flex items-baseline justify-between gap-2">
-        <h3 className="text-[15px] font-bold text-bvc-ink">Lượt nộp 7 ngày qua</h3>
+        <h3 className="text-[15px] font-semibold text-bvc-ink">Lượt nộp 7 ngày qua</h3>
         <span className="font-bvc-mono text-[13px] text-bvc-muted">Tổng {total}</span>
       </div>
       <div className="relative">
@@ -60,7 +60,7 @@ export function ActivityChart({ days }: ActivityChartProps) {
                     x={centerX}
                     y={CHART.bottom - barHeight - 6}
                     fontSize="10"
-                    fontWeight="700"
+                    fontWeight="600"
                     textAnchor="middle"
                     fill="var(--color-bvc-ink)"
                   >
@@ -71,7 +71,7 @@ export function ActivityChart({ days }: ActivityChartProps) {
                   x={centerX}
                   y={CHART.bottom + 16}
                   fontSize="10"
-                  fontWeight={isToday ? 800 : 600}
+                  fontWeight={isToday ? 600 : 500}
                   textAnchor="middle"
                   fill={isToday ? "var(--color-bvc-ink)" : "var(--color-bvc-muted)"}
                 >
@@ -94,7 +94,7 @@ export function ActivityChart({ days }: ActivityChartProps) {
         </svg>
         {hover && hoverIndex !== null && (
           <ChartTooltip percent={((CHART.left + slot * hoverIndex + slot / 2) / CHART.width) * 100}>
-            <div className="font-bold">{formatDayLong(hover.date)}</div>
+            <div className="font-semibold">{formatDayLong(hover.date)}</div>
             <div>{hover.submitted} lượt nộp</div>
             <div className="text-bvc-muted">Điểm TB: {formatPercent(hover.averageAccuracy)}</div>
           </ChartTooltip>

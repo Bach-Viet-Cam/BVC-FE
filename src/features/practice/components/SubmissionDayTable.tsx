@@ -1,5 +1,7 @@
 import { SubmissionRow } from "@/features/practice/components/SubmissionRow";
 import type { SubmissionDayGroup, SubmissionHistoryItem } from "@/features/practice/types/submissionHistoryTypes";
+import { TABLE_STYLES } from "@/shared/components/bvc/tableStyles";
+import { cn } from "@/shared/utils/cn";
 
 interface SubmissionDayTableProps {
   group: SubmissionDayGroup;
@@ -10,7 +12,7 @@ interface SubmissionDayTableProps {
   onToggle: (id: string) => void;
 }
 
-const HEAD_CELL = "px-3 py-2 text-left text-[11.5px] font-semibold text-bvc-muted";
+const HEAD_CELL = TABLE_STYLES.headCell;
 
 // Bảng bài nộp của một ngày. Độ rộng cột cố định (table-fixed) nên mọi bảng thẳng hàng cột với nhau;
 // màn hẹp thì bảng cuộn ngang trong khung thay vì bóp chữ.
@@ -24,9 +26,9 @@ export function SubmissionDayTable({
 }: SubmissionDayTableProps) {
   return (
     <section className="flex shrink-0 flex-col gap-2">
-      <h2 className="text-[13px] font-bold text-bvc-muted">{group.label}</h2>
-      <div className="overflow-x-auto rounded-bvc-lg border border-bvc-border bg-white">
-        <table className="w-full min-w-[640px] table-fixed border-collapse">
+      <h2 className="text-[13px] font-semibold text-bvc-muted">{group.label}</h2>
+      <div className={TABLE_STYLES.frame}>
+        <table className={cn(TABLE_STYLES.table, "min-w-[640px] table-fixed")}>
           <caption className="sr-only">Bài nộp {group.label}</caption>
           <colgroup>
             <col className="w-20" />
@@ -36,9 +38,9 @@ export function SubmissionDayTable({
             <col />
             <col className="w-14" />
           </colgroup>
-          <thead className="bg-bvc-soft">
-            <tr>
-              <th scope="col" className={`${HEAD_CELL} text-center`}>
+          <thead>
+            <tr className={TABLE_STYLES.headRow}>
+              <th scope="col" className={cn(HEAD_CELL, "text-center")}>
                 Accuracy
               </th>
               <th scope="col" className={HEAD_CELL}>

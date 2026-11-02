@@ -21,18 +21,18 @@ interface SummaryCardProps {
 
 function SummaryCard({ side, item }: SummaryCardProps) {
   return (
-    <div className="flex flex-col gap-2 rounded-[18px] border border-bvc-border bg-white px-3.5 py-3.5">
+    <div className="flex flex-col gap-2 rounded-bvc-xl border border-bvc-border bg-white px-3.5 py-3.5">
       <div className="flex items-center gap-2">
         {side === "older" ? <OlderLineSwatch /> : <NewerLineSwatch />}
-        <span className="text-[12.5px] font-bold">{side === "older" ? "Bài cũ hơn" : "Bài mới hơn"}</span>
+        <span className="text-[12.5px] font-semibold">{side === "older" ? "Bài cũ hơn" : "Bài mới hơn"}</span>
       </div>
       <div className="flex flex-col gap-px">
-        <span className="truncate text-sm font-semibold">{item.title}</span>
+        <span className="truncate text-sm font-medium">{item.title}</span>
         <span className="text-[12.5px] text-bvc-muted">{formatSubmittedDay(item.submittedAt)}</span>
       </div>
       <span
         className={cn(
-          "min-w-[52px] self-start rounded-xl bg-bvc-soft px-2.5 py-[5px] text-center font-bvc-mono text-[19px] font-semibold",
+          "min-w-[52px] self-start rounded-xl bg-bvc-soft px-2.5 py-[5px] text-center font-bvc-mono text-[19px] font-medium",
           side === "newer" ? "text-bvc-dot-ok" : "text-bvc-muted"
         )}
       >
@@ -44,7 +44,7 @@ function SummaryCard({ side, item }: SummaryCardProps) {
 
 function RepeatedPill() {
   return (
-    <span className="shrink-0 rounded-full border border-bvc-accent-border bg-bvc-accent-tint px-2.25 py-0.5 text-[11.5px] font-bold text-bvc-accent-text">
+    <span className="shrink-0 rounded-full border border-bvc-accent-border bg-bvc-accent-tint px-2.25 py-0.5 text-[11.5px] font-semibold text-bvc-accent-text">
       Lỗi lặp lại
     </span>
   );
@@ -52,7 +52,7 @@ function RepeatedPill() {
 
 function ImprovedPill() {
   return (
-    <span className="shrink-0 rounded-full bg-bvc-dot-ok px-2.5 py-[3px] text-[11.5px] font-bold text-white">
+    <span className="shrink-0 rounded-full bg-bvc-dot-ok px-2.5 py-[3px] text-[11.5px] font-semibold text-white">
       Đã cải thiện
     </span>
   );
@@ -63,14 +63,14 @@ function SegmentCard({ segment, onPractice }: { segment: CompareSegment; onPract
     return (
       <div className="flex flex-col gap-2.25 rounded-bvc-lg border border-bvc-accent-border bg-bvc-accent-tint px-3.25 py-3">
         <div className="flex items-center justify-between gap-2.5">
-          <span className="text-sm font-bold">{segment.barLabel}</span>
+          <span className="text-sm font-semibold">{segment.barLabel}</span>
           <RepeatedPill />
         </div>
         <p className="text-[12.5px] leading-snug text-bvc-accent-text">{MSG_28}</p>
         <button
           type="button"
           onClick={onPractice}
-          className="flex min-h-11 cursor-pointer items-center justify-between rounded-[13px] border border-bvc-border-strong bg-white pr-3 pl-3.5 text-sm font-semibold text-bvc-ink"
+          className="flex min-h-11 cursor-pointer items-center justify-between rounded-full border border-bvc-border-strong bg-white pr-3 pl-3.5 text-sm font-medium text-bvc-ink"
         >
           Luyện đoạn này
           <ChevronRight className="size-[18px] shrink-0" strokeWidth={1.8} aria-hidden />
@@ -82,7 +82,7 @@ function SegmentCard({ segment, onPractice }: { segment: CompareSegment; onPract
   if (segment.status === "IMPROVED") {
     return (
       <div className="flex items-center justify-between gap-2.5 rounded-bvc-lg border border-bvc-border bg-white p-3.25">
-        <span className="text-sm font-semibold">{segment.barLabel}</span>
+        <span className="text-sm font-medium">{segment.barLabel}</span>
         <ImprovedPill />
       </div>
     );
@@ -91,7 +91,7 @@ function SegmentCard({ segment, onPractice }: { segment: CompareSegment; onPract
   // Lỗi chỉ có ở bài mới hơn: không nhãn (GBR-18)
   return (
     <div className="flex flex-col gap-0.5 rounded-bvc-lg border border-bvc-border bg-white px-3.25 py-3">
-      <span className="text-sm font-semibold">{segment.barLabel}</span>
+      <span className="text-sm font-medium">{segment.barLabel}</span>
       <span className="text-[12.5px] text-bvc-muted">Lỗi ở bài mới hơn</span>
     </div>
   );
@@ -124,7 +124,7 @@ export function SubmissionComparePage() {
 
               <section className="flex shrink-0 flex-col gap-2.5 rounded-bvc-xl border border-bvc-border bg-white px-3 pt-4 pb-3.5">
                 <div className="flex items-baseline justify-between px-1">
-                  <h2 className="text-sm font-bold">Cao độ theo thời gian</h2>
+                  <h2 className="text-sm font-semibold">Cao độ theo thời gian</h2>
                   <span className="font-bvc-mono text-xs text-bvc-muted">Bar 1 - {COMPARE_TOTAL_BARS}</span>
                 </div>
                 <SubmissionCompareChart />
@@ -148,7 +148,7 @@ export function SubmissionComparePage() {
             </div>
 
             <section className="flex shrink-0 flex-col gap-2 lg:sticky lg:top-6">
-              <h2 className="text-sm font-bold">Các đoạn lỗi</h2>
+              <h2 className="text-sm font-semibold">Các đoạn lỗi</h2>
               {segments.map((segment) => (
                 <SegmentCard key={segment.id} segment={segment} onPractice={practiceSegment} />
               ))}
@@ -164,7 +164,7 @@ export function SubmissionComparePage() {
           <button
             type="button"
             onClick={backToSelect}
-            className="flex min-h-[50px] w-full cursor-pointer items-center justify-center rounded-2xl border border-bvc-border-strong bg-bvc-soft text-[15px] font-semibold text-bvc-ink md:w-auto md:min-w-64 md:px-8"
+            className="flex min-h-[50px] w-full cursor-pointer items-center justify-center rounded-2xl border border-bvc-border-strong bg-bvc-soft text-[15px] font-medium text-bvc-ink md:w-auto md:min-w-64 md:px-8"
           >
             Chọn bài khác
           </button>

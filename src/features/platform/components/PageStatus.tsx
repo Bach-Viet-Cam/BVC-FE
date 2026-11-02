@@ -18,7 +18,7 @@ export function PageStatus({ isLoading, error, onRetry, children }: PageStatusPr
         <button
           type="button"
           onClick={onRetry}
-          className="min-h-[42px] cursor-pointer rounded-[14px] border border-bvc-border-strong bg-white px-[16px] text-[14px] font-semibold text-bvc-ink"
+          className="min-h-[42px] cursor-pointer rounded-full border border-bvc-border-strong bg-white px-[16px] text-[14px] font-medium text-bvc-ink"
         >
           Thử lại
         </button>

@@ -4,7 +4,7 @@ import { AssignmentList } from "@/features/classes/components/AssignmentList";
 import { ClassInfoPanel } from "@/features/classes/components/ClassInfoPanel";
 import { ClassProgressBoard } from "@/features/classes/components/ClassProgressBoard";
 import { type ClassTabKey, ClassTabs } from "@/features/classes/components/ClassTabs";
-import { ConfirmDialog } from "@/features/classes/components/ConfirmDialog";
+import { ConfirmDialog } from "@/shared/components/bvc/ConfirmDialog";
 import { ListState } from "@/features/classes/components/ListState";
 import { MembersTab } from "@/features/classes/components/MembersTab";
 import { RoadmapTab } from "@/features/classes/components/RoadmapTab";
@@ -79,13 +79,13 @@ export function ClassDetailPage() {
             </div>
           </div>
           <ConfirmDialog
-            isOpen={isEndDialogOpen}
+            open={isEndDialogOpen}
             title={`Kết thúc lớp ${classDetail.name}?`}
             description="Lớp sẽ chuyển sang chỉ xem, không thể thêm thành viên hoặc bài tập."
             confirmLabel="Kết thúc lớp"
-            isConfirming={isWorking}
+            isLoading={isWorking}
             onConfirm={confirmEndClass}
-            onCancel={() => setIsEndDialogOpen(false)}
+            onOpenChange={(open) => !open && setIsEndDialogOpen(false)}
           />
         </div>
       )}

@@ -19,7 +19,7 @@ export function ResultOverviewCard({ scores }: ResultOverviewCardProps) {
   const circumference = 2 * Math.PI * radius;
 
   return (
-    <section className="flex items-center gap-4 rounded-bvc-xl border border-bvc-border bg-white p-4 md:gap-6 md:rounded-[22px] md:p-5.5">
+    <section className="flex items-center gap-4 rounded-bvc-xl border border-bvc-border bg-white p-4 md:gap-6 md:rounded-bvc-xl md:p-5.5">
       <div className="relative shrink-0" style={{ width: RING_SIZE, height: RING_SIZE }}>
         <svg width={RING_SIZE} height={RING_SIZE} className="-rotate-90" aria-hidden>
           <circle
@@ -43,12 +43,10 @@ export function ResultOverviewCard({ scores }: ResultOverviewCardProps) {
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="font-bvc-display text-2xl leading-none font-extrabold tracking-tight text-bvc-ink">
+          <span className="font-bvc-display text-2xl leading-none font-semibold tracking-tight text-bvc-ink">
             {scores.overall}
           </span>
-          <span className="mt-1 px-1 text-center text-[8px] font-bold tracking-wider text-bvc-muted uppercase">
-            Độ chính xác
-          </span>
+          <span className="mt-1 px-1 text-center text-[8px] font-semibold text-bvc-muted">Độ chính xác</span>
         </div>
       </div>
 
@@ -56,8 +54,8 @@ export function ResultOverviewCard({ scores }: ResultOverviewCardProps) {
         {METRICS.map((metric) => (
           <div key={metric.key}>
             <div className="mb-1 flex items-baseline justify-between">
-              <span className="text-[13px] font-semibold text-bvc-muted">{metric.label}</span>
-              <span className="text-sm font-bold text-bvc-ink">{scores[metric.key] ?? "--"}</span>
+              <span className="text-[13px] font-medium text-bvc-muted">{metric.label}</span>
+              <span className="text-sm font-semibold text-bvc-ink">{scores[metric.key] ?? "--"}</span>
             </div>
             <div className="h-2 w-full overflow-hidden rounded-full bg-bvc-surface">
               <div

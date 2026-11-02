@@ -34,3 +34,8 @@ export function formatNotificationTime(iso: string): string {
     minute: "2-digit",
   });
 }
+
+/** Thời điểm hẹn giờ (ISO) đã qua hoặc đúng bây giờ. */
+export function isPastSchedule(scheduledIso: string): boolean {
+  return new Date(scheduledIso).getTime() <= Date.now();
+}

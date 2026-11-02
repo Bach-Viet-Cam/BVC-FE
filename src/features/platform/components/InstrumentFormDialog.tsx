@@ -1,21 +1,29 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Music2, Pencil } from "lucide-react";
-import { Dialog, DialogClose, DialogDescription, DialogPopup, DialogTitle } from "@/shared/components/ui/dialog";
 import { type InstrumentItem } from "@/features/platform/types/configTypes";
 import { instrumentSchema, type InstrumentFormValues } from "@/features/platform/utils/validateInstrument";
+import { ActionButton } from "@/shared/components/bvc/ActionButton";
+import { FormDialog } from "@/shared/components/bvc/FormDialog";
+import { FormField } from "@/shared/components/bvc/FormField";
+import { FormBody, FormFooter } from "@/shared/components/bvc/FormLayout";
+import { INPUT_CLASSES } from "@/shared/components/bvc/fieldStyles";
+import { useReportDirty } from "@/shared/hooks/useReportDirty";
+import { cn } from "@/shared/utils/cn";
 
 interface InstrumentFormProps {
   instrument: InstrumentItem | null;
   onSubmit: (values: InstrumentFormValues) => Promise<boolean>;
-  onClose: () => void;
+  onCancel: () => void;
+  onSaved: () => void;
+  onDirtyChange: (isDirty: boolean) => void;
 }
 
-function InstrumentForm({ instrument, onSubmit, onClose }: InstrumentFormProps) {
+function InstrumentForm({ instrument, onSubmit, onCancel, onSaved, onDirtyChange }: InstrumentFormProps) {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
   } = useForm<InstrumentFormValues>({
     resolver: zodResolver(instrumentSchema),
     defaultValues: {
@@ -24,77 +32,65 @@ function InstrumentForm({ instrument, onSubmit, onClose }: InstrumentFormProps) 
       description: instrument?.description ?? "",
     },
   });
+  useReportDirty(isDirty, onDirtyChange);
 
   const submit = async (values: InstrumentFormValues) => {
-    if (await onSubmit({ ...values, code: values.code.trim().toUpperCase() })) onClose();
+    if (await onSubmit({ ...values, code: values.code.trim().toUpperCase() })) onSaved();
   };
 
   return (
-    <form onSubmit={handleSubmit(submit)} className="flex flex-col gap-4.5 pt-1">
-      <div className="flex flex-col gap-1.5">
-        <label className="text-[13px] font-bold text-bvc-ink" htmlFor="instrument-code">
-          Mã nhạc cụ (Mã viết tắt) <span className="text-bvc-error">*</span>
-        </label>
-        <input
-          id="instrument-code"
-          placeholder="DTR, DBA, DNH, DSA..."
-          disabled={instrument !== null}
-          {...register("code")}
-          className="h-[40px] w-full rounded-[11px] border border-bvc-border-strong bg-white px-3.5 font-mono text-[13.5px] uppercase text-bvc-ink placeholder:normal-case placeholder:font-sans placeholder:text-bvc-faint transition-colors focus:border-bvc-ink focus:outline-none disabled:cursor-not-allowed disabled:bg-bvc-surface disabled:text-bvc-muted"
-        />
-        {instrument ? (
-          <p className="text-[12px] text-bvc-muted">Mã định danh kỹ thuật không thể thay đổi sau khi tạo.</p>
-        ) : (
-          <p className="text-[12px] text-bvc-muted">
-            Mã viết tắt ngắn gọn dạng chữ in hoa, ví dụ:{" "}
-            <code className="font-mono text-bvc-ink">DTR, DBA, DNH, DSA</code>.
-          </p>
-        )}
-        {errors.code && <p className="text-[12px] font-medium text-bvc-error">{errors.code.message}</p>}
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <label className="text-[13px] font-bold text-bvc-ink" htmlFor="instrument-name">
-          Tên nhạc cụ hiển thị <span className="text-bvc-error">*</span>
-        </label>
-        <input
-          id="instrument-name"
-          placeholder="Đàn Bầu, Đàn Tranh, Sáo Trúc..."
-          {...register("name")}
-          className="h-[40px] w-full rounded-[11px] border border-bvc-border-strong bg-white px-3.5 text-[13.5px] text-bvc-ink placeholder:text-bvc-faint transition-colors focus:border-bvc-ink focus:outline-none"
-        />
-        {errors.name && <p className="text-[12px] font-medium text-bvc-error">{errors.name.message}</p>}
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <label className="text-[13px] font-bold text-bvc-ink" htmlFor="instrument-description">
-          Mô tả ngắn
-        </label>
-        <input
-          id="instrument-description"
-          placeholder="Nhạc cụ dây gảy truyền thống Việt Nam..."
-          {...register("description")}
-          className="h-[40px] w-full rounded-[11px] border border-bvc-border-strong bg-white px-3.5 text-[13.5px] text-bvc-ink placeholder:text-bvc-faint transition-colors focus:border-bvc-ink focus:outline-none"
-        />
-        {errors.description && <p className="text-[12px] font-medium text-bvc-error">{errors.description.message}</p>}
-      </div>
-
-      <div className="mt-2 flex items-center justify-end gap-2.5 border-t border-bvc-line pt-4">
-        <button
-          type="button"
-          onClick={onClose}
-          className="min-h-[40px] cursor-pointer rounded-[12px] border border-bvc-border-strong bg-white px-4 text-[13.5px] font-semibold text-bvc-ink transition-colors hover:border-bvc-ink hover:bg-bvc-surface/40"
+    <form onSubmit={handleSubmit(submit)} className="flex flex-col">
+      <FormBody>
+        <FormField
+          label="Mã nhạc cụ (mã viết tắt)"
+          htmlFor="instrument-code"
+          required
+          hint={
+            instrument
+              ? "Mã định danh kỹ thuật không thể thay đổi sau khi tạo."
+              : "Mã viết tắt ngắn gọn dạng chữ in hoa, ví dụ: DTR, DBA, DNH, DSA."
+          }
+          error={errors.code?.message}
         >
+          <input
+            id="instrument-code"
+            placeholder="DTR, DBA, DNH, DSA..."
+            disabled={instrument !== null}
+            aria-invalid={Boolean(errors.code)}
+            className={cn(INPUT_CLASSES, "font-bvc-mono")}
+            {...register("code")}
+          />
+        </FormField>
+
+        <FormField label="Tên nhạc cụ hiển thị" htmlFor="instrument-name" required error={errors.name?.message}>
+          <input
+            id="instrument-name"
+            placeholder="Đàn bầu, Đàn tranh, Sáo trúc..."
+            aria-invalid={Boolean(errors.name)}
+            className={INPUT_CLASSES}
+            {...register("name")}
+          />
+        </FormField>
+
+        <FormField label="Mô tả ngắn" htmlFor="instrument-description" error={errors.description?.message}>
+          <input
+            id="instrument-description"
+            placeholder="Nhạc cụ dây gảy truyền thống Việt Nam..."
+            aria-invalid={Boolean(errors.description)}
+            className={INPUT_CLASSES}
+            {...register("description")}
+          />
+        </FormField>
+      </FormBody>
+
+      <FormFooter>
+        <ActionButton variant="secondary" onClick={onCancel} disabled={isSubmitting}>
           Hủy
-        </button>
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="min-h-[40px] cursor-pointer rounded-[12px] bg-bvc-ink px-5 text-[13.5px] font-bold text-white transition-colors hover:bg-black disabled:cursor-not-allowed disabled:opacity-50"
-        >
+        </ActionButton>
+        <ActionButton type="submit" disabled={isSubmitting}>
           {isSubmitting ? "Đang lưu..." : "Lưu nhạc cụ"}
-        </button>
-      </div>
+        </ActionButton>
+      </FormFooter>
     </form>
   );
 }
@@ -107,25 +103,29 @@ interface InstrumentFormDialogProps {
 }
 
 export function InstrumentFormDialog({ isOpen, instrument, onOpenChange, onSubmit }: InstrumentFormDialogProps) {
+  const [isDirty, setIsDirty] = useState(false);
+  const close = () => {
+    setIsDirty(false);
+    onOpenChange(false);
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogPopup className="max-w-[480px] rounded-[20px] border border-bvc-border bg-white p-6 shadow-none">
-        <div className="flex items-center gap-3">
-          <div className="flex size-[36px] items-center justify-center rounded-[10px] bg-bvc-surface text-bvc-ink">
-            {instrument ? <Pencil size={18} /> : <Music2 size={18} />}
-          </div>
-          <div>
-            <DialogTitle className="text-[17px] font-extrabold tracking-[-0.02em] text-bvc-ink">
-              {instrument ? "Sửa thông tin nhạc cụ" : "Thêm nhạc cụ mới"}
-            </DialogTitle>
-            <DialogDescription className="text-[12.5px] text-bvc-muted">
-              Nhạc cụ không xóa vĩnh viễn nhằm đảm bảo toàn vẹn dữ liệu bài tập và bài nộp.
-            </DialogDescription>
-          </div>
-        </div>
-        <DialogClose className="top-5 right-5 text-bvc-muted hover:text-bvc-ink" />
-        <InstrumentForm instrument={instrument} onSubmit={onSubmit} onClose={() => onOpenChange(false)} />
-      </DialogPopup>
-    </Dialog>
+    <FormDialog
+      open={isOpen}
+      onClose={close}
+      title={instrument ? "Sửa thông tin nhạc cụ" : "Thêm nhạc cụ"}
+      description="Nhạc cụ không xóa vĩnh viễn để giữ toàn vẹn dữ liệu bài tập và bài nộp."
+      isDirty={isDirty}
+    >
+      {(requestClose) => (
+        <InstrumentForm
+          instrument={instrument}
+          onSubmit={onSubmit}
+          onCancel={requestClose}
+          onSaved={close}
+          onDirtyChange={setIsDirty}
+        />
+      )}
+    </FormDialog>
   );
 }

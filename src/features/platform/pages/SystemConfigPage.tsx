@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { DesktopPageHeader } from "@/shared/components/bvc";
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@/shared/components/ui/tabs";
+import { TABLE_STYLES } from "@/shared/components/bvc/tableStyles";
 import { cn } from "@/shared/utils/cn";
 import { InstrumentFormDialog } from "@/features/platform/components/InstrumentFormDialog";
 import { InstrumentTunesDialog } from "@/features/platform/components/InstrumentTunesDialog";
@@ -34,6 +35,7 @@ import {
   type InstrumentSortKey,
   type SystemConfigItem,
 } from "@/features/platform/types/configTypes";
+import { ActionButton } from "@/shared/components/bvc/ActionButton";
 
 const SEMESTERS_DESCRIPTION = "Các học kỳ dùng khi tạo lớp: mỗi học kỳ có tên, ngày bắt đầu và ngày kết thúc.";
 
@@ -66,7 +68,7 @@ function SortHeader({ label, isActive, direction, onClick }: SortHeaderProps) {
     <button
       type="button"
       onClick={onClick}
-      className="flex cursor-pointer items-center gap-1.5 text-left transition-colors hover:text-bvc-ink uppercase"
+      className="flex cursor-pointer items-center gap-1.5 text-left transition-colors hover:text-bvc-ink"
     >
       <span>{label}</span>
       {isActive ? (
@@ -123,8 +125,8 @@ function InstrumentsTab() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-3 rounded-[16px] border border-bvc-border bg-white p-3.5 sm:flex-row sm:items-center sm:justify-between">
-        <div className="inline-flex flex-wrap items-center rounded-[12px] border border-bvc-border/80 bg-bvc-surface/60 p-1">
+      <div className="flex flex-col gap-3 rounded-bvc-xl border border-bvc-border bg-white p-3.5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="inline-flex flex-wrap items-center rounded-3xl border border-bvc-border/80 bg-bvc-surface/60 p-1">
           {INSTRUMENT_STATUS_OPTIONS.map((opt) => {
             const isActive = filters.status === opt.value;
             return (
@@ -132,7 +134,7 @@ function InstrumentsTab() {
                 key={opt.value}
                 type="button"
                 onClick={() => updateFilters({ status: opt.value })}
-                className={`cursor-pointer rounded-[9px] px-3.5 py-1.5 text-[13px] font-semibold transition-all select-none ${
+                className={`cursor-pointer rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-all select-none ${
                   isActive ? "bg-white text-bvc-ink shadow-xs" : "text-bvc-muted hover:text-bvc-ink"
                 }`}
               >
@@ -168,7 +170,7 @@ function InstrumentsTab() {
             <button
               type="button"
               onClick={resetFilters}
-              className="flex h-[38px] cursor-pointer items-center gap-1.5 rounded-[11px] border border-bvc-border bg-bvc-surface/80 px-2.5 text-[12.5px] font-medium text-bvc-muted transition-colors hover:bg-bvc-border hover:text-bvc-ink"
+              className="flex h-[38px] cursor-pointer items-center gap-1.5 rounded-full border border-bvc-border bg-bvc-surface/80 px-2.5 text-[12.5px] font-medium text-bvc-muted transition-colors hover:bg-bvc-border hover:text-bvc-ink"
               title="Xóa bộ lọc"
             >
               <X size={13} />
@@ -181,28 +183,24 @@ function InstrumentsTab() {
             onClick={reload}
             disabled={isLoading}
             title="Làm mới danh sách"
-            className="flex size-[38px] cursor-pointer items-center justify-center rounded-[11px] border border-bvc-border bg-white text-bvc-muted transition-colors hover:border-bvc-border-strong hover:text-bvc-ink disabled:opacity-50"
+            className="flex size-[38px] cursor-pointer items-center justify-center rounded-full border border-bvc-border bg-white text-bvc-muted transition-colors hover:border-bvc-border-strong hover:text-bvc-ink disabled:opacity-50"
           >
             <RotateCw size={15} className={isLoading ? "animate-spin text-bvc-ink" : ""} />
           </button>
 
-          <button
-            type="button"
-            onClick={() => openForm(null)}
-            className="flex min-h-[38px] cursor-pointer items-center gap-2 rounded-[11px] bg-bvc-ink px-4 text-[13.5px] font-semibold text-white transition-colors hover:bg-black"
-          >
+          <ActionButton size="sm" onClick={() => openForm(null)}>
             <Plus size={15} />
             <span>Thêm nhạc cụ</span>
-          </button>
+          </ActionButton>
         </div>
       </div>
 
-      <div className="flex flex-col overflow-hidden rounded-[18px] border border-bvc-border bg-white shadow-none">
+      <div className="flex flex-col overflow-hidden rounded-bvc-xl border border-bvc-border bg-white">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[960px] border-collapse text-left text-[13px]">
+          <table className={cn(TABLE_STYLES.table, TABLE_STYLES.dense, "min-w-[960px]")}>
             <thead>
-              <tr className="border-b border-bvc-border bg-bvc-surface/50 text-[11.5px] font-bold uppercase tracking-[0.06em] text-bvc-muted">
-                <th className="px-5 py-3.5 w-[180px]">
+              <tr className={cn(TABLE_STYLES.headRow, TABLE_STYLES.headText)}>
+                <th className="px-4 py-3 w-[180px]">
                   <SortHeader
                     label="Mã nhạc cụ (Slug)"
                     isActive={filters.sortBy === "code"}
@@ -210,7 +208,7 @@ function InstrumentsTab() {
                     onClick={() => toggleSort("code")}
                   />
                 </th>
-                <th className="px-5 py-3.5 w-[200px]">
+                <th className="px-4 py-3 w-[200px]">
                   <SortHeader
                     label="Tên hiển thị"
                     isActive={filters.sortBy === "name"}
@@ -218,14 +216,14 @@ function InstrumentsTab() {
                     onClick={() => toggleSort("name")}
                   />
                 </th>
-                <th className="px-5 py-3.5">Mô tả</th>
-                <th className="px-5 py-3.5 w-[160px]">Cấu hình dây</th>
-                <th className="px-5 py-3.5 w-[160px]">Trạng thái</th>
-                <th className="px-5 py-3.5 w-[160px] text-right">Thao tác</th>
+                <th className="px-4 py-3">Mô tả</th>
+                <th className="px-4 py-3 w-[160px]">Cấu hình dây</th>
+                <th className="px-4 py-3 w-[160px]">Trạng thái</th>
+                <th className="px-4 py-3 w-[160px] text-right">Thao tác</th>
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-bvc-line">
+            <tbody className="divide-y divide-bvc-border">
               {isLoading && (
                 <tr>
                   <td colSpan={6} className="px-5 py-10 text-center text-[13.5px] text-bvc-muted">
@@ -245,7 +243,7 @@ function InstrumentsTab() {
               {!isLoading && !error && items.length === 0 && (
                 <tr>
                   <td colSpan={6} className="px-5 py-12 text-center">
-                    <p className="text-[14px] font-bold text-bvc-ink">Không tìm thấy nhạc cụ phù hợp</p>
+                    <p className="text-[14px] font-semibold text-bvc-ink">Không tìm thấy nhạc cụ phù hợp</p>
                     <p className="mt-1 text-[12.5px] text-bvc-muted">
                       {hasActiveFilters
                         ? "Thử thay đổi từ khóa tìm kiếm hoặc bỏ chọn bộ lọc trạng thái."
@@ -258,29 +256,29 @@ function InstrumentsTab() {
               {!isLoading &&
                 !error &&
                 items.map((instrument) => (
-                  <tr key={instrument.id} className="transition-colors hover:bg-bvc-surface/40">
-                    <td className="px-5 py-3.5">
-                      <span className="font-mono text-[12.5px] font-semibold text-bvc-ink bg-bvc-surface border border-bvc-border px-2 py-0.5 rounded-[6px]">
+                  <tr key={instrument.id} className="transition-colors hover:bg-bvc-soft/70">
+                    <td className="px-4 py-3.5">
+                      <span className="font-mono text-[12.5px] font-medium text-bvc-ink bg-bvc-surface border border-bvc-border px-2 py-0.5 rounded-[6px]">
                         {instrument.code}
                       </span>
                     </td>
 
-                    <td className="px-5 py-3.5 font-bold text-bvc-ink text-[13.5px]">{instrument.name}</td>
+                    <td className="px-4 py-3.5 font-semibold text-bvc-ink text-[13.5px]">{instrument.name}</td>
 
-                    <td className="px-5 py-3.5 text-bvc-muted">{instrument.description || "-"}</td>
+                    <td className="px-4 py-3.5 text-bvc-muted">{instrument.description || "-"}</td>
 
-                    <td className="px-5 py-3.5">
+                    <td className="px-4 py-3.5">
                       <button
                         type="button"
                         onClick={() => openTunesDialog(instrument)}
-                        className="flex h-[32px] cursor-pointer items-center gap-1.5 rounded-[8px] border border-bvc-border bg-bvc-surface/60 px-3 text-[12.5px] font-semibold text-bvc-ink transition-all hover:border-bvc-ink hover:bg-white hover:shadow-2xs"
+                        className="flex h-[32px] cursor-pointer items-center gap-1.5 rounded-full border border-bvc-border bg-bvc-surface/60 px-3 text-[12.5px] font-medium text-bvc-ink transition-all hover:border-bvc-ink hover:bg-white hover:shadow-2xs"
                       >
                         <SlidersHorizontal size={13} className="text-bvc-muted" />
                         <span>Cấu hình dây</span>
                       </button>
                     </td>
 
-                    <td className="px-5 py-3.5">
+                    <td className="px-4 py-3.5">
                       <span className="inline-flex items-center gap-2">
                         <span
                           className={`size-[7px] shrink-0 rounded-full ${
@@ -288,20 +286,20 @@ function InstrumentsTab() {
                           }`}
                         />
                         <span
-                          className={`text-[13px] ${instrument.isActive ? "font-semibold text-bvc-ink" : "text-bvc-muted"}`}
+                          className={`text-[13px] ${instrument.isActive ? "font-medium text-bvc-ink" : "text-bvc-muted"}`}
                         >
                           {instrument.isActive ? "Đang hoạt động" : "Ngừng hoạt động"}
                         </span>
                       </span>
                     </td>
 
-                    <td className="px-5 py-3.5 text-right">
+                    <td className="px-4 py-3.5 text-right">
                       <div className="flex items-center justify-end gap-1.5">
                         <button
                           type="button"
                           onClick={() => openForm(instrument)}
                           title="Sửa nhạc cụ"
-                          className="flex h-[32px] cursor-pointer items-center gap-1.5 rounded-[8px] border border-bvc-border bg-white px-2.5 text-[12.5px] font-semibold text-bvc-ink transition-colors hover:border-bvc-ink hover:bg-bvc-surface"
+                          className="flex h-[32px] cursor-pointer items-center gap-1.5 rounded-full border border-bvc-border bg-white px-2.5 text-[12.5px] font-medium text-bvc-ink transition-colors hover:border-bvc-ink hover:bg-bvc-surface"
                         >
                           <Pencil size={13} />
                           <span>Sửa</span>
@@ -311,7 +309,7 @@ function InstrumentsTab() {
                           type="button"
                           onClick={() => void toggleActive(instrument)}
                           title={instrument.isActive ? "Ngừng hoạt động" : "Kích hoạt lại"}
-                          className={`flex h-[32px] cursor-pointer items-center gap-1 rounded-[8px] border border-bvc-border px-2.5 text-[12.5px] font-semibold transition-colors hover:bg-white ${
+                          className={`flex h-[32px] cursor-pointer items-center gap-1 rounded-full border border-bvc-border px-2.5 text-[12.5px] font-medium transition-colors hover:bg-white ${
                             instrument.isActive
                               ? "bg-bvc-surface/60 text-bvc-muted hover:border-bvc-error hover:text-bvc-error"
                               : "bg-bvc-surface text-bvc-ok hover:border-bvc-ok hover:text-bvc-ok"
@@ -376,13 +374,13 @@ function SettingsTab() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-3 rounded-[16px] border border-bvc-border bg-white p-3.5 sm:flex-row sm:items-center sm:justify-between">
-        <div className="inline-flex flex-wrap items-center rounded-[12px] border border-bvc-border/80 bg-bvc-surface/60 p-1">
+      <div className="flex flex-col gap-3 rounded-bvc-xl border border-bvc-border bg-white p-3.5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="inline-flex flex-wrap items-center rounded-3xl border border-bvc-border/80 bg-bvc-surface/60 p-1">
           <button
             type="button"
             onClick={() => updateFilters({ group: undefined })}
             className={cn(
-              "flex cursor-pointer items-center gap-1.5 rounded-[9px] px-3.5 py-1.5 text-[13px] font-semibold transition-all select-none",
+              "flex cursor-pointer items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-all select-none",
               filters.group === undefined ? "bg-white text-bvc-ink shadow-xs" : "text-bvc-muted hover:text-bvc-ink"
             )}
           >
@@ -398,7 +396,7 @@ function SettingsTab() {
                 type="button"
                 onClick={() => updateFilters({ group: opt.value })}
                 className={cn(
-                  "flex cursor-pointer items-center gap-1.5 rounded-[9px] px-3.5 py-1.5 text-[13px] font-semibold transition-all select-none",
+                  "flex cursor-pointer items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-all select-none",
                   isActive ? "bg-white text-bvc-ink shadow-xs" : "text-bvc-muted hover:text-bvc-ink"
                 )}
               >
@@ -435,7 +433,7 @@ function SettingsTab() {
             <button
               type="button"
               onClick={resetFilters}
-              className="flex h-[38px] cursor-pointer items-center gap-1.5 rounded-[11px] border border-bvc-border bg-bvc-surface/80 px-2.5 text-[12.5px] font-medium text-bvc-muted transition-colors hover:bg-bvc-border hover:text-bvc-ink"
+              className="flex h-[38px] cursor-pointer items-center gap-1.5 rounded-full border border-bvc-border bg-bvc-surface/80 px-2.5 text-[12.5px] font-medium text-bvc-muted transition-colors hover:bg-bvc-border hover:text-bvc-ink"
               title="Xóa bộ lọc"
             >
               <X size={13} />
@@ -448,7 +446,7 @@ function SettingsTab() {
             onClick={reload}
             disabled={isLoading}
             title="Làm mới tham số"
-            className="flex size-[38px] cursor-pointer items-center justify-center rounded-[11px] border border-bvc-border bg-white text-bvc-muted transition-colors hover:border-bvc-border-strong hover:text-bvc-ink disabled:opacity-50"
+            className="flex size-[38px] cursor-pointer items-center justify-center rounded-full border border-bvc-border bg-white text-bvc-muted transition-colors hover:border-bvc-border-strong hover:text-bvc-ink disabled:opacity-50"
           >
             <RotateCw size={15} className={isLoading ? "animate-spin text-bvc-ink" : ""} />
           </button>
@@ -459,19 +457,19 @@ function SettingsTab() {
         </div>
       </div>
 
-      <div className="flex flex-col overflow-hidden rounded-[18px] border border-bvc-border bg-white shadow-none">
+      <div className="flex flex-col overflow-hidden rounded-bvc-xl border border-bvc-border bg-white">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[920px] border-collapse text-left text-[13px]">
+          <table className={cn(TABLE_STYLES.table, TABLE_STYLES.dense, "min-w-[920px]")}>
             <thead>
-              <tr className="border-b border-bvc-border bg-bvc-surface/50 text-[11.5px] font-bold uppercase tracking-[0.06em] text-bvc-muted">
-                <th className="px-5 py-3.5 w-[380px]">Tham số & Khóa kỹ thuật</th>
-                <th className="px-5 py-3.5 w-[180px]">Nhóm nghiệp vụ</th>
-                <th className="px-5 py-3.5">Giá trị cấu hình</th>
-                <th className="px-5 py-3.5 w-[110px] text-right">Thao tác</th>
+              <tr className={cn(TABLE_STYLES.headRow, TABLE_STYLES.headText)}>
+                <th className="px-4 py-3 w-[380px]">Tham số & Khóa kỹ thuật</th>
+                <th className="px-4 py-3 w-[180px]">Nhóm nghiệp vụ</th>
+                <th className="px-4 py-3">Giá trị cấu hình</th>
+                <th className="px-4 py-3 w-[110px] text-right">Thao tác</th>
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-bvc-line">
+            <tbody className="divide-y divide-bvc-border">
               {isLoading && (
                 <tr>
                   <td colSpan={4} className="px-5 py-10 text-center text-[13.5px] text-bvc-muted">
@@ -491,7 +489,7 @@ function SettingsTab() {
               {!isLoading && !error && items.length === 0 && (
                 <tr>
                   <td colSpan={4} className="px-5 py-12 text-center">
-                    <p className="text-[14px] font-bold text-bvc-ink">Không tìm thấy tham số phù hợp</p>
+                    <p className="text-[14px] font-semibold text-bvc-ink">Không tìm thấy tham số phù hợp</p>
                     <p className="mt-1 text-[12.5px] text-bvc-muted">
                       Thử thay đổi từ khóa tìm kiếm hoặc lọc theo nhóm khác.
                     </p>
@@ -507,7 +505,8 @@ function SettingsTab() {
                   const jsonItems = isJson
                     ? isSemesters
                       ? parseSemesters(config.value).map(
-                          (semester) => `${semester.name} · ${formatConfigDate(semester.startDate)} – ${formatConfigDate(semester.endDate)}`
+                          (semester) =>
+                            `${semester.name} · ${formatConfigDate(semester.startDate)} – ${formatConfigDate(semester.endDate)}`
                         )
                       : parseJsonArray(config.value)
                     : [];
@@ -515,12 +514,12 @@ function SettingsTab() {
                   const isAccuracy = config.key.includes("ACCURACY");
 
                   return (
-                    <tr key={config.id} className="transition-colors hover:bg-bvc-surface/40">
-                      <td className="px-5 py-3.5">
+                    <tr key={config.id} className="transition-colors hover:bg-bvc-soft/70">
+                      <td className="px-4 py-3.5">
                         <div className="flex flex-col gap-1">
                           <div className="flex items-center gap-2">
-                            <span className="font-bold text-bvc-ink text-[13.5px]">{config.label}</span>
-                            <span className="font-mono text-[11px] font-semibold text-bvc-muted bg-bvc-surface border border-bvc-border px-1.5 py-0.5 rounded-[5px]">
+                            <span className="font-semibold text-bvc-ink text-[13.5px]">{config.label}</span>
+                            <span className="font-mono text-[11px] font-medium text-bvc-muted bg-bvc-surface border border-bvc-border px-1.5 py-0.5 rounded-[5px]">
                               {config.key}
                             </span>
                           </div>
@@ -532,15 +531,15 @@ function SettingsTab() {
                         </div>
                       </td>
 
-                      <td className="px-5 py-3.5">
-                        <span className="inline-block rounded-[7px] border border-bvc-border bg-bvc-surface/70 px-2 py-0.5 text-[11.5px] font-semibold text-bvc-muted">
+                      <td className="px-4 py-3.5">
+                        <span className="inline-block rounded-[7px] border border-bvc-border bg-bvc-surface/70 px-2 py-0.5 text-[11.5px] font-medium text-bvc-muted">
                           {CONFIG_GROUP_LABELS[config.group]}
                         </span>
                       </td>
 
-                      <td className="px-5 py-3.5">
+                      <td className="px-4 py-3.5">
                         {config.valueType === "BOOLEAN" && (
-                          <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold">
+                          <span className="inline-flex items-center gap-1.5 text-[13px] font-medium">
                             <span
                               className={`size-[7px] rounded-full ${
                                 config.value === "true" ? "bg-bvc-ok" : "bg-bvc-bar-strong"
@@ -557,7 +556,7 @@ function SettingsTab() {
                             {jsonItems.map((val) => (
                               <span
                                 key={val}
-                                className="font-mono text-[11.5px] font-semibold text-bvc-ink bg-bvc-surface border border-bvc-border px-2 py-0.5 rounded-[6px]"
+                                className="font-mono text-[11.5px] font-medium text-bvc-ink bg-bvc-surface border border-bvc-border px-2 py-0.5 rounded-[6px]"
                               >
                                 {val}
                               </span>
@@ -568,7 +567,7 @@ function SettingsTab() {
 
                         {!isJson && config.valueType !== "BOOLEAN" && isBytes && (
                           <div className="flex items-baseline gap-2">
-                            <span className="font-mono text-[13.5px] font-bold text-bvc-ink">
+                            <span className="font-mono text-[13.5px] font-semibold text-bvc-ink">
                               {formatBytes(config.value)}
                             </span>
                             <span className="font-mono text-[11px] text-bvc-muted">
@@ -579,7 +578,7 @@ function SettingsTab() {
 
                         {!isJson && config.valueType !== "BOOLEAN" && isAccuracy && (
                           <div className="flex items-baseline gap-2">
-                            <span className="font-mono text-[13.5px] font-bold text-bvc-ink">
+                            <span className="font-mono text-[13.5px] font-semibold text-bvc-ink">
                               {Math.round(Number(config.value) * 100)}%
                             </span>
                             <span className="font-mono text-[11px] text-bvc-muted">({config.value})</span>
@@ -587,7 +586,7 @@ function SettingsTab() {
                         )}
 
                         {!isJson && config.valueType !== "BOOLEAN" && !isBytes && !isAccuracy && (
-                          <span className="font-mono text-[13px] font-bold text-bvc-ink">
+                          <span className="font-mono text-[13px] font-semibold text-bvc-ink">
                             {config.value}
                             {config.key.includes("ATTEMPTS") ? " lần" : ""}
                             {config.key.includes("DAYS") ? " ngày" : ""}
@@ -596,11 +595,11 @@ function SettingsTab() {
                         )}
                       </td>
 
-                      <td className="px-5 py-3.5 text-right">
+                      <td className="px-4 py-3.5 text-right">
                         <button
                           type="button"
                           onClick={() => setEditTarget(config)}
-                          className="inline-flex h-[32px] cursor-pointer items-center gap-1.5 rounded-[8px] border border-bvc-border bg-white px-3 text-[12.5px] font-semibold text-bvc-ink transition-colors hover:border-bvc-ink hover:bg-bvc-surface"
+                          className="inline-flex h-[32px] cursor-pointer items-center gap-1.5 rounded-full border border-bvc-border bg-white px-3 text-[12.5px] font-medium text-bvc-ink transition-colors hover:border-bvc-ink hover:bg-bvc-surface"
                         >
                           <Pencil size={13} />
                           <span>Sửa</span>
@@ -650,7 +649,7 @@ export function SystemConfigPage() {
           onValueChange={(val) => setActiveTab(val as "settings" | "instruments")}
           className="flex flex-1 flex-col gap-4"
         >
-          <div className="inline-flex self-start rounded-[16px] border border-bvc-border bg-white/95 p-1.5 shadow-2xs backdrop-blur-md">
+          <div className="inline-flex self-start rounded-bvc-xl border border-bvc-border bg-white/95 p-1.5 shadow-2xs backdrop-blur-md">
             <TabsList className="bg-transparent p-0 gap-1.5">
               <TabsTab
                 value="settings"
@@ -659,8 +658,8 @@ export function SystemConfigPage() {
                   "hover:bg-bvc-surface/80 hover:text-bvc-ink",
                   "data-selected:bg-bvc-ink data-selected:text-white data-selected:shadow-sm data-selected:ring-1 data-selected:ring-black/5",
                   isSettingsActive
-                    ? "bg-bvc-ink font-bold text-white shadow-sm ring-1 ring-black/5"
-                    : "font-semibold text-bvc-muted"
+                    ? "bg-bvc-ink font-semibold text-white shadow-sm ring-1 ring-black/5"
+                    : "font-medium text-bvc-muted"
                 )}
               >
                 <div
@@ -676,7 +675,7 @@ export function SystemConfigPage() {
                 <span className="tracking-[-0.01em]">Tham số hệ thống</span>
                 <span
                   className={cn(
-                    "flex h-[22px] min-w-[24px] items-center justify-center rounded-full px-2 text-[11.5px] font-bold font-mono tracking-tight transition-all duration-150",
+                    "flex h-[22px] min-w-[24px] items-center justify-center rounded-full px-2 text-[11.5px] font-semibold font-mono tracking-tight transition-all duration-150",
                     isSettingsActive
                       ? "border border-white/15 bg-white/20 text-white shadow-2xs"
                       : "border border-bvc-border bg-bvc-surface text-bvc-muted group-hover:border-bvc-border-strong group-hover:text-bvc-ink"
@@ -693,8 +692,8 @@ export function SystemConfigPage() {
                   "hover:bg-bvc-surface/80 hover:text-bvc-ink",
                   "data-selected:bg-bvc-ink data-selected:text-white data-selected:shadow-sm data-selected:ring-1 data-selected:ring-black/5",
                   isInstrumentsActive
-                    ? "bg-bvc-ink font-bold text-white shadow-sm ring-1 ring-black/5"
-                    : "font-semibold text-bvc-muted"
+                    ? "bg-bvc-ink font-semibold text-white shadow-sm ring-1 ring-black/5"
+                    : "font-medium text-bvc-muted"
                 )}
               >
                 <div
@@ -710,7 +709,7 @@ export function SystemConfigPage() {
                 <span className="tracking-[-0.01em]">Nhạc cụ truyền thống</span>
                 <span
                   className={cn(
-                    "flex h-[22px] min-w-[24px] items-center justify-center rounded-full px-2 text-[11.5px] font-bold font-mono tracking-tight transition-all duration-150",
+                    "flex h-[22px] min-w-[24px] items-center justify-center rounded-full px-2 text-[11.5px] font-semibold font-mono tracking-tight transition-all duration-150",
                     isInstrumentsActive
                       ? "border border-white/15 bg-white/20 text-white shadow-2xs"
                       : "border border-bvc-border bg-bvc-surface text-bvc-muted group-hover:border-bvc-border-strong group-hover:text-bvc-ink"

@@ -28,7 +28,7 @@ export function ManagedSongRow({ song, isUpdating, onRequestVisibility }: Manage
       <div className="flex items-start gap-3 xl:contents">
         <CoverArt title={song.title} tone={coverToneOf(song.id)} url={song.coverUrl ?? undefined} size="thumb" />
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <Link to={editHref} className="truncate text-[15px] font-bold text-bvc-ink hover:text-bvc-accent-text">
+          <Link to={editHref} className="truncate text-[15px] font-semibold text-bvc-ink hover:text-bvc-accent-text">
             {song.title}
           </Link>
           <span className="truncate text-[12.5px] text-bvc-muted">

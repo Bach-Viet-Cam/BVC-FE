@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
-import { ChevronDown, LogOut, Music2 } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+import { ChevronDown, LogOut } from "lucide-react";
+import logoImage from "@/assets/image/logo.png";
 import { NotificationBell } from "@/shared/components/bvc/NotificationBell";
 import { useAuth } from "@/shared/context/AuthContext";
 import { useNewNotificationToast } from "@/shared/hooks/useNewNotificationToast";
@@ -25,8 +26,9 @@ interface TeacherShellProps {
   roleLabel?: string;
 }
 
+// Nút chuông dạng kính mờ trên nền sidebar / header tối
 const bellClass =
-  "flex size-10 shrink-0 items-center justify-center rounded-bvc-md border border-bvc-border bg-white text-bvc-ink hover:text-bvc-ink hover:border-bvc-border-strong transition-colors";
+  "flex size-10 shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white transition-colors hover:bg-white/20 hover:text-white";
 
 function matchesPath(pathname: string, to: string, end: boolean) {
   return pathname === to || (!end && pathname.startsWith(`${to}/`));
@@ -49,26 +51,27 @@ interface SidebarLinkProps {
 function SidebarLink({ item, isActive }: SidebarLinkProps) {
   const Icon = item.icon;
   return (
-    <NavLink
+    <Link
       to={item.to}
+      aria-current={isActive ? "page" : undefined}
       className={cn(
-        "group relative flex min-h-[42px] items-center gap-3 rounded-[13px] px-3.5 py-2 text-[13.5px] font-semibold transition-all duration-150",
+        "group relative flex min-h-[42px] items-center gap-3 rounded-full px-4 py-2 text-[13.5px] font-medium transition-all duration-150",
         isActive
-          ? "bg-bvc-ink font-bold text-white shadow-xs"
-          : "text-bvc-muted hover:bg-white hover:text-bvc-ink hover:shadow-2xs active:scale-[0.99]"
+          ? "bg-white font-semibold text-bvc-ink shadow-xs hover:text-bvc-ink"
+          : "text-white/70 hover:bg-white/10 hover:text-white active:scale-[0.99]"
       )}
     >
       {Icon && (
         <Icon
           className={cn(
             "size-[18px] shrink-0 transition-transform duration-150 group-hover:scale-110",
-            isActive ? "text-emerald-300" : "text-bvc-faint group-hover:text-bvc-ink"
+            isActive ? "text-bvc-accent" : "text-white/45 group-hover:text-white"
           )}
           strokeWidth={isActive ? 2.2 : 1.9}
         />
       )}
       <span className="truncate">{item.label}</span>
-    </NavLink>
+    </Link>
   );
 }
 
@@ -92,15 +95,15 @@ function SidebarGroup({ group, allItems, pathname }: SidebarGroupProps) {
         aria-expanded={isOpen}
         onClick={() => setToggled(!isOpen)}
         className={cn(
-          "group flex min-h-[42px] cursor-pointer items-center gap-3 rounded-[13px] px-3.5 py-2 text-left text-[13.5px] font-semibold transition-all duration-150 hover:bg-white hover:text-bvc-ink hover:shadow-2xs",
-          hasActiveChild ? "text-bvc-ink" : "text-bvc-muted"
+          "group flex min-h-[42px] cursor-pointer items-center gap-3 rounded-full px-4 py-2 text-left text-[13.5px] font-medium transition-all duration-150 hover:bg-white/10 hover:text-white",
+          hasActiveChild ? "text-white" : "text-white/70"
         )}
       >
         {Icon && (
           <Icon
             className={cn(
               "size-[18px] shrink-0 transition-transform duration-150 group-hover:scale-110",
-              hasActiveChild ? "text-bvc-ink" : "text-bvc-faint group-hover:text-bvc-ink"
+              hasActiveChild ? "text-bvc-accent-border" : "text-white/45 group-hover:text-white"
             )}
             strokeWidth={1.9}
           />
@@ -109,11 +112,11 @@ function SidebarGroup({ group, allItems, pathname }: SidebarGroupProps) {
         <ChevronDown
           aria-hidden
           strokeWidth={1.9}
-          className={cn("size-4 shrink-0 text-bvc-faint transition-transform", isOpen && "rotate-180")}
+          className={cn("size-4 shrink-0 text-white/45 transition-transform", isOpen && "rotate-180")}
         />
       </button>
       {isOpen && (
-        <div className="ml-[22px] flex flex-col gap-1 border-l border-bvc-border pl-2">
+        <div className="ml-[22px] flex flex-col gap-1 border-l border-white/15 pl-2">
           {group.children.map((child) => (
             <SidebarLink key={child.to} item={child} isActive={isItemActive(allItems, child, pathname)} />
           ))}
@@ -136,16 +139,9 @@ export function TeacherShell({ children, className, navItems, roleLabel }: Teach
   return (
     <div className="flex min-h-dvh flex-col bg-white font-bvc-sans text-bvc-ink lg:h-dvh lg:flex-row">
       {/* Desktop: sidebar trái */}
-      <aside className="hidden w-[260px] shrink-0 flex-col gap-6 overflow-y-auto border-r border-bvc-border bg-bvc-surface/90 px-3.5 py-6 lg:flex [scrollbar-width:thin] [scrollbar-color:var(--color-bvc-bar)_transparent]">
+      <aside className="hidden w-[264px] shrink-0 flex-col gap-6 overflow-y-auto bg-bvc-ink px-3.5 py-6 text-white lg:flex [scrollbar-width:thin] [scrollbar-color:rgb(255_255_255/0.2)_transparent]">
         <div className="flex items-center justify-between gap-2 px-1">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-bvc-ink text-emerald-300 shadow-xs">
-              <Music2 className="size-[17px]" strokeWidth={2.4} />
-            </div>
-            <span className="truncate text-[17px] font-extrabold tracking-[-0.02em] text-bvc-ink font-bvc-display">
-              Bách Việt Cầm
-            </span>
-          </div>
+          <img src={logoImage} alt="Bách Việt Cầm" className="h-11 w-auto min-w-0 object-contain" />
           <NotificationBell className={bellClass} iconClassName="size-[18px]" />
         </div>
         <nav aria-label={navLabel} className="flex flex-col gap-1">
@@ -157,17 +153,17 @@ export function TeacherShell({ children, className, navItems, roleLabel }: Teach
             )
           )}
         </nav>
-        <div className="mt-auto flex flex-col gap-2 pt-3 border-t border-bvc-border/70">
+        <div className="mt-auto flex flex-col gap-2 border-t border-white/10 pt-3">
           <Link
             to="/profile"
-            className="group flex items-center gap-2.5 rounded-2xl border border-bvc-border bg-white p-[11px] text-bvc-ink shadow-2xs transition-all duration-150 hover:border-bvc-border-strong hover:shadow-xs"
+            className="group flex items-center gap-2.5 rounded-bvc-xl border border-white/15 bg-white/10 p-[11px] text-white transition-all duration-150 hover:bg-white/15 hover:text-white"
           >
             <UserAvatar name={displayName} size="sm" />
             <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-              <span className="truncate text-[13.5px] font-bold text-bvc-ink group-hover:text-bvc-accent transition-colors">
+              <span className="truncate text-[13.5px] font-semibold text-white transition-colors group-hover:text-bvc-accent-border">
                 {displayName}
               </span>
-              <span className="flex items-center gap-1.5 text-xs text-bvc-muted">
+              <span className="flex items-center gap-1.5 text-xs text-white/60">
                 <span className="size-1.5 rounded-full bg-emerald-500" />
                 <span className="truncate">{effectiveRoleLabel}</span>
               </span>
@@ -176,46 +172,47 @@ export function TeacherShell({ children, className, navItems, roleLabel }: Teach
           <button
             type="button"
             onClick={logout}
-            className="group flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-[13px] text-[13px] font-semibold text-bvc-muted transition-all duration-150 hover:bg-red-50 hover:text-red-700 active:scale-[0.99]"
+            className="group flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-full text-[13px] font-medium text-white/60 transition-all duration-150 hover:bg-white/10 hover:text-white active:scale-[0.99]"
           >
-            <LogOut className="size-4 text-bvc-faint transition-colors group-hover:text-red-600" strokeWidth={1.9} />
+            <LogOut className="size-4 text-white/45 transition-colors group-hover:text-white" strokeWidth={1.9} />
             <span>Đăng xuất</span>
           </button>
         </div>
       </aside>
 
       {/* Mobile / tablet: thanh trên + nav cuộn ngang (nhóm được trải phẳng) */}
-      <header className="sticky top-0 z-20 shrink-0 border-b border-bvc-border bg-white lg:hidden">
+      <header className="sticky top-0 z-20 shrink-0 bg-bvc-ink pb-3 text-white lg:hidden">
         <div className="flex items-center gap-2.5 px-[18px] pt-[max(env(safe-area-inset-top),22px)]">
-          <span className="flex-1 text-[19px] font-extrabold tracking-[-0.02em]">Bách Việt Cầm</span>
+          <img src={logoImage} alt="Bách Việt Cầm" className="mr-auto h-10 w-auto" />
           <NotificationBell className={bellClass} iconClassName="size-[18px]" />
           <Link to="/profile" aria-label={`Hồ sơ ${displayName}`}>
             <UserAvatar name={displayName} size="sm" />
           </Link>
         </div>
-        <nav aria-label={navLabel} className="mt-3 flex gap-4 overflow-x-auto px-[18px] [scrollbar-width:none]">
+        <nav aria-label={navLabel} className="mt-3 flex gap-1.5 overflow-x-auto px-[18px] [scrollbar-width:none]">
           {flatItems.map((item) => {
             const Icon = item.icon;
             const isActive = isItemActive(flatItems, item, location.pathname);
             return (
-              <NavLink
+              <Link
                 key={item.to}
                 to={item.to}
+                aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "-mb-px flex min-h-11 shrink-0 items-center gap-2 border-b-2 text-sm whitespace-nowrap transition-colors",
+                  "flex min-h-10 shrink-0 items-center gap-2 rounded-full px-4 text-sm whitespace-nowrap transition-colors",
                   isActive
-                    ? "border-bvc-ink font-bold text-bvc-ink hover:text-bvc-ink"
-                    : "border-transparent text-bvc-muted hover:text-bvc-ink"
+                    ? "bg-white font-semibold text-bvc-ink hover:text-bvc-ink"
+                    : "font-medium text-white/75 hover:bg-white/10 hover:text-white"
                 )}
               >
                 {Icon && (
                   <Icon
-                    className={cn("size-4 shrink-0 transition-colors", isActive ? "text-bvc-ink" : "text-bvc-faint")}
+                    className={cn("size-4 shrink-0 transition-colors", isActive ? "text-bvc-accent" : "text-white/50")}
                     strokeWidth={isActive ? 2.2 : 1.9}
                   />
                 )}
                 <span>{item.label}</span>
-              </NavLink>
+              </Link>
             );
           })}
         </nav>

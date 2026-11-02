@@ -12,10 +12,10 @@ interface HeadphonePromptProps {
 export function HeadphonePrompt({ isOpen, onOpenChange, onChoose }: HeadphonePromptProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogPopup className="max-w-[460px] items-center gap-4 rounded-[22px] border-bvc-border p-6 text-center">
+      <DialogPopup className="max-w-[460px] items-center gap-4 rounded-bvc-xl border-bvc-border p-6 text-center">
         <DialogClose />
         <HeadphonePlugAnimation className="mt-2" />
-        <DialogTitle className="font-bvc-display text-[20px] font-extrabold text-bvc-ink">
+        <DialogTitle className="font-bvc-display text-[20px] font-semibold text-bvc-ink">
           Chưa thấy tai nghe
         </DialogTitle>
         <DialogDescription className="text-[13.5px] leading-relaxed text-bvc-muted">
@@ -27,7 +27,7 @@ export function HeadphonePrompt({ isOpen, onOpenChange, onChoose }: HeadphonePro
           <button
             type="button"
             onClick={() => onChoose("headphones")}
-            className="flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-[15px] bg-bvc-ink text-[15px] font-semibold text-white transition-opacity hover:opacity-90 active:scale-[0.99]"
+            className="flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-bvc-ink text-[15px] font-medium text-white transition-opacity hover:opacity-90 active:scale-[0.99]"
           >
             <Headphones size={18} />
             Tôi đã đeo tai nghe
@@ -35,7 +35,7 @@ export function HeadphonePrompt({ isOpen, onOpenChange, onChoose }: HeadphonePro
           <button
             type="button"
             onClick={() => onChoose("speaker")}
-            className="flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-[15px] border border-bvc-border-strong bg-white text-[14.5px] font-semibold text-bvc-ink transition-colors hover:bg-bvc-surface active:scale-[0.99]"
+            className="flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-bvc-border-strong bg-white text-[14.5px] font-medium text-bvc-ink transition-colors hover:bg-bvc-surface active:scale-[0.99]"
           >
             <Speaker size={18} />
             Thu bằng loa ngoài

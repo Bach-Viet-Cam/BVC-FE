@@ -15,7 +15,7 @@ export function AccordionTrigger({ className, children, ...props }: AccordionTri
       <BaseAccordion.Trigger
         {...props}
         className={cn(
-          "flex w-full items-center justify-between gap-2 rounded-md px-4 py-3 text-left text-sm font-semibold text-on-surface transition-colors",
+          "flex w-full items-center justify-between gap-2 rounded-md px-4 py-3 text-left text-sm font-medium text-on-surface transition-colors",
           "hover:bg-primary/5 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
           "group data-disabled:cursor-not-allowed data-disabled:opacity-50",
           className

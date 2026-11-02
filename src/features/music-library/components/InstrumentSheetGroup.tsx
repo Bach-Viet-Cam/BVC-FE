@@ -30,14 +30,14 @@ export function InstrumentSheetGroup({
   return (
     <section aria-labelledby={headingId} className="flex flex-col gap-3">
       <div className="flex items-baseline justify-between gap-3 border-b border-bvc-border pb-2">
-        <h2 id={headingId} className="text-lg font-extrabold tracking-[-0.01em] text-bvc-ink">
+        <h2 id={headingId} className="text-lg font-semibold tracking-[-0.01em] text-bvc-ink">
           {instrument.name}
         </h2>
         <span className="font-bvc-mono text-[13px] text-bvc-muted">{sheets.length} bản</span>
       </div>
 
       {sheets.length === 0 ? (
-        <div className="flex flex-col items-start gap-3 rounded-[18px] border border-dashed border-bvc-border-strong p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col items-start gap-3 rounded-bvc-xl border border-dashed border-bvc-border-strong p-4 sm:flex-row sm:items-center sm:justify-between">
           <span className="text-[13.5px] text-bvc-muted">
             Chưa có bản nào. Bản đầu tiên của nhạc cụ sẽ là bản chính.
           </span>

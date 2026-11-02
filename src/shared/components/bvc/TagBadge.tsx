@@ -21,7 +21,7 @@ export function TagBadge({ label, variant = "muted" }: TagBadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-[9px] border px-[8px] py-[3px] text-[12px] font-semibold",
+        "inline-flex items-center rounded-[9px] border px-[8px] py-[3px] text-[12px] font-medium",
         STYLES[variant]
       )}
     >

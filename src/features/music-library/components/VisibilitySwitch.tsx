@@ -36,7 +36,7 @@ export function VisibilitySwitch({
       <span
         className={cn(
           "text-[12.5px] whitespace-nowrap",
-          lockedByAdmin ? "font-semibold text-bvc-accent-text" : "text-bvc-ink"
+          lockedByAdmin ? "font-medium text-bvc-accent-text" : "text-bvc-ink"
         )}
       >
         {VISIBILITY_LABELS[visibility]}

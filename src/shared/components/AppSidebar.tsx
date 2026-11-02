@@ -26,14 +26,14 @@ export function AppSidebar() {
 
   return (
     <aside className="flex w-60 shrink-0 flex-col gap-1 border-r border-outline-variant/30 bg-surface-container-lowest p-3">
-      <div className="px-2 py-3 text-lg font-bold text-primary">BachVietCam</div>
+      <div className="px-2 py-3 text-lg font-semibold text-primary">BachVietCam</div>
       {items.map((item) => (
         <NavLink
           key={item.to}
           to={item.to}
           className={({ isActive }) =>
             cn(
-              "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold text-on-surface-variant transition-colors",
+              "flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-on-surface-variant transition-colors",
               "hover:bg-primary/5 hover:text-primary",
               isActive && "bg-primary/10 text-primary"
             )

@@ -1,420 +1,45 @@
-import { useEffect, useRef } from "react";
-import { useForm, useWatch } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Asterisk, ChevronLeft, Music, Users } from "lucide-react";
+import { Music, Users } from "lucide-react";
+import { ClassForm } from "@/features/classes/components/ClassForm";
 import { ListState } from "@/features/classes/components/ListState";
 import { useClassDetail } from "@/features/classes/hooks/useClassDetail";
 import { useInstruments } from "@/features/classes/hooks/useInstruments";
 import { useSaveClass } from "@/features/classes/hooks/useSaveClass";
 import { useSemesters } from "@/features/classes/hooks/useSemesters";
-import {
-  type ApiFieldError,
-  type ClassDetail,
-  type ClassPayload,
-  type Instrument,
-  type Semester,
-} from "@/features/classes/types/classTypes";
-import {
-  buildClassDescription,
-  CLASS_CODE_EXAMPLE,
-  findInstrumentBySubject,
-  parseClassCode,
-} from "@/features/classes/utils/classCode";
-import { formatIsoDate } from "@/features/classes/utils/classFormat";
-import { applyFieldErrors } from "@/features/classes/utils/mapApiErrors";
-import {
-  classFormSchema,
-  createClassFormSchema,
-  type ClassFormValues,
-} from "@/features/classes/utils/validateClassForm";
+import { type ClassPayload } from "@/features/classes/types/classTypes";
+import { LeaveConfirmDialog } from "@/shared/components/bvc/LeaveConfirmDialog";
+import { TeacherPageHeader } from "@/shared/components/bvc/TeacherPageHeader";
+import { TeacherScreen } from "@/shared/components/bvc/TeacherScreen";
 import { toast } from "@/shared/components/ui/toast";
-import { cn } from "@/shared/utils/cn";
+import { useLeaveGuard } from "@/shared/hooks/useLeaveGuard";
 
-const FORM_FIELDS = ["name", "instrumentId", "cohort", "description"] as const;
 const FINISHED_CLASS_MESSAGE = "Không thể sửa lớp vì lớp đã kết thúc.";
 
-const INPUT_CLASSES =
-  "h-[46px] w-full rounded-[14px] border border-bvc-border-strong bg-white px-4 text-[14px] text-bvc-ink focus:border-bvc-ink focus:outline-none aria-[invalid=true]:border-bvc-error read-only:bg-bvc-soft disabled:bg-bvc-soft disabled:text-bvc-muted";
+const NOTES = [
+  "Môn học và học kỳ bị khóa sau khi lớp bắt đầu",
+  "Sinh viên có thể được thêm hoặc xóa sau",
+  "Ngày bắt đầu và kết thúc của lớp lấy theo học kỳ do quản trị viên cấu hình",
+];
 
-interface FieldProps {
-  id: string;
-  label: string;
-  isRequired?: boolean;
-  hint?: string;
-  error?: string;
-  children: React.ReactNode;
-}
-
-function Field({ id, label, isRequired = false, hint, error, children }: FieldProps) {
-  return (
-    <div className="flex flex-col gap-[6px]">
-      <label htmlFor={id} className="flex items-center gap-[4px] text-[13px] font-semibold text-bvc-muted">
-        {label}
-        {isRequired && (
-          <>
-            <Asterisk size={12} strokeWidth={3} aria-hidden className="text-bvc-error" />
-            <span className="sr-only">(bắt buộc)</span>
-          </>
-        )}
-      </label>
-      {children}
-      {error ? (
-        <span id={`${id}-error`} role="alert" className="text-[12px] text-bvc-error">
-          {error}
-        </span>
-      ) : (
-        hint && <span className="text-[12px] text-bvc-muted">{hint}</span>
-      )}
-    </div>
-  );
-}
-
-function toFormValues(classDetail: ClassDetail | null, defaultSemesterName: string | null): ClassFormValues {
-  return {
-    name: classDetail?.name ?? "",
-    instrumentId: classDetail?.instrument.id ?? "",
-    cohort: classDetail?.cohort ?? defaultSemesterName ?? "",
-    description: classDetail?.description ?? "",
-  };
-}
-
-interface ClassDesktopFormProps {
-  classDetail: ClassDetail | null;
-  instruments: Instrument[];
-  semesters: Semester[];
-  defaultSemesterName: string | null;
-  isSaving: boolean;
-  onCancel: () => void;
-  onSubmit: (payload: Partial<ClassPayload>) => Promise<ApiFieldError[] | null>;
-}
-
-function ClassDesktopForm({
-  classDetail,
-  instruments,
-  semesters,
-  defaultSemesterName,
-  isSaving,
-  onCancel,
-  onSubmit,
-}: ClassDesktopFormProps) {
-  const isCreate = classDetail === null;
-  // GBR-36: subject (instrument) and semester are locked once the class has started.
-  const isLocked = classDetail?.hasStarted ?? false;
-  const {
-    register,
-    handleSubmit,
-    control,
-    setError,
-    setValue,
-    getValues,
-    formState: { errors, isSubmitted },
-  } = useForm<ClassFormValues>({
-    resolver: zodResolver(isCreate ? createClassFormSchema : classFormSchema),
-    defaultValues: toFormValues(classDetail, defaultSemesterName),
-  });
-  const instrumentOptions =
-    classDetail && !instruments.some((item) => item.id === classDetail.instrument.id)
-      ? [...instruments, { ...classDetail.instrument, code: "", isActive: false }]
-      : instruments;
-  // A class created before semesters were configured keeps its own cohort and dates.
-  const semesterOptions =
-    classDetail && !semesters.some((item) => item.name === classDetail.cohort)
-      ? [...semesters, { name: classDetail.cohort, startDate: classDetail.startDate, endDate: classDetail.endDate }]
-      : semesters;
-  const selectedCohort = useWatch({ control, name: "cohort" });
-  const selectedSemester = semesterOptions.find((item) => item.name === selectedCohort);
-
-  // Create flow: the subject comes from the instrument code in the class code (DNH103.M2.H1 -> DNH).
-  const enteredName = useWatch({ control, name: "name" });
-  const parsedCode = isCreate ? parseClassCode(enteredName) : null;
-  const matchedInstrument = parsedCode ? findInstrumentBySubject(instruments, parsedCode.subject) : null;
-  const autoDescription =
-    matchedInstrument && parsedCode && selectedCohort
-      ? buildClassDescription(matchedInstrument.name, parsedCode)
-      : null;
-  const lastAutoDescription = useRef("");
-
-  useEffect(() => {
-    if (!isCreate) return;
-    setValue("instrumentId", matchedInstrument?.id ?? "", { shouldValidate: isSubmitted });
-  }, [isCreate, matchedInstrument?.id, isSubmitted, setValue]);
-
-  useEffect(() => {
-    if (!autoDescription) return;
-    // Only overwrite a description the user has not typed themselves.
-    const current = getValues("description");
-    if (current === "" || current === lastAutoDescription.current) {
-      setValue("description", autoDescription, { shouldValidate: isSubmitted });
-    }
-    lastAutoDescription.current = autoDescription;
-  }, [autoDescription, isSubmitted, getValues, setValue]);
-
-  const instrumentHint = isLocked
-    ? "Đã khóa vì lớp đã bắt đầu"
-    : isCreate
-      ? parsedCode && !matchedInstrument
-        ? `Không có nhạc cụ nào có mã khớp với môn ${parsedCode.subject}. Nếu lệch loại đàn, hãy sửa mã môn.`
-        : "Tự động theo mã môn trong mã lớp. Nếu lệch loại đàn, hãy sửa mã môn."
-      : undefined;
-
-  // Class codes are upper case; convert while typing and keep the caret where it was.
-  const nameField = register("name");
-  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const input = event.target;
-    const { selectionStart, selectionEnd } = input;
-    input.value = input.value.toUpperCase();
-    input.setSelectionRange(selectionStart, selectionEnd);
-    void nameField.onChange(event);
-  };
-
-  const submit = handleSubmit(async (values) => {
-    const payload: Partial<ClassPayload> = {
-      name: values.name,
-      description: values.description || null,
-      ...(isLocked ? {} : { instrumentId: values.instrumentId, cohort: values.cohort }),
-    };
-    const fieldErrors = await onSubmit(payload);
-    if (!fieldErrors) return;
-    const unmatched = applyFieldErrors<ClassFormValues>(fieldErrors, FORM_FIELDS, setError);
-    unmatched.forEach((fieldError) => toast.error(fieldError.message));
-  });
-
-  return (
-    <form onSubmit={submit} noValidate className="flex flex-1 flex-col lg:min-h-0">
-      <header className="flex shrink-0 items-center gap-[10px] border-b border-bvc-border-strong px-[18px] py-4 lg:gap-4 lg:px-[32px] lg:py-5">
-        <button
-          type="button"
-          onClick={onCancel}
-          aria-label="Quay lại"
-          className="flex size-[42px] shrink-0 cursor-pointer items-center justify-center rounded-[14px] border border-bvc-border-strong bg-white"
-        >
-          <ChevronLeft size={18} strokeWidth={2} className="text-bvc-ink" />
-        </button>
-        <div className="flex min-w-0 flex-col gap-[3px]">
-          <span className="hidden text-[12px] font-bold uppercase tracking-[0.14em] text-bvc-muted lg:block">
-            Lớp học
-          </span>
-          <span className="text-[18px] font-extrabold tracking-[-0.025em] text-bvc-ink lg:text-[24px]">
-            {isCreate ? "Tạo lớp học" : "Sửa lớp học"}
-          </span>
-        </div>
-        <div className="ml-auto flex items-center gap-[10px]">
-          <button
-            type="button"
-            onClick={onCancel}
-            disabled={isSaving}
-            className="hidden min-h-[44px] cursor-pointer items-center rounded-[14px] border border-bvc-border-strong bg-white px-[18px] text-[14px] font-semibold text-bvc-ink disabled:cursor-not-allowed disabled:opacity-60 sm:flex"
-          >
-            Hủy
-          </button>
-          <button
-            type="submit"
-            disabled={isSaving}
-            className="flex min-h-[44px] cursor-pointer items-center rounded-[14px] bg-bvc-ink px-[18px] text-[14px] font-bold text-white disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isSaving ? "Đang lưu…" : isCreate ? "Tạo lớp" : "Lưu"}
-          </button>
-        </div>
-      </header>
-
-      <div className="flex flex-1 flex-col lg:min-h-0 lg:flex-row lg:overflow-hidden">
-        <div className="flex flex-1 flex-col gap-[18px] p-[18px] lg:overflow-y-auto lg:p-[22px_32px]">
-          <div className="flex flex-col gap-[20px] rounded-[20px] border border-bvc-border bg-white p-[20px]">
-            <div className="flex items-center justify-between">
-              <span className="text-[15px] font-bold text-bvc-ink">Thông tin lớp học</span>
-              <span className="flex items-center gap-[4px] text-[12px] text-bvc-muted">
-                <Asterisk size={12} strokeWidth={3} aria-hidden className="text-bvc-error" />
-                Trường bắt buộc
-              </span>
-            </div>
-
-            <Field
-              id="class-name"
-              label="Mã lớp"
-              isRequired
-              hint={
-                isCreate
-                  ? `Dạng Môn.Slot.Half, ví dụ ${CLASS_CODE_EXAMPLE} (M2 = slot 2 buổi sáng, H1 = half 1)`
-                  : "Tối đa 100 ký tự, không trùng trong cùng học kỳ"
-              }
-              error={errors.name?.message}
-            >
-              <input
-                id="class-name"
-                type="text"
-                {...nameField}
-                onChange={handleNameChange}
-                maxLength={100}
-                placeholder={isCreate ? CLASS_CODE_EXAMPLE : "TRD301"}
-                aria-invalid={Boolean(errors.name)}
-                className={INPUT_CLASSES}
-              />
-            </Field>
-
-            <Field
-              id="class-instrument"
-              label="Tên môn học"
-              isRequired
-              hint={instrumentHint}
-              error={errors.instrumentId?.message}
-            >
-              {isCreate ? (
-                <>
-                  <input type="hidden" {...register("instrumentId")} />
-                  <input
-                    id="class-instrument"
-                    value={matchedInstrument?.name ?? ""}
-                    placeholder="Tự động theo mã lớp"
-                    readOnly
-                    aria-invalid={Boolean(errors.instrumentId)}
-                    className={INPUT_CLASSES}
-                  />
-                </>
-              ) : isLocked ? (
-                // Not registered: the locked value stays in defaultValues and is never sent.
-                <input
-                  id="class-instrument"
-                  value={classDetail?.instrument.name ?? ""}
-                  readOnly
-                  className={INPUT_CLASSES}
-                />
-              ) : (
-                <select
-                  id="class-instrument"
-                  {...register("instrumentId")}
-                  aria-invalid={Boolean(errors.instrumentId)}
-                  className={INPUT_CLASSES}
-                >
-                  <option value="">Chọn môn học</option>
-                  {instrumentOptions.map((instrument) => (
-                    <option key={instrument.id} value={instrument.id}>
-                      {instrument.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </Field>
-
-            <Field
-              id="class-cohort"
-              label="Học kỳ"
-              isRequired
-              hint={
-                isLocked
-                  ? "Đã khóa vì lớp đã bắt đầu"
-                  : semesters.length === 0
-                    ? "Chưa có học kỳ nào. Liên hệ quản trị viên để cấu hình."
-                    : "Ngày bắt đầu và kết thúc lấy theo học kỳ"
-              }
-              error={errors.cohort?.message}
-            >
-              {isLocked ? (
-                <input id="class-cohort" value={classDetail?.cohort ?? ""} readOnly className={INPUT_CLASSES} />
-              ) : (
-                <select
-                  id="class-cohort"
-                  {...register("cohort")}
-                  aria-invalid={Boolean(errors.cohort)}
-                  className={INPUT_CLASSES}
-                >
-                  <option value="">Chọn học kỳ</option>
-                  {semesterOptions.map((semester) => (
-                    <option key={semester.name} value={semester.name}>
-                      {semester.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </Field>
-
-            <Field id="class-description" label="Mô tả" hint="Tối đa 500 ký tự" error={errors.description?.message}>
-              <textarea
-                id="class-description"
-                {...register("description")}
-                maxLength={500}
-                placeholder="Mô tả nội dung lớp học..."
-                aria-invalid={Boolean(errors.description)}
-                className={cn(INPUT_CLASSES, "h-auto min-h-[72px] resize-none py-3")}
-              />
-            </Field>
-
-            <div className="grid gap-[14px] sm:grid-cols-2">
-              <Field id="class-start-date" label="Ngày bắt đầu" isRequired hint="Theo học kỳ đã chọn">
-                <input
-                  id="class-start-date"
-                  value={selectedSemester ? formatIsoDate(selectedSemester.startDate) : ""}
-                  placeholder="dd/mm/yyyy"
-                  readOnly
-                  className={INPUT_CLASSES}
-                />
-              </Field>
-              <Field id="class-end-date" label="Ngày kết thúc" hint="Theo học kỳ đã chọn">
-                <input
-                  id="class-end-date"
-                  value={selectedSemester ? formatIsoDate(selectedSemester.endDate) : ""}
-                  placeholder="dd/mm/yyyy"
-                  readOnly
-                  className={INPUT_CLASSES}
-                />
-              </Field>
-            </div>
-          </div>
-        </div>
-
-        <aside className="flex w-full shrink-0 flex-col gap-[20px] border-t border-bvc-border-strong bg-bvc-surface p-[18px] lg:w-[380px] lg:overflow-y-auto lg:border-l lg:border-t-0 lg:p-[22px_20px]">
-          <div className="flex flex-col gap-[10px] rounded-[20px] border border-bvc-border bg-white p-[18px]">
-            <span className="flex items-center gap-[8px] text-[15px] font-bold text-bvc-ink">
-              <Users size={16} className="text-bvc-muted" />
-              Danh sách sinh viên
-            </span>
-            <span className="text-[13px] leading-[1.5] text-bvc-muted">
-              Sau khi tạo lớp, bạn có thể thêm từng sinh viên hoặc nhập danh sách từ file .xlsx / .csv trong trang chi
-              tiết lớp.
-            </span>
-          </div>
-
-          <div className="flex flex-col gap-[10px] rounded-[20px] border border-bvc-border bg-white p-[18px]">
-            <span className="text-[14px] font-bold text-bvc-ink">Lưu ý</span>
-            <ul className="flex flex-col gap-[8px]">
-              <li className="flex items-start gap-[8px] text-[13px] text-bvc-muted">
-                <Music size={14} className="mt-[2px] shrink-0 text-bvc-muted" />
-                Môn học lấy theo mã môn trong mã lớp; nếu lệch loại đàn, hãy sửa mã môn
-              </li>
-              <li className="flex items-start gap-[8px] text-[13px] text-bvc-muted">
-                <Music size={14} className="mt-[2px] shrink-0 text-bvc-muted" />
-                Môn học và học kỳ bị khóa sau khi lớp bắt đầu
-              </li>
-              <li className="flex items-start gap-[8px] text-[13px] text-bvc-muted">
-                <Music size={14} className="mt-[2px] shrink-0 text-bvc-muted" />
-                Sinh viên có thể được thêm/xóa sau
-              </li>
-              <li className="flex items-start gap-[8px] text-[13px] text-bvc-muted">
-                <Music size={14} className="mt-[2px] shrink-0 text-bvc-muted" />
-                Ngày bắt đầu và kết thúc của lớp lấy theo học kỳ do quản trị viên cấu hình
-              </li>
-            </ul>
-          </div>
-        </aside>
-      </div>
-    </form>
-  );
-}
-
+// Sửa lớp học (tạo lớp mở bằng modal ClassCreateDialog)
 export function ClassFormPage() {
   const navigate = useNavigate();
   const { classId } = useParams<{ classId: string }>();
-  const isCreate = !classId;
   const { classDetail, isLoading: isClassLoading, error: classError, reload } = useClassDetail(classId);
   const { instruments, isLoading: isInstrumentLoading, error: instrumentError } = useInstruments();
   const { semesters, defaultSemesterName, isLoading: isSemesterLoading, error: semesterError } = useSemesters();
   const { saveClass, isSaving } = useSaveClass(classId);
-  const backPath = classId ? `/teacher/classes/${classId}` : "/teacher/classes";
+  const [isDirty, setIsDirty] = useState(false);
+  const { guard, confirmProps } = useLeaveGuard({ isDirty });
+  const backPath = `/teacher/classes/${classId}`;
+  const leave = () => guard(() => navigate(backPath));
 
   const handleSubmit = async (payload: Partial<ClassPayload>) => {
     const result = await saveClass(payload);
     if ("classDetail" in result) {
       toast.success(result.message);
+      setIsDirty(false);
       navigate(`/teacher/classes/${result.classDetail.id}`, { replace: true });
       return null;
     }
@@ -422,14 +47,15 @@ export function ClassFormPage() {
     return result.error.fieldErrors;
   };
 
-  const isLoading = isInstrumentLoading || isSemesterLoading || (!isCreate && isClassLoading);
-  const loadError = instrumentError ?? semesterError ?? (isCreate ? null : classError);
+  const isLoading = isInstrumentLoading || isSemesterLoading || isClassLoading;
+  const loadError = instrumentError ?? semesterError ?? classError;
   const isFinished = classDetail?.isReadOnly ?? false;
 
   return (
-    <div className="flex min-w-0 flex-1 flex-col bg-white lg:min-h-0 lg:overflow-hidden">
-      {isLoading || loadError || isFinished ? (
-        <div className="p-[18px] lg:p-[32px]">
+    <TeacherScreen>
+      <TeacherPageHeader title="Sửa lớp học" subtitle={classDetail?.name} onBack={leave} />
+      {isLoading || loadError || isFinished || !classDetail ? (
+        <div className="px-[18px] lg:px-[32px] lg:pt-[22px]">
           <ListState
             isLoading={isLoading}
             error={loadError}
@@ -441,17 +67,35 @@ export function ClassFormPage() {
           </ListState>
         </div>
       ) : (
-        <ClassDesktopForm
-          key={classDetail?.id ?? "new"}
-          classDetail={isCreate ? null : (classDetail ?? null)}
-          instruments={instruments}
-          semesters={semesters}
-          defaultSemesterName={defaultSemesterName}
-          isSaving={isSaving}
-          onCancel={() => navigate(backPath)}
-          onSubmit={handleSubmit}
-        />
+        <div className="flex grow flex-col lg:flex-row lg:items-start">
+          <ClassForm
+            key={classDetail.id}
+            classDetail={classDetail}
+            instruments={instruments}
+            semesters={semesters}
+            defaultSemesterName={defaultSemesterName}
+            isSaving={isSaving}
+            onCancel={leave}
+            onSubmit={handleSubmit}
+            onDirtyChange={setIsDirty}
+          />
+          <aside className="mx-[18px] mb-6 flex flex-col gap-2.5 rounded-bvc-xl bg-bvc-surface p-[18px] lg:mx-0 lg:mt-[22px] lg:mr-8 lg:w-[340px] lg:shrink-0">
+            <span className="flex items-center gap-2 text-[15px] font-semibold text-bvc-ink">
+              <Users size={16} className="text-bvc-muted" aria-hidden />
+              Lưu ý
+            </span>
+            <ul className="flex flex-col gap-2">
+              {NOTES.map((note) => (
+                <li key={note} className="flex items-start gap-2 text-[13px] text-bvc-muted">
+                  <Music size={14} className="mt-0.5 shrink-0" aria-hidden />
+                  {note}
+                </li>
+              ))}
+            </ul>
+          </aside>
+        </div>
       )}
-    </div>
+      <LeaveConfirmDialog {...confirmProps} />
+    </TeacherScreen>
   );
 }

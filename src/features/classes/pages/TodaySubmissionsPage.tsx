@@ -80,7 +80,7 @@ export function TodaySubmissionsPage() {
           <span className="text-[13px] text-bvc-muted">
             {rows.length} lớp · {soloTotal} sinh viên nộp Độc tấu · {ensembleTotal} sinh viên nộp Hòa tấu
           </span>
-          <ul className="m-0 list-none rounded-[20px] border border-bvc-border bg-white p-0">
+          <ul className="m-0 list-none rounded-bvc-xl border border-bvc-border bg-white p-0">
             {rows.map((row) => (
               <TodaySubmissionRow key={row.classId} row={row} />
             ))}

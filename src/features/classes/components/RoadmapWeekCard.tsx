@@ -19,13 +19,13 @@ export function RoadmapWeekCard({ week }: RoadmapWeekCardProps) {
     <article
       aria-current={isCurrent ? "true" : undefined}
       className={cn(
-        "flex flex-col gap-[10px] rounded-[18px] border px-[14px] py-[13px]",
+        "flex flex-col gap-[10px] rounded-bvc-xl border px-[14px] py-[13px]",
         isCurrent ? "border-bvc-ink" : "border-bvc-border"
       )}
     >
       <div className="flex justify-between gap-[10px]">
         <span className="flex min-w-0 flex-col gap-[2px]">
-          <span className="text-[15px] font-bold">
+          <span className="text-[15px] font-semibold">
             Tuần {week.weekNumber} · {week.title}
           </span>
           <span className="font-bvc-mono text-[12px] text-bvc-muted">{formatWeekRange(week)}</span>
@@ -35,7 +35,7 @@ export function RoadmapWeekCard({ week }: RoadmapWeekCardProps) {
       <p className="m-0 whitespace-pre-line text-[13.5px] leading-[1.5]">{week.content}</p>
       {week.exercises.length > 0 && (
         <div className="flex flex-col gap-[6px]">
-          <span className="text-[12px] font-semibold text-bvc-muted">Bài luyện ngón</span>
+          <span className="text-[12px] font-medium text-bvc-muted">Bài luyện ngón</span>
           <ul className="m-0 flex list-none flex-col gap-[4px] p-0">
             {week.exercises.map((exercise) => (
               <li key={exercise.pieceId} className="flex flex-wrap items-center gap-[8px] text-[13.5px]">

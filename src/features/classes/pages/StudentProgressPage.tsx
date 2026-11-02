@@ -2,20 +2,18 @@ import { ClassProgressBoard } from "@/features/classes/components/ClassProgressB
 import { ListState } from "@/features/classes/components/ListState";
 import { useStudentProgress } from "@/features/classes/hooks/useStudentProgress";
 import { TeacherScreen } from "@/shared/components/bvc/TeacherScreen";
+import { Eyebrow } from "@/shared/components/bvc/SectionIntro";
+import { PageTitle } from "@/shared/components/bvc/PageTitle";
 
 export function StudentProgressPage() {
   const { classes, classId, setClassId, isLoading, error, reload } = useStudentProgress();
 
   return (
     <TeacherScreen>
-      <header className="flex shrink-0 flex-col gap-[12px] px-[18px] pt-[16px] lg:flex-row lg:items-end lg:justify-between lg:gap-[24px] lg:border-b lg:border-bvc-border-strong lg:px-[32px] lg:pb-[18px] lg:pt-[26px]">
+      <header className="flex shrink-0 flex-col gap-[12px] px-[18px] pt-[16px] lg:flex-row lg:items-end lg:justify-between lg:gap-[24px] lg:border-b lg:border-bvc-border lg:px-[32px] lg:pt-[28px] lg:pb-[20px]">
         <div className="flex flex-col gap-[5px]">
-          <span className="hidden text-[12px] font-bold uppercase tracking-[0.14em] text-bvc-muted lg:block">
-            Lớp học
-          </span>
-          <h1 className="m-0 text-[25px] font-extrabold tracking-[-0.025em] lg:font-bvc-display lg:text-[29px]">
-            Tiến độ sinh viên
-          </h1>
+          <Eyebrow className="hidden lg:inline-flex">Lớp học</Eyebrow>
+          <PageTitle>Tiến độ sinh viên</PageTitle>
         </div>
         {classes.length > 0 && (
           <select

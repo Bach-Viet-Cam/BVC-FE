@@ -19,9 +19,7 @@ export function CreateAccountDialog({ open, isLoading, onConfirm, onCancel }: Cr
       }}
     >
       <BvcDialogPopup>
-        <DialogTitle className="text-2xl font-extrabold tracking-[-0.02em] text-bvc-ink">
-          Tạo tài khoản mới?
-        </DialogTitle>
+        <DialogTitle className="text-2xl font-semibold tracking-[-0.02em] text-bvc-ink">Tạo tài khoản mới?</DialogTitle>
         <DialogDescription className="text-[15px] leading-relaxed text-bvc-muted">
           Email này chưa có tài khoản trong hệ thống. Bạn có muốn tạo tài khoản mới với vai trò học sinh không?
         </DialogDescription>

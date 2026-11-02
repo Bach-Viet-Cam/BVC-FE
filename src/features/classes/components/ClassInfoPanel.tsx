@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ActionButton } from "@/features/classes/components/ActionButton";
+import { ActionButton } from "@/shared/components/bvc/ActionButton";
 import { StatusLabel } from "@/features/classes/components/StatusLabel";
 import { type ClassDetail } from "@/features/classes/types/classTypes";
 import { CLASS_STATUS_LABELS, formatIsoDate } from "@/features/classes/utils/classFormat";
@@ -19,9 +19,7 @@ function InfoItem({ label, value, isMono = false }: InfoItemProps) {
   return (
     <div className="flex flex-col gap-[2px]">
       <span className="text-[12px] text-bvc-muted">{label}</span>
-      <span className={isMono ? "font-bvc-mono text-[14.5px] font-semibold" : "text-[14.5px] font-semibold"}>
-        {value}
-      </span>
+      <span className={isMono ? "font-bvc-mono text-[14.5px] font-medium" : "text-[14.5px] font-medium"}>{value}</span>
     </div>
   );
 }
@@ -29,7 +27,7 @@ function InfoItem({ label, value, isMono = false }: InfoItemProps) {
 export function ClassInfoPanel({ classDetail, onEndClass }: ClassInfoPanelProps) {
   const isActive = !classDetail.isReadOnly;
   return (
-    <section className="mx-[18px] mb-[14px] flex shrink-0 flex-col gap-[12px] rounded-[18px] bg-bvc-soft p-[14px] lg:m-0 lg:gap-[16px] lg:rounded-[20px] lg:border lg:border-bvc-border lg:bg-white lg:p-[18px]">
+    <section className="mx-[18px] mb-[14px] flex shrink-0 flex-col gap-[12px] rounded-bvc-xl bg-bvc-soft p-[14px] lg:m-0 lg:gap-[16px] lg:rounded-bvc-xl lg:border lg:border-bvc-border lg:bg-white lg:p-[18px]">
       <div className="flex items-center gap-[8px]">
         <StatusLabel label={CLASS_STATUS_LABELS[classDetail.status]} tone={isActive ? "ok" : "muted"} />
         <span className="whitespace-nowrap rounded-[8px] bg-white px-[9px] py-[4px] text-[12px]">
@@ -46,7 +44,7 @@ export function ClassInfoPanel({ classDetail, onEndClass }: ClassInfoPanelProps)
         <div className="grid grid-cols-2 gap-[8px]">
           <Link
             to={`/teacher/classes/${classDetail.id}/edit`}
-            className="inline-flex min-h-[44px] items-center justify-center rounded-[12px] border border-bvc-border-strong bg-white px-[12px] text-[13px] font-semibold text-bvc-ink"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-bvc-border-strong bg-white px-[12px] text-[13px] font-medium text-bvc-ink"
           >
             Sửa
           </Link>

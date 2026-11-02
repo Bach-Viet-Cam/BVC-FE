@@ -21,13 +21,13 @@ export function CategoryDeleteDialog({ target, onClose, onConfirm }: CategoryDel
 
   return (
     <Dialog open={target !== null} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogPopup className="max-w-[460px] rounded-[20px] border border-bvc-border bg-white p-6 shadow-none">
+      <DialogPopup className="max-w-[460px] rounded-bvc-xl border border-bvc-border bg-white p-6 shadow-none">
         <div className="flex items-start gap-3.5">
           <div className="flex size-[40px] shrink-0 items-center justify-center rounded-[12px] bg-bvc-surface text-bvc-error">
             <AlertTriangle size={20} />
           </div>
           <div className="flex-1 pr-6">
-            <DialogTitle className="text-[17px] font-extrabold tracking-[-0.02em] text-bvc-ink">
+            <DialogTitle className="text-[17px] font-semibold tracking-[-0.02em] text-bvc-ink">
               Xóa danh mục “{target?.name}”?
             </DialogTitle>
             <DialogDescription className="mt-1.5 text-[13px] leading-relaxed text-bvc-muted">
@@ -42,7 +42,7 @@ export function CategoryDeleteDialog({ target, onClose, onConfirm }: CategoryDel
           <button
             type="button"
             onClick={onClose}
-            className="min-h-[40px] cursor-pointer rounded-[12px] border border-bvc-border-strong bg-white px-4 text-[13.5px] font-semibold text-bvc-ink transition-colors hover:border-bvc-ink hover:bg-bvc-surface/40"
+            className="min-h-[40px] cursor-pointer rounded-full border border-bvc-border-strong bg-white px-4 text-[13.5px] font-medium text-bvc-ink transition-colors hover:border-bvc-ink hover:bg-bvc-surface/40"
           >
             Hủy
           </button>
@@ -50,7 +50,7 @@ export function CategoryDeleteDialog({ target, onClose, onConfirm }: CategoryDel
             type="button"
             disabled={isDeleting}
             onClick={confirm}
-            className="min-h-[40px] cursor-pointer rounded-[12px] bg-bvc-error px-4.5 text-[13.5px] font-bold text-white transition-colors hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+            className="min-h-[40px] cursor-pointer rounded-full bg-bvc-error px-4.5 text-[13.5px] font-semibold text-white transition-colors hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isDeleting ? "Đang xóa..." : "Xác nhận xóa"}
           </button>

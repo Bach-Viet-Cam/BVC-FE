@@ -18,11 +18,11 @@ export function AssignmentStudentRow({ assignmentId, student }: AssignmentStuden
   return (
     <Link
       to={`/teacher/assignments/${assignmentId}/students/${student.studentId}`}
-      className="flex flex-col gap-[6px] rounded-[18px] border border-bvc-border px-[14px] py-[13px] text-bvc-ink"
+      className="flex flex-col gap-[6px] rounded-bvc-xl border border-bvc-border px-[14px] py-[13px] text-bvc-ink"
     >
       <span className="flex justify-between gap-[10px]">
         <span className="flex min-w-0 flex-col gap-[2px]">
-          <span className="text-[15px] font-bold">{student.fullName}</span>
+          <span className="text-[15px] font-semibold">{student.fullName}</span>
           <span className="font-bvc-mono text-[12px] text-bvc-muted">{student.studentCode ?? "-"}</span>
         </span>
         <StatusLabel

@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ActionButton } from "@/features/classes/components/ActionButton";
-import { FooterActions } from "@/features/classes/components/FooterActions";
-import { FormField, INPUT_CLASSES } from "@/features/classes/components/FormField";
+import { ActionButton } from "@/shared/components/bvc/ActionButton";
+import { FormBody, FormFooter } from "@/shared/components/bvc/FormLayout";
+import { FormField } from "@/shared/components/bvc/FormField";
+import { INPUT_CLASSES } from "@/shared/components/bvc/fieldStyles";
 import { type ApiFieldError, type MemberLookup } from "@/features/classes/types/classTypes";
 import { applyFieldErrors } from "@/features/classes/utils/mapApiErrors";
 import { type StudentFormValues, studentSchema } from "@/features/classes/utils/validateStudent";
+import { useReportDirty } from "@/shared/hooks/useReportDirty";
 import { cn } from "@/shared/utils/cn";
 
 const FORM_FIELDS = ["studentCode", "fullName", "email"] as const;
@@ -20,11 +22,19 @@ interface AddStudentFormProps {
   // Returns the lookup result, or field errors to show under the email input (null = already toasted).
   onLookup: (email: string) => Promise<MemberLookup | ApiFieldError[] | null>;
   onSubmit: (values: StudentFormValues) => Promise<ApiFieldError[] | null>;
+  onDirtyChange?: (isDirty: boolean) => void;
 }
 
 // Two steps: check the email first, then show Mã sinh viên + Họ tên. Fields an existing student
 // account already has are prefilled and locked; a non-student account cannot be added.
-export function AddStudentForm({ isSaving, isChecking, onCancel, onLookup, onSubmit }: AddStudentFormProps) {
+export function AddStudentForm({
+  isSaving,
+  isChecking,
+  onCancel,
+  onLookup,
+  onSubmit,
+  onDirtyChange,
+}: AddStudentFormProps) {
   const [lookup, setLookup] = useState<MemberLookup | null>(null);
   const {
     register,
@@ -33,11 +43,12 @@ export function AddStudentForm({ isSaving, isChecking, onCancel, onLookup, onSub
     setValue,
     trigger,
     getValues,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<StudentFormValues>({
     resolver: zodResolver(studentSchema),
     defaultValues: { studentCode: "", fullName: "", email: "" },
   });
+  useReportDirty(isDirty, onDirtyChange);
 
   const canAdd = lookup?.status === "NEW" || lookup?.status === "STUDENT";
   const isNameLocked = lookup?.status === "STUDENT" && Boolean(lookup.fullName);
@@ -81,8 +92,8 @@ export function AddStudentForm({ isSaving, isChecking, onCancel, onLookup, onSub
       noValidate
       className="flex grow flex-col"
     >
-      <div className="flex grow flex-col gap-[18px] px-[18px] pb-[18px] pt-[6px] lg:m-[22px_32px] lg:max-w-[720px] lg:grow-0 lg:rounded-[20px] lg:border lg:border-bvc-border lg:p-[20px]">
-        <FormField id="student-email" label="Email" isRequired error={errors.email?.message}>
+      <FormBody>
+        <FormField htmlFor="student-email" label="Email" required error={errors.email?.message}>
           <div className="flex gap-[8px]">
             <input
               id="student-email"
@@ -114,9 +125,9 @@ export function AddStudentForm({ isSaving, isChecking, onCancel, onLookup, onSub
         {canAdd && (
           <>
             <FormField
-              id="student-code"
+              htmlFor="student-code"
               label="Mã sinh viên"
-              isRequired
+              required
               hint={isCodeLocked ? "Lấy từ tài khoản sinh viên đã có." : undefined}
               error={errors.studentCode?.message}
             >
@@ -131,9 +142,9 @@ export function AddStudentForm({ isSaving, isChecking, onCancel, onLookup, onSub
               />
             </FormField>
             <FormField
-              id="student-name"
+              htmlFor="student-name"
               label="Họ tên"
-              isRequired
+              required
               hint={isNameLocked ? "Lấy từ tài khoản sinh viên đã có." : undefined}
               error={errors.fullName?.message}
             >
@@ -148,15 +159,15 @@ export function AddStudentForm({ isSaving, isChecking, onCancel, onLookup, onSub
             </FormField>
           </>
         )}
-      </div>
-      <FooterActions>
-        <ActionButton size="lg" onClick={onCancel} disabled={isSaving}>
+      </FormBody>
+      <FormFooter>
+        <ActionButton variant="secondary" onClick={onCancel} disabled={isSaving}>
           Hủy
         </ActionButton>
-        <ActionButton size="lg" variant="primary" type="submit" disabled={isSaving || !canAdd}>
+        <ActionButton variant="primary" type="submit" disabled={isSaving || !canAdd}>
           {isSaving ? "Đang thêm…" : "Thêm"}
         </ActionButton>
-      </FooterActions>
+      </FormFooter>
     </form>
   );
 }

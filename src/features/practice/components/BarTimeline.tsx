@@ -19,9 +19,9 @@ const LEGEND: { tone: BarAccuracy; label: string }[] = [
 
 export function BarTimeline({ bars, rangeLabel }: BarTimelineProps) {
   return (
-    <section className="flex flex-col gap-2.75 rounded-bvc-xl border border-bvc-border bg-white px-4 py-3.5 md:rounded-[22px] md:px-5.5 md:py-4.5">
+    <section className="flex flex-col gap-2.75 rounded-bvc-xl border border-bvc-border bg-white px-4 py-3.5 md:rounded-bvc-xl md:px-5.5 md:py-4.5">
       <div className="flex items-baseline justify-between">
-        <span className="text-sm font-bold text-bvc-ink">Dòng thời gian theo ô nhịp</span>
+        <span className="text-sm font-semibold text-bvc-ink">Dòng thời gian theo ô nhịp</span>
         <span className="text-xs text-bvc-muted">{rangeLabel}</span>
       </div>
 

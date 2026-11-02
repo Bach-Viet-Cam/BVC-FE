@@ -41,12 +41,12 @@ export function MetronomeView({ targetBpm = PRACTICE_DEFAULTS.targetBpm }: Metro
             aria-label="Giảm BPM"
             disabled={bpm <= BPM_MIN}
             onClick={() => setBpm(bpm - 1)}
-            className="flex size-13.5 cursor-pointer items-center justify-center rounded-bvc-md border border-bvc-border-strong bg-white text-[22px] text-bvc-ink disabled:cursor-not-allowed disabled:text-bvc-faint"
+            className="flex size-13.5 cursor-pointer items-center justify-center rounded-full border border-bvc-border-strong bg-white text-[22px] text-bvc-ink disabled:cursor-not-allowed disabled:text-bvc-faint"
           >
             −
           </button>
           <div className="flex flex-col items-center">
-            <span className="text-[64px] leading-none font-semibold text-bvc-ink md:text-[68px]">{bpm}</span>
+            <span className="text-[64px] leading-none font-medium text-bvc-ink md:text-[68px]">{bpm}</span>
             <span className="text-[13px] tracking-[0.16em] text-bvc-muted">BPM</span>
           </div>
           <button
@@ -54,7 +54,7 @@ export function MetronomeView({ targetBpm = PRACTICE_DEFAULTS.targetBpm }: Metro
             aria-label="Tăng BPM"
             disabled={bpm >= BPM_MAX}
             onClick={() => setBpm(bpm + 1)}
-            className="flex size-13.5 cursor-pointer items-center justify-center rounded-bvc-md border border-bvc-border-strong bg-white text-[22px] text-bvc-ink disabled:cursor-not-allowed disabled:text-bvc-faint"
+            className="flex size-13.5 cursor-pointer items-center justify-center rounded-full border border-bvc-border-strong bg-white text-[22px] text-bvc-ink disabled:cursor-not-allowed disabled:text-bvc-faint"
           >
             +
           </button>
@@ -70,9 +70,9 @@ export function MetronomeView({ targetBpm = PRACTICE_DEFAULTS.targetBpm }: Metro
                 type="button"
                 onClick={() => setBpm(value)}
                 className={cn(
-                  "min-h-10 flex-1 cursor-pointer rounded-xl border text-[13px]",
+                  "min-h-10 flex-1 cursor-pointer rounded-full border text-[13px]",
                   active
-                    ? "border-bvc-accent bg-bvc-accent-tint font-bold text-bvc-accent-text"
+                    ? "border-bvc-accent bg-bvc-accent-tint font-semibold text-bvc-accent-text"
                     : "border-bvc-border-strong bg-white text-bvc-ink"
                 )}
               >
@@ -82,7 +82,7 @@ export function MetronomeView({ targetBpm = PRACTICE_DEFAULTS.targetBpm }: Metro
           })}
         </div>
 
-        <p className="mt-5 text-sm font-bold text-bvc-ink">Phách trong ô nhịp</p>
+        <p className="mt-5 text-sm font-semibold text-bvc-ink">Phách trong ô nhịp</p>
         <div className="mt-2 grid gap-2" style={{ gridTemplateColumns: `repeat(${beats}, minmax(0, 1fr))` }}>
           {Array.from({ length: beats }).map((_, index) => {
             const accent = accents[index];
@@ -94,7 +94,7 @@ export function MetronomeView({ targetBpm = PRACTICE_DEFAULTS.targetBpm }: Metro
                 onClick={() => cycleBeat(index)}
                 className={cn(
                   "flex h-[62px] cursor-pointer items-center justify-center rounded-bvc-lg text-[13px]",
-                  accent === "strong" && "bg-bvc-ink font-bold text-white",
+                  accent === "strong" && "bg-bvc-ink font-semibold text-white",
                   accent === "soft" && "border border-bvc-border-strong bg-white text-bvc-ink",
                   accent === "off" &&
                     "border border-dashed border-bvc-border-strong bg-bvc-surface text-bvc-faint md:bg-bvc-panel",
@@ -108,16 +108,16 @@ export function MetronomeView({ targetBpm = PRACTICE_DEFAULTS.targetBpm }: Metro
         </div>
         <p className="mt-2 text-xs text-bvc-muted">Chạm vào từng phách để đổi giữa mạnh, nhẹ và bỏ trống.</p>
 
-        <p className="mt-5 text-sm font-bold text-bvc-ink">Loại nhịp</p>
-        <div className="mt-2 flex gap-1 rounded-bvc-md bg-bvc-surface p-0.75 md:bg-bvc-panel">
+        <p className="mt-5 text-sm font-semibold text-bvc-ink">Loại nhịp</p>
+        <div className="mt-2 flex gap-1 rounded-full bg-bvc-surface p-0.75 md:bg-bvc-panel">
           {SIGS.map((sig, index) => (
             <button
               key={sig.label}
               type="button"
               onClick={() => setSig(index)}
               className={cn(
-                "min-h-10 flex-1 cursor-pointer rounded-[10px] text-sm",
-                index === sigIndex ? "bg-bvc-ink font-semibold text-white" : "text-bvc-muted"
+                "min-h-10 flex-1 cursor-pointer rounded-full text-sm",
+                index === sigIndex ? "bg-bvc-ink font-medium text-white" : "text-bvc-muted"
               )}
             >
               {sig.label}
@@ -126,7 +126,7 @@ export function MetronomeView({ targetBpm = PRACTICE_DEFAULTS.targetBpm }: Metro
         </div>
 
         <div className="mt-5 flex items-center justify-between gap-3">
-          <span className="text-sm font-bold text-bvc-ink">Chia nhỏ phách</span>
+          <span className="text-sm font-semibold text-bvc-ink">Chia nhỏ phách</span>
           <Select
             value={metronome.subdivision}
             onValueChange={(value) => {
@@ -156,7 +156,7 @@ export function MetronomeView({ targetBpm = PRACTICE_DEFAULTS.targetBpm }: Metro
             type="button"
             aria-pressed={metronome.vibrate}
             onClick={metronome.toggleVibrate}
-            className="flex min-h-12 flex-1 cursor-pointer items-center justify-between rounded-bvc-md border border-bvc-border-strong bg-white px-3.5 text-sm font-semibold text-bvc-ink"
+            className="flex min-h-12 flex-1 cursor-pointer items-center justify-between rounded-full border border-bvc-border-strong bg-white px-3.5 text-sm font-medium text-bvc-ink"
           >
             Rung nhẹ theo phách mạnh
             <span
@@ -183,7 +183,7 @@ export function MetronomeView({ targetBpm = PRACTICE_DEFAULTS.targetBpm }: Metro
           <button
             type="button"
             onClick={metronome.tapTempo}
-            className="flex min-h-11 cursor-pointer items-center justify-center rounded-bvc-md border border-bvc-border-strong bg-white px-4 text-[13px] font-semibold text-bvc-ink"
+            className="flex min-h-11 cursor-pointer items-center justify-center rounded-full border border-bvc-border-strong bg-white px-4 text-[13px] font-medium text-bvc-ink"
           >
             Gõ theo nhịp
           </button>
@@ -197,7 +197,7 @@ export function MetronomeView({ targetBpm = PRACTICE_DEFAULTS.targetBpm }: Metro
             type="button"
             aria-label={playing ? "Dừng metronome" : "Bắt đầu đếm nhịp"}
             onClick={metronome.togglePlaying}
-            className="flex min-h-16 flex-1 cursor-pointer items-center justify-center gap-2.5 rounded-bvc-lg bg-bvc-accent text-base font-bold text-white"
+            className="flex min-h-16 flex-1 cursor-pointer items-center justify-center gap-2.5 rounded-full bg-bvc-accent text-base font-semibold text-white"
           >
             {playing ? (
               <Pause size={26} fill="currentColor" strokeWidth={0} />

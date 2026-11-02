@@ -1,4 +1,4 @@
-import { Download, Headphones, Mic2, Sparkles, Trash2 } from "lucide-react";
+import { CheckCircle2, Download, Headphones, Mic2, Trash2 } from "lucide-react";
 import { LevelMeter } from "@/features/ensemble/components/LevelMeter";
 import { type TakePlayback } from "@/features/ensemble/hooks/useTakePlayback";
 import { type EnsembleTake, type PracticeStatus } from "@/features/ensemble/types/ensembleTypes";
@@ -38,13 +38,13 @@ export function MyTakeLane(props: MyTakeLaneProps) {
             label={`Micro bè ${props.myInstrumentName}`}
           />
           <div className="flex items-center gap-2">
-            <h2 className="font-bvc-display text-[14px] font-extrabold tracking-wide text-bvc-ink uppercase">
+            <h2 className="font-bvc-display text-[14px] font-semibold text-bvc-ink">
               Bè của bạn · {props.myInstrumentName}
             </h2>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 text-[11.5px] font-semibold">
+        <div className="flex items-center gap-1.5 text-[11.5px] font-medium">
           {status === "ready" && (
             <span className="flex items-center gap-1 text-bvc-ok">
               <span className="size-2 rounded-full bg-bvc-ok" />
@@ -65,7 +65,7 @@ export function MyTakeLane(props: MyTakeLaneProps) {
           )}
           {hasTake && (
             <span className="flex items-center gap-1 text-bvc-ink">
-              <Sparkles size={13} className="text-bvc-accent" />
+              <CheckCircle2 size={13} className="text-bvc-ok" />
               Đã có bản thu ({formatClock(take.durationSec)})
             </span>
           )}
@@ -91,7 +91,7 @@ export function MyTakeLane(props: MyTakeLaneProps) {
             />
 
             <div className="flex flex-wrap items-center justify-between gap-2.5 rounded-xl border border-bvc-border/80 bg-bvc-surface/40 px-3 py-2">
-              <label className="flex cursor-pointer items-center gap-2.5 text-[12.5px] font-semibold text-bvc-ink">
+              <label className="flex cursor-pointer items-center gap-2.5 text-[12.5px] font-medium text-bvc-ink">
                 <Headphones size={15} className="text-bvc-accent" />
                 <span>Nghe cùng dàn bè tổng phổ</span>
                 <Switch checked={props.isAccompanied} onCheckedChange={props.onAccompanimentChange} />
@@ -101,7 +101,7 @@ export function MyTakeLane(props: MyTakeLaneProps) {
                 <button
                   type="button"
                   onClick={props.onDownload}
-                  className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-bvc-border bg-white px-2.5 py-1 text-[12px] font-semibold text-bvc-accent-text transition-colors hover:bg-bvc-surface"
+                  className="flex cursor-pointer items-center gap-1.5 rounded-full border border-bvc-border bg-white px-2.5 py-1 text-[12px] font-medium text-bvc-accent-text transition-colors hover:bg-bvc-surface"
                 >
                   <Download size={14} strokeWidth={2} />
                   <span>Tải WAV</span>
@@ -110,7 +110,7 @@ export function MyTakeLane(props: MyTakeLaneProps) {
                   <button
                     type="button"
                     onClick={props.onDiscard}
-                    className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-red-200 bg-red-50/60 px-2.5 py-1 text-[12px] font-semibold text-bvc-error transition-colors hover:bg-red-100"
+                    className="flex cursor-pointer items-center gap-1.5 rounded-full border border-red-200 bg-red-50/60 px-2.5 py-1 text-[12px] font-medium text-bvc-error transition-colors hover:bg-red-100"
                   >
                     <Trash2 size={14} strokeWidth={2} />
                     <span>Xóa bản thu</span>

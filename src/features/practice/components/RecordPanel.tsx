@@ -98,7 +98,7 @@ export function RecordPanel({
             <button
               type="button"
               onClick={onRerecord}
-              className="flex min-h-[50px] flex-1 cursor-pointer items-center justify-center rounded-[15px] border border-bvc-border-strong bg-white px-5 text-[15px] font-semibold whitespace-nowrap text-bvc-ink"
+              className="flex min-h-[50px] flex-1 cursor-pointer items-center justify-center rounded-full border border-bvc-border-strong bg-white px-5 text-[15px] font-medium whitespace-nowrap text-bvc-ink"
             >
               Ghi âm lại
             </button>
@@ -107,7 +107,7 @@ export function RecordPanel({
               disabled={sendDisabled}
               onClick={onSend}
               className={cn(
-                "flex min-h-[50px] flex-1 items-center justify-center rounded-[15px] px-6 text-[15px] font-semibold",
+                "flex min-h-[50px] flex-1 items-center justify-center rounded-full px-6 text-[15px] font-medium",
                 sendDisabled
                   ? "cursor-not-allowed border border-bvc-border bg-bvc-surface text-bvc-faint"
                   : "cursor-pointer bg-bvc-ink text-white"
@@ -122,7 +122,7 @@ export function RecordPanel({
           <button
             type="button"
             onClick={onDownload}
-            className="flex cursor-pointer items-center gap-2 text-[13.5px] font-semibold text-bvc-accent-text"
+            className="flex cursor-pointer items-center gap-2 text-[13.5px] font-medium text-bvc-accent-text"
           >
             <Download size={18} strokeWidth={1.9} />
             Tải xuống
@@ -130,7 +130,7 @@ export function RecordPanel({
           <button
             type="button"
             onClick={onRerecord}
-            className="flex cursor-pointer items-center gap-2 text-[13.5px] font-semibold text-bvc-error"
+            className="flex cursor-pointer items-center gap-2 text-[13.5px] font-medium text-bvc-error"
           >
             <Trash2 size={18} strokeWidth={1.9} />
             Xóa bản thu
@@ -165,7 +165,7 @@ export function RecordPanel({
                 />
                 <span
                   className={cn(
-                    "text-[13.5px] font-bold",
+                    "text-[13.5px] font-semibold",
                     blocked || micDenied ? "text-bvc-accent-text" : "text-bvc-ok"
                   )}
                 >
@@ -183,14 +183,14 @@ export function RecordPanel({
             <>
               <div className="flex items-center gap-2">
                 <Volume2 size={18} strokeWidth={1.9} className="text-bvc-ink" />
-                <span className="text-sm font-bold text-bvc-ink">Đếm nhịp · {targetBpm} BPM</span>
+                <span className="text-sm font-semibold text-bvc-ink">Đếm nhịp · {targetBpm} BPM</span>
               </div>
               <div className="grid grid-cols-4 gap-1.5">
                 {Array.from({ length: COUNT_IN_BEATS }).map((_, i) => (
                   <span
                     key={i}
                     className={cn(
-                      "flex min-h-[34px] items-center justify-center rounded-[10px] text-sm font-semibold",
+                      "flex min-h-[34px] items-center justify-center rounded-[10px] text-sm font-medium",
                       i <= countBeat ? "bg-bvc-accent text-white" : "bg-bvc-surface text-bvc-faint"
                     )}
                   >
@@ -207,11 +207,11 @@ export function RecordPanel({
           {rec === "recording" && (
             <>
               <div className="flex items-center justify-between">
-                <span className="flex items-center gap-2 text-sm font-bold text-bvc-ink">
+                <span className="flex items-center gap-2 text-sm font-semibold text-bvc-ink">
                   <span className="size-2 rounded-full bg-bvc-warn" />
                   Đang ghi
                 </span>
-                <span className="text-[15px] font-semibold text-bvc-ink">
+                <span className="text-[15px] font-medium text-bvc-ink">
                   {fmtTime(elapsed)} / {fmtTime(PRACTICE_DEFAULTS.pieceLen)}
                 </span>
               </div>

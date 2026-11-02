@@ -40,9 +40,9 @@ export function FilterCombobox({ label, value, allValue, options, onChange }: Fi
     >
       <span
         className={cn(
-          "relative inline-flex min-h-[44px] w-[260px] max-w-full shrink-0 items-center rounded-[18px] border text-[13px]",
+          "relative inline-flex min-h-[44px] w-[260px] max-w-full shrink-0 items-center rounded-bvc-xl border text-[13px]",
           isFiltered
-            ? "border-bvc-ink bg-bvc-ink font-semibold text-white"
+            ? "border-bvc-ink bg-bvc-ink font-medium text-white"
             : "border-bvc-border-strong bg-white text-bvc-ink"
         )}
       >

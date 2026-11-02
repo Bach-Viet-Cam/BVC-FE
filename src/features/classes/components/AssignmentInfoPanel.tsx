@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ActionButton } from "@/features/classes/components/ActionButton";
+import { ActionButton } from "@/shared/components/bvc/ActionButton";
 import { StatusLabel } from "@/features/classes/components/StatusLabel";
 import { type AssignmentBase, type AssignmentStatus } from "@/features/classes/types/teacherAssignmentTypes";
 import {
@@ -32,7 +32,7 @@ export function AssignmentInfoPanel({ assignment, isWorking = false, onAction }:
   const statusAction = STATUS_ACTION[assignment.status];
 
   return (
-    <section className="mx-[18px] mb-[14px] flex flex-col gap-[12px] rounded-[18px] bg-bvc-soft p-[14px] lg:m-0 lg:gap-[16px] lg:rounded-[20px] lg:border lg:border-bvc-border lg:bg-white lg:p-[18px]">
+    <section className="mx-[18px] mb-[14px] flex flex-col gap-[12px] rounded-bvc-xl bg-bvc-soft p-[14px] lg:m-0 lg:gap-[16px] lg:rounded-bvc-xl lg:border lg:border-bvc-border lg:bg-white lg:p-[18px]">
       <div className="flex flex-wrap items-center gap-[8px]">
         <StatusLabel label={ASSIGNMENT_STATUS_LABELS[assignment.status]} tone={STATUS_TONES[assignment.status]} />
         <span className="rounded-[8px] bg-white px-[9px] py-[4px] text-[12px]">
@@ -43,17 +43,17 @@ export function AssignmentInfoPanel({ assignment, isWorking = false, onAction }:
       <div className="grid grid-cols-2 gap-x-[12px] gap-y-[10px]">
         <div className="flex flex-col gap-[2px]">
           <span className="text-[12px] text-bvc-muted">Lớp</span>
-          <span className="text-[14.5px] font-semibold">{assignment.className}</span>
+          <span className="text-[14.5px] font-medium">{assignment.className}</span>
         </div>
         <div className="flex flex-col gap-[2px]">
           <span className="text-[12px] text-bvc-muted">BPM</span>
-          <span className="font-bvc-mono text-[14.5px] font-semibold">
+          <span className="font-bvc-mono text-[14.5px] font-medium">
             {assignment.effectiveBpm ? `${assignment.effectiveBpm} BPM` : "-"}
           </span>
         </div>
         <div className="col-span-2 flex flex-col gap-[2px]">
           <span className="text-[12px] text-bvc-muted">Bài nhạc</span>
-          <span className="flex flex-wrap items-center gap-[8px] text-[14.5px] font-semibold">
+          <span className="flex flex-wrap items-center gap-[8px] text-[14.5px] font-medium">
             {assignment.sheetMusic ? sheetMusicLabel(assignment.sheetMusic) : "Không chọn"}
             {assignment.sheetMusic && !assignment.sheetMusic.isAvailable && (
               <span className="rounded-[8px] bg-bvc-accent-tint px-[8px] py-[2px] text-[11.5px] font-normal text-bvc-accent-text">
@@ -70,7 +70,7 @@ export function AssignmentInfoPanel({ assignment, isWorking = false, onAction }:
         <div className="grid grid-cols-3 gap-[8px]">
           <Link
             to={`/teacher/assignments/${assignment.id}/edit`}
-            className="inline-flex min-h-[44px] items-center justify-center rounded-[12px] border border-bvc-border-strong bg-white px-[12px] text-[13px] font-semibold text-bvc-ink"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-bvc-border-strong bg-white px-[12px] text-[13px] font-medium text-bvc-ink"
           >
             Sửa
           </Link>
@@ -81,7 +81,7 @@ export function AssignmentInfoPanel({ assignment, isWorking = false, onAction }:
           >
             {statusAction.label}
           </ActionButton>
-          <ActionButton disabled={isWorking} onClick={() => onAction("delete")}>
+          <ActionButton variant="secondary" disabled={isWorking} onClick={() => onAction("delete")}>
             Xóa
           </ActionButton>
         </div>

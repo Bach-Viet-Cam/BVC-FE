@@ -11,12 +11,7 @@ export function Field({ className, ...props }: FieldRootProps) {
 type FieldLabelProps = React.ComponentProps<typeof BaseField.Label>;
 
 export function FieldLabel({ className, ...props }: FieldLabelProps) {
-  return (
-    <BaseField.Label
-      {...props}
-      className={cn("text-xs font-semibold uppercase tracking-wider text-on-surface-variant", className)}
-    />
-  );
+  return <BaseField.Label {...props} className={cn("text-xs font-medium text-on-surface-variant", className)} />;
 }
 
 export const FieldControl = BaseField.Control;

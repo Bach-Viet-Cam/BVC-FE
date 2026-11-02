@@ -59,9 +59,9 @@ export function TempoCard({
         )}
       >
         <span className="flex min-w-[92px] flex-col gap-0.5">
-          <span className="text-[11px] font-bold tracking-[0.1em] text-bvc-faint uppercase">Mục tiêu</span>
+          <span className="text-[11px] font-semibold text-bvc-faint">Mục tiêu</span>
           <span className="flex items-baseline gap-[5px]">
-            <span className="text-[30px] leading-[1.1] font-semibold text-bvc-ink md:text-[72px]">{targetBpm}</span>
+            <span className="text-[30px] leading-[1.1] font-medium text-bvc-ink md:text-[72px]">{targetBpm}</span>
             <span className="text-xs text-bvc-muted">BPM</span>
           </span>
         </span>
@@ -69,17 +69,15 @@ export function TempoCard({
         <span className="w-px self-stretch bg-bvc-border" />
 
         <span className="flex flex-1 flex-col gap-0.5">
-          <span className="text-[11px] font-bold tracking-[0.1em] text-bvc-faint uppercase">Đang đo</span>
+          <span className="text-[11px] font-semibold text-bvc-faint">Đang đo</span>
           <span className="flex items-baseline gap-2">
-            <span className={cn("text-[30px] leading-[1.1] font-semibold", TONE_CLASS[hintTone])}>
-              {liveBpm ?? "--"}
-            </span>
-            <span className={cn("text-[12.5px] font-bold", TONE_CLASS[hintTone])}>{bpmHint}</span>
+            <span className={cn("text-[30px] leading-[1.1] font-medium", TONE_CLASS[hintTone])}>{liveBpm ?? "--"}</span>
+            <span className={cn("text-[12.5px] font-semibold", TONE_CLASS[hintTone])}>{bpmHint}</span>
           </span>
         </span>
 
         {canOpenDetail && (
-          <span className="flex shrink-0 items-center gap-0.5 text-[12.5px] font-semibold text-bvc-muted">
+          <span className="flex shrink-0 items-center gap-0.5 text-[12.5px] font-medium text-bvc-muted">
             Chỉnh
             <ChevronRight size={16} strokeWidth={2} />
           </span>
@@ -97,7 +95,7 @@ export function TempoCard({
         aria-pressed={clickOn}
         onClick={onToggleClick}
         className={cn(
-          "flex min-h-11 cursor-pointer items-center justify-between rounded-bvc-md border px-3 text-sm font-semibold text-bvc-ink",
+          "flex min-h-11 cursor-pointer items-center justify-between rounded-full border px-3 text-sm font-medium text-bvc-ink",
           clickOn ? "border-bvc-ink bg-bvc-surface" : "border-bvc-border-strong bg-white"
         )}
       >

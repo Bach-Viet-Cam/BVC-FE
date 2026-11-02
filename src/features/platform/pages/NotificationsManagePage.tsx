@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Bell } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { DesktopPageHeader } from "@/shared/components/bvc";
+import { ActionButton } from "@/shared/components/bvc/ActionButton";
+import { FormDialog } from "@/shared/components/bvc/FormDialog";
+import { PillTabs } from "@/shared/components/bvc/PillTabs";
+import { type DraftFormHandle } from "@/shared/hooks/useLeaveGuard";
 import { NotificationDeleteDialog } from "@/features/platform/components/NotificationDeleteDialog";
 import { NotificationForm } from "@/features/platform/components/NotificationForm";
 import { PageStatus } from "@/features/platform/components/PageStatus";
@@ -52,63 +56,53 @@ function parseType(value: string | null): NotificationType {
   return NOTIFICATION_TYPE_OPTIONS.find((option) => option.value === value)?.value ?? "ANNOUNCEMENT";
 }
 
+interface EditorState {
+  // null = soạn thông báo mới
+  item: NotificationItem | null;
+}
+
 export function NotificationsManagePage() {
   const { status, setStatus, items, total, error, isInitialLoading, reload, save, remove } = useNotifications();
   const [searchParams] = useSearchParams();
-  const [selected, setSelected] = useState<NotificationItem | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<NotificationItem | null>(null);
   const presetType = parseType(searchParams.get("type"));
+  // Đi từ lối tắt có ?type=... thì mở sẵn modal soạn thông báo loại đó
+  const [editor, setEditor] = useState<EditorState | null>(() => (searchParams.has("type") ? { item: null } : null));
+  const [deleteTarget, setDeleteTarget] = useState<NotificationItem | null>(null);
+  const [isDirty, setIsDirty] = useState(false);
+  const formRef = useRef<DraftFormHandle>(null);
+  const editingItem = editor?.item ?? null;
+  const canSaveDraft = editingItem?.status !== "SENT";
+
+  const closeEditor = () => {
+    setIsDirty(false);
+    setEditor(null);
+  };
 
   return (
     <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
       <DesktopPageHeader
         breadcrumb="Quản trị"
         title="Quản lý thông báo"
-        actions={
-          <button
-            type="button"
-            onClick={() => setSelected(null)}
-            className="flex min-h-[44px] cursor-pointer items-center rounded-[14px] bg-bvc-ink px-[18px] text-[14px] font-bold text-white"
-          >
-            Soạn thông báo mới
-          </button>
-        }
+        actions={<ActionButton onClick={() => setEditor({ item: null })}>Soạn thông báo mới</ActionButton>}
       />
 
-      <div className="flex flex-1 flex-col gap-[20px] p-[16px_18px_24px] md:p-[22px_32px_26px] lg:flex-row lg:overflow-hidden">
-        <div className="flex min-w-0 flex-1 flex-col lg:overflow-y-auto">
-          <div className="mb-4 flex gap-2">
-            {NOTIFICATION_FILTER_CHIPS.map((chip) => (
-              <button
-                key={chip.value}
-                type="button"
-                onClick={() => setStatus(chip.value)}
-                className={`cursor-pointer rounded-[11px] px-3 py-1.5 text-[13px] ${
-                  status === chip.value
-                    ? "bg-bvc-ink font-bold text-white"
-                    : "border border-bvc-border-strong text-bvc-muted"
-                }`}
-              >
-                {chip.label}
-              </button>
-            ))}
-          </div>
+      <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-[16px_18px_24px] md:p-[22px_32px_26px]">
+        <PillTabs label="Lọc theo trạng thái" tabs={NOTIFICATION_FILTER_CHIPS} value={status} onChange={setStatus} />
 
-          <PageStatus isLoading={isInitialLoading} error={error} onRetry={reload}>
-            {items.length === 0 && <p className="py-[10px] text-[13px] text-bvc-muted">Chưa có thông báo nào.</p>}
+        <PageStatus isLoading={isInitialLoading} error={error} onRetry={reload}>
+          {items.length === 0 && <p className="py-[10px] text-[13px] text-bvc-muted">Chưa có thông báo nào.</p>}
+          <div className="grid gap-3 lg:grid-cols-2">
             {items.map((item) => (
               <button
                 key={item.id}
                 type="button"
-                onClick={() => setSelected(item)}
-                className={`mb-3 w-full cursor-pointer rounded-[20px] border p-[14px] text-left ${
-                  item.id === selected?.id ? "border-bvc-ink bg-bvc-surface" : "border-bvc-border"
-                }`}
+                onClick={() => setEditor({ item })}
+                className="w-full cursor-pointer rounded-bvc-xl border border-bvc-border p-[14px] text-left transition-colors hover:bg-bvc-soft"
               >
                 <div className="flex items-start gap-[10px]">
                   <Bell size={16} className="mt-[2px] shrink-0 text-bvc-muted" />
                   <div className="flex flex-1 flex-col gap-[4px]">
-                    <span className="text-[14px] font-bold text-bvc-ink">{item.title}</span>
+                    <span className="text-[14px] font-medium text-bvc-ink">{item.title}</span>
                     <span className="text-[12px] text-bvc-muted">{describeTarget(item)}</span>
                     <div className="mt-[6px] flex items-center justify-between">
                       <span className="text-[12px] text-bvc-muted">{describeSchedule(item)}</span>
@@ -118,35 +112,47 @@ export function NotificationsManagePage() {
                 </div>
               </button>
             ))}
-            {total > items.length && (
-              <p className="text-[12px] text-bvc-muted">
-                Hiển thị {items.length}/{total} thông báo mới nhất.
-              </p>
-            )}
-          </PageStatus>
-        </div>
+          </div>
+          {total > items.length && (
+            <p className="text-[12px] text-bvc-muted">
+              Hiển thị {items.length}/{total} thông báo mới nhất.
+            </p>
+          )}
+        </PageStatus>
+      </div>
 
-        <div className="flex w-full shrink-0 flex-col rounded-[20px] border border-bvc-border p-[16px] md:p-[20px] lg:w-[400px] lg:overflow-y-auto">
+      <FormDialog
+        open={editor !== null}
+        onClose={closeEditor}
+        title={editingItem ? "Chi tiết thông báo" : "Soạn thông báo mới"}
+        size="lg"
+        isDirty={isDirty}
+        onSaveDraft={canSaveDraft ? async () => (await formRef.current?.saveDraft()) ?? false : undefined}
+      >
+        {(requestClose) => (
           <NotificationForm
-            key={`${selected?.id ?? "new"}-${selected?.status ?? ""}-${selected ? "" : presetType}`}
-            item={selected}
+            key={`${editingItem?.id ?? "new"}-${editingItem?.status ?? ""}`}
+            ref={formRef}
+            item={editingItem}
             defaultType={presetType}
             onSave={async (values, action) => {
-              const saved = await save(selected?.id ?? null, values, action);
-              if (saved) setSelected(saved);
+              const saved = await save(editingItem?.id ?? null, values, action);
+              if (saved) closeEditor();
               return saved;
             }}
             onDelete={setDeleteTarget}
+            onCancel={requestClose}
+            onDirtyChange={setIsDirty}
           />
-        </div>
-      </div>
+        )}
+      </FormDialog>
 
       <NotificationDeleteDialog
         target={deleteTarget}
         onClose={() => setDeleteTarget(null)}
         onConfirm={async (item) => {
           const isRemoved = await remove(item.id);
-          if (isRemoved && selected?.id === item.id) setSelected(null);
+          if (isRemoved && editingItem?.id === item.id) closeEditor();
           return isRemoved;
         }}
       />

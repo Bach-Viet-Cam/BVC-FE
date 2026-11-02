@@ -1,8 +1,10 @@
+import { useImperativeHandle, type Ref } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ActionButton } from "@/features/classes/components/ActionButton";
-import { FooterActions } from "@/features/classes/components/FooterActions";
-import { FormField, INPUT_CLASSES } from "@/features/classes/components/FormField";
+import { ActionButton } from "@/shared/components/bvc/ActionButton";
+import { FormBody, FormFooter } from "@/shared/components/bvc/FormLayout";
+import { FormField } from "@/shared/components/bvc/FormField";
+import { INPUT_CLASSES } from "@/shared/components/bvc/fieldStyles";
 import { useClassSheetMusic } from "@/features/classes/hooks/useClassSheetMusic";
 import { type ApiFieldError } from "@/features/classes/types/classTypes";
 import {
@@ -18,6 +20,8 @@ import {
   type AssignmentFormValues,
   toAssignmentContent,
 } from "@/features/classes/utils/validateAssignment";
+import { type DraftFormHandle } from "@/shared/hooks/useLeaveGuard";
+import { useReportDirty } from "@/shared/hooks/useReportDirty";
 import { cn } from "@/shared/utils/cn";
 
 const FORM_FIELDS = ["classId", "title", "kind", "description", "sheetMusicId", "requiredBpm"] as const;
@@ -34,6 +38,9 @@ interface AssignmentFormProps {
     payload: AssignmentContentPayload & { classId: string },
     publish: boolean
   ) => Promise<ApiFieldError[] | null>;
+  onDirtyChange?: (isDirty: boolean) => void;
+  // Tạo mới: cho hộp hỏi lại khi thoát gọi "Lưu bản nháp"
+  ref?: Ref<DraftFormHandle>;
 }
 
 export function AssignmentForm({
@@ -44,6 +51,8 @@ export function AssignmentForm({
   isSaving,
   onCancel,
   onSubmit,
+  onDirtyChange,
+  ref,
 }: AssignmentFormProps) {
   const isEdit = mode === "edit";
   const {
@@ -52,7 +61,7 @@ export function AssignmentForm({
     handleSubmit,
     setError,
     setValue,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<AssignmentFormValues>({ resolver: zodResolver(assignmentFormSchema), defaultValues: initialValues });
   const classId = useWatch({ control, name: "classId" });
   const sheetMusicId = useWatch({ control, name: "sheetMusicId" });
@@ -66,16 +75,33 @@ export function AssignmentForm({
   const sheetMusicField = register("sheetMusicId");
   const className = classes.find((item) => item.id === classId)?.name ?? "";
 
+  useReportDirty(isDirty, onDirtyChange);
+
+  const save = async (values: AssignmentFormValues, publish: boolean) => {
+    const fieldErrors = await onSubmit({ classId: values.classId, ...toAssignmentContent(values) }, publish);
+    if (fieldErrors) applyFieldErrors<AssignmentFormValues>(fieldErrors, FORM_FIELDS, setError);
+    return !fieldErrors;
+  };
+
   const submitWith = (publish: boolean) =>
     handleSubmit(async (values) => {
-      const fieldErrors = await onSubmit({ classId: values.classId, ...toAssignmentContent(values) }, publish);
-      if (fieldErrors) applyFieldErrors<AssignmentFormValues>(fieldErrors, FORM_FIELDS, setError);
+      await save(values, publish);
     });
+
+  useImperativeHandle(ref, () => ({
+    saveDraft: () =>
+      new Promise<boolean>((resolve) => {
+        void handleSubmit(
+          async (values) => resolve(await save(values, false)),
+          () => resolve(false)
+        )();
+      }),
+  }));
 
   return (
     <form onSubmit={submitWith(!isEdit)} noValidate className="flex grow flex-col">
-      <div className="flex grow flex-col gap-[16px] px-[18px] pb-[18px] pt-[6px] lg:m-[22px_32px] lg:max-w-[720px] lg:grow-0 lg:rounded-[20px] lg:border lg:border-bvc-border lg:p-[20px]">
-        <FormField id="assignment-class" label="Lớp" isRequired error={errors.classId?.message}>
+      <FormBody>
+        <FormField htmlFor="assignment-class" label="Lớp" required error={errors.classId?.message}>
           {isEdit ? (
             <input id="assignment-class" value={className} readOnly className={INPUT_CLASSES} />
           ) : (
@@ -96,9 +122,9 @@ export function AssignmentForm({
           )}
         </FormField>
         <FormField
-          id="assignment-title"
+          htmlFor="assignment-title"
           label="Tiêu đề"
-          isRequired
+          required
           hint={`${title.length} / ${ASSIGNMENT_TITLE_MAX}`}
           error={errors.title?.message}
         >
@@ -109,7 +135,7 @@ export function AssignmentForm({
             className={INPUT_CLASSES}
           />
         </FormField>
-        <FormField id="assignment-kind" label="Loại bài" isRequired error={errors.kind?.message}>
+        <FormField htmlFor="assignment-kind" label="Loại bài" required error={errors.kind?.message}>
           <select
             id="assignment-kind"
             {...register("kind")}
@@ -125,7 +151,7 @@ export function AssignmentForm({
           </select>
         </FormField>
         <FormField
-          id="assignment-description"
+          htmlFor="assignment-description"
           label="Mô tả"
           hint={`${description.length} / ${ASSIGNMENT_DESCRIPTION_MAX}`}
           error={errors.description?.message}
@@ -138,7 +164,7 @@ export function AssignmentForm({
             className={cn(INPUT_CLASSES, "h-auto resize-y py-[11px] leading-[1.5]")}
           />
         </FormField>
-        <FormField id="assignment-sheet-music" label="Bài nhạc" error={errors.sheetMusicId?.message}>
+        <FormField htmlFor="assignment-sheet-music" label="Bài nhạc" error={errors.sheetMusicId?.message}>
           <select
             id="assignment-sheet-music"
             // Controlled: options arrive after mount, so an uncontrolled select would fall back to "Không chọn".
@@ -163,7 +189,7 @@ export function AssignmentForm({
           </select>
         </FormField>
         <FormField
-          id="assignment-bpm"
+          htmlFor="assignment-bpm"
           label="BPM yêu cầu"
           hint="Bỏ trống để dùng BPM mặc định của bài nhạc"
           error={errors.requiredBpm?.message}
@@ -177,26 +203,26 @@ export function AssignmentForm({
             className={cn(INPUT_CLASSES, "font-bvc-mono")}
           />
         </FormField>
-      </div>
-      <FooterActions>
-        <ActionButton size="lg" onClick={onCancel} disabled={isSaving}>
+      </FormBody>
+      <FormFooter>
+        <ActionButton variant="secondary" onClick={onCancel} disabled={isSaving}>
           Hủy
         </ActionButton>
         {isEdit ? (
-          <ActionButton size="lg" variant="primary" type="submit" disabled={isSaving}>
+          <ActionButton variant="primary" type="submit" disabled={isSaving}>
             {isSaving ? "Đang lưu…" : "Lưu"}
           </ActionButton>
         ) : (
           <>
-            <ActionButton size="lg" onClick={submitWith(false)} disabled={isSaving}>
+            <ActionButton variant="secondary" onClick={submitWith(false)} disabled={isSaving}>
               Lưu nháp
             </ActionButton>
-            <ActionButton size="lg" variant="primary" type="submit" disabled={isSaving}>
+            <ActionButton variant="primary" type="submit" disabled={isSaving}>
               Lưu & Giao Bài
             </ActionButton>
           </>
         )}
-      </FooterActions>
+      </FormFooter>
     </form>
   );
 }

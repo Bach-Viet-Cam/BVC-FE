@@ -36,10 +36,10 @@ export function ScoreRing({ score, size = 120, strokeWidth = 10, label, sublabel
         />
       </svg>
       <div className="absolute flex flex-col items-center justify-center">
-        <span className="font-bvc-mono text-[28px] font-semibold leading-none" style={{ color }}>
+        <span className="font-bvc-mono text-[28px] font-medium leading-none" style={{ color }}>
           {score}%
         </span>
-        {label && <span className="mt-[3px] text-[12px] font-bold text-bvc-ink">{label}</span>}
+        {label && <span className="mt-[3px] text-[12px] font-semibold text-bvc-ink">{label}</span>}
         {sublabel && <span className="text-[11px] text-bvc-muted">{sublabel}</span>}
       </div>
     </div>

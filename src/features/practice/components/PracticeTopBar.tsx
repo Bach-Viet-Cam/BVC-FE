@@ -28,24 +28,31 @@ export function PracticeTopBar({
   return (
     <>
       <div className="md:hidden">
-        <MobileHeader title={title} subtitle={subtitle} variant={variant} onBack={onBack} rightSlot={rightSlot} />
+        <MobileHeader
+          title={title}
+          subtitle={subtitle}
+          variant={variant}
+          onBack={onBack}
+          rightSlot={rightSlot}
+          tone="dark"
+        />
       </div>
 
-      <header className="hidden h-19 shrink-0 items-center gap-4 border-b border-bvc-border bg-white px-8 md:flex">
+      <header className="hidden h-19 shrink-0 items-center gap-4 bg-bvc-ink px-8 text-white md:flex">
         <button
           type="button"
           aria-label={variant === "close" ? "Đóng" : "Quay lại"}
           onClick={handleBack}
-          className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-bvc-md border border-bvc-border-strong bg-white text-bvc-ink"
+          className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-white/25 bg-white/10 text-white transition-colors hover:bg-white/20"
         >
           {variant === "close" ? <X size={20} strokeWidth={1.8} /> : <ChevronLeft size={20} strokeWidth={1.8} />}
         </button>
 
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <span className="truncate font-bvc-display text-[21px] leading-tight font-extrabold tracking-[-0.025em] text-bvc-ink">
+          <span className="truncate font-bvc-display text-[21px] leading-tight font-semibold tracking-[-0.025em] text-white">
             {title}
           </span>
-          {subtitle && <span className="text-[13px] text-bvc-muted">{subtitle}</span>}
+          {subtitle && <span className="text-[13px] text-white/70">{subtitle}</span>}
         </div>
 
         {deadlineSlot}

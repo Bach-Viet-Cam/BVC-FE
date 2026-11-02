@@ -39,19 +39,19 @@ export function ClassRankCard({ rank }: ClassRankCardProps) {
 
 function PendingClassCard({ rank }: ClassRankCardProps) {
   return (
-    <section className="flex flex-col gap-3 rounded-bvc-xl border border-bvc-border bg-white p-4 md:rounded-[22px] md:p-5.5">
+    <section className="flex flex-col gap-3 rounded-bvc-xl border border-bvc-border bg-white p-4 md:rounded-bvc-xl md:p-5.5">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <h2 className="text-sm font-bold text-bvc-ink">Vị trí tương đối trong lớp</h2>
+          <h2 className="text-sm font-semibold text-bvc-ink">Vị trí tương đối trong lớp</h2>
           <p className="mt-0.5 text-[11px] text-bvc-muted">Ẩn danh · Cùng bài tập lớp {rank.className}</p>
         </div>
-        <span className="flex shrink-0 items-center gap-1 rounded-full bg-bvc-surface px-2 py-0.5 text-[11px] font-semibold text-bvc-muted">
+        <span className="flex shrink-0 items-center gap-1 rounded-full bg-bvc-surface px-2 py-0.5 text-[11px] font-medium text-bvc-muted">
           <Users className="size-3 text-bvc-faint" aria-hidden />
           {rank.peerCount}/{rank.minPeers} bạn
         </span>
       </div>
       <div className="flex items-center gap-3 rounded-xl border border-bvc-border bg-bvc-soft p-3.5">
-        <span className="font-bvc-display text-3xl leading-none font-extrabold text-bvc-ink">{rank.myScore}</span>
+        <span className="font-bvc-display text-3xl leading-none font-semibold text-bvc-ink">{rank.myScore}</span>
         <p className="text-[12.5px] leading-snug text-bvc-muted">
           Điểm của bạn đã được tính vào bài tập. Vị trí trong lớp sẽ hiện khi có ít nhất {rank.minPeers} bạn khác hoàn
           tất phân tích bài này (hiện có {rank.peerCount}), để điểm của từng bạn luôn được ẩn danh.
@@ -83,18 +83,18 @@ function RankedClassCard({ rank }: { rank: RankedClassRank }) {
   const myX = xAt(rank.myScore);
 
   return (
-    <section className="flex flex-col gap-3 rounded-bvc-xl border border-bvc-border bg-white p-4 md:rounded-[22px] md:p-5.5">
+    <section className="flex flex-col gap-3 rounded-bvc-xl border border-bvc-border bg-white p-4 md:rounded-bvc-xl md:p-5.5">
       <div className="flex items-start justify-between gap-2">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-sm font-bold text-bvc-ink">Vị trí tương đối trong lớp</h2>
-            <span className="rounded-full bg-bvc-soft px-2 py-0.5 text-[10px] font-bold text-bvc-ink">
+            <h2 className="text-sm font-semibold text-bvc-ink">Vị trí tương đối trong lớp</h2>
+            <span className="rounded-full bg-bvc-soft px-2 py-0.5 text-[10px] font-semibold text-bvc-ink">
               Top {rank.topPercent}%
             </span>
           </div>
           <p className="mt-0.5 text-[11px] text-bvc-muted">Ẩn danh · Cùng bài tập lớp {rank.className}</p>
         </div>
-        <span className="flex shrink-0 items-center gap-1 rounded-full bg-bvc-surface px-2 py-0.5 text-[11px] font-semibold text-bvc-muted">
+        <span className="flex shrink-0 items-center gap-1 rounded-full bg-bvc-surface px-2 py-0.5 text-[11px] font-medium text-bvc-muted">
           <Lock className="size-3 text-bvc-faint" aria-hidden />
           Ẩn danh
         </span>
@@ -105,8 +105,8 @@ function RankedClassCard({ rank }: { rank: RankedClassRank }) {
           <ArrowUp className="size-4" strokeWidth={2.5} aria-hidden />
         </span>
         <p className="text-[12px] leading-snug text-bvc-ink">
-          Bạn đang tốt hơn <strong className="font-bold">{rank.betterThanPercent}%</strong> sinh viên trong lớp ở bài
-          tập này.
+          Bạn đang tốt hơn <strong className="font-semibold">{rank.betterThanPercent}%</strong> sinh viên trong lớp ở
+          bài tập này.
         </p>
       </div>
 
@@ -145,7 +145,7 @@ function RankedClassCard({ rank }: { rank: RankedClassRank }) {
               strokeWidth="1.5"
               strokeDasharray="3 3"
             />
-            <text x={averageX - 5} y={CHART.top - 2} fontSize="8.5" fill="#64748b" fontWeight="600" textAnchor="end">
+            <text x={averageX - 5} y={CHART.top - 2} fontSize="8.5" fill="#64748b" fontWeight="500" textAnchor="end">
               TB: {rank.classAverage}đ
             </text>
 
@@ -159,7 +159,7 @@ function RankedClassCard({ rank }: { rank: RankedClassRank }) {
             />
             <g transform={`translate(${myX - 29}, ${CHART.top - 24})`}>
               <rect width="58" height="16" rx="4" fill="var(--color-bvc-ink)" />
-              <text x="29" y="11" fontSize="8.5" fill="#fff" fontWeight="700" textAnchor="middle">
+              <text x="29" y="11" fontSize="8.5" fill="#fff" fontWeight="600" textAnchor="middle">
                 Bạn ({rank.myScore}đ)
               </text>
             </g>
@@ -173,7 +173,7 @@ function RankedClassCard({ rank }: { rank: RankedClassRank }) {
                   y={CHART.bottom + 15}
                   fontSize="8"
                   fill="#94a3b8"
-                  fontWeight="600"
+                  fontWeight="500"
                   textAnchor="middle"
                 >
                   {score}
@@ -200,7 +200,7 @@ function RankedClassCard({ rank }: { rank: RankedClassRank }) {
           </svg>
           {hover && (
             <ChartTooltip percent={(hover.x / VIEW_WIDTH) * 100}>
-              <div className="font-bold">Điểm {hover.score}</div>
+              <div className="font-semibold">Điểm {hover.score}</div>
               <div>≈ {hover.students} sinh viên</div>
             </ChartTooltip>
           )}

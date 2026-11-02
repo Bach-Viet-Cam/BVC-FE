@@ -123,7 +123,7 @@ export function SegmentPickerSheet({
         >
           <ChevronLeft className="size-5" strokeWidth={2.5} />
         </button>
-        <PracticeSheetTitle className="font-bvc-display text-base font-bold tracking-tight text-bvc-ink">
+        <PracticeSheetTitle className="font-bvc-display text-base font-semibold tracking-tight text-bvc-ink">
           Chọn đoạn luyện tập
         </PracticeSheetTitle>
         <PracticeSheetClose
@@ -137,11 +137,11 @@ export function SegmentPickerSheet({
       <div className="flex flex-col gap-5 overflow-y-auto px-5 pt-4 pb-3">
         <div>
           <div className="mb-2.5 flex items-center justify-between">
-            <span className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-bvc-muted uppercase">
+            <span className="flex items-center gap-1.5 text-xs font-semibold text-bvc-muted">
               <Lightbulb className="size-3.5 text-bvc-ink" aria-hidden />
               Gợi ý tối ưu từ AI
             </span>
-            <span className="text-[11px] font-semibold text-bvc-ink">{suggestions.length} đề xuất</span>
+            <span className="text-[11px] font-medium text-bvc-ink">{suggestions.length} đề xuất</span>
           </div>
           <div className="flex flex-wrap gap-2">
             {suggestions.map((suggestion) => {
@@ -154,7 +154,7 @@ export function SegmentPickerSheet({
                   aria-pressed={selected}
                   onClick={() => setRange(slots)}
                   className={cn(
-                    "flex cursor-pointer items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold",
+                    "flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-medium",
                     selected
                       ? "border-bvc-ink bg-bvc-soft text-bvc-ink ring-1 ring-bvc-ink/20"
                       : "border-bvc-border bg-white font-medium text-bvc-muted hover:bg-bvc-soft"
@@ -174,8 +174,8 @@ export function SegmentPickerSheet({
 
         <div className="rounded-2xl border border-bvc-border bg-bvc-soft p-4">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-bvc-ink">Kéo chọn đoạn cần luyện</span>
-            <span className="rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-bvc-ink">{rangeLabel}</span>
+            <span className="text-xs font-semibold text-bvc-ink">Kéo chọn đoạn cần luyện</span>
+            <span className="rounded-md bg-white px-2 py-0.5 text-[11px] font-medium text-bvc-ink">{rangeLabel}</span>
           </div>
 
           <div
@@ -240,9 +240,9 @@ export function SegmentPickerSheet({
             />
           </div>
 
-          <div className="flex items-center justify-between px-0.5 text-[10px] font-semibold text-bvc-faint">
+          <div className="flex items-center justify-between px-0.5 text-[10px] font-medium text-bvc-faint">
             <span>00:00</span>
-            <span className="rounded border border-bvc-border bg-white px-1.5 py-0.5 font-bold text-bvc-ink">
+            <span className="rounded border border-bvc-border bg-white px-1.5 py-0.5 font-semibold text-bvc-ink">
               {fmtTime(startSec)} - {fmtTime(endSec)}
             </span>
             <span>{fmtTime(durationSec)}</span>
@@ -255,7 +255,7 @@ export function SegmentPickerSheet({
             <p className="leading-relaxed">
               <strong className="text-bvc-ink">Đã chọn: {rangeLabel}</strong> (khoảng {Math.max(0, endSec - startSec)}{" "}
               giây) · Có{" "}
-              <span className="font-semibold text-bvc-dot-warn underline decoration-bvc-dot-warn/40">
+              <span className="font-medium text-bvc-dot-warn underline decoration-bvc-dot-warn/40">
                 {issueCount} lỗi cao độ &amp; nhịp
               </span>{" "}
               cần tập trung cải thiện.
@@ -269,7 +269,7 @@ export function SegmentPickerSheet({
               <Music2 className="size-4" aria-hidden />
             </span>
             <span className="min-w-0">
-              <span className="block text-xs font-semibold text-bvc-ink">Phát âm mẫu đệm trước (Count-in 1 bar)</span>
+              <span className="block text-xs font-medium text-bvc-ink">Phát âm mẫu đệm trước (Count-in 1 bar)</span>
               <span className="block text-[11px] text-bvc-faint">Gõ nhịp 4 phách dẫn vào chuẩn tempo</span>
             </span>
           </span>
@@ -301,7 +301,7 @@ export function SegmentPickerSheet({
         <button
           type="button"
           onClick={() => onStart({ start: startSec, end: endSec, countIn })}
-          className="flex min-h-14 w-full cursor-pointer items-center justify-center gap-2.5 rounded-2xl bg-bvc-ink text-base font-bold text-white"
+          className="flex min-h-14 w-full cursor-pointer items-center justify-center gap-2.5 rounded-2xl bg-bvc-ink text-base font-semibold text-white"
         >
           <Play className="size-5 fill-current" aria-hidden />
           Bắt đầu luyện tập
