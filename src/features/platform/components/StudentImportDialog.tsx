@@ -12,6 +12,7 @@ import {
 import { useStudentImport } from "@/features/platform/hooks/useStudentImport";
 import { type StudentImportAction, type StudentImportMode } from "@/features/platform/types/userImportTypes";
 import { downloadStudentTemplate } from "@/features/platform/utils/studentExcelTemplate";
+import { TABLE_STYLES } from "@/shared/components/bvc/tableStyles";
 import { cn } from "@/shared/utils/cn";
 
 type RowFilter = "ALL" | StudentImportAction;
@@ -51,7 +52,7 @@ function StudentImportContent({ onClose, onImported }: StudentImportContentProps
   if (phase === "select") {
     return (
       <>
-        <DialogTitle className="text-[17px] font-bold text-bvc-ink">Nhập sinh viên từ Excel</DialogTitle>
+        <DialogTitle className="text-[17px] font-semibold text-bvc-ink">Nhập sinh viên từ Excel</DialogTitle>
         <DialogDescription className="text-[13px] leading-relaxed text-bvc-muted">
           Tối đa {IMPORT_MAX_ROWS} dòng, file không quá 5 MB. Cần đủ 3 cột: Mã sinh viên, Họ và tên, Email.
         </DialogDescription>
@@ -67,13 +68,13 @@ function StudentImportContent({ onClose, onImported }: StudentImportContentProps
             if (!isBusy) handleFile(event.dataTransfer.files[0]);
           }}
           className={cn(
-            "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-[16px] border-2 border-dashed p-10 text-center",
+            "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-bvc-xl border-2 border-dashed p-10 text-center",
             isDragging ? "border-bvc-ink bg-bvc-surface" : "border-bvc-border-strong",
             isBusy && "pointer-events-none opacity-60"
           )}
         >
           <Upload size={28} className="text-bvc-muted" />
-          <span className="text-[14px] font-semibold text-bvc-ink">
+          <span className="text-[14px] font-medium text-bvc-ink">
             {isBusy ? "Đang đọc và kiểm tra file..." : "Kéo thả file .xlsx vào đây hoặc bấm để chọn"}
           </span>
           <input
@@ -96,7 +97,7 @@ function StudentImportContent({ onClose, onImported }: StudentImportContentProps
           <button
             type="button"
             onClick={downloadStudentTemplate}
-            className="flex cursor-pointer items-center gap-2 text-[13px] font-semibold text-bvc-ink underline-offset-2 hover:underline"
+            className="flex cursor-pointer items-center gap-2 text-[13px] font-medium text-bvc-ink underline-offset-2 hover:underline"
           >
             <FileSpreadsheet size={16} />
             Tải file mẫu (.xlsx)
@@ -116,7 +117,7 @@ function StudentImportContent({ onClose, onImported }: StudentImportContentProps
   if (phase === "done") {
     return (
       <>
-        <DialogTitle className="text-[17px] font-bold text-bvc-ink">Import hoàn tất</DialogTitle>
+        <DialogTitle className="text-[17px] font-semibold text-bvc-ink">Import hoàn tất</DialogTitle>
         <DialogDescription className="text-[13px] leading-relaxed text-bvc-muted">
           Đã tạo {analysis.createdCount} tài khoản, cập nhật {analysis.updatedCount}, bỏ qua {summary.skip}, lỗi{" "}
           {summary.error}. Tài khoản mới ở trạng thái “Chờ kích hoạt” và tự kích hoạt khi sinh viên đăng nhập Google lần
@@ -136,7 +137,7 @@ function StudentImportContent({ onClose, onImported }: StudentImportContentProps
 
   return (
     <>
-      <DialogTitle className="text-[17px] font-bold text-bvc-ink">Xem trước: {fileName}</DialogTitle>
+      <DialogTitle className="text-[17px] font-semibold text-bvc-ink">Xem trước: {fileName}</DialogTitle>
       <DialogDescription className="text-[13px] leading-relaxed text-bvc-muted">
         Kiểm tra kết quả bên dưới rồi xác nhận. Dòng lỗi sẽ được bỏ qua, các dòng còn lại vẫn được import.
       </DialogDescription>
@@ -159,7 +160,7 @@ function StudentImportContent({ onClose, onImported }: StudentImportContentProps
               className="mt-[3px]"
             />
             <span>
-              <span className="font-semibold">{option.label}</span>
+              <span className="font-medium">{option.label}</span>
               <span className="ml-2 text-bvc-muted">{option.hint}</span>
             </span>
           </label>
@@ -173,9 +174,9 @@ function StudentImportContent({ onClose, onImported }: StudentImportContentProps
             type="button"
             onClick={() => setFilter(item.value)}
             className={cn(
-              "cursor-pointer rounded-[11px] px-3 py-1.5 text-[13px]",
+              "cursor-pointer rounded-full px-3 py-1.5 text-[13px]",
               filter === item.value
-                ? "bg-bvc-ink font-bold text-white"
+                ? "bg-bvc-ink font-semibold text-white"
                 : "border border-bvc-border-strong text-bvc-muted"
             )}
           >
@@ -185,15 +186,15 @@ function StudentImportContent({ onClose, onImported }: StudentImportContentProps
       </div>
 
       <div className="max-h-[300px] overflow-auto rounded-[14px] border border-bvc-border">
-        <table className="w-full border-collapse text-left text-[13px]">
-          <thead className="sticky top-0 bg-bvc-surface text-[12px] uppercase tracking-[0.06em] text-bvc-muted">
-            <tr>
-              <th className="px-3 py-2">Dòng</th>
-              <th className="px-3 py-2">Mã SV</th>
-              <th className="px-3 py-2">Họ tên</th>
-              <th className="px-3 py-2">Email</th>
-              <th className="px-3 py-2">Kết quả</th>
-              <th className="px-3 py-2">Chi tiết</th>
+        <table className={cn(TABLE_STYLES.table, TABLE_STYLES.dense)}>
+          <thead className="sticky top-0">
+            <tr className={cn(TABLE_STYLES.headRow, TABLE_STYLES.headText)}>
+              <th className="px-4 py-3">Dòng</th>
+              <th className="px-4 py-3">Mã SV</th>
+              <th className="px-4 py-3">Họ tên</th>
+              <th className="px-4 py-3">Email</th>
+              <th className="px-4 py-3">Kết quả</th>
+              <th className="px-4 py-3">Chi tiết</th>
             </tr>
           </thead>
           <tbody>
@@ -205,22 +206,22 @@ function StudentImportContent({ onClose, onImported }: StudentImportContentProps
               </tr>
             )}
             {visibleRows.map((result) => (
-              <tr key={result.rowNumber} className="border-t border-bvc-line align-top">
-                <td className="px-3 py-2 font-mono text-bvc-muted">{result.rowNumber}</td>
-                <td className="px-3 py-2 font-mono">{result.studentCode}</td>
-                <td className="px-3 py-2">{result.username}</td>
-                <td className="px-3 py-2">{result.email}</td>
-                <td className="px-3 py-2">
+              <tr key={result.rowNumber} className="border-t border-bvc-border align-top">
+                <td className="px-4 py-3 font-mono text-bvc-muted">{result.rowNumber}</td>
+                <td className="px-4 py-3 font-mono">{result.studentCode}</td>
+                <td className="px-4 py-3">{result.username}</td>
+                <td className="px-4 py-3">{result.email}</td>
+                <td className="px-4 py-3">
                   <span
                     className={cn(
-                      "rounded-[8px] px-2 py-0.5 text-[11px] font-semibold",
+                      "rounded-[8px] px-2 py-0.5 text-[11px] font-medium",
                       IMPORT_ACTION_BADGE[result.action]
                     )}
                   >
                     {IMPORT_ACTION_LABELS[result.action]}
                   </span>
                 </td>
-                <td className="px-3 py-2 text-bvc-muted">{result.messages.join(" ")}</td>
+                <td className="px-4 py-3 text-bvc-muted">{result.messages.join(" ")}</td>
               </tr>
             ))}
           </tbody>
@@ -259,7 +260,7 @@ interface StudentImportDialogProps {
 export function StudentImportDialog({ isOpen, onOpenChange, onImported }: StudentImportDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogPopup className="max-w-[920px] rounded-[18px] border-bvc-border p-6">
+      <DialogPopup className="max-w-[920px] rounded-bvc-xl border-bvc-border p-6">
         {isOpen && <StudentImportContent onClose={() => onOpenChange(false)} onImported={onImported} />}
       </DialogPopup>
     </Dialog>

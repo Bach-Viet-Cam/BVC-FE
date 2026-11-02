@@ -71,7 +71,7 @@ export function ReferencePlayer({ recording, title, subtitle, rate = 1, classNam
           )}
         </button>
         <span className="flex min-w-0 flex-1 flex-col gap-0.5 @xl:max-w-[210px] @xl:flex-none @xl:basis-[210px]">
-          <span className="text-sm font-bold text-bvc-ink">{title}</span>
+          <span className="text-sm font-semibold text-bvc-ink">{title}</span>
           {subtitle && <span className="truncate text-[12.5px] text-bvc-muted">{subtitle}</span>}
         </span>
         <span className="shrink-0 font-bvc-mono text-[13px] text-bvc-muted @xl:order-last">

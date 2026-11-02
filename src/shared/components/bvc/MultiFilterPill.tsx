@@ -30,7 +30,7 @@ export function MultiFilterPill({ label, values, options, onChange, size = "md" 
       className={cn(
         // Pill thường nằm trong hàng overflow-x-auto: chừa 1px trên/dưới để mép cắt của hàng không ăn mất viền
         "my-px inline-flex shrink-0 items-center rounded-full whitespace-nowrap",
-        isActive ? "bg-bvc-ink pr-1 font-semibold text-white" : "border border-bvc-border-strong bg-white text-bvc-ink",
+        isActive ? "bg-bvc-ink pr-1 font-medium text-white" : "border border-bvc-border-strong bg-white text-bvc-ink",
         height
       )}
     >
@@ -75,7 +75,7 @@ export function MultiFilterPill({ label, values, options, onChange, size = "md" 
             <button
               type="button"
               onClick={() => onChange([])}
-              className="mt-1 w-full cursor-pointer rounded-lg border-t border-bvc-border px-2.5 pt-2 pb-1 text-left text-[13px] font-semibold text-bvc-accent-text hover:underline"
+              className="mt-1 w-full cursor-pointer rounded-lg border-t border-bvc-border px-2.5 pt-2 pb-1 text-left text-[13px] font-medium text-bvc-accent-text hover:underline"
             >
               Bỏ chọn tất cả
             </button>

@@ -16,6 +16,7 @@ import { useSaveToggle } from "@/features/music-library/hooks/useSaveToggle";
 import { useSongDetail } from "@/features/music-library/hooks/useSongDetail";
 import { libraryFilterHref } from "@/features/music-library/utils/libraryLinks";
 import { groupSheetsByInstrument, sheetViewerHref } from "@/features/music-library/utils/sheetUtils";
+import { PageTitle } from "@/shared/components/bvc/PageTitle";
 
 function DetailSkeleton() {
   return (
@@ -82,7 +83,7 @@ export function SongDetailPage() {
             Thư viện bài hát
           </Link>
           <span aria-hidden>/</span>
-          <span className="truncate font-semibold text-bvc-ink">{song.title}</span>
+          <span className="truncate font-medium text-bvc-ink">{song.title}</span>
         </nav>
 
         <div className="flex flex-col gap-5 md:flex-row md:items-end md:gap-9">
@@ -94,10 +95,8 @@ export function SongDetailPage() {
             className="w-[140px] md:w-[220px]"
           />
           <div className="flex min-w-0 flex-1 flex-col gap-3">
-            <span className="text-xs font-bold tracking-[0.08em] text-bvc-muted uppercase">Bài hát</span>
-            <h1 className="text-[34px] leading-none font-extrabold tracking-[-0.035em] text-bvc-ink md:text-[56px]">
-              {song.title}
-            </h1>
+            <span className="text-xs font-semibold text-bvc-muted">Bài hát</span>
+            <PageTitle>{song.title}</PageTitle>
             <span className="text-[15px] text-bvc-muted">
               Tác giả: {song.composer || "Chưa rõ"} · {song.genre.name} · {song.instruments.length} nhạc cụ
             </span>
@@ -164,7 +163,7 @@ export function SongDetailPage() {
         className="mx-auto flex w-full max-w-[1440px] flex-1 flex-col gap-4 px-[18px] py-6 md:px-14"
       >
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-5">
-          <h2 id="sheet-heading" className="text-2xl font-extrabold tracking-[-0.02em] text-bvc-ink">
+          <h2 id="sheet-heading" className="text-2xl font-semibold tracking-[-0.02em] text-bvc-ink">
             Bản nhạc
           </h2>
           {groups.length > 0 && activeGroup && (
@@ -200,12 +199,12 @@ export function SongDetailPage() {
         {role === "teacher" && (
           <div className="mt-auto flex flex-col gap-2 border-t border-bvc-border pt-4">
             <span className="inline-flex items-center gap-1.5 text-xs text-bvc-muted">
-              <Chip className="min-h-0 py-[3px] text-[11.5px] font-bold">Giảng viên</Chip>
+              <Chip className="min-h-0 py-[3px] text-[11.5px] font-semibold">Giảng viên</Chip>
               Thêm bản nhạc mới cho bài hát này, theo nhạc cụ và độ khó
             </span>
             <Link
               to={`/songs/${song.id}/sheets?new=1${activeGroup ? `&instrument=${activeGroup.instrument.id}` : ""}`}
-              className={actionButtonClass("dashed", "lg", "w-full font-bold hover:text-bvc-ink")}
+              className={actionButtonClass("dashed", "lg", "w-full font-semibold hover:text-bvc-ink")}
             >
               <Plus className="size-[18px]" aria-hidden />
               Tạo bản nhạc

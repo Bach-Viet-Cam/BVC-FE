@@ -70,10 +70,8 @@ export function ScoreLanes(props: ScoreLanesProps) {
             <Music2 size={15} strokeWidth={2.2} />
           </div>
           <div className="flex items-center gap-2">
-            <h2 className="font-bvc-display text-[14px] font-extrabold tracking-wide text-bvc-ink uppercase">
-              Tổng phổ các bè
-            </h2>
-            <span className="rounded-md bg-bvc-surface px-2 py-0.5 text-[11px] font-semibold text-bvc-muted">
+            <h2 className="font-bvc-display text-[14px] font-semibold text-bvc-ink">Tổng phổ các bè</h2>
+            <span className="rounded-md bg-bvc-surface px-2 py-0.5 text-[11px] font-medium text-bvc-muted">
               {tracks.length} bè mẫu
             </span>
           </div>
@@ -81,14 +79,14 @@ export function ScoreLanes(props: ScoreLanesProps) {
 
         <div className="flex items-center gap-2">
           {anySolo && (
-            <span className="rounded-md bg-amber-50 px-2 py-0.5 text-[11px] font-bold text-amber-700 ring-1 ring-amber-200">
+            <span className="rounded-md bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700 ring-1 ring-amber-200">
               Solo đang bật
             </span>
           )}
           <button
             type="button"
             onClick={props.onReset}
-            className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-bvc-border px-2.5 py-1 text-[12px] font-semibold text-bvc-ink transition-colors hover:bg-bvc-surface"
+            className="flex cursor-pointer items-center gap-1.5 rounded-full border border-bvc-border px-2.5 py-1 text-[12px] font-medium text-bvc-ink transition-colors hover:bg-bvc-surface"
           >
             <RotateCcw size={13} strokeWidth={2} />
             Đặt lại
@@ -98,7 +96,7 @@ export function ScoreLanes(props: ScoreLanesProps) {
 
       {/* Thước thời gian (thẳng cột với LaneWave) */}
       <div className={cn(LANE_GRID, "shrink-0 py-1 text-[11px]")} aria-hidden>
-        <span className="text-[10.5px] font-bold tracking-wider text-bvc-faint uppercase">Bè & Điều khiển</span>
+        <span className="text-[10.5px] font-semibold text-bvc-faint">Bè & Điều khiển</span>
         <div className="relative h-4.5 border-b border-bvc-border/70">
           {ticks.map((second) => (
             <span
@@ -110,7 +108,7 @@ export function ScoreLanes(props: ScoreLanesProps) {
             </span>
           ))}
         </div>
-        <span className="text-right text-[10.5px] font-bold tracking-wider text-bvc-faint uppercase">Âm lượng</span>
+        <span className="text-right text-[10.5px] font-semibold text-bvc-faint">Âm lượng</span>
       </div>
 
       {/* Danh sách các track bè hòa tấu */}
@@ -143,7 +141,7 @@ export function ScoreLanes(props: ScoreLanesProps) {
                   <div className="flex min-w-0 flex-col">
                     <span
                       className={cn(
-                        "truncate text-[13px] font-bold",
+                        "truncate text-[13px] font-semibold",
                         isSilenced ? "text-bvc-muted line-through" : "text-bvc-ink"
                       )}
                     >
@@ -160,7 +158,7 @@ export function ScoreLanes(props: ScoreLanesProps) {
                     aria-pressed={setting.isMuted}
                     onClick={() => props.onToggleMute(track.id)}
                     className={cn(
-                      "size-6.5 shrink-0 cursor-pointer rounded-md text-[11px] font-extrabold transition-all",
+                      "size-6.5 shrink-0 cursor-pointer rounded-full text-[11px] font-semibold transition-all",
                       setting.isMuted
                         ? "bg-bvc-ink text-white shadow-sm ring-1 ring-bvc-ink"
                         : "border border-bvc-border bg-white text-bvc-muted hover:border-bvc-ink/40 hover:text-bvc-ink"
@@ -174,7 +172,7 @@ export function ScoreLanes(props: ScoreLanesProps) {
                     aria-pressed={setting.isSolo}
                     onClick={() => props.onToggleSolo(track.id)}
                     className={cn(
-                      "size-6.5 shrink-0 cursor-pointer rounded-md text-[11px] font-extrabold transition-all",
+                      "size-6.5 shrink-0 cursor-pointer rounded-full text-[11px] font-semibold transition-all",
                       setting.isSolo
                         ? "bg-amber-600 text-white shadow-sm ring-1 ring-amber-600"
                         : "border border-bvc-border bg-white text-bvc-muted hover:border-amber-600/40 hover:text-bvc-ink"
@@ -206,7 +204,7 @@ export function ScoreLanes(props: ScoreLanesProps) {
                   onChange={(event) => props.onVolumeChange(track.id, Number(event.target.value))}
                   className="h-1.5 min-w-0 flex-1 cursor-pointer accent-[var(--color-bvc-ink)]"
                 />
-                <span className="w-6 text-right font-bvc-mono text-[11px] font-semibold text-bvc-muted">
+                <span className="w-6 text-right font-bvc-mono text-[11px] font-medium text-bvc-muted">
                   {setting.volume}
                 </span>
               </div>
@@ -231,4 +229,3 @@ export function ScoreLanes(props: ScoreLanesProps) {
     </section>
   );
 }
-

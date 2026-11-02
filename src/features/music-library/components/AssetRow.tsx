@@ -36,7 +36,7 @@ export function AssetRow({
           fileName
             ? "font-bvc-mono text-bvc-ink"
             : emptyTone === "warn"
-              ? "font-semibold text-bvc-accent-text"
+              ? "font-medium text-bvc-accent-text"
               : "text-bvc-muted"
         )}
       >
@@ -61,7 +61,7 @@ export function AssetRow({
         type="button"
         disabled={disabled}
         onClick={() => inputRef.current?.click()}
-        className="min-h-9 shrink-0 cursor-pointer rounded-[10px] border border-bvc-border-strong bg-white px-2.5 text-[12.5px] font-semibold text-bvc-ink hover:bg-bvc-surface disabled:cursor-not-allowed disabled:opacity-40"
+        className="min-h-9 shrink-0 cursor-pointer rounded-full border border-bvc-border-strong bg-white px-2.5 text-[12.5px] font-medium text-bvc-ink hover:bg-bvc-surface disabled:cursor-not-allowed disabled:opacity-40"
       >
         {fileName ? "Thay file" : "Tải lên"}
       </button>

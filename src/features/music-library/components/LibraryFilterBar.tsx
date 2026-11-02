@@ -54,7 +54,7 @@ export function LibraryFilterBar({
           <button
             type="button"
             onClick={onClearFilters}
-            className="cursor-pointer text-[13.5px] font-semibold text-bvc-accent-text hover:underline md:ml-1.5"
+            className="cursor-pointer text-[13.5px] font-medium text-bvc-accent-text hover:underline md:ml-1.5"
           >
             Xóa bộ lọc
           </button>

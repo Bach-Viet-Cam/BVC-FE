@@ -12,9 +12,9 @@ interface CoverArtProps {
 }
 
 const SIZES = {
-  thumb: { box: "w-12 rounded-[10px]", icon: "size-5", showLabel: false },
-  card: { box: "w-full rounded-[18px]", icon: "size-10", showLabel: true },
-  hero: { box: "w-full rounded-bvc-xl", icon: "size-14", showLabel: true },
+  thumb: { box: "w-12 rounded-[10px]", icon: "size-5" },
+  card: { box: "w-full rounded-bvc-xl", icon: "size-10" },
+  hero: { box: "w-full rounded-bvc-xl", icon: "size-14" },
 };
 
 // Không có ảnh thì dùng ảnh mặc định theo tông màu của bài
@@ -37,14 +37,7 @@ export function CoverArt({ title, tone, url, size = "card", className }: CoverAr
       {url ? (
         <img src={url} alt="" className="size-full object-cover" />
       ) : (
-        <>
-          <Music className={cn(config.icon, "opacity-70")} strokeWidth={1.5} aria-hidden />
-          {config.showLabel && (
-            <span className="absolute bottom-2 left-2.5 text-[11px] font-bold tracking-[0.08em] opacity-85">
-              ẢNH BÌA
-            </span>
-          )}
-        </>
+        <Music className={cn(config.icon, "opacity-70")} strokeWidth={1.5} aria-hidden />
       )}
     </span>
   );

@@ -10,7 +10,7 @@ export function SongGridSkeleton({ count = 10 }: SongGridSkeletonProps) {
     >
       {Array.from({ length: count }, (_, index) => (
         <div key={index} className="flex animate-pulse flex-col gap-2.5">
-          <span className="aspect-square w-full rounded-[18px] bg-bvc-surface" />
+          <span className="aspect-square w-full rounded-bvc-xl bg-bvc-surface" />
           <span className="h-4 w-3/4 rounded bg-bvc-surface" />
           <span className="h-3 w-1/2 rounded bg-bvc-surface" />
         </div>

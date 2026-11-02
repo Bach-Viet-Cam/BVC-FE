@@ -44,7 +44,7 @@ export function CoverPicker({ title, tone, currentUrl, file, isRemoved, error, o
 
   return (
     <div className="flex flex-col gap-2.5">
-      <span className="text-[13.5px] font-semibold text-bvc-ink">Ảnh bìa</span>
+      <span className="text-[13.5px] font-medium text-bvc-ink">Ảnh bìa</span>
       <CoverArt title={title || "bài hát mới"} tone={tone} url={shownUrl} size="hero" className="w-40 lg:w-full" />
       <div className="flex gap-2">
         <input

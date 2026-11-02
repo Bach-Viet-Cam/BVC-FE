@@ -48,7 +48,7 @@ export function UploadPanel({
         )}
       >
         <Upload size={34} strokeWidth={1.7} />
-        <span className="text-[15px] font-bold">Chọn file ghi âm từ thiết bị</span>
+        <span className="text-[15px] font-semibold">Chọn file ghi âm từ thiết bị</span>
         <span className="text-[12.5px] text-bvc-muted">MP3, WAV, M4A · tối đa 20 MB</span>
       </button>
     );
@@ -64,7 +64,7 @@ export function UploadPanel({
             type="button"
             aria-label={playing ? "Tạm dừng" : "Nghe thử file"}
             onClick={onTogglePlay}
-            className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-[15px] bg-bvc-ink text-white"
+            className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full bg-bvc-ink text-white"
           >
             {playing ? (
               <Pause size={19} fill="currentColor" strokeWidth={0} />
@@ -73,7 +73,7 @@ export function UploadPanel({
             )}
           </button>
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-            <span className="truncate text-sm font-bold text-bvc-ink">{file.name}</span>
+            <span className="truncate text-sm font-semibold text-bvc-ink">{file.name}</span>
             <span className="text-[12.5px] text-bvc-muted">
               {mbText(file.mb)} · {fmtTime(file.dur)}
             </span>
@@ -93,7 +93,7 @@ export function UploadPanel({
           disabled={blocked}
           onClick={onPickOther}
           className={cn(
-            "flex min-h-[50px] flex-1 items-center justify-center rounded-[15px] border text-[15px] font-semibold",
+            "flex min-h-[50px] flex-1 items-center justify-center rounded-full border text-[15px] font-medium",
             blocked
               ? "cursor-not-allowed border-bvc-border bg-bvc-surface text-bvc-faint"
               : "cursor-pointer border-bvc-border-strong bg-white text-bvc-ink"
@@ -106,7 +106,7 @@ export function UploadPanel({
           disabled={sendDisabled}
           onClick={onSend}
           className={cn(
-            "flex min-h-[50px] flex-1 items-center justify-center rounded-[15px] text-[15px] font-semibold",
+            "flex min-h-[50px] flex-1 items-center justify-center rounded-full text-[15px] font-medium",
             sendDisabled
               ? "cursor-not-allowed border border-bvc-border bg-bvc-surface text-bvc-faint"
               : "cursor-pointer bg-bvc-ink text-white"

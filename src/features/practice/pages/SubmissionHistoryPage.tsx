@@ -49,7 +49,7 @@ export function SubmissionHistoryPage() {
               <button
                 type="button"
                 onClick={history.cancelSelecting}
-                className="flex min-h-11 shrink-0 cursor-pointer items-center px-3 text-[15px] font-bold text-bvc-ink"
+                className="flex min-h-11 shrink-0 cursor-pointer items-center px-3 text-[15px] font-semibold text-bvc-ink"
               >
                 Hủy
               </button>
@@ -76,16 +76,16 @@ export function SubmissionHistoryPage() {
             }
             onClick={() => setIsAdvancedOpen(true)}
             className={cn(
-              "flex min-h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-xl border pr-2.5 pl-3 text-[13.5px]",
+              "flex min-h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-full border pr-2.5 pl-3 text-[13.5px]",
               advancedFilterCount > 0
-                ? "border-bvc-accent bg-bvc-accent-tint font-bold text-bvc-accent-text"
-                : "border-bvc-border-strong bg-white font-semibold text-bvc-ink"
+                ? "border-bvc-accent bg-bvc-accent-tint font-semibold text-bvc-accent-text"
+                : "border-bvc-border-strong bg-white font-medium text-bvc-ink"
             )}
           >
             <SlidersHorizontal className="size-4 shrink-0" strokeWidth={2} aria-hidden />
             Lọc nâng cao
             {advancedFilterCount > 0 && (
-              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-bvc-ink px-1.5 font-bvc-mono text-[11.5px] font-semibold text-white">
+              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-bvc-ink px-1.5 font-bvc-mono text-[11.5px] font-medium text-white">
                 {advancedFilterCount}
               </span>
             )}
@@ -95,13 +95,13 @@ export function SubmissionHistoryPage() {
         {error && (
           <div
             role="alert"
-            className="flex flex-col items-center gap-3 rounded-[20px] border border-bvc-border bg-white px-5 py-7 text-center"
+            className="flex flex-col items-center gap-3 rounded-bvc-xl border border-bvc-border bg-white px-5 py-7 text-center"
           >
-            <p className="text-[15px] font-bold text-bvc-ink">{error}</p>
+            <p className="text-[15px] font-semibold text-bvc-ink">{error}</p>
             <button
               type="button"
               onClick={history.reload}
-              className="flex min-h-11 cursor-pointer items-center justify-center rounded-[14px] border border-bvc-border-strong bg-bvc-soft px-[18px] text-sm font-semibold text-bvc-ink"
+              className="flex min-h-11 cursor-pointer items-center justify-center rounded-full border border-bvc-border-strong bg-bvc-soft px-[18px] text-sm font-medium text-bvc-ink"
             >
               Thử lại
             </button>
@@ -109,25 +109,25 @@ export function SubmissionHistoryPage() {
         )}
 
         {isEmpty ? (
-          <div className="flex flex-col items-center gap-3 rounded-[20px] border border-bvc-border bg-white px-5 py-7 text-center">
+          <div className="flex flex-col items-center gap-3 rounded-bvc-xl border border-bvc-border bg-white px-5 py-7 text-center">
             <span className="flex size-11 items-center justify-center rounded-bvc-md bg-bvc-soft text-bvc-muted">
               <Search className="size-[21px]" strokeWidth={1.7} aria-hidden />
             </span>
             {isNeverSubmitted ? (
               <>
-                <p className="text-[15px] font-bold text-bvc-ink">Chưa có bài nộp nào</p>
+                <p className="text-[15px] font-semibold text-bvc-ink">Chưa có bài nộp nào</p>
                 <p className="text-[13px] leading-normal text-bvc-muted">Bài bạn nộp khi luyện tập sẽ hiện ở đây.</p>
               </>
             ) : (
               <>
-                <p className="text-[15px] font-bold text-bvc-ink">Không có bài nộp nào khớp</p>
+                <p className="text-[15px] font-semibold text-bvc-ink">Không có bài nộp nào khớp</p>
                 <p className="text-[13px] leading-normal text-bvc-muted">
                   Thử mở rộng khoảng ngày hoặc hạ mức accuracy.
                 </p>
                 <button
                   type="button"
                   onClick={history.clearFilter}
-                  className="flex min-h-11 cursor-pointer items-center justify-center rounded-[14px] border border-bvc-border-strong bg-bvc-soft px-[18px] text-sm font-semibold text-bvc-ink"
+                  className="flex min-h-11 cursor-pointer items-center justify-center rounded-full border border-bvc-border-strong bg-bvc-soft px-[18px] text-sm font-medium text-bvc-ink"
                 >
                   Xóa bộ lọc
                 </button>
@@ -152,7 +152,7 @@ export function SubmissionHistoryPage() {
           <button
             type="button"
             onClick={history.loadMore}
-            className="flex min-h-11 shrink-0 cursor-pointer items-center justify-center self-center rounded-[14px] border border-bvc-border-strong bg-white px-[18px] text-sm font-semibold text-bvc-ink"
+            className="flex min-h-11 shrink-0 cursor-pointer items-center justify-center self-center rounded-full border border-bvc-border-strong bg-white px-[18px] text-sm font-medium text-bvc-ink"
           >
             Xem thêm
           </button>
@@ -169,8 +169,8 @@ export function SubmissionHistoryPage() {
           <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-2.5 px-[18px] pt-3.5 pb-6 md:flex-row md:items-center md:gap-6 md:px-14 md:py-4">
             {isSelecting && (
               <div className="flex flex-col gap-2 md:flex-1 md:flex-row md:items-center md:gap-4">
-                <p className="text-sm font-semibold text-bvc-ink">
-                  Đã chọn <span className="font-bvc-mono font-bold">{selectedIds.length}/2</span>
+                <p className="text-sm font-medium text-bvc-ink">
+                  Đã chọn <span className="font-bvc-mono font-semibold">{selectedIds.length}/2</span>
                 </p>
                 {showInvalid && (
                   <div
@@ -186,7 +186,7 @@ export function SubmissionHistoryPage() {
               <button
                 type="button"
                 onClick={history.submitCompare}
-                className="flex min-h-[50px] w-full cursor-pointer items-center justify-center rounded-2xl bg-bvc-ink text-[15px] font-bold text-white md:ml-auto md:w-auto md:min-w-64 md:px-8"
+                className="flex min-h-[50px] w-full cursor-pointer items-center justify-center rounded-2xl bg-bvc-ink text-[15px] font-semibold text-white md:ml-auto md:w-auto md:min-w-64 md:px-8"
               >
                 Xem so sánh
               </button>
@@ -194,7 +194,7 @@ export function SubmissionHistoryPage() {
               <button
                 type="button"
                 onClick={history.startSelecting}
-                className="flex min-h-[50px] w-full cursor-pointer items-center justify-center rounded-2xl border border-bvc-border-strong bg-bvc-soft text-[15px] font-semibold text-bvc-ink md:ml-auto md:w-auto md:min-w-64 md:px-8"
+                className="flex min-h-[50px] w-full cursor-pointer items-center justify-center rounded-2xl border border-bvc-border-strong bg-bvc-soft text-[15px] font-medium text-bvc-ink md:ml-auto md:w-auto md:min-w-64 md:px-8"
               >
                 So sánh
               </button>

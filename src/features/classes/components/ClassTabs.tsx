@@ -32,7 +32,7 @@ export function ClassTabs({ activeTab, onChange }: ClassTabsProps) {
             onClick={() => onChange(tab.key)}
             className={cn(
               "flex min-h-[44px] cursor-pointer items-center whitespace-nowrap text-[14px]",
-              isActive ? "border-b-2 border-bvc-ink font-bold text-bvc-ink" : "text-bvc-muted"
+              isActive ? "border-b-2 border-bvc-ink font-semibold text-bvc-ink" : "text-bvc-muted"
             )}
           >
             {tab.label}

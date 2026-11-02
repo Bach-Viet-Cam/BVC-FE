@@ -6,6 +6,7 @@ import { useMyAssignments } from "@/features/classes/hooks/useMyAssignments";
 import { type AssignmentListItem } from "@/features/classes/types/assignmentTypes";
 import { formatShortDeadline } from "@/features/classes/utils/assignmentFormat";
 import { cn } from "@/shared/utils/cn";
+import { PageTitle } from "@/shared/components/bvc/PageTitle";
 
 type BonusFilter = "open" | "done" | "expired";
 
@@ -42,19 +43,15 @@ export function BonusListPage() {
         <div className="flex flex-col gap-2">
           <Link
             to="/assignments"
-            className="group inline-flex items-center gap-1.5 self-start text-[13px] font-bold text-bvc-accent transition-colors hover:text-bvc-ink"
+            className="group inline-flex items-center gap-1.5 self-start text-[13px] font-semibold text-bvc-accent transition-colors hover:text-bvc-ink"
           >
             <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-0.5" />
             <span>Quay lại bài tập của tôi</span>
           </Link>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="font-bvc-display text-[22px] font-black tracking-tight text-bvc-ink sm:text-[26px]">
-                Bài tập bonus
-              </h1>
-              <p className="text-[12.5px] text-bvc-muted sm:text-[13px]">
-                Luyện thêm để nâng cao kỹ năng diễn tấu.
-              </p>
+              <PageTitle>Bài tập bonus</PageTitle>
+              <p className="text-[12.5px] text-bvc-muted sm:text-[13px]">Luyện thêm để nâng cao kỹ năng diễn tấu.</p>
             </div>
           </div>
         </div>
@@ -89,7 +86,7 @@ export function BonusListPage() {
                 aria-label="Lớp"
                 value={classFilter}
                 onChange={(event) => setClassFilter(event.target.value)}
-                className="h-9.5 cursor-pointer rounded-xl border border-bvc-border bg-bvc-surface/40 px-3 text-[12.5px] font-semibold text-bvc-ink focus:border-bvc-accent focus:bg-white focus:outline-none"
+                className="h-9.5 cursor-pointer rounded-full border border-bvc-border bg-bvc-surface/40 px-3 text-[12.5px] font-medium text-bvc-ink focus:border-bvc-accent focus:bg-white focus:outline-none"
               >
                 <option value="all">Tất cả lớp</option>
                 {classes.map(([id, name]) => (
@@ -112,13 +109,11 @@ export function BonusListPage() {
                   onClick={() => setFilter(value)}
                   className={cn(
                     "group relative pb-2 pt-0.5 text-[13px] font-medium transition-colors shrink-0",
-                    isActive ? "text-bvc-ink font-bold" : "text-bvc-muted hover:text-bvc-ink"
+                    isActive ? "text-bvc-ink font-semibold" : "text-bvc-muted hover:text-bvc-ink"
                   )}
                 >
                   <span>{label}</span>
-                  {isActive && (
-                    <span className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full bg-bvc-accent" />
-                  )}
+                  {isActive && <span className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full bg-bvc-accent" />}
                 </button>
               );
             })}
@@ -130,12 +125,12 @@ export function BonusListPage() {
           {isLoading && (
             <div className="py-16 text-center text-[14px] text-bvc-muted">
               <span className="inline-block size-5 animate-spin rounded-full border-2 border-bvc-accent border-t-transparent" />
-              <p className="mt-2.5 font-semibold">Đang tải danh sách bài bonus...</p>
+              <p className="mt-2.5 font-medium">Đang tải danh sách bài bonus...</p>
             </div>
           )}
 
           {!isLoading && error && (
-            <div className="rounded-2xl border border-red-200 bg-red-50/60 p-4 text-center text-[13.5px] font-semibold text-bvc-error">
+            <div className="rounded-2xl border border-red-200 bg-red-50/60 p-4 text-center text-[13.5px] font-medium text-bvc-error">
               {error}
             </div>
           )}
@@ -169,13 +164,11 @@ export function BonusListPage() {
                     <div>
                       {/* Eyebrow & Status Dot (NO PILLS) */}
                       <div className="flex items-center justify-between gap-2 text-[12px]">
-                        <span className="font-medium text-bvc-muted">
-                          {item.className} · Bonus
-                        </span>
+                        <span className="font-medium text-bvc-muted">{item.className} · Bonus</span>
 
                         <div className="flex items-center gap-1.5 shrink-0 text-[11.5px] font-medium">
                           {isOverdue && (
-                            <span className="flex items-center gap-1 font-semibold text-bvc-error">
+                            <span className="flex items-center gap-1 font-medium text-bvc-error">
                               <span className="size-1.5 rounded-full bg-bvc-error" />
                               <span>Quá hạn</span>
                             </span>
@@ -187,13 +180,13 @@ export function BonusListPage() {
                             </span>
                           )}
                           {isSubmitted && (
-                            <span className="flex items-center gap-1 font-semibold text-bvc-accent">
+                            <span className="flex items-center gap-1 font-medium text-bvc-accent">
                               <span className="size-1.5 rounded-full bg-bvc-accent" />
                               <span>Đã nộp</span>
                             </span>
                           )}
                           {isPassed && (
-                            <span className="flex items-center gap-1 font-semibold text-bvc-ok">
+                            <span className="flex items-center gap-1 font-medium text-bvc-ok">
                               <span className="size-1.5 rounded-full bg-bvc-ok" />
                               <span>Đạt</span>
                             </span>
@@ -201,17 +194,17 @@ export function BonusListPage() {
                         </div>
                       </div>
 
-                      <h2 className="mt-3 font-bvc-display text-[16px] font-bold leading-snug text-bvc-ink transition-colors group-hover:text-bvc-accent line-clamp-2">
+                      <h2 className="mt-3 font-bvc-display text-[16px] font-semibold leading-snug text-bvc-ink transition-colors group-hover:text-bvc-accent line-clamp-2">
                         {item.title}
                       </h2>
                     </div>
 
                     <div className="mt-4 flex items-center justify-between border-t border-bvc-line/70 pt-3 text-[12px]">
-                      <span className={cn("font-medium", isOverdue ? "font-semibold text-bvc-error" : "text-bvc-muted")}>
+                      <span className={cn("font-medium", isOverdue ? "font-medium text-bvc-error" : "text-bvc-muted")}>
                         Hạn: {formatShortDeadline(item.deadline)}
                       </span>
 
-                      <span className="flex items-center gap-1 text-[11.5px] font-bold text-bvc-accent transition-transform group-hover:translate-x-0.5">
+                      <span className="flex items-center gap-1 text-[11.5px] font-semibold text-bvc-accent transition-transform group-hover:translate-x-0.5">
                         <span>Luyện bài</span>
                         <ArrowRight size={12} />
                       </span>

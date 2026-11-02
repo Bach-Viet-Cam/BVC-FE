@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ActionButton } from "@/features/classes/components/ActionButton";
+import { ActionButton } from "@/shared/components/bvc/ActionButton";
 import { SearchInput } from "@/features/classes/components/SearchInput";
 import { useFingerExercises } from "@/features/classes/hooks/useFingerExercises";
 import { type FingerExercise } from "@/features/classes/types/roadmapTypes";
@@ -49,8 +49,8 @@ export function ExercisePickerDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(nextOpen) => !nextOpen && close()}>
-      <DialogPopup className="w-[calc(100%-36px)] max-w-[480px] gap-[14px] rounded-[20px] border-bvc-border bg-white p-[18px] font-bvc-sans text-bvc-ink">
-        <DialogTitle className="text-[17px] font-extrabold text-bvc-ink">Thêm bài luyện ngón</DialogTitle>
+      <DialogPopup className="w-[calc(100%-36px)] max-w-[480px] gap-[14px] rounded-bvc-xl border-bvc-border bg-white p-[18px] font-bvc-sans text-bvc-ink">
+        <DialogTitle className="text-[17px] font-semibold text-bvc-ink">Thêm bài luyện ngón</DialogTitle>
         <SearchInput id="exercise-search" label="Tìm bài luyện ngón" value={searchText} onChange={setSearchText} />
         <div className="flex max-h-[320px] flex-col overflow-y-auto">
           {isLoading && <span className="py-[10px] text-[13px] text-bvc-muted">Đang tải…</span>}
@@ -74,8 +74,8 @@ export function ExercisePickerDialog({
               </label>
             ))}
         </div>
-        <div className="flex gap-[10px]">
-          <ActionButton size="lg" onClick={close}>
+        <div className="flex gap-[10px] [&>*]:flex-1">
+          <ActionButton variant="secondary" size="lg" onClick={close}>
             Đóng
           </ActionButton>
           <ActionButton size="lg" variant="primary" onClick={add} disabled={selected.length === 0}>

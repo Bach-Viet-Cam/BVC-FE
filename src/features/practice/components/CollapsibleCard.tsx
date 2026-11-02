@@ -15,12 +15,12 @@ export function CollapsibleCard({ label, summary, open, onToggle, children, clas
   return (
     <section
       className={cn(
-        "flex shrink-0 flex-col rounded-[18px] border border-bvc-border bg-white md:rounded-[22px]",
+        "flex shrink-0 flex-col rounded-bvc-xl border border-bvc-border bg-white md:rounded-bvc-xl",
         className
       )}
     >
       <div className="flex min-h-11 items-center gap-2 pr-1.5 pl-3.5 md:min-h-14 md:pl-6">
-        <span className="text-[11.5px] font-bold tracking-[0.12em] text-bvc-muted uppercase">{label}</span>
+        <span className="text-[11.5px] font-semibold text-bvc-muted">{label}</span>
         <span className="flex-1" />
         {summary}
         <button
@@ -28,7 +28,7 @@ export function CollapsibleCard({ label, summary, open, onToggle, children, clas
           aria-label={`Thu gọn hoặc mở rộng phần ${label.toLowerCase()}`}
           aria-expanded={open}
           onClick={onToggle}
-          className="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-xl text-bvc-ink"
+          className="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full text-bvc-ink"
         >
           <ChevronDown size={18} strokeWidth={2} className={cn("transition-transform", open && "rotate-180")} />
         </button>

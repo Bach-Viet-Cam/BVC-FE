@@ -109,7 +109,7 @@ export function CategoriesAdminPage() {
               <button
                 type="button"
                 onClick={() => openCategoryForm(null)}
-                className="flex min-h-[42px] cursor-pointer items-center gap-2 rounded-[12px] bg-bvc-ink px-4 text-[13.5px] font-semibold text-white transition-colors hover:bg-black"
+                className="flex min-h-[42px] cursor-pointer items-center gap-2 rounded-[12px] bg-bvc-ink px-4 text-[13.5px] font-medium text-white transition-colors hover:bg-black"
               >
                 <FolderPlus size={16} />
                 <span>Thêm danh mục gốc</span>
@@ -120,14 +120,14 @@ export function CategoriesAdminPage() {
       />
 
       <div className="flex min-w-0 flex-1 flex-col gap-4 p-6 md:px-8">
-        <div className="flex flex-col overflow-hidden rounded-[18px] border border-bvc-border bg-white">
+        <div className="flex flex-col overflow-hidden rounded-bvc-xl border border-bvc-border bg-white">
           <div className="flex flex-col gap-3 border-b border-bvc-border p-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-2.5">
               <div className="flex size-[32px] items-center justify-center rounded-[8px] bg-bvc-surface text-bvc-ink">
                 <FolderTree size={16} />
               </div>
               <div>
-                <h2 className="text-[15px] font-extrabold tracking-[-0.02em] text-bvc-ink">Cây danh mục nội dung</h2>
+                <h2 className="text-[15px] font-semibold tracking-[-0.02em] text-bvc-ink">Cây danh mục nội dung</h2>
               </div>
             </div>
 
@@ -159,7 +159,7 @@ export function CategoriesAdminPage() {
                   <button
                     type="button"
                     onClick={expandAll}
-                    className="cursor-pointer rounded-[7px] px-2 py-1 text-[11.5px] font-semibold text-bvc-muted transition-colors hover:text-bvc-ink"
+                    className="cursor-pointer rounded-[7px] px-2 py-1 text-[11.5px] font-medium text-bvc-muted transition-colors hover:text-bvc-ink"
                   >
                     Mở rộng
                   </button>
@@ -168,7 +168,7 @@ export function CategoriesAdminPage() {
                   <button
                     type="button"
                     onClick={collapseAll}
-                    className="cursor-pointer rounded-[7px] px-2 py-1 text-[11.5px] font-semibold text-bvc-muted transition-colors hover:text-bvc-ink"
+                    className="cursor-pointer rounded-[7px] px-2 py-1 text-[11.5px] font-medium text-bvc-muted transition-colors hover:text-bvc-ink"
                   >
                     Thu gọn
                   </button>
@@ -184,7 +184,7 @@ export function CategoriesAdminPage() {
                   <div className="flex size-[44px] items-center justify-center rounded-[12px] bg-bvc-surface text-bvc-muted">
                     <Folder size={20} />
                   </div>
-                  <p className="mt-3 text-[14px] font-bold text-bvc-ink">
+                  <p className="mt-3 text-[14px] font-semibold text-bvc-ink">
                     {categorySearch ? "Không tìm thấy danh mục phù hợp" : "Chưa có danh mục nội dung"}
                   </p>
                   <p className="mt-1 text-[12.5px] text-bvc-muted">
@@ -217,7 +217,7 @@ export function CategoriesAdminPage() {
 
                             <Folder size={17} className="shrink-0 text-bvc-ink" />
 
-                            <span className="truncate text-[14px] font-bold text-bvc-ink">{category.name}</span>
+                            <span className="truncate text-[14px] font-semibold text-bvc-ink">{category.name}</span>
 
                             <span className="font-mono text-[11.5px] font-medium text-bvc-muted bg-bvc-surface border border-bvc-border px-2 py-0.5 rounded-[6px]">
                               {category.pieceCount} bài

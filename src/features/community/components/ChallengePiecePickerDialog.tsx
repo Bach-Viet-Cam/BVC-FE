@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ActionButton } from "@/features/classes/components/ActionButton";
+import { ActionButton } from "@/shared/components/bvc/ActionButton";
 import { SearchInput } from "@/features/classes/components/SearchInput";
 import { useChallengePieces } from "@/features/community/hooks/useChallengePieces";
 import { type ChallengePiece } from "@/features/community/types/challenge";
@@ -36,8 +36,8 @@ export function ChallengePiecePickerDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(nextOpen) => !nextOpen && close()}>
-      <DialogPopup className="w-[calc(100%-36px)] max-w-[480px] gap-[14px] rounded-[20px] border-bvc-border bg-white p-[18px] font-bvc-sans text-bvc-ink">
-        <DialogTitle className="text-[17px] font-extrabold text-bvc-ink">Chọn bài nhạc</DialogTitle>
+      <DialogPopup className="w-[calc(100%-36px)] max-w-[480px] gap-[14px] rounded-bvc-xl border-bvc-border bg-white p-[18px] font-bvc-sans text-bvc-ink">
+        <DialogTitle className="text-[17px] font-semibold text-bvc-ink">Chọn bài nhạc</DialogTitle>
         <SearchInput id="challenge-piece-search" label="Tìm bài nhạc" value={searchText} onChange={setSearchText} />
         <div className="flex max-h-[320px] flex-col overflow-y-auto">
           {isLoading && <span className="py-[10px] text-[13px] text-bvc-muted">Đang tải…</span>}
@@ -53,14 +53,14 @@ export function ChallengePiecePickerDialog({
                 onClick={() => select(piece)}
                 className="flex min-h-[44px] cursor-pointer flex-col items-start justify-center border-t border-bvc-border py-[6px] text-left text-[14px]"
               >
-                <span className="font-semibold">{piece.title}</span>
+                <span className="font-medium">{piece.title}</span>
                 <span className="text-[12px] text-bvc-muted">
                   {[piece.composer, `${piece.bpm} BPM`].filter(Boolean).join(" - ")}
                 </span>
               </button>
             ))}
         </div>
-        <ActionButton size="lg" onClick={close}>
+        <ActionButton variant="secondary" size="lg" onClick={close}>
           Đóng
         </ActionButton>
       </DialogPopup>

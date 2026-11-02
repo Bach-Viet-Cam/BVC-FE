@@ -16,7 +16,7 @@ export function FeaturedSheetCard({ sheet, viewerHref }: FeaturedSheetCardProps)
     <div className="flex flex-col gap-3.5 rounded-bvc-xl bg-bvc-surface p-4 md:px-5 md:py-[18px]">
       <SheetBadges sheet={sheet} durationSec={sheet.referenceRecording?.durationSec} />
       <div className="flex flex-col gap-3 md:flex-row md:items-center">
-        <Link to={viewerHref} className="text-[19px] font-extrabold text-bvc-ink hover:text-bvc-accent-text">
+        <Link to={viewerHref} className="text-[19px] font-semibold text-bvc-ink hover:text-bvc-accent-text">
           {sheet.name}
         </Link>
         <span className="hidden flex-1 md:block" />

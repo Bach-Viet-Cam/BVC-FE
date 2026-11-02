@@ -5,6 +5,7 @@ import { Pagination } from "@/shared/components/bvc/Pagination";
 import { EmptyState } from "@/shared/components/bvc/EmptyState";
 import { ActionButton } from "@/shared/components/bvc/ActionButton";
 import { useDebouncedCallback } from "@/shared/hooks/useDebouncedCallback";
+import { Eyebrow } from "@/shared/components/bvc/SectionIntro";
 import { cn } from "@/shared/utils/cn";
 import { LibraryFilterBar } from "@/features/music-library/components/LibraryFilterBar";
 import { LibraryShell } from "@/features/music-library/components/LibraryShell";
@@ -18,6 +19,7 @@ import { useSaveToggle } from "@/features/music-library/hooks/useSaveToggle";
 import { useTrendingSongs } from "@/features/music-library/hooks/useTrendingSongs";
 import { TrendingCarousel } from "@/features/music-library/components/TrendingCarousel";
 import { KEYWORD_MAX_LENGTH, LIBRARY_MESSAGES } from "@/features/music-library/constants/musicLibraryConstants";
+import { PageTitle } from "@/shared/components/bvc/PageTitle";
 
 function describeNoResult(filterCount: number, hasKeyword: boolean) {
   const conditions = filterCount + (hasKeyword ? 1 : 0);
@@ -55,10 +57,9 @@ export function LibraryPage() {
   return (
     <LibraryShell>
       <div className="mx-auto flex w-full max-w-[1440px] flex-1 flex-col gap-4 px-[18px] pt-3.5 pb-6 md:gap-6 md:px-14 md:pt-8 md:pb-7">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-[27px] leading-tight font-extrabold tracking-[-0.025em] text-bvc-ink md:text-[40px] md:tracking-[-0.03em]">
-            Thư viện bài hát
-          </h1>
+        <div className="flex flex-col gap-2">
+          <Eyebrow>Thư viện</Eyebrow>
+          <PageTitle>Thư viện bài hát</PageTitle>
           <p className="hidden text-[15px] text-bvc-muted md:block">Bài hát và bản nhạc giảng viên đã công khai.</p>
         </div>
 

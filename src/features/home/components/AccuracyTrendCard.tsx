@@ -29,7 +29,7 @@ function DeltaBadge({ delta }: DeltaBadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[12px] font-bold",
+        "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[12px] font-semibold",
         delta > 0 ? "border-bvc-ok/25 bg-bvc-soft text-bvc-ok" : "border-bvc-border bg-bvc-soft text-bvc-muted"
       )}
     >
@@ -67,7 +67,7 @@ export function AccuracyTrendCard({ title, icon, progress, emptyText }: Accuracy
             {icon}
           </span>
           <div>
-            <h3 className="text-[15px] font-bold text-bvc-ink">{title}</h3>
+            <h3 className="text-[15px] font-semibold text-bvc-ink">{title}</h3>
             <p className="text-[12px] text-bvc-muted">{progress.completed} lần đã chấm</p>
           </div>
         </div>
@@ -81,13 +81,13 @@ export function AccuracyTrendCard({ title, icon, progress, emptyText }: Accuracy
           <div className="flex items-baseline gap-4">
             <span className="flex flex-col">
               <span className="text-[11.5px] text-bvc-muted">Gần nhất</span>
-              <span className="font-bvc-mono text-[24px] leading-tight font-semibold text-bvc-ink">
+              <span className="font-bvc-mono text-[24px] leading-tight font-medium text-bvc-ink">
                 {formatPercent(progress.latestAccuracy)}
               </span>
             </span>
             <span className="flex flex-col">
               <span className="text-[11.5px] text-bvc-muted">Trung bình</span>
-              <span className="font-bvc-mono text-[16px] leading-tight font-semibold text-bvc-muted">
+              <span className="font-bvc-mono text-[16px] leading-tight font-medium text-bvc-muted">
                 {formatPercent(progress.averageAccuracy)}
               </span>
             </span>
@@ -135,7 +135,7 @@ export function AccuracyTrendCard({ title, icon, progress, emptyText }: Accuracy
             </svg>
             {hover && (
               <ChartTooltip percent={(hover.x / CHART.width) * 100}>
-                <div className="font-bold">{formatPercent(hover.accuracy)}</div>
+                <div className="font-semibold">{formatPercent(hover.accuracy)}</div>
                 <div className="text-bvc-muted">{formatSubmittedAt(hover.submittedAt)}</div>
               </ChartTooltip>
             )}

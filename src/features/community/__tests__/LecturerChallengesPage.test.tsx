@@ -7,7 +7,13 @@ import { LecturerChallengesPage } from "@/features/community/pages/LecturerChall
 import { type Challenge } from "@/features/community/types/challenge";
 
 vi.mock("@/features/community/api/challengeApi", () => ({
-  challengeApi: { list: vi.fn(), remove: vi.fn() },
+  challengeApi: { list: vi.fn(), remove: vi.fn(), formMeta: vi.fn(() => new Promise(() => {})) },
+}));
+vi.mock("@/features/classes/hooks/useLecturerClasses", () => ({
+  useLecturerClasses: () => ({ classes: [], isLoading: false }),
+}));
+vi.mock("@/features/classes/hooks/useInstruments", () => ({
+  useInstruments: () => ({ instruments: [], isLoading: false, error: null }),
 }));
 
 const navigate = vi.fn();
@@ -84,12 +90,14 @@ describe("LecturerChallengesPage", () => {
     expect(await screen.findByText("Bạn chưa có thử thách.")).toBeInTheDocument();
   });
 
-  it("navigates to the form from Tạo thử thách", async () => {
+  it("opens the create form in a modal from Tạo thử thách", async () => {
     mockList([]);
     renderPage();
     await screen.findByText("Bạn chưa có thử thách.");
     await userEvent.click(screen.getByRole("button", { name: "Tạo thử thách" }));
-    expect(navigate).toHaveBeenCalledWith("/teacher/challenges/new");
+    const dialog = await screen.findByRole("dialog");
+    expect(within(dialog).getByRole("heading", { name: "Tạo thử thách" })).toBeInTheDocument();
+    expect(navigate).not.toHaveBeenCalled();
   });
 
   it("offers Sửa and Xóa on drafts only", async () => {

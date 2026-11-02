@@ -17,7 +17,7 @@ import { toast } from "@/shared/components/ui/toast";
 import { cn } from "@/shared/utils/cn";
 
 const PRIMARY_BUTTON =
-  "flex min-h-13 w-full cursor-pointer items-center justify-center rounded-[15px] bg-bvc-ink text-[15px] font-semibold text-white";
+  "flex min-h-13 w-full cursor-pointer items-center justify-center rounded-[15px] bg-bvc-ink text-[15px] font-medium text-white";
 const WARN_BOX =
   "rounded-bvc-md border border-bvc-warn/50 bg-bvc-accent-tint px-3.5 py-3 text-[13px] leading-normal text-bvc-accent-text md:border-bvc-notice-border md:px-4.5 md:py-3.75 md:text-sm";
 
@@ -87,7 +87,7 @@ export function ProcessingPage() {
         <div className="flex items-center gap-2.5">
           <span
             className={cn(
-              "inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[13px] font-semibold",
+              "inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[13px] font-medium",
               warnTone ? "bg-bvc-accent-tint text-bvc-accent-text" : "bg-bvc-surface text-bvc-ink"
             )}
           >
@@ -157,7 +157,7 @@ export function ProcessingPage() {
               disabled={retrySec > 0 || retrying}
               onClick={() => void retry()}
               className={cn(
-                "flex min-h-13 w-full items-center justify-center rounded-[15px] text-[15px] font-semibold",
+                "flex min-h-13 w-full items-center justify-center rounded-[15px] text-[15px] font-medium",
                 retrySec > 0 || retrying
                   ? "cursor-not-allowed border border-bvc-border bg-bvc-surface text-bvc-faint"
                   : "cursor-pointer bg-bvc-ink text-white"

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { ChevronLeft } from "lucide-react";
+import { PageTitle } from "@/shared/components/bvc/PageTitle";
 
 interface SubmissionPageTitleProps {
   title: string;
@@ -17,15 +18,13 @@ export function SubmissionPageTitle({ title, subtitle, onBack, rightSlot }: Subm
           type="button"
           aria-label="Quay lại"
           onClick={onBack}
-          className="-ml-2 flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-bvc-md text-bvc-ink"
+          className="-ml-2 flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full text-bvc-ink transition-colors hover:bg-bvc-surface"
         >
           <ChevronLeft size={21} strokeWidth={1.8} />
         </button>
       )}
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <h1 className="truncate text-[27px] leading-tight font-extrabold tracking-[-0.025em] text-bvc-ink md:text-[32px]">
-          {title}
-        </h1>
+        <PageTitle className="truncate">{title}</PageTitle>
         {subtitle && <p className="text-[13px] text-bvc-muted">{subtitle}</p>}
       </div>
       {rightSlot}

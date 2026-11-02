@@ -1,15 +1,15 @@
 import { useState } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { TeacherShell } from "@/shared/components/bvc/TeacherShell";
-import { FocusHeader } from "@/shared/components/bvc/FocusHeader";
+import { TeacherPageHeader } from "@/shared/components/bvc/TeacherPageHeader";
 import { EmptyState } from "@/shared/components/bvc/EmptyState";
 import { ConfirmDialog } from "@/shared/components/bvc/ConfirmDialog";
 import { ActionButton } from "@/shared/components/bvc/ActionButton";
 import { actionButtonClass } from "@/shared/components/bvc/actionButtonStyles";
 import { cn } from "@/shared/utils/cn";
 import { InstrumentSheetGroup } from "@/features/music-library/components/InstrumentSheetGroup";
-import { SheetFormPanel } from "@/features/music-library/components/SheetFormPanel";
+import { SheetFormDialog } from "@/features/music-library/components/SheetFormDialog";
 import { useMusicCategories } from "@/features/music-library/hooks/useMusicCategories";
 import { useSongSheets } from "@/features/music-library/hooks/useSongSheets";
 import { useVisibilityConfirm } from "@/features/music-library/hooks/useVisibilityConfirm";
@@ -20,6 +20,7 @@ import type { SheetFormValues } from "@/features/music-library/utils/validateShe
 type PanelState = { mode: "create"; instrumentId?: string } | { mode: "edit"; sheet: LecturerSheetMusic } | null;
 
 export function SheetManagePage() {
+  const navigate = useNavigate();
   const { songId = "" } = useParams();
   const [params, setParams] = useSearchParams();
   const { options } = useMusicCategories("lecturer");
@@ -49,13 +50,12 @@ export function SheetManagePage() {
     song && isSongViewable && sheet.effectiveVisibility === "PUBLIC" ? sheetViewerHref(song.id, sheet.id) : undefined;
 
   return (
-    <TeacherShell className="lg:flex-row lg:overflow-hidden">
+    <TeacherShell className="lg:overflow-hidden">
       <div className="flex min-w-0 flex-1 flex-col lg:overflow-y-auto">
-        <FocusHeader
-          backTo={song && !song.canEdit ? `/library/${song.id}` : "/songs"}
-          backLabel={song && !song.canEdit ? "Quay lại trang bài hát" : "Quay lại thư viện của tôi"}
+        <TeacherPageHeader
+          onBack={() => navigate(song && !song.canEdit ? `/library/${song.id}` : "/songs")}
           title={song ? `Bản nhạc - ${song.title}` : "Bản nhạc"}
-          subtitle={song && `${sheets.length} bản · ${groups.length} nhạc cụ · mỗi nhạc cụ 1 bản chính`}
+          subtitle={song ? `${sheets.length} bản · ${groups.length} nhạc cụ · mỗi nhạc cụ 1 bản chính` : undefined}
           actions={
             <>
               {song && isSongViewable && (
@@ -81,7 +81,7 @@ export function SheetManagePage() {
           ) : data.isFirstLoad ? (
             <div aria-hidden className="flex animate-pulse flex-col gap-3">
               {Array.from({ length: 3 }, (_, index) => (
-                <span key={index} className="h-44 rounded-[18px] bg-bvc-surface" />
+                <span key={index} className="h-44 rounded-bvc-xl bg-bvc-surface" />
               ))}
             </div>
           ) : groups.length === 0 ? (
@@ -112,7 +112,7 @@ export function SheetManagePage() {
       </div>
 
       {panel && song && (
-        <SheetFormPanel
+        <SheetFormDialog
           key={panel.mode === "edit" ? panel.sheet.id : `new-${panel.instrumentId ?? ""}`}
           song={song}
           sheets={sheets}

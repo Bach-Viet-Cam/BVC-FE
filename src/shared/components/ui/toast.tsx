@@ -67,7 +67,7 @@ function ToastList() {
             )}
           />
           <div className="flex flex-1 flex-col gap-0.5">
-            <BaseToast.Title className="text-sm font-semibold text-on-surface" />
+            <BaseToast.Title className="text-sm font-medium text-on-surface" />
             <BaseToast.Description className="text-sm text-on-surface-variant" />
           </div>
           <BaseToast.Close

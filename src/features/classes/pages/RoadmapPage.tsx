@@ -90,12 +90,10 @@ export function RoadmapPage() {
                     <div
                       key={week.weekNumber}
                       aria-current={week.status === "CURRENT" ? "true" : undefined}
-                      className={`flex flex-col gap-[10px] rounded-[20px] border p-[14px] ${WEEK_CARD_CLASSES[week.status]}`}
+                      className={`flex flex-col gap-[10px] rounded-bvc-xl border p-[14px] ${WEEK_CARD_CLASSES[week.status]}`}
                     >
                       <div className="mb-1 flex items-center justify-between">
-                        <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-bvc-muted">
-                          Tuần {week.weekNumber}
-                        </span>
+                        <span className="text-[11px] font-semibold text-bvc-muted">Tuần {week.weekNumber}</span>
                         {week.status === "PAST" && (
                           <span className="flex size-[18px] shrink-0 items-center justify-center rounded-full bg-bvc-ok">
                             <Check size={11} color="white" />
@@ -105,7 +103,7 @@ export function RoadmapPage() {
                       </div>
 
                       <div
-                        className={`text-[13px] font-bold ${week.status === "CURRENT" ? "text-bvc-accent-text" : "text-bvc-ink"}`}
+                        className={`text-[13px] font-semibold ${week.status === "CURRENT" ? "text-bvc-accent-text" : "text-bvc-ink"}`}
                       >
                         {week.title}
                       </div>
@@ -116,20 +114,20 @@ export function RoadmapPage() {
                       {week.exercises.map((exercise) => (
                         <div key={exercise.pieceId} className="flex items-center gap-[6px]">
                           <Music size={14} className="shrink-0 text-bvc-muted" />
-                          <span className="text-[12px] font-semibold text-bvc-ink">{exercise.title}</span>
+                          <span className="text-[12px] font-medium text-bvc-ink">{exercise.title}</span>
                         </div>
                       ))}
                     </div>
                   ))}
                 </div>
 
-                <div className="flex flex-col overflow-hidden rounded-[20px] border border-bvc-border bg-white">
+                <div className="flex flex-col overflow-hidden rounded-bvc-xl border border-bvc-border bg-white">
                   <div className="border-b border-bvc-border px-[20px] py-[14px]">
-                    <span className="text-[15px] font-extrabold tracking-[-0.025em]">Bài luyện ngón theo tuần</span>
+                    <span className="text-[15px] font-semibold tracking-[-0.025em]">Bài luyện ngón theo tuần</span>
                     <span className="ml-[10px] text-[12.5px] text-bvc-muted">Phiên bản v{roadmap.version}</span>
                   </div>
 
-                  <div className="grid h-[40px] grid-cols-[0.5fr_2fr_1fr_1fr] items-center gap-[14px] border-b border-bvc-border bg-bvc-surface px-[20px] text-[12px] font-bold uppercase tracking-[0.08em] text-bvc-muted">
+                  <div className="grid h-[40px] grid-cols-[0.5fr_2fr_1fr_1fr] items-center gap-[14px] border-b border-bvc-border bg-bvc-surface px-[20px] text-[12px] font-semibold text-bvc-muted">
                     <span>Tuần</span>
                     <span>Bài luyện ngón</span>
                     <span>Loại</span>

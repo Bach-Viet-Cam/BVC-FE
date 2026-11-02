@@ -17,12 +17,16 @@ import { withCurrentOptions } from "@/features/music-library/utils/categoryOptio
 import { coverToneOf } from "@/features/music-library/utils/coverTone";
 import type { FormFailure } from "@/features/music-library/utils/formFailure";
 import { songSchema, type SongFormValues } from "@/features/music-library/utils/validateSong";
+import { cn } from "@/shared/utils/cn";
+import { useReportDirty } from "@/shared/hooks/useReportDirty";
 
 interface SongFormProps {
   formId: string;
   song?: LecturerPiece;
   options: { genres: SelectOption[] };
   onSubmit: (values: SongFormValues) => Promise<FormFailure<keyof SongFormValues> | null>;
+  onDirtyChange?: (isDirty: boolean) => void;
+  className?: string;
 }
 
 function defaultValuesOf(song?: LecturerPiece): SongFormValues {
@@ -38,18 +42,19 @@ function defaultValuesOf(song?: LecturerPiece): SongFormValues {
   };
 }
 
-export function SongForm({ formId, song, options, onSubmit }: SongFormProps) {
+export function SongForm({ formId, song, options, onSubmit, onDirtyChange, className }: SongFormProps) {
   const {
     register,
     handleSubmit,
     control,
     setValue,
     setError,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<SongFormValues>({
     resolver: zodResolver(songSchema),
     defaultValues: defaultValuesOf(song),
   });
+  useReportDirty(isDirty, onDirtyChange);
   const selectOptions = useMemo(
     () => ({
       genres: withCurrentOptions(options.genres, song ? [song.genre] : []),
@@ -75,7 +80,10 @@ export function SongForm({ formId, song, options, onSubmit }: SongFormProps) {
       id={formId}
       noValidate
       onSubmit={handleSubmit(submit)}
-      className="grid gap-8 px-[18px] py-6 md:px-8 md:py-7 lg:grid-cols-[240px_minmax(0,1fr)_minmax(0,1fr)] lg:items-start lg:gap-10 xl:grid-cols-[280px_minmax(0,1fr)_minmax(0,1fr)]"
+      className={cn(
+        "grid gap-8 px-[18px] py-6 md:px-8 md:py-7 lg:grid-cols-[240px_minmax(0,1fr)_minmax(0,1fr)] lg:items-start lg:gap-10 xl:grid-cols-[280px_minmax(0,1fr)_minmax(0,1fr)]",
+        className
+      )}
     >
       <CoverPicker
         title={title}
@@ -95,7 +103,7 @@ export function SongForm({ formId, song, options, onSubmit }: SongFormProps) {
       />
 
       <section className="flex flex-col gap-3.5">
-        <h2 className="text-base font-extrabold text-bvc-ink">Thông tin cơ bản</h2>
+        <h2 className="text-base font-semibold text-bvc-ink">Thông tin cơ bản</h2>
         <FormField label="Tiêu đề" htmlFor="song-title" required hint="1–200 ký tự" error={errors.title?.message}>
           <input
             {...register("title")}
@@ -131,7 +139,7 @@ export function SongForm({ formId, song, options, onSubmit }: SongFormProps) {
 
       <div className="flex flex-col gap-7">
         <section className="flex flex-col gap-3.5">
-          <h2 className="text-base font-extrabold text-bvc-ink">Phân loại</h2>
+          <h2 className="text-base font-semibold text-bvc-ink">Phân loại</h2>
           <FormField
             label="Thể loại"
             htmlFor="song-genre"
@@ -162,7 +170,7 @@ export function SongForm({ formId, song, options, onSubmit }: SongFormProps) {
         </section>
 
         <section className="flex flex-col gap-3.5">
-          <h2 className="text-base font-extrabold text-bvc-ink">Trạng thái</h2>
+          <h2 className="text-base font-semibold text-bvc-ink">Trạng thái</h2>
           <FormField
             label="Hiển thị"
             error={errors.visibility?.message}

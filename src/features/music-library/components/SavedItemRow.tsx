@@ -39,7 +39,7 @@ export function SavedItemRow({
   const savedDate = formatDate(savedAt, "dd/MM");
   const titleBlock = (
     <span className="flex min-w-0 flex-col gap-0.5">
-      <span className="truncate text-[15px] font-bold">{title}</span>
+      <span className="truncate text-[15px] font-semibold">{title}</span>
       <span className="truncate text-[12.5px] text-bvc-muted">
         {subtitle}
         <span className="md:hidden"> · đã lưu {savedDate}</span>

@@ -53,7 +53,7 @@ export function TunerView({ audio, tunes }: TunerViewProps) {
       <div className="flex-1 overflow-y-auto px-5 pb-6 md:px-8">
         <div className="flex flex-col items-center gap-2 pt-3.5">
           <span
-            className="text-[76px] leading-none font-extrabold tracking-[-0.04em]"
+            className="text-[76px] leading-none font-semibold tracking-[-0.04em]"
             style={{ color: live ? "var(--color-bvc-ink)" : "var(--color-bvc-faint)" }}
           >
             {live && note ? note.vn : "--"}
@@ -69,14 +69,14 @@ export function TunerView({ audio, tunes }: TunerViewProps) {
         </div>
 
         <p
-          className="mt-3 rounded-xl border border-bvc-border-strong bg-bvc-surface px-4 py-3 text-center text-sm font-bold md:bg-bvc-panel"
+          className="mt-3 rounded-xl border border-bvc-border-strong bg-bvc-surface px-4 py-3 text-center text-sm font-semibold md:bg-bvc-panel"
           style={{ color: live ? color : "var(--color-bvc-muted)" }}
         >
           {advice}
         </p>
 
         <div className="mt-4 flex items-baseline justify-between">
-          <span className="text-sm font-bold text-bvc-ink">Các dây cần kiểm tra</span>
+          <span className="text-sm font-semibold text-bvc-ink">Các dây cần kiểm tra</span>
           <span className="text-[13px] text-bvc-muted">
             {tunedCount} / {strings.length} dây đã đúng
           </span>
@@ -113,16 +113,16 @@ export function TunerView({ audio, tunes }: TunerViewProps) {
                 )}
               >
                 <span className="w-11 shrink-0 text-[13px] text-bvc-muted">{item.code}</span>
-                <span className="flex-1 text-sm font-semibold text-bvc-ink">
+                <span className="flex-1 text-sm font-medium text-bvc-ink">
                   {item.vn} — {item.en}
                 </span>
                 {ok ? (
-                  <span className="flex items-center gap-1 text-[13px] font-bold text-bvc-ok">
+                  <span className="flex items-center gap-1 text-[13px] font-semibold text-bvc-ok">
                     Đúng
                     <Check size={16} strokeWidth={2.4} />
                   </span>
                 ) : isSelected ? (
-                  <span className="text-[13px] font-bold" style={{ color }}>
+                  <span className="text-[13px] font-semibold" style={{ color }}>
                     {signed(cents)}¢
                   </span>
                 ) : (
@@ -147,7 +147,7 @@ export function TunerView({ audio, tunes }: TunerViewProps) {
           aria-pressed={isToneOn}
           onClick={toggleTone}
           className={cn(
-            "flex min-h-13.5 w-full cursor-pointer items-center justify-center gap-2 rounded-bvc-lg border text-[15px] font-semibold disabled:cursor-not-allowed disabled:opacity-50",
+            "flex min-h-13.5 w-full cursor-pointer items-center justify-center gap-2 rounded-full border text-[15px] font-medium disabled:cursor-not-allowed disabled:opacity-50",
             isToneOn
               ? "border-bvc-ink bg-bvc-ink text-white"
               : "border-bvc-border-strong bg-white text-bvc-ink md:bg-bvc-panel"

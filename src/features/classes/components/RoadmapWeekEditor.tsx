@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { ArrowDown, ArrowUp, Plus } from "lucide-react";
 import { type Control, type FieldErrors, type UseFormRegister, useFieldArray, useWatch } from "react-hook-form";
-import { ActionButton } from "@/features/classes/components/ActionButton";
+import { ActionButton } from "@/shared/components/bvc/ActionButton";
 import { ExercisePickerDialog } from "@/features/classes/components/ExercisePickerDialog";
-import { INPUT_CLASSES } from "@/features/classes/components/FormField";
+import { INPUT_CLASSES } from "@/shared/components/bvc/fieldStyles";
 import {
   ROADMAP_CONTENT_MAX,
   ROADMAP_TITLE_MAX,
@@ -41,14 +41,14 @@ export function RoadmapWeekEditor({ weekIndex, instrumentId, control, register, 
   return (
     <section
       aria-labelledby={headingId}
-      className="flex flex-col gap-[12px] rounded-[18px] border border-bvc-border p-[16px]"
+      className="flex flex-col gap-[12px] rounded-bvc-xl border border-bvc-border p-[16px]"
     >
-      <h3 id={headingId} className="m-0 text-[15px] font-extrabold tracking-[-0.01em]">
+      <h3 id={headingId} className="m-0 text-[15px] font-semibold tracking-[-0.01em]">
         Tuần {weekNumber}
       </h3>
       <div className="flex flex-col gap-[6px]">
         <div className="flex justify-between">
-          <label htmlFor={titleId} className="text-[13.5px] font-semibold">
+          <label htmlFor={titleId} className="text-[13.5px] font-medium">
             Tiêu đề
           </label>
           <span id={`${titleId}-count`} className="font-bvc-mono text-[12px] text-bvc-muted">
@@ -70,7 +70,7 @@ export function RoadmapWeekEditor({ weekIndex, instrumentId, control, register, 
       </div>
       <div className="flex flex-col gap-[6px]">
         <div className="flex justify-between">
-          <label htmlFor={contentId} className="text-[13.5px] font-semibold">
+          <label htmlFor={contentId} className="text-[13.5px] font-medium">
             Nội dung học tập
           </label>
           <span id={`${contentId}-count`} className="font-bvc-mono text-[12px] text-bvc-muted">
@@ -92,13 +92,13 @@ export function RoadmapWeekEditor({ weekIndex, instrumentId, control, register, 
         )}
       </div>
       <div className="flex flex-col gap-[8px]">
-        <span className="text-[13.5px] font-semibold">Bài luyện ngón</span>
+        <span className="text-[13.5px] font-medium">Bài luyện ngón</span>
         {fields.length === 0 && <span className="text-[12.5px] text-bvc-muted">Chưa có bài luyện ngón.</span>}
         {fields.map((field, index) => (
           <div key={field.fieldKey} className="flex items-center gap-[8px] border-t border-bvc-border pt-[8px]">
             <span className="font-bvc-mono w-[22px] text-[12px] text-bvc-muted">{index + 1}.</span>
             <span className="flex min-w-0 grow flex-col">
-              <span data-testid="roadmap-exercise-title" className="text-[14px] font-semibold">
+              <span data-testid="roadmap-exercise-title" className="text-[14px] font-medium">
                 {field.title}
               </span>
               {!field.isAvailable && <span className="text-[12px] text-bvc-accent-text">Không còn khả dụng</span>}
@@ -121,7 +121,7 @@ export function RoadmapWeekEditor({ weekIndex, instrumentId, control, register, 
             >
               <ArrowDown size={16} strokeWidth={1.8} aria-hidden="true" />
             </button>
-            <ActionButton aria-label={`Xóa ${field.title}`} onClick={() => remove(index)}>
+            <ActionButton variant="secondary" aria-label={`Xóa ${field.title}`} onClick={() => remove(index)}>
               Xóa
             </ActionButton>
           </div>
@@ -132,7 +132,7 @@ export function RoadmapWeekEditor({ weekIndex, instrumentId, control, register, 
           </span>
         )}
         <div>
-          <ActionButton onClick={() => setIsPickerOpen(true)}>
+          <ActionButton variant="secondary" onClick={() => setIsPickerOpen(true)}>
             <Plus size={16} strokeWidth={2} aria-hidden="true" /> Thêm bài luyện ngón
           </ActionButton>
         </div>

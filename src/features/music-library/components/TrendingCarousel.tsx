@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Flame, Music } from "lucide-react";
 import { COVER_TONE_CLASSES } from "@/features/music-library/constants/musicLibraryConstants";
 import type { TrendingSong } from "@/features/music-library/types/musicLibraryTypes";
 import { cn } from "@/shared/utils/cn";
+import { SectionTitle } from "@/shared/components/bvc/SectionTitle";
 
 interface TrendingCarouselProps {
   songs: TrendingSong[];
@@ -47,7 +48,7 @@ function TrendingSlide({ song, rank, total }: TrendingSlideProps) {
       <span className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/30 to-black/10" aria-hidden />
 
       <span className="relative flex w-full flex-col justify-end gap-4 p-5 md:flex-row md:items-center md:justify-start md:gap-8 md:p-8">
-        <span className="hidden aspect-square h-full max-h-[260px] shrink-0 overflow-hidden rounded-[18px] shadow-2xl ring-1 ring-white/15 md:block">
+        <span className="hidden aspect-square h-full max-h-[260px] shrink-0 overflow-hidden rounded-bvc-xl shadow-2xl ring-1 ring-white/15 md:block">
           {song.coverUrl ? (
             <img
               src={song.coverUrl}
@@ -62,11 +63,11 @@ function TrendingSlide({ song, rank, total }: TrendingSlideProps) {
         </span>
 
         <span className="flex min-w-0 flex-col gap-2">
-          <span className="inline-flex items-center gap-1.5 self-start rounded-full bg-white/15 px-3 py-1 text-[12px] font-bold tracking-[0.06em] uppercase backdrop-blur">
+          <span className="inline-flex items-center gap-1.5 self-start rounded-full bg-white/15 px-3 py-1 text-[12px] font-semibold backdrop-blur">
             <Flame className="size-3.5" strokeWidth={2.2} aria-hidden />
             Top {rank} tuần này
           </span>
-          <span className="line-clamp-2 text-[26px] leading-tight font-extrabold tracking-[-0.025em] md:text-[40px]">
+          <span className="line-clamp-2 text-[26px] leading-tight font-semibold tracking-[-0.025em] md:text-[40px]">
             {song.title}
           </span>
           <span className="truncate text-[14px] text-white/80 md:text-[15px]">
@@ -77,11 +78,11 @@ function TrendingSlide({ song, rank, total }: TrendingSlideProps) {
               {song.description}
             </span>
           )}
-          <span className="mt-1 flex flex-wrap items-center gap-3 text-[13px] font-semibold">
+          <span className="mt-1 flex flex-wrap items-center gap-3 text-[13px] font-medium">
             <span className="font-bvc-mono">{song.weeklySubmissionCount} lượt nộp</span>
             <span className="text-white/60">·</span>
             <span>{song.instrumentCount} nhạc cụ</span>
-            <span className="ml-auto rounded-full bg-white px-4 py-2 text-[13.5px] font-bold text-bvc-ink md:ml-2">
+            <span className="ml-auto rounded-full bg-white px-4 py-2 text-[13.5px] font-semibold text-bvc-ink md:ml-2">
               Luyện bài này
             </span>
           </span>
@@ -135,9 +136,7 @@ export function TrendingCarousel({ songs, title = "Đang hot tuần này" }: Tre
       onTouchStart={() => setIsPaused(true)}
     >
       <div className="flex items-center justify-between gap-3">
-        <h2 id="trending-heading" className="text-xl font-extrabold tracking-[-0.02em] text-bvc-ink md:text-2xl">
-          {title}
-        </h2>
+        <SectionTitle id="trending-heading">{title}</SectionTitle>
         {total > 1 && (
           <div className="flex items-center gap-2">
             <button

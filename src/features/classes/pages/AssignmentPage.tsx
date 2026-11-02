@@ -23,6 +23,7 @@ import {
 } from "@/features/classes/utils/assignmentFormat";
 import { type AssignmentDetail, type AssignmentType } from "@/features/classes/types/assignmentTypes";
 import { cn } from "@/shared/utils/cn";
+import { PageTitle } from "@/shared/components/bvc/PageTitle";
 
 function AssignmentTypeIcon({
   type,
@@ -63,7 +64,7 @@ function InfoRow({ label, value, highlight }: InfoRowProps) {
   return (
     <div className="flex items-center justify-between gap-3 border-b border-bvc-line/80 py-2.5 text-[13px] last:border-0">
       <span className="text-bvc-muted">{label}</span>
-      <span className={cn("text-right font-semibold", highlight ? "text-bvc-accent font-bold" : "text-bvc-ink")}>
+      <span className={cn("text-right font-medium", highlight ? "text-bvc-accent font-semibold" : "text-bvc-ink")}>
         {value}
       </span>
     </div>
@@ -74,8 +75,8 @@ function AssignmentRequirementsCard({ assignment }: { assignment: AssignmentDeta
   return (
     <div className="rounded-2xl border border-bvc-border bg-white p-4.5 shadow-2xs md:p-5">
       <div className="flex items-center justify-between">
-        <p className="text-[11px] font-extrabold uppercase tracking-wider text-bvc-muted">Yêu cầu bài tập</p>
-        <span className="text-[12px] font-semibold text-bvc-muted">{assignment.className}</span>
+        <p className="text-[11px] font-semibold text-bvc-muted">Yêu cầu bài tập</p>
+        <span className="text-[12px] font-medium text-bvc-muted">{assignment.className}</span>
       </div>
 
       <div className="mt-2.5 flex flex-col">
@@ -88,12 +89,12 @@ function AssignmentRequirementsCard({ assignment }: { assignment: AssignmentDeta
       </div>
 
       <div className="mt-3.5 rounded-xl border border-bvc-border bg-bvc-surface/40 p-3">
-        <div className="flex items-center justify-between text-[11.5px] font-bold">
+        <div className="flex items-center justify-between text-[11.5px] font-semibold">
           <span className="flex items-center gap-1 text-bvc-muted">
             <Target size={13} className="text-bvc-accent" />
             <span>Ngưỡng đạt</span>
           </span>
-          <span className="font-bvc-mono font-black text-bvc-ink">≥ {assignment.minAccuracy}%</span>
+          <span className="font-bvc-mono font-semibold text-bvc-ink">≥ {assignment.minAccuracy}%</span>
         </div>
         <div className="relative mt-2 h-1.5 w-full overflow-hidden rounded-full bg-bvc-border/80">
           <div
@@ -103,7 +104,7 @@ function AssignmentRequirementsCard({ assignment }: { assignment: AssignmentDeta
         </div>
         <div className="mt-1.5 flex justify-between text-[10.5px] text-bvc-muted">
           <span>0%</span>
-          <span className="font-semibold text-bvc-accent">Ngưỡng đạt {assignment.minAccuracy}%</span>
+          <span className="font-medium text-bvc-accent">Ngưỡng đạt {assignment.minAccuracy}%</span>
           <span>100%</span>
         </div>
       </div>
@@ -117,8 +118,8 @@ function AssignmentRubricCard({ rubric }: { rubric: { name: string; weight: numb
   return (
     <div className="rounded-2xl border border-bvc-border bg-white p-4.5 shadow-2xs md:p-5">
       <div className="flex items-center justify-between">
-        <p className="text-[11px] font-extrabold uppercase tracking-wider text-bvc-muted">Rubric chấm điểm</p>
-        <span className="font-bvc-mono text-[11px] font-semibold text-bvc-muted">Tổng 100%</span>
+        <p className="text-[11px] font-semibold text-bvc-muted">Rubric chấm điểm</p>
+        <span className="font-bvc-mono text-[11px] font-medium text-bvc-muted">Tổng 100%</span>
       </div>
 
       <div className="mt-3 flex flex-col gap-2.5">
@@ -129,7 +130,7 @@ function AssignmentRubricCard({ rubric }: { rubric: { name: string; weight: numb
           >
             <div className="flex items-center justify-between text-[12.5px]">
               <span className="font-medium text-bvc-ink">{criterion.name}</span>
-              <span className="font-bvc-mono text-[12px] font-bold text-bvc-accent">{criterion.weight}%</span>
+              <span className="font-bvc-mono text-[12px] font-semibold text-bvc-accent">{criterion.weight}%</span>
             </div>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-bvc-surface">
               <div
@@ -151,10 +152,10 @@ function AttemptTimeline({ assignment }: { assignment: AssignmentDetail }) {
   return (
     <div className="rounded-2xl border border-bvc-border bg-white p-4 shadow-2xs md:p-5">
       <div className="flex items-center justify-between">
-        <p className="text-[11px] font-extrabold uppercase tracking-wider text-bvc-muted">
+        <p className="text-[11px] font-semibold text-bvc-muted">
           Tiến trình nộp bài ({assignment.usedSubmissions}/{max} lượt)
         </p>
-        <span className="text-[11.5px] font-semibold text-bvc-muted">
+        <span className="text-[11.5px] font-medium text-bvc-muted">
           {assignment.canSubmit ? "Có thể nộp thêm" : "Đã khóa nộp"}
         </span>
       </div>
@@ -181,11 +182,11 @@ function AttemptTimeline({ assignment }: { assignment: AssignmentDetail }) {
                 {sub ? (
                   <CheckCircle2 size={13} className="text-bvc-ok" />
                 ) : (
-                  <span className="font-bvc-mono text-[11px] font-bold text-bvc-faint">#{attemptNumber}</span>
+                  <span className="font-bvc-mono text-[11px] font-semibold text-bvc-faint">#{attemptNumber}</span>
                 )}
-                <span className="text-[11.5px] font-bold">Lượt {attemptNumber}</span>
+                <span className="text-[11.5px] font-semibold">Lượt {attemptNumber}</span>
               </div>
-              <span className="font-bvc-mono text-[12px] font-extrabold text-bvc-ink mt-0.5">
+              <span className="font-bvc-mono text-[12px] font-semibold text-bvc-ink mt-0.5">
                 {sub && sub.accuracy !== null ? `${Math.round(sub.accuracy)}%` : sub ? "Đã nộp" : "Chưa nộp"}
               </span>
             </div>
@@ -214,7 +215,7 @@ function AssignmentStudioBox({ assignment, recordingTarget, ensembleTarget, onNa
             {isEnsemble ? <Music2 size={20} strokeWidth={2.2} /> : <Mic size={20} strokeWidth={2.2} />}
           </div>
           <div>
-            <h3 className="font-bvc-display text-[15px] font-bold text-bvc-ink">
+            <h3 className="font-bvc-display text-[15px] font-semibold text-bvc-ink">
               {isEnsemble ? "Hòa tấu cùng bè ảo" : "Thu âm diễn tấu"}
             </h3>
             <p className="text-[12px] text-bvc-muted">
@@ -237,7 +238,7 @@ function AssignmentStudioBox({ assignment, recordingTarget, ensembleTarget, onNa
               type="button"
               disabled={!assignment.canSubmit || !assignment.pieceId || !assignment.hasEnsembleTracks}
               onClick={() => onNavigate(ensembleTarget)}
-              className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl bg-bvc-accent px-4.5 text-[13px] font-bold text-white shadow-2xs transition-all hover:bg-bvc-ink active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-full bg-bvc-accent px-4.5 text-[13px] font-semibold text-white shadow-2xs transition-all hover:bg-bvc-ink active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
             >
               <Music2 size={16} strokeWidth={2.2} />
               <span>Luyện &amp; nộp hòa tấu</span>
@@ -248,7 +249,7 @@ function AssignmentStudioBox({ assignment, recordingTarget, ensembleTarget, onNa
                 <button
                   type="button"
                   onClick={() => onNavigate(`/ensemble/new?pieceId=${assignment.pieceId}`)}
-                  className="flex h-10 items-center justify-center gap-1.5 rounded-xl border border-bvc-border bg-white px-3.5 text-[12.5px] font-semibold text-bvc-ink transition-colors hover:bg-bvc-surface active:scale-[0.98]"
+                  className="flex h-10 items-center justify-center gap-1.5 rounded-full border border-bvc-border bg-white px-3.5 text-[12.5px] font-medium text-bvc-ink transition-colors hover:bg-bvc-surface active:scale-[0.98]"
                 >
                   <Music2 size={15} strokeWidth={2.2} />
                   <span>Luyện cùng bè ảo</span>
@@ -259,7 +260,7 @@ function AssignmentStudioBox({ assignment, recordingTarget, ensembleTarget, onNa
                 type="button"
                 disabled={!assignment.canSubmit || !recordingTarget}
                 onClick={() => recordingTarget && onNavigate(recordingTarget)}
-                className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl bg-bvc-accent px-4.5 text-[13px] font-bold text-white shadow-2xs transition-all hover:bg-bvc-ink active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-full bg-bvc-accent px-4.5 text-[13px] font-semibold text-white shadow-2xs transition-all hover:bg-bvc-ink active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <Mic size={16} strokeWidth={2.2} />
                 <span>Thu âm / Tải bản thu</span>
@@ -289,7 +290,7 @@ export function AssignmentPage() {
         <div className="mx-auto flex w-full max-w-[1100px] flex-1 flex-col gap-4 px-3.5 py-4 sm:px-6 md:gap-6 md:px-10 md:py-8">
           <Link
             to="/assignments"
-            className="group inline-flex items-center gap-1.5 text-[13px] font-bold text-bvc-accent transition-colors hover:text-bvc-ink"
+            className="group inline-flex items-center gap-1.5 text-[13px] font-semibold text-bvc-accent transition-colors hover:text-bvc-ink"
           >
             <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-0.5" />
             <span>Quay lại bài tập của tôi</span>
@@ -298,10 +299,10 @@ export function AssignmentPage() {
             {isLoading ? (
               <div className="flex flex-col items-center gap-2.5 text-bvc-muted">
                 <span className="size-6 animate-spin rounded-full border-2 border-bvc-accent border-t-transparent" />
-                <span className="text-[14px] font-semibold">Đang tải chi tiết bài tập...</span>
+                <span className="text-[14px] font-medium">Đang tải chi tiết bài tập...</span>
               </div>
             ) : (
-              <div className="rounded-2xl border border-bvc-border bg-bvc-surface/60 p-5 text-[14px] font-semibold text-bvc-error">
+              <div className="rounded-2xl border border-bvc-border bg-bvc-surface/60 p-5 text-[14px] font-medium text-bvc-error">
                 {error}
               </div>
             )}
@@ -324,12 +325,12 @@ export function AssignmentPage() {
         <div className="flex items-center justify-between">
           <Link
             to="/assignments"
-            className="group inline-flex items-center gap-1.5 text-[13px] font-bold text-bvc-accent transition-colors hover:text-bvc-ink"
+            className="group inline-flex items-center gap-1.5 text-[13px] font-semibold text-bvc-accent transition-colors hover:text-bvc-ink"
           >
             <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-0.5" />
             <span>Quay lại danh sách bài tập</span>
           </Link>
-          <span className="text-[12.5px] font-semibold text-bvc-muted">{assignment.className}</span>
+          <span className="text-[12.5px] font-medium text-bvc-muted">{assignment.className}</span>
         </div>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-6">
@@ -342,7 +343,7 @@ export function AssignmentPage() {
               <div className="flex items-center justify-between gap-2 flex-wrap text-[12px]">
                 <div className="flex items-center gap-2 text-bvc-muted">
                   <AssignmentTypeIcon type={assignment.type} size={14} className="text-bvc-accent" strokeWidth={2.2} />
-                  <span className="font-bold text-bvc-ink">{assignment.className}</span>
+                  <span className="font-semibold text-bvc-ink">{assignment.className}</span>
                   {assignment.weekNo && (
                     <>
                       <span className="text-bvc-line">·</span>
@@ -353,7 +354,7 @@ export function AssignmentPage() {
                   <span>{ASSIGNMENT_TYPE_LABELS[assignment.type] || "Bài tập"}</span>
                 </div>
 
-                <div className="flex items-center gap-1.5 font-semibold text-[12px]">
+                <div className="flex items-center gap-1.5 font-medium text-[12px]">
                   {assignment.status === "OVERDUE" && (
                     <span className="flex items-center gap-1.5 text-bvc-error">
                       <span className="size-1.5 rounded-full bg-bvc-error" />
@@ -381,9 +382,7 @@ export function AssignmentPage() {
                 </div>
               </div>
 
-              <h1 className="mt-3.5 font-bvc-display text-[22px] font-black tracking-tight text-bvc-ink sm:text-[25px] md:text-[28px]">
-                {assignment.title}
-              </h1>
+              <PageTitle className="mt-3.5">{assignment.title}</PageTitle>
 
               <div
                 className={cn(
@@ -399,18 +398,16 @@ export function AssignmentPage() {
                   ) : (
                     <Clock size={17} className="shrink-0 text-bvc-accent-text" />
                   )}
-                  <span className="text-[13px] font-bold">Hạn nộp: {formatFullDeadline(assignment.deadline)}</span>
+                  <span className="text-[13px] font-semibold">Hạn nộp: {formatFullDeadline(assignment.deadline)}</span>
                 </div>
-                <span className="rounded-lg bg-white/90 px-2.5 py-1 font-bvc-mono text-[11.5px] font-bold shadow-2xs">
+                <span className="rounded-lg bg-white/90 px-2.5 py-1 font-bvc-mono text-[11.5px] font-semibold shadow-2xs">
                   {describeTimeLeft(assignment.deadline, new Date())}
                 </span>
               </div>
 
               {assignment.description && (
                 <div className="mt-4 border-t border-bvc-line/90 pt-3.5">
-                  <p className="mb-1 text-[11.5px] font-bold uppercase tracking-wider text-bvc-muted">
-                    Hướng dẫn từ giảng viên
-                  </p>
+                  <p className="mb-1 text-[11.5px] font-semibold text-bvc-muted">Hướng dẫn từ giảng viên</p>
                   <p className="whitespace-pre-line text-[13.5px] leading-relaxed text-bvc-ink/90 sm:text-[14px]">
                     {assignment.description}
                   </p>
@@ -451,7 +448,7 @@ export function AssignmentPage() {
             type="button"
             disabled={!assignment.canSubmit || !assignment.pieceId || !assignment.hasEnsembleTracks}
             onClick={() => navigate(ensembleTarget)}
-            className="flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-bvc-accent text-[14px] font-bold text-white shadow-sm transition-all hover:bg-bvc-ink active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-bvc-accent text-[14px] font-semibold text-white shadow-sm transition-all hover:bg-bvc-ink active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Music2 size={17} strokeWidth={2.2} />
             <span>Luyện &amp; nộp hòa tấu</span>
@@ -462,7 +459,7 @@ export function AssignmentPage() {
               type="button"
               disabled={!assignment.canSubmit || !recordingTarget}
               onClick={() => recordingTarget && navigate(recordingTarget)}
-              className="flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-bvc-accent text-[14px] font-bold text-white shadow-sm transition-all hover:bg-bvc-ink active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-bvc-accent text-[14px] font-semibold text-white shadow-sm transition-all hover:bg-bvc-ink active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
             >
               <Mic size={17} strokeWidth={2.2} />
               <span>Thu âm / Tải lên</span>
@@ -472,7 +469,7 @@ export function AssignmentPage() {
               <button
                 type="button"
                 onClick={() => navigate(`/ensemble/new?pieceId=${assignment.pieceId}`)}
-                className="flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-bvc-border bg-white text-[13px] font-semibold text-bvc-ink transition-colors hover:bg-bvc-surface"
+                className="flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-bvc-border bg-white text-[13px] font-medium text-bvc-ink transition-colors hover:bg-bvc-surface"
               >
                 <Music2 size={15} strokeWidth={2.2} />
                 <span>Luyện cùng bè ảo</span>

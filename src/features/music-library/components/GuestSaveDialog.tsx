@@ -26,7 +26,7 @@ export function GuestSaveDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <BvcDialogPopup>
-        <DialogTitle className="text-2xl font-extrabold tracking-[-0.02em] text-bvc-ink">{title}</DialogTitle>
+        <DialogTitle className="text-2xl font-semibold tracking-[-0.02em] text-bvc-ink">{title}</DialogTitle>
         <DialogDescription className="text-[15px] leading-relaxed text-bvc-muted">{description}</DialogDescription>
         <div className="mt-2 flex flex-col gap-2">
           <Link
@@ -34,7 +34,7 @@ export function GuestSaveDialog({
             state={{ from: redirectTo ?? `${location.pathname}${location.search}` }}
             className={actionButtonClass("primary", "lg", "w-full hover:text-white")}
           >
-            <span className="flex size-6 items-center justify-center rounded-full bg-white text-[13px] font-extrabold text-bvc-ink">
+            <span className="flex size-6 items-center justify-center rounded-full bg-white text-[13px] font-semibold text-bvc-ink">
               G
             </span>
             Đăng nhập bằng Google

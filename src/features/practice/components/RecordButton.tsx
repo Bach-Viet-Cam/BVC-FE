@@ -11,7 +11,7 @@ interface RecordButtonProps {
 export function RecordButton({ variant, countNumber, disabled, onClick }: RecordButtonProps) {
   if (variant === "count") {
     return (
-      <div className="flex size-[84px] shrink-0 items-center justify-center rounded-full bg-bvc-accent text-[38px] font-bold text-white">
+      <div className="flex size-[84px] shrink-0 items-center justify-center rounded-full bg-bvc-accent text-[38px] font-semibold text-white">
         {countNumber}
       </div>
     );

@@ -1,30 +1,14 @@
 import { useEffect, useState } from "react";
-import {
-  Info,
-  Pencil,
-  RotateCw,
-  Search,
-  X,
-} from "lucide-react";
+import { Info, Pencil, RotateCw, Search, X } from "lucide-react";
 import { DesktopPageHeader } from "@/shared/components/bvc";
-import {
-  Select,
-  SelectItem,
-  SelectPopup,
-  SelectTrigger,
-  SelectValue,
-} from "@/shared/components/ui/select";
+import { TABLE_STYLES } from "@/shared/components/bvc/tableStyles";
+import { cn } from "@/shared/utils/cn";
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
 import { formatConfigDate, parseSemesters, SEMESTERS_CONFIG_KEY } from "@/features/platform/utils/configValue";
 import { SettingFormDialog } from "@/features/platform/components/SettingFormDialog";
-import {
-  CONFIG_GROUP_LABELS,
-  CONFIG_GROUP_OPTIONS,
-} from "@/features/platform/constants/configConstants";
+import { CONFIG_GROUP_LABELS, CONFIG_GROUP_OPTIONS } from "@/features/platform/constants/configConstants";
 import { useSystemConfigs } from "@/features/platform/hooks/useSystemConfigs";
-import {
-  type ConfigGroup,
-  type SystemConfigItem,
-} from "@/features/platform/types/configTypes";
+import { type ConfigGroup, type SystemConfigItem } from "@/features/platform/types/configTypes";
 
 const SEMESTERS_DESCRIPTION = "Các học kỳ dùng khi tạo lớp: mỗi học kỳ có tên, ngày bắt đầu và ngày kết thúc.";
 
@@ -93,9 +77,7 @@ export function SettingsPanel() {
           <div className="relative">
             <Select
               value={filters.group ?? "ALL"}
-              onValueChange={(val) =>
-                updateFilters({ group: val === "ALL" ? undefined : (val as ConfigGroup) })
-              }
+              onValueChange={(val) => updateFilters({ group: val === "ALL" ? undefined : (val as ConfigGroup) })}
             >
               <SelectTrigger
                 aria-label="Lọc theo nhóm cấu hình"
@@ -147,11 +129,11 @@ export function SettingsPanel() {
         </span>
       </div>
 
-      <div className="flex flex-col overflow-hidden rounded-[18px] border border-bvc-border bg-white shadow-none">
+      <div className="flex flex-col overflow-hidden rounded-bvc-xl border border-bvc-border bg-white shadow-none">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[920px] border-collapse text-left text-[13px]">
+          <table className={cn(TABLE_STYLES.table, TABLE_STYLES.dense, "min-w-[920px]")}>
             <thead>
-              <tr className="border-b border-bvc-border bg-bvc-surface/50 text-[11.5px] font-bold uppercase tracking-[0.06em] text-bvc-muted">
+              <tr className={cn(TABLE_STYLES.headRow, TABLE_STYLES.headText)}>
                 <th className="px-5 py-3.5 w-[380px]">Tham số & Khóa kỹ thuật</th>
                 <th className="px-5 py-3.5 w-[180px]">Nhóm nghiệp vụ</th>
                 <th className="px-5 py-3.5">Giá trị cấu hình</th>
@@ -159,7 +141,7 @@ export function SettingsPanel() {
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-bvc-line">
+            <tbody>
               {isLoading && (
                 <tr>
                   <td colSpan={4} className="px-5 py-10 text-center text-[13.5px] text-bvc-muted">
@@ -179,7 +161,7 @@ export function SettingsPanel() {
               {!isLoading && !error && items.length === 0 && (
                 <tr>
                   <td colSpan={4} className="px-5 py-12 text-center">
-                    <p className="text-[14px] font-bold text-bvc-ink">Không tìm thấy tham số phù hợp</p>
+                    <p className="text-[14px] font-semibold text-bvc-ink">Không tìm thấy tham số phù hợp</p>
                     <p className="mt-1 text-[12.5px] text-bvc-muted">
                       Thử thay đổi từ khóa tìm kiếm hoặc lọc theo nhóm khác.
                     </p>
@@ -195,7 +177,8 @@ export function SettingsPanel() {
                   const jsonItems = isJson
                     ? isSemesters
                       ? parseSemesters(config.value).map(
-                          (semester) => `${semester.name} · ${formatConfigDate(semester.startDate)} – ${formatConfigDate(semester.endDate)}`
+                          (semester) =>
+                            `${semester.name} · ${formatConfigDate(semester.startDate)} – ${formatConfigDate(semester.endDate)}`
                         )
                       : parseJsonArray(config.value)
                     : [];
@@ -203,12 +186,12 @@ export function SettingsPanel() {
                   const isAccuracy = config.key.includes("ACCURACY");
 
                   return (
-                    <tr key={config.id} className="transition-colors hover:bg-bvc-surface/40">
+                    <tr key={config.id} className={TABLE_STYLES.row}>
                       <td className="px-5 py-3.5">
                         <div className="flex flex-col gap-1">
                           <div className="flex items-center gap-2">
-                            <span className="font-bold text-bvc-ink text-[13.5px]">{config.label}</span>
-                            <span className="font-mono text-[11px] font-semibold text-bvc-muted bg-bvc-surface border border-bvc-border px-1.5 py-0.5 rounded-[5px]">
+                            <span className="font-semibold text-bvc-ink text-[13.5px]">{config.label}</span>
+                            <span className="font-mono text-[11px] font-medium text-bvc-muted bg-bvc-surface border border-bvc-border px-1.5 py-0.5 rounded-[5px]">
                               {config.key}
                             </span>
                           </div>
@@ -221,14 +204,14 @@ export function SettingsPanel() {
                       </td>
 
                       <td className="px-5 py-3.5">
-                        <span className="inline-block rounded-[7px] border border-bvc-border bg-bvc-surface/70 px-2 py-0.5 text-[11.5px] font-semibold text-bvc-muted">
+                        <span className="inline-block rounded-[7px] border border-bvc-border bg-bvc-surface/70 px-2 py-0.5 text-[11.5px] font-medium text-bvc-muted">
                           {CONFIG_GROUP_LABELS[config.group]}
                         </span>
                       </td>
 
                       <td className="px-5 py-3.5">
                         {config.valueType === "BOOLEAN" && (
-                          <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold">
+                          <span className="inline-flex items-center gap-1.5 text-[13px] font-medium">
                             <span
                               className={`size-[7px] rounded-full ${
                                 config.value === "true" ? "bg-bvc-ok" : "bg-bvc-bar-strong"
@@ -245,7 +228,7 @@ export function SettingsPanel() {
                             {jsonItems.map((val) => (
                               <span
                                 key={val}
-                                className="font-mono text-[11.5px] font-semibold text-bvc-ink bg-bvc-surface border border-bvc-border px-2 py-0.5 rounded-[6px]"
+                                className="font-mono text-[11.5px] font-medium text-bvc-ink bg-bvc-surface border border-bvc-border px-2 py-0.5 rounded-[6px]"
                               >
                                 {val}
                               </span>
@@ -256,7 +239,7 @@ export function SettingsPanel() {
 
                         {!isJson && config.valueType !== "BOOLEAN" && isBytes && (
                           <div className="flex items-baseline gap-2">
-                            <span className="font-mono text-[13.5px] font-bold text-bvc-ink">
+                            <span className="font-mono text-[13.5px] font-semibold text-bvc-ink">
                               {formatBytes(config.value)}
                             </span>
                             <span className="font-mono text-[11px] text-bvc-muted">
@@ -267,7 +250,7 @@ export function SettingsPanel() {
 
                         {!isJson && config.valueType !== "BOOLEAN" && isAccuracy && (
                           <div className="flex items-baseline gap-2">
-                            <span className="font-mono text-[13.5px] font-bold text-bvc-ink">
+                            <span className="font-mono text-[13.5px] font-semibold text-bvc-ink">
                               {Math.round(Number(config.value) * 100)}%
                             </span>
                             <span className="font-mono text-[11px] text-bvc-muted">({config.value})</span>
@@ -275,7 +258,7 @@ export function SettingsPanel() {
                         )}
 
                         {!isJson && config.valueType !== "BOOLEAN" && !isBytes && !isAccuracy && (
-                          <span className="font-mono text-[13px] font-bold text-bvc-ink">
+                          <span className="font-mono text-[13px] font-semibold text-bvc-ink">
                             {config.value}
                             {config.key.includes("ATTEMPTS") ? " lần" : ""}
                             {config.key.includes("DAYS") ? " ngày" : ""}
@@ -288,7 +271,7 @@ export function SettingsPanel() {
                         <button
                           type="button"
                           onClick={() => setEditTarget(config)}
-                          className="inline-flex h-[32px] cursor-pointer items-center gap-1.5 rounded-[8px] border border-bvc-border bg-white px-3 text-[12.5px] font-semibold text-bvc-ink transition-colors hover:border-bvc-ink hover:bg-bvc-surface"
+                          className="inline-flex h-[32px] cursor-pointer items-center gap-1.5 rounded-[8px] border border-bvc-border bg-white px-3 text-[12.5px] font-medium text-bvc-ink transition-colors hover:border-bvc-ink hover:bg-bvc-surface"
                         >
                           <Pencil size={13} />
                           <span>Sửa</span>

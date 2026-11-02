@@ -1,4 +1,5 @@
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { AssignmentForm } from "@/features/classes/components/AssignmentForm";
 import { ListState } from "@/features/classes/components/ListState";
 import { useTeacherAssignmentDetail } from "@/features/classes/hooks/useTeacherAssignmentDetail";
@@ -6,25 +7,24 @@ import { useLecturerClasses } from "@/features/classes/hooks/useLecturerClasses"
 import { useSaveAssignment } from "@/features/classes/hooks/useSaveAssignment";
 import { type ApiFieldError } from "@/features/classes/types/classTypes";
 import { type AssignmentContentPayload } from "@/features/classes/types/teacherAssignmentTypes";
-import { ASSIGNMENT_KIND_LABELS } from "@/features/classes/utils/teacherAssignmentFormat";
-import { EMPTY_ASSIGNMENT_FORM, toAssignmentFormValues } from "@/features/classes/utils/validateAssignment";
+import { toAssignmentFormValues } from "@/features/classes/utils/validateAssignment";
+import { LeaveConfirmDialog } from "@/shared/components/bvc/LeaveConfirmDialog";
 import { TeacherPageHeader } from "@/shared/components/bvc/TeacherPageHeader";
 import { TeacherScreen } from "@/shared/components/bvc/TeacherScreen";
 import { toast } from "@/shared/components/ui/toast";
+import { useLeaveGuard } from "@/shared/hooks/useLeaveGuard";
 
+// Sửa bài tập (tạo mới mở bằng modal AssignmentCreateDialog)
 export function AssignmentFormPage() {
   const navigate = useNavigate();
   const { assignmentId } = useParams<{ assignmentId: string }>();
-  const [searchParams] = useSearchParams();
-  const isEdit = Boolean(assignmentId);
   const { assignment, isLoading, error, reload } = useTeacherAssignmentDetail(assignmentId);
   const { classes, isLoading: isClassesLoading } = useLecturerClasses();
   const { saveAssignment, isSaving } = useSaveAssignment(assignmentId);
-  const presetClassId = searchParams.get("classId") ?? "";
-  const presetKind = searchParams.get("kind") ?? "";
-  const backPath = assignmentId ? `/teacher/assignments/${assignmentId}` : "/teacher/assignments";
-  // New assignments only go to active classes; when editing, the class is fixed.
-  const formClasses = isEdit ? classes : classes.filter((item) => item.status === "ACTIVE");
+  const [isDirty, setIsDirty] = useState(false);
+  const { guard, confirmProps } = useLeaveGuard({ isDirty });
+  const backPath = `/teacher/assignments/${assignmentId}`;
+  const leave = () => guard(() => navigate(backPath));
 
   const handleSubmit = async (
     payload: AssignmentContentPayload & { classId: string },
@@ -33,6 +33,7 @@ export function AssignmentFormPage() {
     const result = await saveAssignment(payload, publish);
     if ("assignment" in result) {
       toast.success(result.message);
+      setIsDirty(false);
       navigate(`/teacher/assignments/${result.assignment.id}`, { replace: true });
       return null;
     }
@@ -40,23 +41,12 @@ export function AssignmentFormPage() {
     return result.error.fieldErrors;
   };
 
-  const isPageLoading = isClassesLoading || (isEdit && isLoading);
-  const initialValues = assignment
-    ? toAssignmentFormValues(assignment)
-    : {
-        ...EMPTY_ASSIGNMENT_FORM,
-        classId: presetClassId,
-        kind: presetKind in ASSIGNMENT_KIND_LABELS ? presetKind : "",
-      };
+  const isPageLoading = isClassesLoading || isLoading;
 
   return (
     <TeacherScreen>
-      <TeacherPageHeader
-        title={isEdit ? "Sửa bài tập" : "Tạo bài tập"}
-        subtitle={assignment?.title}
-        onBack={() => navigate(backPath)}
-      />
-      {isPageLoading || (isEdit && (error || !assignment)) ? (
+      <TeacherPageHeader title="Sửa bài tập" subtitle={assignment?.title} onBack={leave} />
+      {isPageLoading || error || !assignment ? (
         <div className="px-[18px] lg:px-[32px] lg:pt-[22px]">
           <ListState isLoading={isPageLoading} error={error} isEmpty={false} emptyMessage="" onRetry={reload}>
             {null}
@@ -64,16 +54,18 @@ export function AssignmentFormPage() {
         </div>
       ) : (
         <AssignmentForm
-          key={assignment?.id ?? `new:${presetClassId}`}
-          mode={isEdit ? "edit" : "create"}
-          initialValues={initialValues}
-          classes={formClasses}
-          currentSheetMusic={assignment?.sheetMusic ?? null}
+          key={assignment.id}
+          mode="edit"
+          initialValues={toAssignmentFormValues(assignment)}
+          classes={classes}
+          currentSheetMusic={assignment.sheetMusic}
           isSaving={isSaving}
-          onCancel={() => navigate(backPath)}
+          onCancel={leave}
           onSubmit={handleSubmit}
+          onDirtyChange={setIsDirty}
         />
       )}
+      <LeaveConfirmDialog {...confirmProps} />
     </TeacherScreen>
   );
 }

@@ -32,9 +32,9 @@ function FilterDropdown({ label, isActive, children }: FilterDropdownProps) {
     <Popover>
       <PopoverTrigger
         className={cn(
-          "flex min-h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-xl border pr-2.5 pl-3 text-[13.5px]",
+          "flex min-h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-full border pr-2.5 pl-3 text-[13.5px]",
           isActive
-            ? "border-bvc-accent bg-bvc-accent-tint font-bold text-bvc-accent-text"
+            ? "border-bvc-accent bg-bvc-accent-tint font-semibold text-bvc-accent-text"
             : "border-bvc-border-strong bg-white text-bvc-ink"
         )}
       >
@@ -144,7 +144,7 @@ export function SubmissionFilterBar({
         <button
           type="button"
           onClick={onClear}
-          className="min-h-9 shrink-0 cursor-pointer px-1.5 text-[13.5px] font-bold text-bvc-ink"
+          className="min-h-9 shrink-0 cursor-pointer px-1.5 text-[13.5px] font-semibold text-bvc-ink"
         >
           Xóa
         </button>

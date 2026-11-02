@@ -3,13 +3,13 @@ import { type TodaySubmissions } from "@/features/classes/utils/teacherHomeForma
 function KindCount({ label, count, memberCount }: { label: string; count: number | null; memberCount: number }) {
   return (
     <div className="flex w-[92px] shrink-0 flex-col items-end gap-[2px]">
-      <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-bvc-muted">{label}</span>
+      <span className="text-[11px] font-semibold text-bvc-muted">{label}</span>
       {count === null ? (
         <span className="text-[13px] text-bvc-muted" title="Lớp chưa có bài tập đang mở">
           -
         </span>
       ) : (
-        <span className="font-mono text-[15px] font-semibold text-bvc-ink">
+        <span className="font-mono text-[15px] font-medium text-bvc-ink">
           {count}
           <span className="text-[12px] font-normal text-bvc-muted">/{memberCount}</span>
         </span>
@@ -23,7 +23,7 @@ export function TodaySubmissionRow({ row }: { row: TodaySubmissions }) {
   return (
     <li className="flex min-h-[56px] items-center gap-3 border-b border-bvc-line px-[20px] py-[8px] last:border-0">
       <div className="flex min-w-0 flex-1 flex-col gap-[2px]">
-        <span className="truncate text-[14px] font-semibold text-bvc-ink">{row.className}</span>
+        <span className="truncate text-[14px] font-medium text-bvc-ink">{row.className}</span>
         <span className="truncate text-[12.5px] text-bvc-muted">
           {row.cohort} · {row.memberCount} sinh viên
         </span>

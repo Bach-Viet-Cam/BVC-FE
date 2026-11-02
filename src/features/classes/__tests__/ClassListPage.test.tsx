@@ -96,7 +96,9 @@ describe("ClassListPage", () => {
     expect(screen.queryByText("Tuần hiện tại")).not.toBeInTheDocument();
     expect(screen.getAllByRole("link", { name: "Mở lớp" })[0]).toHaveAttribute("href", "/teacher/classes/c1");
     await userEvent.click(screen.getByRole("button", { name: "Tạo mới" }));
-    expect(navigate).toHaveBeenCalledWith("/teacher/classes/new");
+    const dialog = await screen.findByRole("dialog");
+    expect(within(dialog).getByRole("heading", { name: "Tạo lớp học" })).toBeInTheDocument();
+    expect(navigate).not.toHaveBeenCalledWith("/teacher/classes/new");
   });
 
   it("shows the load error with a retry that refetches", async () => {

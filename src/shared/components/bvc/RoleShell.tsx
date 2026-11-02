@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { PageHeader } from "@/shared/components/bvc/PageHeader";
 import { StudentShell } from "@/shared/components/bvc/StudentShell";
 import { TeacherShell } from "@/shared/components/bvc/TeacherShell";
 import { NAV_BY_ROLE } from "@/shared/config/navConfig";
@@ -27,15 +28,7 @@ export function RoleShell({ title, subtitle, actions, children, contentClassName
         contentClassName
       )}
     >
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="flex min-w-0 flex-col gap-1">
-          <h1 className="m-0 text-[27px] leading-tight font-extrabold tracking-[-0.025em] text-bvc-ink md:text-[34px] md:tracking-[-0.03em]">
-            {title}
-          </h1>
-          {subtitle && <p className="m-0 text-sm text-bvc-muted md:text-[15px]">{subtitle}</p>}
-        </div>
-        {actions}
-      </div>
+      <PageHeader title={title} description={subtitle} actions={actions} />
       {children}
     </div>
   );

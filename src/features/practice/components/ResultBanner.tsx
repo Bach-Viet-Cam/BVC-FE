@@ -23,7 +23,7 @@ export function ResultBanner({ className }: ResultBannerProps) {
         navigate(`/practice/submissions/${lastSubmitted.submissionId}`);
       }}
       className={cn(
-        "z-50 cursor-pointer rounded-bvc-lg bg-bvc-ink px-4 py-3 text-[13.5px] font-semibold text-white",
+        "z-50 cursor-pointer rounded-full bg-bvc-ink px-4 py-3 text-[13.5px] font-medium text-white",
         className
       )}
     >

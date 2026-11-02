@@ -22,9 +22,9 @@ export function FilterChips({ chips, active, onChange }: FilterChipsProps) {
             type="button"
             onClick={() => onChange(value)}
             className={cn(
-              "min-h-[34px] shrink-0 cursor-pointer rounded-[11px] border px-[12px] text-[13px]",
+              "min-h-[34px] shrink-0 cursor-pointer rounded-full border px-[12px] text-[13px]",
               isActive
-                ? "border-bvc-accent bg-bvc-accent-tint font-bold text-bvc-accent-text"
+                ? "border-bvc-accent bg-bvc-accent-tint font-semibold text-bvc-accent-text"
                 : "border-bvc-border-strong bg-white font-medium text-bvc-ink"
             )}
           >

@@ -18,7 +18,7 @@ export function SpeedSelector({ value, onChange }: SpeedSelectorProps) {
           onClick={() => onChange(speed)}
           className={cn(
             "min-h-9 flex-1 cursor-pointer rounded-[9px] font-bvc-mono text-[13px]",
-            speed === value ? "bg-bvc-ink font-semibold text-white" : "text-bvc-muted hover:text-bvc-ink"
+            speed === value ? "bg-bvc-ink font-medium text-white" : "text-bvc-muted hover:text-bvc-ink"
           )}
         >
           {speed}×

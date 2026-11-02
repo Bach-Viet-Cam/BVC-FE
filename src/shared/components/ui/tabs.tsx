@@ -22,7 +22,7 @@ export function TabsTab({ className, ...props }: TabsTabProps) {
     <BaseTabs.Tab
       {...props}
       className={cn(
-        "rounded-md px-4 py-2 text-sm font-semibold text-on-surface-variant transition-colors",
+        "rounded-md px-4 py-2 text-sm font-medium text-on-surface-variant transition-colors",
         "hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
         "data-selected:bg-surface-container-lowest data-selected:text-primary data-selected:shadow-sm",
         "data-disabled:cursor-not-allowed data-disabled:opacity-50",

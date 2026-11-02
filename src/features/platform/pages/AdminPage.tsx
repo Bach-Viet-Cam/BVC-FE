@@ -6,6 +6,7 @@ import { USER_ROLE_LABELS, USER_STATUS_DOT, USER_STATUS_OPTIONS } from "@/featur
 import { useAdminOverview } from "@/features/platform/hooks/useAdminOverview";
 import { type AdminOverview } from "@/features/platform/types/adminTypes";
 import { formatDayShort, formatPercent, getTodayLabel, scaleBarHeights } from "@/features/platform/utils/adminFormat";
+import { ActionButton } from "@/shared/components/bvc/ActionButton";
 
 function getStatusLabel(status: string): string {
   return USER_STATUS_OPTIONS.find((option) => option.value === status)?.label ?? status;
@@ -26,9 +27,9 @@ function OverviewContent({ overview, onOpenConfig }: { overview: AdminOverview; 
           <StatCard label="Lỗi phân tích 24h" value={overview.failed24h} variant="accent" />
         </div>
 
-        <div className="flex flex-col gap-[14px] rounded-[20px] border border-bvc-border bg-white p-[18px]">
+        <div className="flex flex-col gap-[14px] rounded-bvc-xl border border-bvc-border bg-white p-[18px]">
           <div className="flex items-baseline justify-between">
-            <span className="text-[15px] font-bold">Lượt nộp bài · {overview.submissionsByDay.length} ngày</span>
+            <span className="text-[15px] font-semibold">Lượt nộp bài · {overview.submissionsByDay.length} ngày</span>
             <span className="text-[13px] text-bvc-muted">Tổng {totalSubmissions} lượt</span>
           </div>
           <div className="flex h-[120px] items-end gap-[6px]">
@@ -46,13 +47,13 @@ function OverviewContent({ overview, onOpenConfig }: { overview: AdminOverview; 
           </div>
         </div>
 
-        <div className="flex flex-1 flex-col overflow-hidden rounded-[20px] border border-bvc-border bg-white">
-          <div className="shrink-0 border-b border-bvc-border px-[18px] py-[15px] text-[15px] font-bold">
+        <div className="flex flex-1 flex-col overflow-hidden rounded-bvc-xl border border-bvc-border bg-white">
+          <div className="shrink-0 border-b border-bvc-border px-[18px] py-[15px] text-[15px] font-semibold">
             Người dùng mới nhất
           </div>
           {/* Bảng 4 cột: trên điện thoại cuộn ngang trong thẻ thay vì bóp chữ */}
           <div className="flex min-h-0 flex-1 flex-col overflow-x-auto">
-            <div className="grid min-w-[560px] shrink-0 grid-cols-[2fr_2fr_1.2fr_1fr] gap-[12px] border-b border-bvc-border px-[18px] py-[10px] text-[12px] font-bold uppercase tracking-[0.08em] text-bvc-muted">
+            <div className="grid min-w-[560px] shrink-0 grid-cols-[2fr_2fr_1.2fr_1fr] gap-[12px] border-b border-bvc-border px-[18px] py-[10px] text-[12px] font-semibold text-bvc-muted">
               <span>Họ tên</span>
               <span>Email</span>
               <span>Vai trò</span>
@@ -84,8 +85,8 @@ function OverviewContent({ overview, onOpenConfig }: { overview: AdminOverview; 
       <div className="flex w-full shrink-0 flex-col gap-[14px] xl:w-[306px]">
         <OverviewAlertCard alerts={overview.alerts} />
 
-        <div className="flex flex-col gap-[12px] rounded-[20px] border border-bvc-border bg-white p-[16px]">
-          <span className="text-[14px] font-bold">Cấu hình đang áp dụng</span>
+        <div className="flex flex-col gap-[12px] rounded-bvc-xl border border-bvc-border bg-white p-[16px]">
+          <span className="text-[14px] font-semibold">Cấu hình đang áp dụng</span>
           <div className="flex flex-col gap-[9px]">
             {overview.config.map((item) => (
               <div key={item.label} className="flex justify-between gap-[12px] text-[13.5px]">
@@ -94,13 +95,9 @@ function OverviewContent({ overview, onOpenConfig }: { overview: AdminOverview; 
               </div>
             ))}
           </div>
-          <button
-            type="button"
-            onClick={onOpenConfig}
-            className="min-h-[42px] cursor-pointer rounded-[14px] border border-bvc-border-strong bg-white text-[14px] font-semibold text-bvc-ink"
-          >
+          <ActionButton variant="secondary" onClick={onOpenConfig}>
             Mở cấu hình
-          </button>
+          </ActionButton>
         </div>
       </div>
     </div>
@@ -118,20 +115,10 @@ export function AdminPage() {
         title="Tổng quan hệ thống"
         actions={
           <>
-            <button
-              type="button"
-              onClick={() => navigate("/admin/instruments")}
-              className="min-h-[42px] cursor-pointer rounded-[14px] border border-bvc-border-strong bg-white px-[16px] text-[14px] font-semibold text-bvc-ink"
-            >
+            <ActionButton variant="secondary" onClick={() => navigate("/admin/instruments")}>
               Thêm nhạc cụ
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate("/admin/notifications?type=SYSTEM")}
-              className="min-h-[42px] cursor-pointer rounded-[14px] border-none bg-bvc-ink px-[16px] text-[14px] font-bold text-white"
-            >
-              Thông báo bảo trì
-            </button>
+            </ActionButton>
+            <ActionButton onClick={() => navigate("/admin/notifications?type=SYSTEM")}>Thông báo bảo trì</ActionButton>
           </>
         }
       />

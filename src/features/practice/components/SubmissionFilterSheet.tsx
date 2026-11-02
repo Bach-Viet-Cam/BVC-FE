@@ -50,9 +50,9 @@ function PresetChip({ label, active, onClick }: PresetChipProps) {
       type="button"
       onClick={onClick}
       className={cn(
-        "min-h-9 cursor-pointer rounded-xl border px-3.5 text-[13.5px]",
+        "min-h-9 cursor-pointer rounded-full border px-3.5 text-[13.5px]",
         active
-          ? "border-bvc-accent bg-bvc-accent-tint font-bold text-bvc-accent-text"
+          ? "border-bvc-accent bg-bvc-accent-tint font-semibold text-bvc-accent-text"
           : "border-bvc-border-strong bg-white text-bvc-ink"
       )}
     >
@@ -108,19 +108,19 @@ function AdvancedForm({ advanced, onApply }: AdvancedFormProps) {
   return (
     <form onSubmit={handleSubmit(onApply)} className="flex min-h-0 flex-1 flex-col">
       <div className="flex shrink-0 items-center gap-2 border-b border-bvc-border py-2 pr-3 pl-5">
-        <PracticeSheetTitle className="flex-1 font-bvc-display text-lg font-extrabold tracking-[-0.02em] text-bvc-ink">
+        <PracticeSheetTitle className="flex-1 font-bvc-display text-lg font-semibold tracking-[-0.02em] text-bvc-ink">
           Lọc nâng cao
         </PracticeSheetTitle>
         <button
           type="button"
           onClick={resetAll}
-          className="min-h-11 cursor-pointer px-3 text-sm font-bold text-bvc-ink"
+          className="min-h-11 cursor-pointer px-3 text-sm font-semibold text-bvc-ink"
         >
           Đặt lại
         </button>
         <PracticeSheetClose
           aria-label="Đóng"
-          className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-bvc-md text-bvc-ink"
+          className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full text-bvc-ink"
         >
           <X className="size-[18px]" strokeWidth={1.9} />
         </PracticeSheetClose>
@@ -128,7 +128,7 @@ function AdvancedForm({ advanced, onApply }: AdvancedFormProps) {
 
       <div className="flex flex-col gap-5 overflow-y-auto px-5 pt-4 pb-1.5">
         <section className="flex flex-col gap-2">
-          <label htmlFor="submission-filter-title" className="text-[13px] font-bold text-bvc-muted">
+          <label htmlFor="submission-filter-title" className="text-[13px] font-semibold text-bvc-muted">
             Tên bài
           </label>
           <div className="flex min-h-11 items-center gap-2 rounded-[13px] border border-bvc-border-strong bg-white px-3 focus-within:border-bvc-ink">
@@ -154,7 +154,7 @@ function AdvancedForm({ advanced, onApply }: AdvancedFormProps) {
         </section>
 
         <section className="flex flex-col gap-2">
-          <span className="text-[13px] font-bold text-bvc-muted">Ngày nộp</span>
+          <span className="text-[13px] font-semibold text-bvc-muted">Ngày nộp</span>
           <div className="flex items-start gap-2.5">
             <div className="flex min-w-0 flex-1 flex-col gap-1.5">
               <span className="text-xs text-bvc-muted">Từ ngày</span>
@@ -195,7 +195,7 @@ function AdvancedForm({ advanced, onApply }: AdvancedFormProps) {
         </section>
 
         <section className="flex flex-col gap-2">
-          <span className="text-[13px] font-bold text-bvc-muted">Accuracy</span>
+          <span className="text-[13px] font-semibold text-bvc-muted">Accuracy</span>
           <div className="flex items-start gap-2.5">
             <label className="flex min-w-0 flex-1 flex-col gap-1.5">
               <span className="text-xs text-bvc-muted">Từ</span>
@@ -238,7 +238,7 @@ function AdvancedForm({ advanced, onApply }: AdvancedFormProps) {
         </section>
 
         <section className="flex flex-col gap-2">
-          <span className="text-[13px] font-bold text-bvc-muted">Loại bài</span>
+          <span className="text-[13px] font-semibold text-bvc-muted">Loại bài</span>
           <div className="flex flex-wrap gap-[7px]">
             {ADVANCED_KIND_OPTIONS.map((option) => (
               <PresetChip
@@ -257,7 +257,7 @@ function AdvancedForm({ advanced, onApply }: AdvancedFormProps) {
       <div className="mt-3.5 shrink-0 border-t border-bvc-border-strong bg-white px-4 pt-3.5 pb-6">
         <button
           type="submit"
-          className="flex min-h-12.5 w-full cursor-pointer items-center justify-center rounded-2xl bg-bvc-ink text-[15px] font-bold text-white"
+          className="flex min-h-12.5 w-full cursor-pointer items-center justify-center rounded-2xl bg-bvc-ink text-[15px] font-semibold text-white"
         >
           Áp dụng
         </button>

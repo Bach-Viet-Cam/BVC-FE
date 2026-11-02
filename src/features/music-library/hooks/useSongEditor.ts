@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { toast } from "@/shared/components/ui/toast";
 import { useAsyncData } from "@/shared/hooks/useAsyncData";
 import { lecturerApi } from "@/features/music-library/api/lecturerApi";
@@ -20,9 +19,8 @@ const FIELD_MAP: Partial<Record<string, keyof SongFormValues>> = {
   coverFileId: "coverFile",
 };
 
-// songId rỗng = tạo mới
-export function useSongEditor(songId?: string) {
-  const navigate = useNavigate();
+// songId rỗng = tạo mới; onSaved chạy sau khi lưu xong (về danh sách, đóng modal...)
+export function useSongEditor(songId: string | undefined, onSaved: () => void) {
   const isEditing = Boolean(songId);
   const [isSubmitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -52,7 +50,7 @@ export function useSongEditor(songId?: string) {
         : await lecturerApi.createPiece(request);
       toast.success(body.message, body.data.piece.title);
       if (body.data.warning) toast.info("Lưu ý", body.data.warning.message);
-      navigate("/songs");
+      onSaved();
       return null;
     } catch (saveError) {
       const failure = toFormFailure(saveError, SAVE_ERROR, FIELD_MAP);

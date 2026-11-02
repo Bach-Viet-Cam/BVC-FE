@@ -22,7 +22,7 @@ export function AttentionStudentRow({ student, onOpen }: AttentionStudentRowProp
         className="flex min-h-[56px] w-full cursor-pointer items-center gap-3 px-[20px] py-[8px] text-left hover:bg-bvc-surface"
       >
         <div className="flex min-w-0 flex-1 flex-col gap-[2px]">
-          <span className="truncate text-[14px] font-semibold text-bvc-ink">{student.username}</span>
+          <span className="truncate text-[14px] font-medium text-bvc-ink">{student.username}</span>
           <span className="truncate text-[12.5px] text-bvc-muted">
             {student.studentCode ? `${student.studentCode} · ` : ""}
             {student.className}

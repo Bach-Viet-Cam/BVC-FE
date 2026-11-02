@@ -20,7 +20,7 @@ import { StudentShell } from "@/shared/components/bvc/StudentShell";
 
 type OpenSheet = "mode" | "segment" | null;
 
-const CARD = "rounded-bvc-xl border border-bvc-border bg-white p-4 md:rounded-[22px] md:p-5.5";
+const CARD = "rounded-bvc-xl border border-bvc-border bg-white p-4 md:rounded-bvc-xl md:p-5.5";
 
 // M01 Kết quả phân tích. Mỗi thẻ tải từ API riêng: lỗi một phần chỉ ảnh hưởng thẻ đó.
 // Bài chưa phân tích xong (đang xử lý, bị từ chối, lỗi) được chuyển sang màn tiến trình.
@@ -71,7 +71,7 @@ export function ResultsPage() {
             <button
               type="button"
               onClick={result.reload}
-              className="min-h-11 cursor-pointer rounded-xl border border-bvc-border px-4 text-sm font-semibold text-bvc-ink"
+              className="min-h-11 cursor-pointer rounded-full border border-bvc-border px-4 text-sm font-medium text-bvc-ink"
             >
               Thử lại
             </button>
@@ -118,7 +118,7 @@ export function ResultsPage() {
             <button
               type="button"
               onClick={() => setSheet("mode")}
-              className="mx-auto flex min-h-13 w-full max-w-180 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-bvc-ink text-base font-bold text-white lg:max-w-300"
+              className="mx-auto flex min-h-13 w-full max-w-180 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-bvc-ink text-base font-semibold text-white lg:max-w-300"
             >
               <RotateCw className="size-5" strokeWidth={2.5} aria-hidden />
               Luyện tập lại

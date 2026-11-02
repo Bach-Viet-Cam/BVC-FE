@@ -18,8 +18,12 @@ export function EmptyState({ icon, title, description, actions, className }: Emp
         className
       )}
     >
-      {icon && <span className="text-bvc-muted">{icon}</span>}
-      <p className="text-lg font-extrabold tracking-[-0.01em]">{title}</p>
+      {icon && (
+        <span className="flex size-16 items-center justify-center rounded-full bg-white text-bvc-accent shadow-sm">
+          {icon}
+        </span>
+      )}
+      <p className="font-bvc-display text-lg font-semibold tracking-[-0.02em] md:text-xl">{title}</p>
       {description && <p className="max-w-md text-sm leading-relaxed text-bvc-muted">{description}</p>}
       {actions && <div className="mt-1 flex flex-wrap justify-center gap-2">{actions}</div>}
     </div>

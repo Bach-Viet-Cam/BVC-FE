@@ -89,6 +89,15 @@ export function useInstruments() {
     [reload]
   );
 
-  return { filters, updateFilters, items: data ?? [], error, isLoading, reload, saveInstrument, saveTunes, toggleActive };
+  return {
+    filters,
+    updateFilters,
+    items: data ?? [],
+    error,
+    isLoading,
+    reload,
+    saveInstrument,
+    saveTunes,
+    toggleActive,
+  };
 }
-

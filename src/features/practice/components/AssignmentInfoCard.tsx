@@ -38,8 +38,8 @@ function buildRows(context: PracticeContext): InfoRow[] {
 // Thẻ thông tin chỉ có ở bố cục laptop (từ lg): cấu hình bản nhạc và bài tập của lớp (nếu có)
 export function AssignmentInfoCard({ context, isLoading, error }: AssignmentInfoCardProps) {
   return (
-    <section className="hidden flex-col rounded-[22px] border border-bvc-border bg-bvc-panel p-5.5 lg:flex">
-      <span className="text-[11.5px] font-bold tracking-[0.12em] text-bvc-muted uppercase">Bài tập</span>
+    <section className="hidden flex-col rounded-bvc-xl border border-bvc-border bg-bvc-panel p-5.5 lg:flex">
+      <span className="text-[11.5px] font-semibold text-bvc-muted">Bài tập</span>
 
       {isLoading && <div aria-hidden className="mt-4 h-40 animate-pulse rounded-bvc-md bg-bvc-surface" />}
       {!isLoading && error && <p className="mt-3 text-sm text-bvc-muted">{error}</p>}
@@ -53,7 +53,7 @@ export function AssignmentInfoCard({ context, isLoading, error }: AssignmentInfo
             {buildRows(context).map((row) => (
               <div key={row.label} className={ROW_CLASS}>
                 <dt className="text-bvc-muted">{row.label}</dt>
-                <dd className="text-right font-semibold text-bvc-ink">{row.value}</dd>
+                <dd className="text-right font-medium text-bvc-ink">{row.value}</dd>
               </div>
             ))}
           </dl>

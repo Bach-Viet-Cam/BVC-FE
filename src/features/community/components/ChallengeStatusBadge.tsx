@@ -15,7 +15,7 @@ const BADGE_CLASSES: Record<ChallengeDisplayStatus, string> = {
 
 export function ChallengeStatusBadge({ status }: ChallengeStatusBadgeProps) {
   return (
-    <span className={cn("inline-flex rounded-[9px] px-2 py-0.5 text-[12px] font-semibold", BADGE_CLASSES[status])}>
+    <span className={cn("inline-flex rounded-[9px] px-2 py-0.5 text-[12px] font-medium", BADGE_CLASSES[status])}>
       {CHALLENGE_STATUS_LABELS[status]}
     </span>
   );

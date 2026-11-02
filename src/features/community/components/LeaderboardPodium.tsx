@@ -47,7 +47,7 @@ export function LeaderboardPodium({ rows, category, viewerId, layout = "list" }:
           >
             <span
               className={cn(
-                "font-bvc-mono font-extrabold",
+                "font-bvc-mono font-semibold",
                 isWeb ? "text-[32px]" : "text-[20px]",
                 isFirst ? "text-bvc-gold" : "text-bvc-ink"
               )}
@@ -55,13 +55,13 @@ export function LeaderboardPodium({ rows, category, viewerId, layout = "list" }:
               {row.rank}
             </span>
             <UserAvatar name={row.fullName} className={isWeb ? "size-14 text-[17px]" : undefined} />
-            <span className={cn("w-full truncate font-bold text-bvc-ink", isWeb ? "text-[16px]" : "text-[13px]")}>
+            <span className={cn("w-full truncate font-semibold text-bvc-ink", isWeb ? "text-[16px]" : "text-[13px]")}>
               {row.fullName}
             </span>
             <span className={cn("w-full truncate text-bvc-muted", isWeb ? "text-[13px]" : "text-[11px]")}>
               {row.className}
             </span>
-            <span className={cn("font-bvc-mono font-bold text-bvc-ink", isWeb ? "text-[20px]" : "text-[14px]")}>
+            <span className={cn("font-bvc-mono font-semibold text-bvc-ink", isWeb ? "text-[20px]" : "text-[14px]")}>
               {formatLeaderboardValue(category, row.value)}
             </span>
           </li>

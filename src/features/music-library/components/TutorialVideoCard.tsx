@@ -10,7 +10,7 @@ export function TutorialVideoCard({ video }: TutorialVideoCardProps) {
   return (
     <div className="flex flex-col gap-2.5">
       <div className="flex items-baseline justify-between">
-        <span className="text-[15px] font-bold text-bvc-ink">Video hướng dẫn</span>
+        <span className="text-[15px] font-semibold text-bvc-ink">Video hướng dẫn</span>
         {video && (
           <span className="font-bvc-mono text-[12.5px] text-bvc-muted">{formatDuration(video.durationSec)}</span>
         )}

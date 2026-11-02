@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
-import { Sparkles } from "lucide-react";
-import { actionButtonClass } from "@/shared/components/bvc/actionButtonStyles";
+import { Music2 } from "lucide-react";
+import { PillLink } from "@/shared/components/bvc/PillLink";
 import { SongCard } from "@/features/music-library/components/SongCard";
 import { TrendingCarousel } from "@/features/music-library/components/TrendingCarousel";
 import { useLibrarySongs } from "@/features/music-library/hooks/useLibrarySongs";
 import { useTrendingSongs } from "@/features/music-library/hooks/useTrendingSongs";
 import type { LibrarySongQuery } from "@/features/music-library/types/musicLibraryTypes";
+import { SectionTitle } from "@/shared/components/bvc/SectionTitle";
 
 const NEWEST_QUERY: LibrarySongQuery = {
   keyword: "",
@@ -26,19 +27,17 @@ export function LibrarySuggestions() {
 
   return (
     <div className="flex flex-col gap-7">
-      <section className="flex flex-col items-start gap-3 rounded-bvc-xl bg-bvc-ink p-5 text-white md:flex-row md:items-center md:justify-between md:p-7">
+      <section className="flex flex-col items-start gap-4 rounded-bvc-xl border border-bvc-accent-border bg-bvc-accent-tint p-5 text-bvc-ink md:flex-row md:items-center md:justify-between md:p-7">
         <span className="flex items-start gap-3">
-          <Sparkles className="mt-0.5 size-6 shrink-0 text-bvc-accent-border" strokeWidth={1.8} aria-hidden />
+          <Music2 className="mt-0.5 size-6 shrink-0 text-bvc-accent-text" strokeWidth={1.8} aria-hidden />
           <span className="flex flex-col gap-1">
-            <span className="text-[18px] font-extrabold md:text-[20px]">Bạn chưa có lần nộp nào</span>
-            <span className="text-[14px] text-white/75">
+            <span className="font-bvc-display text-[18px] font-semibold md:text-[22px]">Bạn chưa có lần nộp nào</span>
+            <span className="text-[14px] text-bvc-muted">
               Chọn một bài trong thư viện, thu âm và nộp để xem điểm và sự tiến bộ của bạn tại đây.
             </span>
           </span>
         </span>
-        <Link to="/library" className={actionButtonClass("secondary", "lg", "shrink-0")}>
-          Khám phá thư viện
-        </Link>
+        <PillLink to="/library" label="Khám phá thư viện" size="md" />
       </section>
 
       {trending.songs.length > 0 ? (
@@ -47,10 +46,8 @@ export function LibrarySuggestions() {
         newestSongs.length > 0 && (
           <section aria-labelledby="newest-heading" className="flex flex-col gap-3">
             <div className="flex items-center justify-between gap-3">
-              <h2 id="newest-heading" className="text-xl font-extrabold tracking-[-0.02em] text-bvc-ink md:text-2xl">
-                Bài mới trong thư viện
-              </h2>
-              <Link to="/library" className="text-[13.5px] font-semibold text-bvc-accent-text">
+              <SectionTitle id="newest-heading">Bài mới trong thư viện</SectionTitle>
+              <Link to="/library" className="text-[13.5px] font-medium text-bvc-accent-text">
                 Xem tất cả
               </Link>
             </div>

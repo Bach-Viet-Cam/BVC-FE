@@ -16,7 +16,7 @@ export function ReferenceAudioPlayer({ url, isFallback }: ReferenceAudioPlayerPr
   return (
     <div className="flex flex-col gap-2 rounded-2xl border border-bvc-border bg-bvc-soft p-3">
       <div className="flex items-center justify-between gap-2">
-        <span className="flex items-center gap-1.5 text-[13.5px] font-bold text-bvc-ink">
+        <span className="flex items-center gap-1.5 text-[13.5px] font-semibold text-bvc-ink">
           <Music2 className="size-4" aria-hidden />
           Bản thu mẫu
         </span>

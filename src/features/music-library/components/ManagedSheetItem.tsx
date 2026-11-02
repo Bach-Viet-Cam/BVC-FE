@@ -52,7 +52,7 @@ export function ManagedSheetItem({
   return (
     <li
       className={cn(
-        "flex flex-col gap-3 rounded-[18px] border bg-bvc-surface p-4 transition-colors",
+        "flex flex-col gap-3 rounded-bvc-xl border bg-bvc-surface p-4 transition-colors",
         isSelected ? "border-bvc-ink" : "border-transparent",
         isBusy && "opacity-60"
       )}
@@ -89,12 +89,12 @@ export function ManagedSheetItem({
       </div>
 
       <div className="flex flex-col gap-0.5">
-        <span className="text-base font-bold text-bvc-ink">{sheet.name}</span>
+        <span className="text-base font-semibold text-bvc-ink">{sheet.name}</span>
         {sheet.description && <span className="text-[13px] text-bvc-muted">{sheet.description}</span>}
         {note && (
           <span
             role="status"
-            className={cn("text-[12.5px]", note.isWarning ? "font-semibold text-bvc-accent-text" : "text-bvc-muted")}
+            className={cn("text-[12.5px]", note.isWarning ? "font-medium text-bvc-accent-text" : "text-bvc-muted")}
           >
             {note.text}
           </span>

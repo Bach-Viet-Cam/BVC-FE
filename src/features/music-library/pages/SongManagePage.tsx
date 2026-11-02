@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { TeacherShell } from "@/shared/components/bvc/TeacherShell";
 import { SearchField } from "@/shared/components/bvc/SearchField";
@@ -8,9 +7,11 @@ import { Pagination } from "@/shared/components/bvc/Pagination";
 import { EmptyState } from "@/shared/components/bvc/EmptyState";
 import { ConfirmDialog } from "@/shared/components/bvc/ConfirmDialog";
 import { ActionButton } from "@/shared/components/bvc/ActionButton";
-import { actionButtonClass } from "@/shared/components/bvc/actionButtonStyles";
+import { PageHeader } from "@/shared/components/bvc/PageHeader";
+import { useCreateDialog } from "@/shared/hooks/useCreateDialog";
 import { useDebouncedCallback } from "@/shared/hooks/useDebouncedCallback";
 import { cn } from "@/shared/utils/cn";
+import { SongCreateDialog } from "@/features/music-library/components/SongCreateDialog";
 import { MANAGED_GRID_COLUMNS, ManagedSongRow } from "@/features/music-library/components/ManagedSongRow";
 import {
   KEYWORD_MAX_LENGTH,
@@ -53,24 +54,21 @@ export function SongManagePage() {
   };
 
   const pendingSong = visibility.pending?.item;
+  const createDialog = useCreateDialog("song");
 
   return (
     <TeacherShell>
-      <header className="flex shrink-0 flex-wrap items-end justify-between gap-4 px-[18px] pt-5 pb-4 md:px-8 md:pt-7">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-[27px] leading-tight font-extrabold tracking-[-0.03em] text-bvc-ink md:text-[34px]">
-            Thư viện của tôi
-          </h1>
-          <span className="text-sm text-bvc-muted">
-            {result ? `${result.total} bài · ` : ""}
-            {MANAGE_PAGE_SIZE} bài mỗi trang, mới cập nhật trước
-          </span>
-        </div>
-        <Link to="/songs/new" className={actionButtonClass("primary", "md", "hover:text-white")}>
-          <Plus className="size-[18px]" aria-hidden />
-          Thêm bài hát
-        </Link>
-      </header>
+      <PageHeader
+        className="shrink-0 px-[18px] pt-5 pb-4 md:px-8 md:pt-7"
+        title="Thư viện của tôi"
+        description={`${result ? `${result.total} bài · ` : ""}${MANAGE_PAGE_SIZE} bài mỗi trang, mới cập nhật trước`}
+        actions={
+          <ActionButton onClick={() => createDialog.open()}>
+            <Plus className="size-[18px]" aria-hidden />
+            Thêm bài hát
+          </ActionButton>
+        }
+      />
 
       <div className="flex shrink-0 flex-col gap-2.5 px-[18px] pb-3.5 md:px-8 lg:flex-row lg:items-center">
         <SearchField
@@ -138,9 +136,7 @@ export function SongManagePage() {
               hasFilters ? (
                 <ActionButton onClick={resetFilters}>Xóa bộ lọc</ActionButton>
               ) : (
-                <Link to="/songs/new" className={actionButtonClass("primary", "md", "hover:text-white")}>
-                  Thêm bài hát
-                </Link>
+                <ActionButton onClick={() => createDialog.open()}>Thêm bài hát</ActionButton>
               )
             }
           />
@@ -148,10 +144,7 @@ export function SongManagePage() {
           <>
             <div
               aria-hidden
-              className={cn(
-                "hidden px-3.5 pb-2.5 text-xs font-bold tracking-[0.06em] text-bvc-muted uppercase",
-                MANAGED_GRID_COLUMNS
-              )}
+              className={cn("hidden px-3.5 pb-2.5 text-xs font-semibold text-bvc-muted", MANAGED_GRID_COLUMNS)}
             >
               {COLUMN_HEADERS.map((header, index) => (
                 <span key={index}>{header}</span>
@@ -198,6 +191,7 @@ export function SongManagePage() {
         onConfirm={visibility.confirm}
         isLoading={visibility.isApplying}
       />
+      <SongCreateDialog open={createDialog.isOpen} onClose={createDialog.close} onCreated={songs.reload} />
     </TeacherShell>
   );
 }
