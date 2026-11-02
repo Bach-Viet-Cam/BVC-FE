@@ -164,7 +164,7 @@ export function MonitoringPage() {
   const { monitoring, error, isLoading, reload } = useAdminMonitoring();
 
   return (
-    <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
+    <div className="flex min-w-0 flex-1 flex-col">
       <DesktopPageHeader
         breadcrumb="Quản trị"
         title="Giám sát hệ thống"
@@ -178,6 +178,6 @@ export function MonitoringPage() {
       <PageStatus isLoading={isLoading} error={error} onRetry={reload}>
         {monitoring && <MonitoringContent monitoring={monitoring} />}
       </PageStatus>
-    </main>
+    </div>
   );
 }

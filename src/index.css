@@ -25,7 +25,10 @@
   --color-bvc-bar: #d7e2da;
   --color-bvc-bar-strong: #9fb0a5;
   --color-bvc-ok: #2e7d4f;
+  --color-bvc-ok-tint: #e8f3ec;
+  --color-bvc-ok-border: #bcdcc8;
   --color-bvc-warn: #d99b1e;
+  --color-bvc-warn-border: #f9d2c2;
   --color-bvc-error: #f4622e;
   /* M03 mobile designs (UI/): status dots, soft panels, gold accents */
   --color-bvc-dot-ok: #3a6b44;

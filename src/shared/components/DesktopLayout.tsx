@@ -11,7 +11,6 @@ export function DesktopLayout() {
 
   return (
     <TeacherShell
-      className="lg:overflow-hidden"
       navItems={NAV_BY_ROLE[user.role]}
       roleLabel={user.role === ROLES.SYSTEM_ADMIN ? "Quản trị viên" : undefined}
     >

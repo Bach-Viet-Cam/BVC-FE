@@ -37,6 +37,7 @@ import {
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
 import { Skeleton } from "@/shared/components/ui/skeleton";
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
 import { toast } from "@/shared/components/ui/toast";
 import { StudentImportDialog } from "@/features/platform/components/StudentImportDialog";
 import { UserFormDialog } from "@/features/platform/components/UserFormDialog";
@@ -124,7 +125,7 @@ export function UserManagePage() {
 
   return (
     <>
-      <main className="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#FAF9F7]">
+      <div className="flex min-w-0 flex-1 flex-col bg-[#FAF9F7]">
         <DesktopPageHeader
           breadcrumb="Quản trị"
           title="Người dùng"
@@ -140,22 +141,28 @@ export function UserManagePage() {
                 <RotateCw size={16} className={cn(isLoading && "animate-spin text-bvc-ink")} />
               </button>
 
-              <ActionButton variant="secondary" onClick={() => setIsImportOpen(true)}>
+              <ActionButton
+                variant="secondary"
+                title="Nhập từ Excel"
+                className="max-sm:px-3.5"
+                onClick={() => setIsImportOpen(true)}
+              >
                 <FileSpreadsheet size={16} />
-                <span>Nhập từ Excel</span>
+                <span className="hidden sm:inline">Nhập từ Excel</span>
               </ActionButton>
 
-              <ActionButton onClick={() => openForm(null)}>
+              <ActionButton title="Thêm người dùng" className="max-sm:px-3.5" onClick={() => openForm(null)}>
                 <UserPlus size={16} />
-                <span>Thêm người dùng</span>
+                <span className="hidden sm:inline">Thêm người dùng</span>
               </ActionButton>
             </div>
           }
         />
 
-        <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-6 md:px-8">
-          <div className="flex flex-col gap-3 rounded-bvc-xl border border-bvc-border bg-white p-3.5 shadow-none sm:flex-row sm:items-center sm:justify-between">
-            <div className="inline-flex flex-wrap items-center rounded-3xl border border-bvc-border/80 bg-bvc-surface/60 p-1">
+        <div className="flex min-w-0 flex-1 flex-col gap-4 p-6 md:px-8">
+          <div className="flex flex-col gap-3 rounded-bvc-xl border border-bvc-border bg-white p-3.5 shadow-none lg:flex-row lg:items-center lg:justify-between">
+            {/* Màn lớn (>= lg): Hiện đầy đủ các tabs chọn vai trò bên trái */}
+            <div className="hidden shrink-0 items-center rounded-3xl border border-bvc-border/80 bg-bvc-surface/60 p-1 lg:inline-flex">
               {ROLE_TABS.map((tab) => {
                 const isActive = filters.role === tab.value;
                 const Icon = tab.icon;
@@ -163,39 +170,24 @@ export function UserManagePage() {
                   <button
                     key={tab.value ?? "all"}
                     type="button"
+                    role="tab"
+                    aria-selected={isActive}
                     onClick={() => updateFilters({ role: tab.value })}
                     className={cn(
                       "flex cursor-pointer items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-all select-none",
                       isActive ? "bg-white text-bvc-ink shadow-xs" : "text-bvc-muted hover:text-bvc-ink"
                     )}
                   >
-                    {Icon && <Icon size={14} className={isActive ? "text-bvc-ink" : "text-bvc-faint"} />}
+                    <Icon size={14} className={isActive ? "text-bvc-ink" : "text-bvc-faint"} />
                     <span>{tab.label}</span>
                   </button>
                 );
               })}
             </div>
 
-            <div className="flex flex-wrap items-center gap-2.5">
-              <div className="relative">
-                <select
-                  aria-label="Trạng thái tài khoản"
-                  value={filters.status ?? ""}
-                  onChange={(event) =>
-                    updateFilters({ status: (event.target.value || undefined) as UserStatus | undefined })
-                  }
-                  className="h-[38px] cursor-pointer rounded-[11px] border border-bvc-border-strong bg-white pl-3 pr-8 text-[13px] font-medium text-bvc-ink transition-colors focus:border-bvc-ink focus:outline-none"
-                >
-                  <option value="">Tất cả trạng thái</option>
-                  {USER_STATUS_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="relative flex items-center">
+            {/* Các bộ lọc phụ, tìm kiếm và dropdown vai trò khi màn nhỏ (cùng nằm chung 1 hàng) */}
+            <div className="flex flex-1 flex-wrap items-center gap-2.5 lg:justify-end">
+              <div className="relative flex flex-1 items-center min-w-[180px] sm:max-w-[260px]">
                 <Search size={15} className="pointer-events-none absolute left-3 text-bvc-muted" />
                 <input
                   type="search"
@@ -203,7 +195,7 @@ export function UserManagePage() {
                   onChange={(event) => setSearchText(event.target.value)}
                   placeholder="Tên, email hoặc mã SV..."
                   maxLength={100}
-                  className="h-[38px] w-[240px] rounded-[11px] border border-bvc-border-strong bg-white pl-8.5 pr-8 text-[13px] text-bvc-ink placeholder:text-bvc-faint transition-all focus:border-bvc-ink focus:outline-none"
+                  className="h-[38px] w-full rounded-[10px] border border-bvc-border-strong bg-white pl-8.5 pr-8 text-[13px] text-bvc-ink placeholder:text-bvc-faint transition-all focus:border-bvc-ink focus:outline-none"
                 />
                 {searchText && (
                   <button
@@ -214,6 +206,86 @@ export function UserManagePage() {
                     <X size={14} />
                   </button>
                 )}
+              </div>
+
+              {/* Màn nhỏ (< lg): Thu gọn vai trò thành dropdown shadcn Select nằm CHUNG HÀNG */}
+              <div className="flex lg:hidden items-center">
+                <Select
+                  value={filters.role ? String(filters.role) : "ALL"}
+                  onValueChange={(val) => updateFilters({ role: val === "ALL" ? undefined : Number(val) })}
+                >
+                  <SelectTrigger
+                    aria-label="Chọn vai trò người dùng"
+                    className="h-[38px] min-w-[145px] rounded-[10px] border-bvc-border-strong bg-white px-3 text-[13px] font-medium text-bvc-ink shadow-2xs hover:border-bvc-ink"
+                  >
+                    <SelectValue>
+                      {(val) => {
+                        const tab = ROLE_TABS.find((t) => (t.value ? String(t.value) : "ALL") === val);
+                        const Icon = tab?.icon;
+                        return (
+                          <span className="flex items-center gap-2 truncate">
+                            {Icon && <Icon size={14} className="text-bvc-ink shrink-0" />}
+                            <span className="truncate">{tab?.label ?? "Tất cả vai trò"}</span>
+                          </span>
+                        );
+                      }}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectPopup positionerClassName="z-50">
+                    <SelectItem value="ALL">
+                      <span className="flex items-center gap-2">
+                        <Users size={14} className="text-bvc-muted shrink-0" />
+                        <span>Tất cả vai trò</span>
+                      </span>
+                    </SelectItem>
+                    <SelectItem value={String(ROLES.STUDENT)}>
+                      <span className="flex items-center gap-2">
+                        <BookOpen size={14} className="text-bvc-muted shrink-0" />
+                        <span>Sinh viên</span>
+                      </span>
+                    </SelectItem>
+                    <SelectItem value={String(ROLES.TEACHER)}>
+                      <span className="flex items-center gap-2">
+                        <GraduationCap size={14} className="text-bvc-muted shrink-0" />
+                        <span>Giảng viên</span>
+                      </span>
+                    </SelectItem>
+                    <SelectItem value={String(ROLES.SYSTEM_ADMIN)}>
+                      <span className="flex items-center gap-2">
+                        <ShieldCheck size={14} className="text-bvc-muted shrink-0" />
+                        <span>Quản trị viên</span>
+                      </span>
+                    </SelectItem>
+                  </SelectPopup>
+                </Select>
+              </div>
+
+              {/* Bộ lọc trạng thái dùng shadcn Select với SelectValue hiển thị đúng tiếng Việt */}
+              <div className="relative">
+                <Select
+                  value={filters.status ?? "ALL"}
+                  onValueChange={(val) => updateFilters({ status: val === "ALL" ? undefined : (val as UserStatus) })}
+                >
+                  <SelectTrigger
+                    aria-label="Trạng thái tài khoản"
+                    className="h-[38px] min-w-[160px] rounded-[10px] border-bvc-border-strong bg-white px-3 text-[13px] font-medium text-bvc-ink shadow-2xs hover:border-bvc-ink"
+                  >
+                    <SelectValue>
+                      {(val) => {
+                        const opt = USER_STATUS_OPTIONS.find((o) => o.value === val);
+                        return <span className="truncate">{opt?.label ?? "Tất cả trạng thái"}</span>;
+                      }}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectPopup positionerClassName="z-50">
+                    <SelectItem value="ALL">Tất cả trạng thái</SelectItem>
+                    {USER_STATUS_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectPopup>
+                </Select>
               </div>
 
               {hasActiveFilters && (
@@ -228,7 +300,7 @@ export function UserManagePage() {
                 </button>
               )}
 
-              <span className="ml-1 font-mono text-[13px] text-bvc-muted">
+              <span className="shrink-0 font-mono text-[13px] text-bvc-muted ml-1">
                 {total} <span className="font-sans text-[12px] text-bvc-faint">người dùng</span>
               </span>
             </div>
@@ -634,7 +706,7 @@ export function UserManagePage() {
             </div>
           </div>
         </div>
-      </main>
+      </div>
 
       <StudentImportDialog isOpen={isImportOpen} onOpenChange={setIsImportOpen} onImported={reload} />
 

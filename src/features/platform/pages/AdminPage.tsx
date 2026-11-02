@@ -1,29 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { DesktopPageHeader, StatCard } from "@/shared/components/bvc";
+import { OverviewAlertCard } from "@/features/platform/components/OverviewAlertCard";
 import { PageStatus } from "@/features/platform/components/PageStatus";
 import { USER_ROLE_LABELS, USER_STATUS_DOT, USER_STATUS_OPTIONS } from "@/features/platform/constants/userConstants";
 import { useAdminOverview } from "@/features/platform/hooks/useAdminOverview";
 import { type AdminOverview } from "@/features/platform/types/adminTypes";
 import { formatDayShort, formatPercent, getTodayLabel, scaleBarHeights } from "@/features/platform/utils/adminFormat";
 import { ActionButton } from "@/shared/components/bvc/ActionButton";
-
-function WarningIcon() {
-  return (
-    <svg
-      width="17"
-      height="17"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 4.5 21 20H3z" />
-      <path d="M12 10v4M12 17h.01" />
-    </svg>
-  );
-}
 
 function getStatusLabel(status: string): string {
   return USER_STATUS_OPTIONS.find((option) => option.value === status)?.label ?? status;
@@ -35,7 +18,7 @@ function OverviewContent({ overview, onOpenConfig }: { overview: AdminOverview; 
   const totalSubmissions = counts.reduce((sum, count) => sum + count, 0);
 
   return (
-    <div className="flex flex-1 flex-col gap-[20px] p-[16px_18px_24px] md:p-[20px_32px_24px] xl:flex-row xl:overflow-hidden">
+    <div className="flex flex-1 flex-col gap-[20px] p-[16px_18px_24px] md:p-[20px_32px_24px] xl:flex-row">
       <div className="flex min-w-0 flex-1 flex-col gap-[18px]">
         <div className="grid grid-cols-2 gap-[12px] lg:grid-cols-4">
           <StatCard label="Đang hoạt động (7 ngày)" value={overview.activeUsers7d} />
@@ -100,27 +83,7 @@ function OverviewContent({ overview, onOpenConfig }: { overview: AdminOverview; 
       </div>
 
       <div className="flex w-full shrink-0 flex-col gap-[14px] xl:w-[306px]">
-        <div className="flex flex-col gap-[12px] rounded-bvc-xl border border-[#F9D2C2] bg-bvc-accent-tint p-[16px]">
-          <div className="flex items-center gap-[8px]">
-            <span className="text-bvc-accent-text">
-              <WarningIcon />
-            </span>
-            <span className="text-[14px] font-semibold text-bvc-accent-text">Cần xử lý</span>
-          </div>
-          <div className="flex flex-col gap-[9px]">
-            {overview.alerts.length === 0 && (
-              <div className="rounded-[14px] bg-white p-[11px_12px] text-[13px] text-bvc-muted">
-                Hệ thống ổn định, không có cảnh báo.
-              </div>
-            )}
-            {overview.alerts.map((alert) => (
-              <div key={alert.code} className="flex flex-col gap-[2px] rounded-[14px] bg-white p-[11px_12px]">
-                <span className="text-[14px] font-semibold">{alert.level === "ERROR" ? "Lỗi" : "Cảnh báo"}</span>
-                <span className="text-[12.5px] text-bvc-muted">{alert.message}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+        <OverviewAlertCard alerts={overview.alerts} />
 
         <div className="flex flex-col gap-[12px] rounded-bvc-xl border border-bvc-border bg-white p-[16px]">
           <span className="text-[14px] font-semibold">Cấu hình đang áp dụng</span>
@@ -146,13 +109,13 @@ export function AdminPage() {
   const { overview, error, isLoading, reload } = useAdminOverview();
 
   return (
-    <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
+    <div className="flex min-w-0 flex-1 flex-col bg-white">
       <DesktopPageHeader
         breadcrumb={`Hôm nay · ${getTodayLabel()}`}
         title="Tổng quan hệ thống"
         actions={
           <>
-            <ActionButton variant="secondary" onClick={() => navigate("/admin/config")}>
+            <ActionButton variant="secondary" onClick={() => navigate("/admin/instruments")}>
               Thêm nhạc cụ
             </ActionButton>
             <ActionButton onClick={() => navigate("/admin/notifications?type=SYSTEM")}>Thông báo bảo trì</ActionButton>
@@ -162,6 +125,6 @@ export function AdminPage() {
       <PageStatus isLoading={isLoading} error={error} onRetry={reload}>
         {overview && <OverviewContent overview={overview} onOpenConfig={() => navigate("/admin/config")} />}
       </PageStatus>
-    </main>
+    </div>
   );
 }

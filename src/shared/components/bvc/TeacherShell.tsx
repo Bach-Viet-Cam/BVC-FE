@@ -221,7 +221,7 @@ export function TeacherShell({ children, className, navItems, roleLabel }: Teach
       {/* key theo đường dẫn: khi làm layout (Outlet), mỗi lần chuyển màn vẫn chạy hiệu ứng hiện dần */}
       <main
         key={location.pathname}
-        className={cn("flex min-w-0 flex-1 flex-col motion-safe:animate-page-enter lg:overflow-y-auto", className)}
+        className={cn("flex min-w-0 min-h-0 flex-1 flex-col motion-safe:animate-page-enter lg:overflow-y-auto", className)}
       >
         {children}
       </main>
