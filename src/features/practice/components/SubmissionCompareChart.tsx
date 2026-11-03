@@ -1,10 +1,13 @@
+import { useId, useState } from "react";
+import { Maximize2, ZoomIn, ZoomOut } from "lucide-react";
+import { ChartFullscreen } from "@/features/practice/components/ChartFullscreen";
 import { useElementWidth } from "@/features/practice/hooks/useElementWidth";
 import type {
   CompareSegment,
   CompareSegmentBand,
   SubmissionCompare,
 } from "@/features/practice/types/submissionHistoryTypes";
-import { formatTick } from "@/features/practice/utils/chartView";
+import { formatTick, isZoomed, zoomView } from "@/features/practice/utils/chartView";
 import { hzToMidiFloat, midiToNoteInfo } from "@/features/practice/utils/noteMath";
 import { toCompareChartPaths, toSegmentBands } from "@/features/practice/utils/submissionCompare";
 
@@ -58,25 +61,38 @@ interface SubmissionCompareChartProps {
 }
 
 // Biểu đồ cao độ chồng nhau của hai bài nộp trên trục thời gian bản mẫu (không zoom, không phát âm thanh)
-export function SubmissionCompareChart({ chart, segments, selectedId, visible, onSelectSegment }: SubmissionCompareChartProps) {
+export function SubmissionCompareChart(props: SubmissionCompareChartProps) {
+  const [fullscreen, setFullscreen] = useState(false);
+  return <>
+    <ComparePlot {...props} onFullscreen={() => setFullscreen(true)} />
+    {fullscreen && <ChartFullscreen onClose={() => setFullscreen(false)}><ComparePlot {...props} onFullscreen={() => setFullscreen(false)} /></ChartFullscreen>}
+  </>;
+}
+
+function ComparePlot({ chart, segments, selectedId, visible, onSelectSegment, onFullscreen }: SubmissionCompareChartProps & { onFullscreen: () => void }) {
+  const clipId = useId();
   const { ref, width } = useElementWidth<HTMLDivElement>();
 
   const duration = Math.max(chart.durationSec, 0.1);
   const lowMidi = hzToMidiFloat(chart.minHz) - MIDI_PADDING;
   const highMidi = hzToMidiFloat(chart.maxHz) + MIDI_PADDING;
+  const base = { t0: 0, t1: duration, m0: lowMidi, m1: highMidi };
+  const [view, setView] = useState(base);
+  const zoomed = isZoomed(view, base);
+  const zoom = (factor: number) => setView(current => zoomView(current, factor, { seconds: (current.t0 + current.t1) / 2, midi: (current.m0 + current.m1) / 2 }, base));
   const plotWidth = Math.max(width - PLOT.left - PLOT.right, 1);
   const plotHeight = HEIGHT - PLOT.top - PLOT.bottom;
-  const xAt = (seconds: number) => PLOT.left + (Math.min(Math.max(seconds, 0), duration) / duration) * plotWidth;
-  const yAtMidi = (midi: number) => PLOT.top + (1 - (midi - lowMidi) / (highMidi - lowMidi)) * plotHeight;
+  const xAt = (seconds: number) => PLOT.left + ((seconds - view.t0) / (view.t1 - view.t0)) * plotWidth;
+  const yAtMidi = (midi: number) => PLOT.top + (1 - (midi - view.m0) / (view.m1 - view.m0)) * plotHeight;
   const yAt = (hz: number) => yAtMidi(hzToMidiFloat(hz));
 
-  const noteStep = Math.max(1, Math.ceil((highMidi - lowMidi) / MAX_NOTE_LINES));
+  const noteStep = Math.max(1, Math.ceil((view.m1 - view.m0) / MAX_NOTE_LINES));
   const noteLines: number[] = [];
-  for (let midi = Math.ceil(lowMidi); midi <= highMidi; midi += noteStep) noteLines.push(midi);
-  const ticks = Array.from({ length: TIME_TICKS }, (_, index) => (duration * index) / (TIME_TICKS - 1));
+  for (let midi = Math.ceil(view.m0); midi <= view.m1; midi += noteStep) noteLines.push(midi);
+  const ticks = Array.from({ length: TIME_TICKS }, (_, index) => view.t0 + ((view.t1 - view.t0) * index) / (TIME_TICKS - 1));
 
   const paths = toCompareChartPaths(chart, xAt, yAt);
-  const bands = toSegmentBands(segments, xAt);
+  const bands = toSegmentBands(segments.filter(segment => segment.endSec >= view.t0 && segment.startSec <= view.t1), xAt);
   const kindById = new Map(segments.map((segment) => [segment.id, segment.kind]));
   const axisY = HEIGHT - PLOT.bottom;
 
@@ -91,6 +107,7 @@ export function SubmissionCompareChart({ chart, segments, selectedId, visible, o
           aria-label="Biểu đồ cao độ theo thời gian của hai bài nộp và bản mẫu"
           className="block"
         >
+          <defs><clipPath id={clipId}><rect x={PLOT.left} y={PLOT.top} width={plotWidth} height={plotHeight} /></clipPath></defs>
           {noteLines.map((midi) => (
             <g key={midi}>
               <line
@@ -107,6 +124,7 @@ export function SubmissionCompareChart({ chart, segments, selectedId, visible, o
             </g>
           ))}
 
+          <g clipPath={`url(#${clipId})`}>
           {bands.map((band) => (
             <rect
               key={band.id}
@@ -119,16 +137,18 @@ export function SubmissionCompareChart({ chart, segments, selectedId, visible, o
             />
           ))}
 
+          </g>
           <line x1={PLOT.left} y1={axisY} x2={width - PLOT.right} y2={axisY} stroke="#cfdcd3" strokeWidth="1" />
           {ticks.map((seconds) => (
             <g key={seconds}>
               <line x1={xAt(seconds)} y1={axisY} x2={xAt(seconds)} y2={axisY + 4} stroke="#93a399" strokeWidth="1" />
               <text x={xAt(seconds)} y={axisY + 16} textAnchor="middle" fontSize="10.5" fill="#5e6f66">
-                {formatTick(seconds, duration)}
+                {formatTick(seconds, view.t1 - view.t0)}
               </text>
             </g>
           ))}
 
+          <g clipPath={`url(#${clipId})`}>
           {visible.teacher && paths.teacher && (
             <path d={paths.teacher} fill="none" stroke={TEACHER} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           )}
@@ -148,11 +168,13 @@ export function SubmissionCompareChart({ chart, segments, selectedId, visible, o
             <path d={paths.newer} fill="none" stroke={ACCENT} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           )}
 
+          </g>
           {bands.map((band) => {
             const badge = bandBadge(band.status);
-            const bandWidth = Math.max(band.width, 2);
+            const bandLeft = Math.max(PLOT.left, band.x);
+            const bandWidth = Math.max(2, Math.min(width - PLOT.right, band.x + band.width) - bandLeft);
             const x = Math.min(
-              Math.max(band.x + bandWidth / 2 - badge.width / 2, PLOT.left),
+              Math.max(bandLeft + bandWidth / 2 - badge.width / 2, PLOT.left),
               width - PLOT.right - badge.width
             );
             return (
@@ -171,7 +193,7 @@ export function SubmissionCompareChart({ chart, segments, selectedId, visible, o
                 }}
               >
                 {/* Vùng chạm phủ cả dải để dễ bấm trên điện thoại */}
-                <rect x={band.x} y={5} width={bandWidth} height={axisY - 5} fill="transparent" />
+                <rect x={bandLeft} y={5} width={bandWidth} height={axisY - 5} fill="transparent" />
                 <rect x={x} y="5" width={badge.width} height="17" rx="8.5" fill={badge.fill} stroke={badge.stroke} />
                 <text x={x + badge.width / 2} y="16.8" textAnchor="middle" fontSize="10.5" fontWeight="600" fill={badge.text}>
                   {badge.label}
@@ -181,6 +203,11 @@ export function SubmissionCompareChart({ chart, segments, selectedId, visible, o
           })}
         </svg>
       )}
+      <div className="flex justify-end gap-1 pt-1">
+        <button type="button" aria-label="Thu nh?" title="Thu nh?" disabled={!zoomed} onClick={() => zoom(1 / 1.6)} className="flex size-9 items-center justify-center rounded-full border border-bvc-border bg-white disabled:opacity-40"><ZoomOut className="size-4" /></button>
+        <button type="button" aria-label="Ph?ng to" title="Ph?ng to" onClick={() => zoom(1.6)} className="flex size-9 items-center justify-center rounded-full border border-bvc-border bg-white"><ZoomIn className="size-4" /></button>
+        <button type="button" aria-label="Xem to?n b?" title="Xem to?n b?" onClick={onFullscreen} className="flex size-9 items-center justify-center rounded-full border border-bvc-border bg-white"><Maximize2 className="size-4" /></button>
+      </div>
     </div>
   );
 }
