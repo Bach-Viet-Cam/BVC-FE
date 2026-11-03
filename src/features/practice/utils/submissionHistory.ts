@@ -145,6 +145,22 @@ export function formatSubmittedDay(isoDateTime: string) {
   return format(parseISO(isoDateTime), "dd/MM/yyyy");
 }
 
+export const SELECTION_LIMIT = 2;
+
+export type SelectionBlock = "NOT_COMPLETED" | "DIFFERENT_SHEET" | "FULL";
+
+// Lý do một bài chưa chọn được để so sánh; null = chọn được. Chỉ so sánh bài đã phân tích xong, cùng bản nhạc,
+// nên sau bài đầu tiên chỉ còn bài cùng sheetMusicId; đủ 2 bài thì chỉ còn hai bài đã chọn.
+export function selectionBlock(item: SubmissionHistoryItem, selected: SubmissionHistoryItem[]): SelectionBlock | null {
+  if (item.status !== "COMPLETED") return "NOT_COMPLETED";
+  if (selected.some((chosen) => chosen.id === item.id)) return null;
+  if (selected.length >= SELECTION_LIMIT) return "FULL";
+  if (selected.length > 0 && (item.sheetMusicId === null || item.sheetMusicId !== selected[0].sheetMusicId)) {
+    return "DIFFERENT_SHEET";
+  }
+  return null;
+}
+
 export function orderByDate<T extends Pick<SubmissionHistoryItem, "submittedAt">>(a: T, b: T) {
   return a.submittedAt <= b.submittedAt ? { older: a, newer: b } : { older: b, newer: a };
 }

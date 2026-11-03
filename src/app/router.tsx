@@ -8,6 +8,7 @@ import { TunerPage } from "@/features/practice/pages/TunerPage";
 import { MetronomePage } from "@/features/practice/pages/MetronomePage";
 import { ProcessingPage } from "@/features/practice/pages/ProcessingPage";
 import { ResultsPage } from "@/features/practice/pages/ResultsPage";
+import { SegmentPracticePage } from "@/features/practice/pages/SegmentPracticePage";
 import { SubmissionHistoryPage } from "@/features/practice/pages/SubmissionHistoryPage";
 import { SubmissionComparePage } from "@/features/practice/pages/SubmissionComparePage";
 
@@ -137,6 +138,8 @@ export function AppRouter() {
             <Route path="/practice/sheets/:sheetId/tuner" element={<TunerPage />} />
             <Route path="/practice/sheets/:sheetId/metronome" element={<MetronomePage />} />
             <Route path="/practice/submissions/:submissionId/processing" element={<ProcessingPage />} />
+            {/* UC-03 - luyện lại một đoạn; đặt trước :submissionId để không bị nhầm với trang kết quả */}
+            <Route path="/practice/submissions/:submissionId/segment" element={<SegmentPracticePage />} />
             <Route path="/practice/submissions/:submissionId" element={<ResultsPage />} />
             {/* SCR-01, SCR-02 - lịch sử và so sánh bài nộp (mockup) */}
             <Route path="/practice/submissions" element={<SubmissionHistoryPage />} />

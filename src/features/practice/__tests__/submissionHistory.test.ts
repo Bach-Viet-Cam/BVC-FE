@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { EMPTY_SUBMISSION_FILTER } from "@/features/practice/constants/submissionHistoryMockData";
 import type { SubmissionFilter, SubmissionHistoryItem } from "@/features/practice/types/submissionHistoryTypes";
-import { groupByDay, toHistoryQuery } from "@/features/practice/utils/submissionHistory";
+import { groupByDay, selectionBlock, toHistoryQuery } from "@/features/practice/utils/submissionHistory";
 
 const today = new Date(2026, 9, 24, 15, 0);
 
@@ -97,5 +97,30 @@ describe("groupByDay", () => {
       ["Hôm qua", ["1"]],
       ["20/10/2026", ["0"]],
     ]);
+  });
+});
+
+describe("selectionBlock", () => {
+  const pick = (id: string, sheetMusicId: string | null, status: SubmissionHistoryItem["status"] = "COMPLETED") => ({
+    ...item(id, "2026-10-24T08:00:00Z"),
+    sheetMusicId,
+    status,
+  });
+
+  it("bài chưa phân tích xong thì không chọn được", () => {
+    expect(selectionBlock(pick("a", "s1", "PROCESSING"), [])).toBe("NOT_COMPLETED");
+  });
+
+  it("sau bài đầu chỉ chọn được bài cùng bản nhạc", () => {
+    const first = pick("a", "s1");
+    expect(selectionBlock(pick("b", "s2"), [first])).toBe("DIFFERENT_SHEET");
+    expect(selectionBlock(pick("c", "s1"), [first])).toBeNull();
+    expect(selectionBlock(pick("d", null), [first])).toBe("DIFFERENT_SHEET");
+  });
+
+  it("đủ 2 bài thì chỉ còn hai bài đã chọn bấm được", () => {
+    const chosen = [pick("a", "s1"), pick("b", "s1")];
+    expect(selectionBlock(pick("c", "s1"), chosen)).toBe("FULL");
+    expect(selectionBlock(chosen[0], chosen)).toBeNull();
   });
 });

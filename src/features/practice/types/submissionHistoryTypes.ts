@@ -19,11 +19,6 @@ export interface SubmissionHistoryItem {
   kind: SubmissionKind;
 }
 
-// SCR-02 (mockup): bài nộp kèm nhãn "Tên bài #n" để hiện trên thẻ so sánh
-export interface SubmissionCompareItem extends SubmissionHistoryItem {
-  title: string;
-}
-
 // Số bài nộp của học viên theo trạng thái, không tính bộ lọc
 export interface SubmissionHistoryOverall {
   total: number;
@@ -31,6 +26,8 @@ export interface SubmissionHistoryOverall {
   processing: number;
   rejected: number;
   failed: number;
+  // Có bản nhạc với ít nhất 2 bài đã phân tích xong thì mới so sánh được (GBR-15)
+  canCompare: boolean;
 }
 
 export interface SubmissionHistoryPage {
@@ -90,20 +87,41 @@ export interface SubmissionPieceOption {
 // GBR-18: chỉ có ở bài cũ = đã cải thiện; có ở cả hai = lỗi lặp lại; chỉ có ở bài mới = lỗi mới (không nhãn)
 export type CompareSegmentStatus = "IMPROVED" | "REPEATED" | "NEW";
 
+// Đoạn lỗi trên trục thời gian của bản mẫu (giây)
 export interface CompareSegment {
   id: string;
-  barLabel: string;
+  kind: "pitch" | "rhythm";
   status: CompareSegmentStatus;
+  startSec: number;
+  endSec: number;
+  olderLabel: string | null;
+  newerLabel: string | null;
 }
 
-export interface CompareChartBand {
+// [giây, Hz bản mẫu, Hz bài cũ, Hz bài mới]; null = không có cao độ tại điểm đó
+export type ComparePitchPoint = [number, number | null, number | null, number | null];
+
+export interface CompareSide {
+  submissionId: string;
+  submittedAt: string;
+  attemptNo: number;
+  accuracy: number;
+}
+
+// GET /practice/submissions/compare?a=&b=
+export interface SubmissionCompare {
+  piece: { id: string; title: string };
+  sheetMusic: { id: string; name: string };
+  older: CompareSide;
+  newer: CompareSide;
+  chart: { durationSec: number; minHz: number; maxHz: number; points: ComparePitchPoint[] };
+  segments: CompareSegment[];
+  noSegmentsToCompare: boolean;
+}
+
+export interface CompareSegmentBand {
   id: string;
   status: Exclude<CompareSegmentStatus, "NEW">;
   x: number;
   width: number;
-}
-
-export interface CompareChartTick {
-  x: number;
-  label: string;
 }

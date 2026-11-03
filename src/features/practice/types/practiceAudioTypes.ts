@@ -9,6 +9,8 @@ export interface ExpectedNote {
 export interface PracticeSessionConfig {
   targetBpm: number;
   beatsPerBar: number;
+  // Số tiếng đếm nhịp trước khi ghi; bỏ trống = COUNT_IN_BEATS (luyện đoạn có thể tắt đếm nhịp bằng 0)
+  countInBeats?: number;
   pieceLenSec: number;
   hasPitch: boolean;
   fminHz: number;
