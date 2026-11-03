@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ChevronDown, LogOut } from "lucide-react";
+import { Dialog } from "@base-ui/react/dialog";
+import { ChevronDown, LogOut, Menu, X } from "lucide-react";
 import logoImage from "@/assets/image/logo.png";
 import { NotificationBell } from "@/shared/components/bvc/NotificationBell";
 import { useAuth } from "@/shared/context/AuthContext";
@@ -126,15 +127,77 @@ function SidebarGroup({ group, allItems, pathname }: SidebarGroupProps) {
   );
 }
 
+interface NavPanelProps {
+  entries: NavEntry[];
+  allItems: NavItem[];
+  pathname: string;
+  navLabel: string;
+  displayName: string;
+  roleLabel: string;
+  onLogout: () => void;
+}
+
+// Menu nhóm + thẻ hồ sơ + đăng xuất; dùng chung cho sidebar desktop và ngăn kéo mobile
+function NavPanel({ entries, allItems, pathname, navLabel, displayName, roleLabel, onLogout }: NavPanelProps) {
+  return (
+    <>
+      <nav aria-label={navLabel} className="flex flex-col gap-1">
+        {entries.map((entry) =>
+          isNavGroup(entry) ? (
+            <SidebarGroup key={entry.label} group={entry} allItems={allItems} pathname={pathname} />
+          ) : (
+            <SidebarLink key={entry.to} item={entry} isActive={isItemActive(allItems, entry, pathname)} />
+          )
+        )}
+      </nav>
+      <div className="mt-auto flex flex-col gap-2 border-t border-white/10 pt-3">
+        <Link
+          to="/profile"
+          className="group flex items-center gap-2.5 rounded-bvc-xl border border-white/15 bg-white/10 p-[11px] text-white transition-all duration-150 hover:bg-white/15 hover:text-white"
+        >
+          <UserAvatar name={displayName} size="sm" />
+          <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <span className="truncate text-[13.5px] font-semibold text-white transition-colors group-hover:text-bvc-accent-border">
+              {displayName}
+            </span>
+            <span className="flex items-center gap-1.5 text-xs text-white/60">
+              <span className="size-1.5 rounded-full bg-emerald-500" />
+              <span className="truncate">{roleLabel}</span>
+            </span>
+          </span>
+        </Link>
+        <button
+          type="button"
+          onClick={onLogout}
+          className="group flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-full text-[13px] font-medium text-white/60 transition-all duration-150 hover:bg-white/10 hover:text-white active:scale-[0.99]"
+        >
+          <LogOut className="size-4 text-white/45 transition-colors group-hover:text-white" strokeWidth={1.9} />
+          <span>Đăng xuất</span>
+        </button>
+      </div>
+    </>
+  );
+}
+
 export function TeacherShell({ children, className, navItems, roleLabel }: TeacherShellProps) {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   useNewNotificationToast(user?.role === ROLES.TEACHER);
   const effectiveRoleLabel = roleLabel ?? (user?.role === ROLES.SYSTEM_ADMIN ? "Quản trị viên" : "Giảng viên");
   const effectiveNavItems = navItems ?? (user?.role && NAV_BY_ROLE[user.role] ? NAV_BY_ROLE[user.role] : TEACHER_NAV);
   const flatItems = flattenNav(effectiveNavItems);
   const displayName = user?.username ?? effectiveRoleLabel;
   const navLabel = `Điều hướng ${effectiveRoleLabel.toLowerCase()}`;
+  const panelProps = {
+    entries: effectiveNavItems,
+    allItems: flatItems,
+    pathname: location.pathname,
+    navLabel,
+    displayName,
+    roleLabel: effectiveRoleLabel,
+    onLogout: logout,
+  };
 
   return (
     <div className="flex min-h-dvh flex-col bg-white font-bvc-sans text-bvc-ink lg:h-dvh lg:flex-row">
@@ -144,84 +207,49 @@ export function TeacherShell({ children, className, navItems, roleLabel }: Teach
           <img src={logoImage} alt="Bách Việt Cầm" className="h-11 w-auto min-w-0 object-contain" />
           <NotificationBell className={bellClass} iconClassName="size-[18px]" />
         </div>
-        <nav aria-label={navLabel} className="flex flex-col gap-1">
-          {effectiveNavItems.map((entry) =>
-            isNavGroup(entry) ? (
-              <SidebarGroup key={entry.label} group={entry} allItems={flatItems} pathname={location.pathname} />
-            ) : (
-              <SidebarLink key={entry.to} item={entry} isActive={isItemActive(flatItems, entry, location.pathname)} />
-            )
-          )}
-        </nav>
-        <div className="mt-auto flex flex-col gap-2 border-t border-white/10 pt-3">
-          <Link
-            to="/profile"
-            className="group flex items-center gap-2.5 rounded-bvc-xl border border-white/15 bg-white/10 p-[11px] text-white transition-all duration-150 hover:bg-white/15 hover:text-white"
-          >
-            <UserAvatar name={displayName} size="sm" />
-            <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-              <span className="truncate text-[13.5px] font-semibold text-white transition-colors group-hover:text-bvc-accent-border">
-                {displayName}
-              </span>
-              <span className="flex items-center gap-1.5 text-xs text-white/60">
-                <span className="size-1.5 rounded-full bg-emerald-500" />
-                <span className="truncate">{effectiveRoleLabel}</span>
-              </span>
-            </span>
-          </Link>
-          <button
-            type="button"
-            onClick={logout}
-            className="group flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-full text-[13px] font-medium text-white/60 transition-all duration-150 hover:bg-white/10 hover:text-white active:scale-[0.99]"
-          >
-            <LogOut className="size-4 text-white/45 transition-colors group-hover:text-white" strokeWidth={1.9} />
-            <span>Đăng xuất</span>
-          </button>
-        </div>
+        <NavPanel {...panelProps} />
       </aside>
 
-      {/* Mobile / tablet: thanh trên + nav cuộn ngang (nhóm được trải phẳng) */}
-      <header className="sticky top-0 z-20 shrink-0 bg-bvc-ink pb-3 text-white lg:hidden">
-        <div className="flex items-center gap-2.5 px-[18px] pt-[max(env(safe-area-inset-top),22px)]">
+      {/* Mobile / tablet: thanh trên gọn; menu nhóm nằm trong ngăn kéo thay cho dải tab cuộn ngang */}
+      <header className="sticky top-0 z-20 shrink-0 bg-bvc-ink text-white lg:hidden">
+        <div className="flex items-center gap-2.5 px-[18px] pt-[max(env(safe-area-inset-top),14px)] pb-[14px]">
           <img src={logoImage} alt="Bách Việt Cầm" className="mr-auto h-10 w-auto" />
           <NotificationBell className={bellClass} iconClassName="size-[18px]" />
-          <Link to="/profile" aria-label={`Hồ sơ ${displayName}`}>
-            <UserAvatar name={displayName} size="sm" />
-          </Link>
-        </div>
-        <nav aria-label={navLabel} className="mt-3 flex gap-1.5 overflow-x-auto px-[18px] [scrollbar-width:none]">
-          {flatItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = isItemActive(flatItems, item, location.pathname);
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                aria-current={isActive ? "page" : undefined}
-                className={cn(
-                  "flex min-h-10 shrink-0 items-center gap-2 rounded-full px-4 text-sm whitespace-nowrap transition-colors",
-                  isActive
-                    ? "bg-white font-semibold text-bvc-ink hover:text-bvc-ink"
-                    : "font-medium text-white/75 hover:bg-white/10 hover:text-white"
-                )}
+          <Dialog.Root open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+            <Dialog.Trigger aria-label="Mở menu" className={cn(bellClass, "size-11 cursor-pointer")}>
+              <Menu className="size-[19px]" strokeWidth={1.9} />
+            </Dialog.Trigger>
+            <Dialog.Portal>
+              <Dialog.Backdrop className="fixed inset-0 z-50 bg-bvc-ink/45 transition-opacity duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0 lg:hidden" />
+              <Dialog.Popup
+                // Đóng ngăn kéo ngay khi chọn một liên kết bên trong
+                onClick={(event) => {
+                  if ((event.target as HTMLElement).closest("a")) setIsMenuOpen(false);
+                }}
+                className="fixed inset-y-0 right-0 z-50 flex w-[min(320px,86vw)] flex-col gap-5 overflow-y-auto bg-bvc-ink px-3.5 pt-[max(env(safe-area-inset-top),14px)] pb-[max(env(safe-area-inset-bottom),18px)] text-white transition-transform duration-[260ms] ease-[cubic-bezier(0.16,1,0.3,1)] data-ending-style:translate-x-full data-starting-style:translate-x-full motion-reduce:transition-none lg:hidden [scrollbar-width:thin] [scrollbar-color:rgb(255_255_255/0.2)_transparent]"
               >
-                {Icon && (
-                  <Icon
-                    className={cn("size-4 shrink-0 transition-colors", isActive ? "text-bvc-accent" : "text-white/50")}
-                    strokeWidth={isActive ? 2.2 : 1.9}
-                  />
-                )}
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
-        </nav>
+                <div className="flex items-center justify-between gap-2 px-1">
+                  <Dialog.Title className="m-0 text-[15px] font-semibold tracking-[-0.02em] text-white">
+                    Menu
+                  </Dialog.Title>
+                  <Dialog.Close aria-label="Đóng menu" className={cn(bellClass, "size-11 cursor-pointer")}>
+                    <X className="size-[19px]" strokeWidth={1.9} />
+                  </Dialog.Close>
+                </div>
+                <NavPanel {...panelProps} />
+              </Dialog.Popup>
+            </Dialog.Portal>
+          </Dialog.Root>
+        </div>
       </header>
 
       {/* key theo đường dẫn: khi làm layout (Outlet), mỗi lần chuyển màn vẫn chạy hiệu ứng hiện dần */}
       <main
         key={location.pathname}
-        className={cn("flex min-w-0 min-h-0 flex-1 flex-col motion-safe:animate-page-enter lg:overflow-y-auto", className)}
+        className={cn(
+          "flex min-w-0 min-h-0 flex-1 flex-col motion-safe:animate-page-enter lg:overflow-y-auto",
+          className
+        )}
       >
         {children}
       </main>

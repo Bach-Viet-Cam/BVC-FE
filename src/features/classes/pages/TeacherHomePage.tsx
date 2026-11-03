@@ -25,7 +25,7 @@ export function TeacherHomePage() {
           actions={<ActionButton onClick={() => createDialog.open()}>Giao bài tập mới</ActionButton>}
         />
 
-        <div className="flex flex-1 flex-col gap-[18px] overflow-y-auto p-[22px_32px_26px]">
+        <div className="flex flex-1 flex-col gap-[18px] overflow-y-auto px-[18px] pt-[18px] pb-[max(env(safe-area-inset-bottom),26px)] md:p-[22px_32px_26px]">
           <ListState isLoading={isLoading} error={error} isEmpty={false} emptyMessage="" onRetry={reload}>
             <div className="grid grid-cols-2 gap-[12px]">
               <StatCard label="Lớp đang dạy" value={classes.length} />
@@ -62,7 +62,7 @@ export function TeacherHomePage() {
                   Bạn chưa có lớp nào đang dạy.
                 </p>
               ) : (
-                <div className="grid grid-cols-3 gap-[14px]">
+                <div className="grid grid-cols-1 gap-[10px] sm:grid-cols-2 sm:gap-[14px] xl:grid-cols-3">
                   {classes.map((cls) => (
                     <button
                       key={cls.id}
@@ -124,8 +124,11 @@ export function TeacherHomePage() {
               )}
             </div>
 
-            <div className="flex items-center gap-[10px]">
-              <ActionButton onClick={() => createDialog.open()}>Giao bài tập mới</ActionButton>
+            {/* Mobile: nút chính đã nằm trên header, chỉ giữ hai lối tắt chia đôi chiều ngang */}
+            <div className="grid grid-cols-2 gap-[10px] sm:flex sm:items-center">
+              <ActionButton className="hidden sm:inline-flex" onClick={() => createDialog.open()}>
+                Giao bài tập mới
+              </ActionButton>
               <ActionButton variant="secondary" onClick={() => navigate("/teacher/review")}>
                 Duyệt bài nộp
               </ActionButton>

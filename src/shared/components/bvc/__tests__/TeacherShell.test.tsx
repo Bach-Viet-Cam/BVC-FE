@@ -15,7 +15,7 @@ function renderAt(path: string) {
       <TeacherShell>nội dung</TeacherShell>
     </MemoryRouter>
   );
-  // Sidebar desktop là nav đầu tiên, nav thứ hai là thanh cuộn ngang trên mobile
+  // Sidebar desktop là nav duy nhất lúc đầu; menu mobile chỉ render khi mở ngăn kéo
   return screen.getAllByRole("navigation", { name: "Điều hướng giảng viên" });
 }
 
@@ -53,22 +53,18 @@ describe("TeacherShell menu", () => {
     expect(nav.getByRole("link", { name: "Đánh giá sinh viên" })).not.toHaveAttribute("aria-current");
   });
 
-  it("flattens groups in the mobile nav", () => {
-    const [, mobile] = renderAt("/teacher/home");
-    const labels = within(mobile)
-      .getAllByRole("link")
-      .map((link) => link.textContent);
-    expect(labels).toEqual([
-      "Trang chủ",
-      "Danh sách lớp",
-      "Duyệt bài nộp",
-      "Đánh giá sinh viên",
-      "Quản lý thử thách",
-      "Bảng xếp hạng",
-      "Thư viện của tôi",
-      "Thư viện công khai",
-      "Phân loại nội dung",
-      "Nội dung đã xác minh",
-    ]);
+  it("mobile: no flattened tab strip, the grouped menu opens in a drawer and closes on navigation", async () => {
+    renderAt("/teacher/home");
+    expect(screen.getAllByRole("navigation", { name: "Điều hướng giảng viên" })).toHaveLength(1);
+
+    await userEvent.click(screen.getByRole("button", { name: "Mở menu" }));
+    const drawer = within(await screen.findByRole("dialog", { name: "Menu" }));
+    expect(drawer.getByRole("link", { name: "Trang chủ" })).toHaveAttribute("aria-current", "page");
+    expect(drawer.getByRole("button", { name: "Lớp học" })).toHaveAttribute("aria-expanded", "false");
+    expect(drawer.getByRole("button", { name: "Đăng xuất" })).toBeInTheDocument();
+
+    await userEvent.click(drawer.getByRole("button", { name: "Lớp học" }));
+    await userEvent.click(drawer.getByRole("link", { name: "Duyệt bài nộp" }));
+    await vi.waitFor(() => expect(screen.queryByRole("dialog", { name: "Menu" })).not.toBeInTheDocument());
   });
 });
