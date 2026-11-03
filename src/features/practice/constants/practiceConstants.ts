@@ -71,6 +71,9 @@ export const MSG = {
   resultLoadFailed: "Tải kết quả phân tích thất bại. Vui lòng thử lại.", // MSG-09
   resultPartFailed: "Chưa tải được phần này. Vui lòng thử lại.",
   referencePlaybackFailed: "Phát bản thu mẫu thất bại. Vui lòng thử lại.", // MSG-09
+  segmentInvalid: "Đoạn luyện tập không hợp lệ.",
+  segmentNoNotes: "Đoạn này không có nốt để chấm",
+  segmentKeepOld: "Kết quả cũ vẫn được giữ nguyên",
   noTunes: (instrument: string | null) =>
     `${instrument ?? "Nhạc cụ này"} chưa được cấu hình dây chuẩn. Vui lòng liên hệ quản trị viên.`,
 };
