@@ -337,9 +337,9 @@ export function RecordPage() {
             </div>
 
             <div className="contents">
-              <div className="mx-3.5 mt-3 flex min-h-0 flex-1 flex-col gap-2.75 pb-5.5 md:mx-0 md:mt-0 md:min-h-98 md:rounded-[22px] md:border md:border-bvc-border md:bg-white md:p-5.5 md:pb-5.5">
+              <div className="mx-3.5 mt-3 flex min-h-0 flex-1 flex-col gap-2.75 pb-5.5 md:mx-0 md:mt-0 md:min-h-98 md:rounded-bvc-xl md:border md:border-bvc-border md:bg-white md:p-5.5 md:pb-5.5">
                 <div className="contents md:flex md:shrink-0 md:items-center md:justify-between md:gap-4">
-                  <div className="flex shrink-0 gap-1 rounded-bvc-md border border-bvc-border-strong bg-bvc-surface p-0.75 md:w-85 md:border-0 md:bg-bvc-panel">
+                  <div className="flex shrink-0 gap-1 rounded-full border border-bvc-border-strong bg-bvc-surface p-0.75 md:w-85 md:border-0 md:bg-bvc-panel">
                     {(["record", "upload"] as const).map((value) => (
                       <button
                         key={value}
@@ -347,7 +347,7 @@ export function RecordPage() {
                         aria-pressed={mode === value}
                         onClick={() => switchMode(value)}
                         className={cn(
-                          "min-h-10 flex-1 cursor-pointer rounded-bvc-sm text-sm font-semibold md:min-h-10.5",
+                          "min-h-10 flex-1 cursor-pointer rounded-full text-sm font-medium md:min-h-10.5",
                           mode === value ? "bg-bvc-ink text-white" : "text-bvc-muted",
                           recActive && "opacity-60"
                         )}
@@ -429,7 +429,7 @@ export function RecordPage() {
                   <button
                     type="button"
                     onClick={() => navigate("/library")}
-                    className="flex min-h-11 w-full shrink-0 cursor-pointer items-center justify-center rounded-[15px] border border-bvc-border-strong bg-white text-sm font-semibold text-bvc-ink"
+                    className="flex min-h-11 w-full shrink-0 cursor-pointer items-center justify-center rounded-full border border-bvc-border-strong bg-white text-sm font-medium text-bvc-ink"
                   >
                     Chọn bản nhạc để nộp bài
                   </button>
@@ -467,7 +467,7 @@ export function RecordPage() {
           <button
             type="button"
             onClick={() => setMicPopup(false)}
-            className="flex min-h-12.5 w-full cursor-pointer items-center justify-center rounded-[15px] bg-bvc-ink text-[15px] font-semibold text-white"
+            className="flex min-h-12.5 w-full cursor-pointer items-center justify-center rounded-full bg-bvc-ink text-[15px] font-medium text-white"
           >
             Đóng
           </button>

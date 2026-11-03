@@ -5,6 +5,7 @@ export type AccountStatusFilter = "ALL" | "ACTIVE" | "PENDING";
 
 export interface Instrument {
   id: string;
+  code: string;
   name: string;
   isActive: boolean;
 }

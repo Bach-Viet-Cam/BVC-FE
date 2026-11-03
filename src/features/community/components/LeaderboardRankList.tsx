@@ -34,10 +34,10 @@ export function LeaderboardRankList({ rows, category, viewerId, ...loadMore }: L
                 <span className="w-8 shrink-0 font-bvc-mono text-[13px] text-bvc-muted">{row.rank}</span>
                 <UserAvatar name={row.fullName} />
                 <span className="flex min-w-0 flex-1 flex-col">
-                  <span className="truncate text-[14px] font-semibold text-bvc-ink">{row.fullName}</span>
+                  <span className="truncate text-[14px] font-medium text-bvc-ink">{row.fullName}</span>
                   <span className="truncate text-[11px] text-bvc-muted">{row.className}</span>
                 </span>
-                <span className="font-bvc-mono text-[14px] font-bold text-bvc-ink">
+                <span className="font-bvc-mono text-[14px] font-semibold text-bvc-ink">
                   {formatLeaderboardValue(category, row.value)}
                 </span>
               </li>

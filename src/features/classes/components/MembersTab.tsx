@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { Link } from "react-router-dom";
-import { ConfirmDialog } from "@/features/classes/components/ConfirmDialog";
+import { AddStudentDialog } from "@/features/classes/components/AddStudentDialog";
+import { ConfirmDialog } from "@/shared/components/bvc/ConfirmDialog";
 import { ListState } from "@/features/classes/components/ListState";
 import { MemberCard } from "@/features/classes/components/MemberCard";
 import { SearchInput } from "@/features/classes/components/SearchInput";
@@ -9,15 +10,15 @@ import { useClassActions } from "@/features/classes/hooks/useClassActions";
 import { useMembers } from "@/features/classes/hooks/useMembers";
 import { type AccountStatusFilter, type ClassDetail, type Member } from "@/features/classes/types/classTypes";
 import { toast } from "@/shared/components/ui/toast";
+import { ActionButton } from "@/shared/components/bvc/ActionButton";
+import { actionButtonClass } from "@/shared/components/bvc/actionButtonStyles";
+import { useCreateDialog } from "@/shared/hooks/useCreateDialog";
 import { useDebouncedValue } from "@/shared/hooks/useDebouncedValue";
 
 interface MembersTabProps {
   classDetail: ClassDetail;
   onMembersChanged: () => void;
 }
-
-const LINK_BUTTON_BASE =
-  "inline-flex min-h-[44px] items-center justify-center gap-[6px] rounded-[12px] px-[12px] text-[13px] font-semibold";
 
 export function MembersTab({ classDetail, onMembersChanged }: MembersTabProps) {
   const [searchText, setSearchText] = useState("");
@@ -28,6 +29,7 @@ export function MembersTab({ classDetail, onMembersChanged }: MembersTabProps) {
   const { removeMember, isWorking } = useClassActions(classDetail.id);
   const canEdit = !classDetail.isReadOnly;
   const isFiltered = Boolean(debouncedSearch) || accountStatus !== "ALL";
+  const createDialog = useCreateDialog("member");
 
   const confirmRemove = async () => {
     if (!memberToRemove) return;
@@ -46,15 +48,12 @@ export function MembersTab({ classDetail, onMembersChanged }: MembersTabProps) {
     <>
       {canEdit && (
         <div className="grid shrink-0 grid-cols-2 gap-[8px] px-[18px] pb-[10px] pt-[14px] md:flex lg:px-[32px] lg:pt-[20px]">
-          <Link
-            to={`/teacher/classes/${classDetail.id}/members/new`}
-            className={`${LINK_BUTTON_BASE} bg-bvc-ink text-white`}
-          >
+          <ActionButton onClick={() => createDialog.open()}>
             <Plus size={16} strokeWidth={2} aria-hidden="true" /> Thêm sinh viên
-          </Link>
+          </ActionButton>
           <Link
             to={`/teacher/classes/${classDetail.id}/import`}
-            className={`${LINK_BUTTON_BASE} border border-bvc-border-strong bg-white text-bvc-ink`}
+            className={actionButtonClass("secondary", "md", "hover:text-bvc-ink")}
           >
             Nhập danh sách SV
           </Link>
@@ -68,7 +67,7 @@ export function MembersTab({ classDetail, onMembersChanged }: MembersTabProps) {
           aria-label="Lọc tài khoản"
           value={accountStatus}
           onChange={(event) => setAccountStatus(event.target.value as AccountStatusFilter)}
-          className="h-[46px] shrink-0 rounded-[22px] border border-bvc-border-strong bg-white px-[10px] text-[13px] text-bvc-ink"
+          className="h-[46px] shrink-0 rounded-bvc-xl border border-bvc-border-strong bg-white px-[10px] text-[13px] text-bvc-ink"
         >
           <option value="ALL">Tài khoản: Tất cả</option>
           <option value="ACTIVE">Hoạt động</option>
@@ -93,14 +92,25 @@ export function MembersTab({ classDetail, onMembersChanged }: MembersTabProps) {
           </div>
         </ListState>
       </div>
+      {canEdit && (
+        <AddStudentDialog
+          open={createDialog.isOpen}
+          classDetail={classDetail}
+          onClose={createDialog.close}
+          onAdded={() => {
+            reload();
+            onMembersChanged();
+          }}
+        />
+      )}
       <ConfirmDialog
-        isOpen={memberToRemove !== null}
+        open={memberToRemove !== null}
         title={`Xóa sinh viên ${memberToRemove?.fullName ?? ""} khỏi lớp?`}
         description="Bài nộp và đánh giá trước đó vẫn được giữ lại."
         confirmLabel="Xóa"
-        isConfirming={isWorking}
+        isLoading={isWorking}
         onConfirm={confirmRemove}
-        onCancel={() => setMemberToRemove(null)}
+        onOpenChange={(open) => !open && setMemberToRemove(null)}
       />
     </>
   );

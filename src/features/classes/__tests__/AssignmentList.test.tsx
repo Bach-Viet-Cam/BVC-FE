@@ -59,7 +59,9 @@ describe("AssignmentList", () => {
     expect(within(card).getByText("Đã đăng")).toBeInTheDocument();
     expect(within(card).getByText("3/20 đã nộp")).toBeInTheDocument();
     expect(within(card).getByText("TRD301")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Tạo bài tập/ })).toHaveAttribute("href", "/teacher/assignments/new");
+    await userEvent.click(screen.getByRole("button", { name: /Tạo bài tập/ }));
+    const dialog = await screen.findByRole("dialog");
+    expect(within(dialog).getByRole("heading", { name: "Tạo bài tập" })).toBeInTheDocument();
   });
 
   it("shows the empty message when the lecturer has no assignment", async () => {
@@ -83,7 +85,7 @@ describe("AssignmentList", () => {
     await screen.findByText("Độc tấu - Lý ngựa ô");
     expect(assignmentsApi.listAssignments).toHaveBeenCalledWith(expect.objectContaining({ classId: "c1" }));
     expect(screen.queryByLabelText("Lớp")).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: /Tạo bài tập/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Tạo bài tập/ })).not.toBeInTheDocument();
     expect(screen.getByText("Lớp chưa có bài Hòa tấu.")).toBeInTheDocument();
   });
 
@@ -92,15 +94,14 @@ describe("AssignmentList", () => {
     renderList({ classId: "c1", canCreate: true });
     await screen.findByText("Độc tấu - Lý ngựa ô");
     expect(screen.queryByLabelText("Loại")).not.toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Tạo bài Hòa tấu/ })).toHaveAttribute(
-      "href",
-      "/teacher/assignments/new?classId=c1&kind=ENSEMBLE"
-    );
-    expect(screen.queryByRole("link", { name: /Tạo bài Độc tấu/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Tạo bài Độc tấu/ })).not.toBeInTheDocument();
     const heading = screen.getByRole("heading", { name: "Bài tập khác" });
     expect(heading.compareDocumentPosition(screen.getByText("Bonus tuần 3"))).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
     expect(heading.compareDocumentPosition(screen.getByText("Độc tấu - Lý ngựa ô"))).toBe(
       Node.DOCUMENT_POSITION_PRECEDING
     );
+    await userEvent.click(screen.getByRole("button", { name: /Tạo bài Hòa tấu/ }));
+    const dialog = await screen.findByRole("dialog");
+    expect(await within(dialog).findByLabelText(/Loại/)).toHaveValue("ENSEMBLE");
   });
 });

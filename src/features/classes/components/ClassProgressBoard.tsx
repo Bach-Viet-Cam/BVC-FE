@@ -57,10 +57,10 @@ function StatusText({ status }: { status: ProgressStatus | null }) {
 
 function ProgressCard({ item }: { item: ProgressItem }) {
   return (
-    <article className="flex flex-col gap-[10px] rounded-[18px] border border-bvc-border px-[14px] py-[13px] text-[13px]">
+    <article className="flex flex-col gap-[10px] rounded-bvc-xl border border-bvc-border px-[14px] py-[13px] text-[13px]">
       <div className="flex justify-between gap-[10px]">
         <span className="flex min-w-0 flex-col gap-[2px]">
-          <span className="truncate text-[15px] font-bold text-bvc-ink">{item.username}</span>
+          <span className="truncate text-[15px] font-semibold text-bvc-ink">{item.username}</span>
           <span className="font-mono text-[12px] text-bvc-muted">{item.studentCode ?? "-"}</span>
         </span>
         <StatusText status={item.status} />
@@ -120,7 +120,7 @@ export function ClassProgressBoard({ classId }: ClassProgressBoardProps) {
                 onClick={() => updateFilters({ status: isActive ? undefined : status })}
                 className={cn(
                   "flex h-[40px] shrink-0 cursor-pointer items-center gap-[8px] whitespace-nowrap rounded-full border px-[14px] text-[13.5px]",
-                  isActive ? "border-bvc-ink bg-bvc-surface font-bold" : "border-bvc-border-strong bg-white"
+                  isActive ? "border-bvc-ink bg-bvc-surface font-semibold" : "border-bvc-border-strong bg-white"
                 )}
               >
                 <span className={`size-[8px] rounded-full ${STATUS_META[status].dot}`} />
@@ -145,7 +145,7 @@ export function ClassProgressBoard({ classId }: ClassProgressBoardProps) {
                 const sort = MOBILE_SORTS.find((option) => option.value === event.target.value);
                 if (sort) updateFilters({ sortBy: sort.sortBy, sortDir: sort.sortDir });
               }}
-              className="h-[46px] w-[120px] shrink-0 rounded-[22px] border border-bvc-border-strong bg-white px-[10px] text-[13px] text-bvc-ink"
+              className="h-[46px] w-[120px] shrink-0 rounded-bvc-xl border border-bvc-border-strong bg-white px-[10px] text-[13px] text-bvc-ink"
             >
               {MOBILE_SORTS.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -166,22 +166,22 @@ export function ClassProgressBoard({ classId }: ClassProgressBoardProps) {
           </div>
         </ListState>
       ) : (
-        <div className="flex flex-col overflow-x-auto rounded-[20px] border border-bvc-border bg-white">
+        <div className="flex flex-col overflow-x-auto rounded-bvc-xl border border-bvc-border bg-white">
           <div className="flex min-w-[720px] flex-col">
             <div
-              className={`grid ${COLUMNS} gap-[14px] border-b border-bvc-border px-[20px] py-[11px] text-[12px] font-bold uppercase tracking-[0.08em] text-bvc-muted`}
+              className={`grid ${COLUMNS} gap-[14px] border-b border-bvc-border px-[20px] py-[11px] text-[12px] font-semibold text-bvc-muted`}
             >
               <button
                 type="button"
                 onClick={() => toggleSort("studentCode")}
-                className="flex cursor-pointer items-center gap-[4px] text-left uppercase"
+                className="flex cursor-pointer items-center gap-[4px] text-left"
               >
                 Mã SV {sortIcon("studentCode")}
               </button>
               <button
                 type="button"
                 onClick={() => toggleSort("username")}
-                className="flex cursor-pointer items-center gap-[4px] text-left uppercase"
+                className="flex cursor-pointer items-center gap-[4px] text-left"
               >
                 Họ tên {sortIcon("username")}
               </button>
@@ -189,7 +189,7 @@ export function ClassProgressBoard({ classId }: ClassProgressBoardProps) {
               <button
                 type="button"
                 onClick={() => toggleSort("averageAccuracy")}
-                className="flex cursor-pointer items-center gap-[4px] text-left uppercase"
+                className="flex cursor-pointer items-center gap-[4px] text-left"
               >
                 Accuracy TB {sortIcon("averageAccuracy")}
               </button>
@@ -206,7 +206,7 @@ export function ClassProgressBoard({ classId }: ClassProgressBoardProps) {
                   className={`grid min-h-[52px] ${COLUMNS} items-center gap-[14px] border-b border-bvc-line px-[20px] py-[8px] text-[13px] last:border-0`}
                 >
                   <span className="font-mono text-bvc-muted">{item.studentCode ?? "-"}</span>
-                  <span className="truncate font-semibold text-bvc-ink">{item.username}</span>
+                  <span className="truncate font-medium text-bvc-ink">{item.username}</span>
                   <span className="font-mono text-bvc-muted">{item.submissionCount}</span>
                   <AccuracyBar value={item.averageAccuracy} barClassName="w-[120px]" />
                   <StatusText status={item.status} />

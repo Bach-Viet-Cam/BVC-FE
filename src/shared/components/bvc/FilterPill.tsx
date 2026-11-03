@@ -21,7 +21,7 @@ export function FilterPill({ label, value, options, onChange, size = "md" }: Fil
     return (
       <span
         className={cn(
-          "inline-flex shrink-0 items-center gap-1.5 rounded-full bg-bvc-ink pr-1 pl-4 font-semibold whitespace-nowrap text-white",
+          "inline-flex shrink-0 items-center gap-1.5 rounded-full bg-bvc-ink pr-1 pl-4 font-medium whitespace-nowrap text-white",
           clipGap,
           height
         )}

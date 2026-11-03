@@ -18,6 +18,7 @@ import type {
   SavedPieceDto,
   SavedSheetMusicDto,
   Song,
+  TrendingPieceDto,
 } from "@/features/music-library/types/musicLibraryTypes";
 
 // Danh sách đã lưu hiển thị một lần, lấy tối đa số bản ghi BE cho phép mỗi trang
@@ -29,7 +30,8 @@ const ignoreData = () => undefined;
 const toLibraryParams = (query: LibrarySongQuery) => ({
   q: query.keyword || undefined,
   genreIds: query.genreId || undefined,
-  instrumentIds: query.instrumentId || undefined,
+  // BE nhận danh sách dạng "a,b"
+  instrumentIds: query.instrumentIds.length > 0 ? query.instrumentIds.join(",") : undefined,
   levelIds: query.levelId || undefined,
   sort: query.sort,
   page: query.page,
@@ -159,6 +161,18 @@ export const musicLibraryApi: MusicLibraryApi = {
       page: page.page,
       limit: page.pageSize,
       totalPages: page.totalPages,
+    })),
+  listTrendingSongs: () =>
+    unwrap(
+      axiosClient.get<ApiResponse<{ weekStart: string; items: TrendingPieceDto[] }>>("/library/pieces/trending")
+    ).then(({ weekStart, items }) => ({
+      weekStart,
+      items: items.map((piece) => ({
+        ...toSong(piece),
+        description: piece.description ?? "",
+        isSaved: piece.isSaved,
+        weeklySubmissionCount: piece.weeklySubmissionCount,
+      })),
     })),
   getLibrarySong: (songId) =>
     unwrap(axiosClient.get<ApiResponse<LibraryPieceDetailDto>>(`/library/pieces/${songId}`)).then(toSongDetail),

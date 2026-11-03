@@ -17,7 +17,7 @@ export function FormField({ label, htmlFor, required, hint, error, children, cla
 
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
-      <LabelTag htmlFor={htmlFor} className="text-[13.5px] font-semibold text-bvc-ink">
+      <LabelTag htmlFor={htmlFor} className="text-[13.5px] font-medium text-bvc-ink">
         {label}
         {required && <span className="ml-1 text-bvc-accent-text">*</span>}
       </LabelTag>

@@ -185,10 +185,10 @@ export function PitchContourCard({ chart, loading, error }: PitchContourCardProp
   const [mode, setMode] = useState<SeriesMode>("both");
 
   return (
-    <section className="flex flex-col gap-3 rounded-bvc-xl border border-bvc-border bg-white p-4 md:rounded-[22px] md:p-5.5">
+    <section className="flex flex-col gap-3 rounded-bvc-xl border border-bvc-border bg-white p-4 md:rounded-bvc-xl md:p-5.5">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
-          <h2 className="text-sm font-bold text-bvc-ink">So sánh cao độ &amp; nhịp (Pitch Contour)</h2>
+          <h2 className="text-sm font-semibold text-bvc-ink">So sánh cao độ &amp; nhịp (Pitch Contour)</h2>
           <p className="mt-0.5 text-[11px] text-bvc-muted">Đường cao độ bản thu so với bản mẫu theo thời gian</p>
         </div>
         <div role="radiogroup" aria-label="Đường hiển thị" className="flex rounded-full bg-bvc-surface p-0.5">
@@ -200,7 +200,7 @@ export function PitchContourCard({ chart, loading, error }: PitchContourCardProp
               aria-checked={mode === option.value}
               onClick={() => setMode(option.value)}
               className={cn(
-                "min-h-8 cursor-pointer rounded-full px-3 text-xs font-semibold whitespace-nowrap",
+                "min-h-8 cursor-pointer rounded-full px-3 text-xs font-medium whitespace-nowrap",
                 mode === option.value ? "bg-bvc-ink text-white" : "text-bvc-muted hover:text-bvc-ink"
               )}
             >
@@ -415,7 +415,7 @@ function PitchContourPlot({ chart, width, mode }: { chart: PitchChart; width: nu
                 y={yAtMidi(line.midi) + 4}
                 fontSize={line.isNote ? (line.isNatural ? 11 : 10) : 9}
                 fill={line.isNatural ? "#64748b" : AXIS_TEXT}
-                fontWeight={line.isNatural ? 700 : 500}
+                fontWeight={line.isNatural ? 600 : 500}
               >
                 {line.label}
               </text>
@@ -445,7 +445,7 @@ function PitchContourPlot({ chart, width, mode }: { chart: PitchChart; width: nu
         {chips.map((chip) => (
           <g key={chip.segment.id} transform={`translate(${chip.x}, ${chip.y})`}>
             <rect width={chip.width} height={CHIP_HEIGHT} rx="4" fill={SEGMENT_STYLE[chip.segment.kind].chip} />
-            <text x={chip.width / 2} y="11.5" fontSize="10" fill="#fff" fontWeight="700" textAnchor="middle">
+            <text x={chip.width / 2} y="11.5" fontSize="10" fill="#fff" fontWeight="600" textAnchor="middle">
               {chip.text}
             </text>
           </g>
@@ -466,7 +466,7 @@ function PitchContourPlot({ chart, width, mode }: { chart: PitchChart; width: nu
               y={TICK_LABEL_Y}
               fontSize="11"
               fill={tick.color}
-              fontWeight="700"
+              fontWeight="600"
               textAnchor="middle"
             >
               {formatTick(tick.seconds, view.t1 - view.t0)}
@@ -528,7 +528,7 @@ function PitchContourPlot({ chart, width, mode }: { chart: PitchChart; width: nu
 
       {hover && (
         <ChartTooltip percent={(hover.x / width) * 100}>
-          <div className="font-bold">{fmtTime(hover.seconds)}</div>
+          <div className="font-semibold">{fmtTime(hover.seconds)}</div>
           {mode !== "student" && (
             <div className="flex items-center gap-1.5">
               <span className="size-2 rounded-full bg-bvc-ink" />
@@ -548,7 +548,7 @@ function PitchContourPlot({ chart, width, mode }: { chart: PitchChart; width: nu
               Lệch {signed(1200 * Math.log2(hover.studentHz / hover.teacherHz))}¢ so với bản mẫu
             </div>
           )}
-          {hoverSegment && <div className="font-semibold">{hoverSegment.label}</div>}
+          {hoverSegment && <div className="font-medium">{hoverSegment.label}</div>}
         </ChartTooltip>
       )}
     </>

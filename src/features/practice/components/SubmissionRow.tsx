@@ -6,6 +6,7 @@ import {
   formatSubmittedAt,
 } from "@/features/practice/utils/submissionHistory";
 import { toStatusLabel } from "@/features/practice/utils/submissionStatus";
+import { TABLE_STYLES } from "@/shared/components/bvc/tableStyles";
 import { cn } from "@/shared/utils/cn";
 
 interface SubmissionRowProps {
@@ -24,7 +25,7 @@ const KIND_CLASS: Record<SubmissionKind, string> = {
   BONUS: "bg-bvc-accent-tint text-bvc-accent-text",
 };
 
-const CELL = "px-3 py-2.5 align-middle";
+const CELL = TABLE_STYLES.cell;
 
 function scoreClass(accuracy: number) {
   if (accuracy >= 85) return "text-bvc-dot-ok";
@@ -51,13 +52,13 @@ export function SubmissionRow({ item, isSelecting, isSelected, isSelectable, onO
       onClick={handleRowClick}
       aria-selected={isSelecting ? isSelected : undefined}
       className={cn(
-        "border-t border-bvc-border text-bvc-ink first:border-t-0",
-        isClickable && "cursor-pointer hover:bg-bvc-soft",
+        "border-b border-bvc-border text-bvc-ink transition-colors last:border-b-0",
+        isClickable && "cursor-pointer hover:bg-bvc-soft/70",
         (isProcessing || isSelected) && "bg-bvc-soft",
         isSelecting && !isSelectable && "cursor-not-allowed bg-bvc-soft opacity-55"
       )}
     >
-      <td className={cn(CELL, "text-center font-bvc-mono text-sm font-bold")}>
+      <td className={cn(CELL, "text-center font-bvc-mono text-sm font-semibold")}>
         {item.accuracy === null ? (
           <span className="text-bvc-faint">-</span>
         ) : (
@@ -66,11 +67,11 @@ export function SubmissionRow({ item, isSelecting, isSelected, isSelectable, onO
       </td>
       <td className={CELL}>
         {isOpenable ? (
-          <button type="button" className="block w-full cursor-pointer truncate text-left text-sm font-semibold">
+          <button type="button" className="block w-full cursor-pointer truncate text-left text-sm font-medium">
             {item.pieceTitle}
           </button>
         ) : (
-          <span className="block truncate text-sm font-semibold">{item.pieceTitle}</span>
+          <span className="block truncate text-sm font-medium">{item.pieceTitle}</span>
         )}
         {isProcessing && (
           <span className="mt-0.5 flex items-center gap-1 text-[11px] text-bvc-ink">
@@ -88,7 +89,7 @@ export function SubmissionRow({ item, isSelecting, isSelected, isSelectable, onO
       <td className={cn(CELL, "text-xs whitespace-nowrap text-bvc-muted")}>{formatSubmittedAt(item.submittedAt)}</td>
       <td className={CELL}>
         <span
-          className={cn("rounded-full px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap", KIND_CLASS[item.kind])}
+          className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium whitespace-nowrap", KIND_CLASS[item.kind])}
         >
           {SUBMISSION_KIND_LABEL[item.kind]}
         </span>

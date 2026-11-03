@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AssignmentInfoPanel, type AssignmentPanelAction } from "@/features/classes/components/AssignmentInfoPanel";
 import { AssignmentStudentRow } from "@/features/classes/components/AssignmentStudentRow";
-import { ConfirmDialog } from "@/features/classes/components/ConfirmDialog";
+import { ConfirmDialog } from "@/shared/components/bvc/ConfirmDialog";
 import { ListState } from "@/features/classes/components/ListState";
 import { useAssignmentActions } from "@/features/classes/hooks/useAssignmentActions";
 import { useTeacherAssignmentDetail } from "@/features/classes/hooks/useTeacherAssignmentDetail";
@@ -68,12 +68,12 @@ export function TeacherAssignmentDetailPage() {
             <AssignmentInfoPanel assignment={assignment} isWorking={isWorking} onAction={handleAction} />
           </aside>
           <div className="flex min-w-0 flex-1 flex-col lg:overflow-y-auto lg:pt-[22px]">
-            <h2 className="m-0 px-[18px] pb-[8px] text-[16px] font-extrabold lg:px-[32px]">
+            <h2 className="m-0 px-[18px] pb-[8px] text-[16px] font-semibold lg:px-[32px]">
               Sinh viên ({assignment.students.length})
             </h2>
             <div className="flex flex-col gap-[10px] px-[18px] pb-[22px] lg:px-[32px]">
               {assignment.students.length === 0 ? (
-                <p className="m-0 rounded-[18px] bg-bvc-soft p-[15px] text-[13.5px] text-bvc-muted">
+                <p className="m-0 rounded-bvc-xl bg-bvc-soft p-[15px] text-[13.5px] text-bvc-muted">
                   Lớp chưa có sinh viên.
                 </p>
               ) : (
@@ -86,7 +86,7 @@ export function TeacherAssignmentDetailPage() {
             </div>
           </div>
           <ConfirmDialog
-            isOpen={pendingAction !== null}
+            open={pendingAction !== null}
             title={
               pendingAction === "delete" ? `Xóa bài tập ${assignment.title}?` : `Đóng bài tập ${assignment.title}?`
             }
@@ -94,9 +94,9 @@ export function TeacherAssignmentDetailPage() {
               pendingAction === "delete" ? "Bài tập sẽ bị ẩn với cả lớp." : "Sinh viên sẽ không thể nộp bài nữa."
             }
             confirmLabel={pendingAction === "delete" ? "Xóa" : "Đóng"}
-            isConfirming={isWorking}
+            isLoading={isWorking}
             onConfirm={confirmPending}
-            onCancel={() => setPendingAction(null)}
+            onOpenChange={(open) => !open && setPendingAction(null)}
           />
         </div>
       )}

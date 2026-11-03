@@ -41,7 +41,7 @@ export function FileField({
         <span
           className={cn(
             "truncate text-[12.5px]",
-            currentName ? "font-bvc-mono text-bvc-ink" : "text-sm font-semibold text-bvc-ink"
+            currentName ? "font-bvc-mono text-bvc-ink" : "text-sm font-medium text-bvc-ink"
           )}
         >
           {currentName ?? emptyLabel}
@@ -66,7 +66,7 @@ export function FileField({
         type="button"
         disabled={disabled}
         onClick={() => inputRef.current?.click()}
-        className="min-h-9 shrink-0 cursor-pointer rounded-[10px] border border-bvc-border-strong bg-white px-2.5 text-[12.5px] font-semibold text-bvc-ink hover:bg-bvc-surface disabled:cursor-not-allowed disabled:opacity-40"
+        className="min-h-9 shrink-0 cursor-pointer rounded-full border border-bvc-border-strong bg-white px-2.5 text-[12.5px] font-medium text-bvc-ink hover:bg-bvc-surface disabled:cursor-not-allowed disabled:opacity-40"
       >
         {currentName ? "Thay file" : "Chọn file"}
       </button>

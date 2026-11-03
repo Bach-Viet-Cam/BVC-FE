@@ -27,7 +27,7 @@ export function SearchField({
     <div
       className={cn(
         "flex items-center gap-2.5 border border-bvc-border-strong bg-white focus-within:border-bvc-ink",
-        size === "lg" ? "rounded-2xl px-[18px]" : "rounded-[22px] px-3.5",
+        size === "lg" ? "rounded-2xl px-[18px]" : "rounded-bvc-xl px-3.5",
         className
       )}
     >

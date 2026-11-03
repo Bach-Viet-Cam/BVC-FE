@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AxiosError } from "axios";
 import { MemoryRouter } from "react-router-dom";
@@ -14,15 +14,13 @@ vi.mock("@/features/community/api/challengeApi", () => ({
 }));
 vi.mock("@/shared/components/ui/toast", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 
-const navigate = vi.fn();
-vi.mock("react-router-dom", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("react-router-dom")>()),
-  useNavigate: () => navigate,
-}));
+const onCancel = vi.fn();
+const onSaved = vi.fn();
+const onDirtyChange = vi.fn();
 
 const INSTRUMENTS = [
-  { id: "i1", name: "Đàn tranh", isActive: true },
-  { id: "i2", name: "Đàn bầu", isActive: true },
+  { id: "i1", code: "DTR", name: "Đàn tranh", isActive: true },
+  { id: "i2", code: "DBA", name: "Đàn bầu", isActive: true },
 ];
 
 function makeClass(id: string, name: string, instrumentId: string, status: "ACTIVE" | "ENDED"): ClassSummary {
@@ -49,7 +47,15 @@ const PIECES = [{ id: "p1", title: "Lý ngựa ô", composer: null, kind: "SONG"
 function renderForm() {
   return render(
     <MemoryRouter>
-      <ChallengeForm classes={CLASSES} instruments={INSTRUMENTS} defaultMinAccuracy={70} maxSubmissionsDefault={3} />
+      <ChallengeForm
+        classes={CLASSES}
+        instruments={INSTRUMENTS}
+        defaultMinAccuracy={70}
+        maxSubmissionsDefault={3}
+        onCancel={onCancel}
+        onSaved={onSaved}
+        onDirtyChange={onDirtyChange}
+      />
     </MemoryRouter>
   );
 }
@@ -116,7 +122,7 @@ describe("ChallengeForm", () => {
       classIds: [],
       weekStart: null,
     });
-    await waitFor(() => expect(navigate).toHaveBeenCalledWith("/teacher/challenges", { replace: true }));
+    await waitFor(() => expect(onSaved).toHaveBeenCalledTimes(1));
   });
 
   it("'Đăng thử thách' with missing fields shows inline errors and does not call the API", async () => {
@@ -169,24 +175,20 @@ describe("ChallengeForm", () => {
     await userEvent.click(screen.getByRole("button", { name: "Lưu nháp" }));
     expect(await screen.findByText("Tuần đã kết thúc.")).toBeInTheDocument();
     expect(screen.getByLabelText(/Tên thử thách/)).toHaveValue("Giữ dữ liệu");
-    expect(navigate).not.toHaveBeenCalled();
+    expect(onSaved).not.toHaveBeenCalled();
   });
 
-  it("navigates away on 'Hủy' when the form is clean", async () => {
+  it("leaves the decision to the container on 'Hủy'", async () => {
     renderForm();
     await userEvent.click(screen.getByRole("button", { name: "Hủy" }));
-    expect(navigate).toHaveBeenCalledWith("/teacher/challenges");
+    expect(onCancel).toHaveBeenCalledTimes(1);
   });
 
-  it("asks for MSG-02 confirmation on 'Hủy' when the form is dirty", async () => {
+  it("reports that the form has unsaved input once the user types", async () => {
     renderForm();
+    expect(onDirtyChange).toHaveBeenLastCalledWith(false);
     await userEvent.type(screen.getByLabelText(/Tên thử thách/), "Đã gõ");
-    await userEvent.click(screen.getByRole("button", { name: "Hủy" }));
-    expect(navigate).not.toHaveBeenCalled();
-    const dialog = await screen.findByRole("dialog");
-    expect(within(dialog).getByText("Hủy thay đổi?")).toBeInTheDocument();
-    await userEvent.click(within(dialog).getByRole("button", { name: "Rời đi" }));
-    expect(navigate).toHaveBeenCalledWith("/teacher/challenges");
+    expect(onDirtyChange).toHaveBeenLastCalledWith(true);
   });
 });
 

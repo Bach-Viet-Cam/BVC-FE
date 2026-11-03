@@ -115,7 +115,7 @@ export function PlaybackBar({
       <DropdownMenu>
         <DropdownMenuTrigger aria-label="Tốc độ phát" className={cn(ICON_BUTTON, "gap-1 px-2")}>
           <Clock size={19} strokeWidth={1.9} />
-          {rate !== 1 && <span className="text-xs font-semibold text-bvc-accent-text">{rate}×</span>}
+          {rate !== 1 && <span className="text-xs font-medium text-bvc-accent-text">{rate}×</span>}
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-32 rounded-[12px] border-bvc-border bg-white p-1.5 shadow-level-1">
           {PLAYBACK_RATES.map((value) => (
@@ -124,7 +124,7 @@ export function PlaybackBar({
               onClick={() => onRateChange(value)}
               className={cn(
                 "cursor-pointer rounded-[8px] px-2.5 py-1.5 text-[13px] text-bvc-ink data-highlighted:bg-bvc-surface data-highlighted:text-bvc-ink",
-                value === rate && "font-semibold text-bvc-accent"
+                value === rate && "font-medium text-bvc-accent"
               )}
             >
               {value === 1 ? "Bình thường" : `${value}×`}

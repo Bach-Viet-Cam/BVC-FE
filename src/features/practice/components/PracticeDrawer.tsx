@@ -36,12 +36,12 @@ export function PracticeDrawer({ title, subtitle, onClose, children }: PracticeD
             type="button"
             aria-label="Đóng"
             onClick={onClose}
-            className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-bvc-md border border-bvc-border-strong bg-white text-bvc-ink"
+            className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-bvc-border-strong bg-white text-bvc-ink"
           >
             <X size={20} strokeWidth={1.8} />
           </button>
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-            <span className="truncate font-bvc-display text-xl leading-tight font-extrabold tracking-[-0.02em] text-bvc-ink">
+            <span className="truncate font-bvc-display text-xl leading-tight font-semibold tracking-[-0.02em] text-bvc-ink">
               {title}
             </span>
             {subtitle && <span className="text-[13px] text-bvc-muted">{subtitle}</span>}

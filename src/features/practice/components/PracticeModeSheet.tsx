@@ -1,4 +1,4 @@
-import { ChevronRight, Music2, Scissors, Sparkles, X } from "lucide-react";
+import { ChevronRight, Music2, Scissors, X } from "lucide-react";
 import {
   PracticeBottomSheet,
   PracticeSheetClose,
@@ -30,7 +30,7 @@ export function PracticeModeSheet({
       <div className="flex flex-col gap-4 overflow-y-auto px-6 pt-4 pb-6">
         <header className="flex items-start justify-between gap-2">
           <div>
-            <PracticeSheetTitle className="font-bvc-display text-xl font-bold tracking-tight text-bvc-ink">
+            <PracticeSheetTitle className="font-bvc-display text-xl font-semibold tracking-tight text-bvc-ink">
               Chọn chế độ luyện tập
             </PracticeSheetTitle>
             <PracticeSheetDescription className="mt-1 text-xs leading-relaxed text-bvc-muted">
@@ -51,15 +51,14 @@ export function PracticeModeSheet({
             onClick={onSegment}
             className="relative flex cursor-pointer items-center gap-3.5 rounded-2xl border-2 border-bvc-ink bg-bvc-soft p-4 text-left"
           >
-            <span className="absolute -top-2.5 left-4 flex items-center gap-1 rounded-full bg-bvc-ink px-2.5 py-0.5 text-[10px] font-semibold text-white">
-              <Sparkles className="size-3" aria-hidden />
+            <span className="absolute -top-2.5 left-4 rounded-full bg-bvc-ink px-2.5 py-0.5 text-[10.5px] font-medium text-white">
               Khuyến nghị từ AI
             </span>
             <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-bvc-ink text-white">
               <Scissors className="size-6" strokeWidth={2} aria-hidden />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block text-sm font-bold text-bvc-ink">Luyện tập theo phân đoạn</span>
+              <span className="block text-sm font-semibold text-bvc-ink">Luyện tập theo phân đoạn</span>
               <span className="mt-0.5 block text-xs leading-snug text-bvc-muted">
                 Tập trung sửa các ô nhịp có lỗi (như Bar 18–24 hoặc tùy chọn đoạn tuỳ ý)
               </span>
@@ -76,7 +75,7 @@ export function PracticeModeSheet({
               <Music2 className="size-6" strokeWidth={2} aria-hidden />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block text-sm font-bold text-bvc-ink">Luyện tập toàn bộ bài hát</span>
+              <span className="block text-sm font-semibold text-bvc-ink">Luyện tập toàn bộ bài hát</span>
               <span className="mt-0.5 block text-xs leading-snug text-bvc-muted">
                 Luyện từ đầu đến cuối{durationLabel ? ` (${durationLabel})` : ""} để kiểm tra độ ổn định
               </span>
@@ -85,7 +84,7 @@ export function PracticeModeSheet({
           </button>
         </div>
 
-        <PracticeSheetClose className="min-h-12 w-full cursor-pointer rounded-xl bg-bvc-surface text-sm font-semibold text-bvc-muted">
+        <PracticeSheetClose className="min-h-12 w-full cursor-pointer rounded-full bg-bvc-surface text-sm font-medium text-bvc-muted">
           Đóng
         </PracticeSheetClose>
       </div>

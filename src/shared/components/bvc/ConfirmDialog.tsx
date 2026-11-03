@@ -28,7 +28,7 @@ export function ConfirmDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <BvcDialogPopup className="max-w-[420px]">
-        <DialogTitle className="text-xl font-extrabold tracking-[-0.02em] text-bvc-ink">{title}</DialogTitle>
+        <DialogTitle className="text-xl font-semibold tracking-[-0.02em] text-bvc-ink">{title}</DialogTitle>
         {description && (
           <DialogDescription className="text-sm leading-relaxed text-bvc-muted">{description}</DialogDescription>
         )}

@@ -1,35 +1,45 @@
-import { Link, useParams } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { TeacherShell } from "@/shared/components/bvc/TeacherShell";
-import { FocusHeader } from "@/shared/components/bvc/FocusHeader";
+import { TeacherPageHeader } from "@/shared/components/bvc/TeacherPageHeader";
 import { EmptyState } from "@/shared/components/bvc/EmptyState";
 import { ActionButton } from "@/shared/components/bvc/ActionButton";
-import { actionButtonClass } from "@/shared/components/bvc/actionButtonStyles";
+import { LeaveConfirmDialog } from "@/shared/components/bvc/LeaveConfirmDialog";
+import { useLeaveGuard } from "@/shared/hooks/useLeaveGuard";
 import { SongForm } from "@/features/music-library/components/SongForm";
 import { useMusicCategories } from "@/features/music-library/hooks/useMusicCategories";
 import { useSongEditor } from "@/features/music-library/hooks/useSongEditor";
 
 const FORM_ID = "song-form";
+const LIST_PATH = "/songs";
 
+// Sửa bài hát (thêm bài hát mở bằng modal SongCreateDialog)
 export function SongFormPage() {
+  const navigate = useNavigate();
   const { songId } = useParams();
-  const editor = useSongEditor(songId);
+  const [isDirty, setIsDirty] = useState(false);
+  const editor = useSongEditor(songId, () => {
+    setIsDirty(false);
+    navigate(LIST_PATH);
+  });
   const { options, isLoading: isCategoriesLoading, error: categoriesError } = useMusicCategories("lecturer");
+  const { guard, confirmProps } = useLeaveGuard({ isDirty });
+  const leave = () => guard(() => navigate(LIST_PATH));
 
-  const title = editor.isEditing ? `Sửa bài hát${editor.song ? ` - ${editor.song.title}` : ""}` : "Thêm bài hát";
   const loadError = editor.loadError ?? categoriesError;
   const isReady = !editor.isLoading && !isCategoriesLoading && !loadError;
 
   return (
     <TeacherShell>
-      <FocusHeader
-        backTo="/songs"
-        backLabel="Quay lại thư viện bài hát của tôi"
-        title={title}
+      <TeacherPageHeader
+        title="Sửa bài hát"
+        subtitle={editor.song?.title}
+        onBack={leave}
         actions={
           <>
-            <Link to="/songs" className={actionButtonClass("secondary", "md", "hover:text-bvc-ink")}>
+            <ActionButton variant="secondary" onClick={leave} className="max-sm:hidden">
               Hủy
-            </Link>
+            </ActionButton>
             <ActionButton type="submit" form={FORM_ID} disabled={!isReady} isLoading={editor.isSubmitting}>
               Lưu
             </ActionButton>
@@ -63,8 +73,10 @@ export function SongFormPage() {
           song={editor.song}
           options={options}
           onSubmit={editor.submit}
+          onDirtyChange={setIsDirty}
         />
       )}
+      <LeaveConfirmDialog {...confirmProps} />
     </TeacherShell>
   );
 }

@@ -167,7 +167,7 @@ export function EnsemblePage() {
         <EnsembleHeader title="Luyện hòa tấu" deadline={null} onClose={leave} />
         <div className="flex flex-1 items-center justify-center p-6">
           <p
-            className={`text-[14.5px] font-semibold ${error ? "text-bvc-error" : "text-bvc-muted"}`}
+            className={`text-[14.5px] font-medium ${error ? "text-bvc-error" : "text-bvc-muted"}`}
             role={error ? "alert" : "status"}
           >
             {isLoading ? "Đang kết nối phòng thu và chuẩn bị các bè mẫu..." : error}

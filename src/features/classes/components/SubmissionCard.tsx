@@ -1,8 +1,8 @@
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ActionButton } from "@/features/classes/components/ActionButton";
-import { INPUT_CLASSES } from "@/features/classes/components/FormField";
+import { ActionButton } from "@/shared/components/bvc/ActionButton";
+import { INPUT_CLASSES } from "@/shared/components/bvc/fieldStyles";
 import { StatusLabel } from "@/features/classes/components/StatusLabel";
 import { type ApiFieldError } from "@/features/classes/types/classTypes";
 import { type StudentSubmission, type SubmissionStatus } from "@/features/classes/types/teacherAssignmentTypes";
@@ -59,9 +59,9 @@ export function SubmissionCard({ submission, canComment, onSaveComment }: Submis
   });
 
   return (
-    <article className="flex flex-col gap-[10px] rounded-[18px] border border-bvc-border px-[14px] py-[13px]">
+    <article className="flex flex-col gap-[10px] rounded-bvc-xl border border-bvc-border px-[14px] py-[13px]">
       <div className="flex justify-between gap-[10px]">
-        <span className="text-[13.5px] font-bold">
+        <span className="text-[13.5px] font-semibold">
           Lần nộp {submission.attemptNumber} · {formatVietnamDateTime(submission.submittedAt)} · phiên bản v
           {submission.version}
         </span>
@@ -82,7 +82,7 @@ export function SubmissionCard({ submission, canComment, onSaveComment }: Submis
       </audio>
       <form onSubmit={submit} noValidate className="flex flex-col gap-[6px]">
         <div className="flex justify-between">
-          <label htmlFor={commentId} className="text-[13.5px] font-semibold">
+          <label htmlFor={commentId} className="text-[13.5px] font-medium">
             Nhận xét
           </label>
           <span className="font-bvc-mono text-[12px] text-bvc-muted">

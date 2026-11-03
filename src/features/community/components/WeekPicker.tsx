@@ -77,7 +77,7 @@ export function WeekPicker({ id, value, onChange, hasError = false, now = new Da
             key={option.value}
             className={cn(
               "flex min-h-[44px] cursor-pointer items-center gap-[10px] rounded-[13px] border border-bvc-border-strong bg-white px-[13px] font-mono text-[13.5px] text-bvc-ink",
-              isChecked && "border-bvc-ink bg-bvc-soft font-semibold",
+              isChecked && "border-bvc-ink bg-bvc-soft font-medium",
               option.isPast && "cursor-not-allowed bg-bvc-soft text-bvc-muted"
             )}
           >

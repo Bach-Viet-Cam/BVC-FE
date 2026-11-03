@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
 import { Plus } from "lucide-react";
-import { Link } from "react-router-dom";
 import { AssignmentCard } from "@/features/classes/components/AssignmentCard";
+import { AssignmentCreateDialog } from "@/features/classes/components/AssignmentCreateDialog";
 import { FilterSelect } from "@/features/classes/components/FilterSelect";
+import { ActionButton } from "@/shared/components/bvc/ActionButton";
 import { ListState } from "@/features/classes/components/ListState";
 import { SearchInput } from "@/features/classes/components/SearchInput";
 import { useAssignmentList } from "@/features/classes/hooks/useAssignmentList";
@@ -13,6 +14,7 @@ import {
   type AssignmentStatus,
 } from "@/features/classes/types/teacherAssignmentTypes";
 import { ASSIGNMENT_KIND_LABELS, ASSIGNMENT_STATUS_LABELS } from "@/features/classes/utils/teacherAssignmentFormat";
+import { useCreateDialog } from "@/shared/hooks/useCreateDialog";
 import { useDebouncedValue } from "@/shared/hooks/useDebouncedValue";
 
 interface AssignmentListProps {
@@ -55,7 +57,8 @@ export function AssignmentList({ classId, canCreate }: AssignmentListProps) {
   const isFiltered =
     Boolean(debouncedSearch) || kind !== ALL || status !== ALL || (!classId && selectedClassId !== ALL);
   const items = result?.items ?? [];
-  const createPath = classId ? `/teacher/assignments/new?classId=${classId}` : "/teacher/assignments/new";
+  const createDialog = useCreateDialog("assignment", ["classId", "kind"] as const);
+  const openCreate = (presetKind?: AssignmentKind) => createDialog.open({ classId, kind: presetKind });
 
   return (
     <div className="flex grow flex-col gap-[10px] px-[18px] pb-[18px] pt-[14px] lg:px-[32px] lg:pb-[24px] lg:pt-[20px]">
@@ -65,13 +68,10 @@ export function AssignmentList({ classId, canCreate }: AssignmentListProps) {
         </div>
         <FilterSelect label="Trạng thái" value={status} allValue={ALL} options={STATUS_OPTIONS} onChange={setStatus} />
         {canCreate && (
-          <Link
-            to={createPath}
-            className="inline-flex min-h-[44px] shrink-0 items-center justify-center gap-[8px] rounded-[14px] bg-bvc-ink px-[14px] text-[14px] font-semibold text-white lg:ml-auto lg:px-[18px]"
-          >
+          <ActionButton className="max-sm:px-3.5 lg:ml-auto" onClick={() => openCreate()}>
             <Plus size={16} strokeWidth={2} aria-hidden="true" />
             <span className="max-sm:sr-only">Tạo bài tập</span>
-          </Link>
+          </ActionButton>
         )}
       </div>
       {!classId && (
@@ -88,7 +88,7 @@ export function AssignmentList({ classId, canCreate }: AssignmentListProps) {
       )}
       {classId ? (
         <ListState isLoading={isLoading} error={error} isEmpty={false} emptyMessage="" onRetry={reload}>
-          <ClassAssignmentSections classId={classId} items={items} canCreate={canCreate} isFiltered={isFiltered} />
+          <ClassAssignmentSections items={items} canCreate={canCreate} isFiltered={isFiltered} onCreate={openCreate} />
         </ListState>
       ) : (
         <ListState
@@ -101,20 +101,29 @@ export function AssignmentList({ classId, canCreate }: AssignmentListProps) {
           <AssignmentGrid items={items} />
         </ListState>
       )}
+      {canCreate && (
+        <AssignmentCreateDialog
+          open={createDialog.isOpen}
+          onClose={createDialog.close}
+          presetClassId={createDialog.presets.classId}
+          presetKind={createDialog.presets.kind}
+          onSaved={reload}
+        />
+      )}
     </div>
   );
 }
 
 interface ClassAssignmentSectionsProps {
-  classId: string;
   items: AssignmentListItem[];
   canCreate: boolean;
   isFiltered: boolean;
+  onCreate: (kind: AssignmentKind) => void;
 }
 
 // Class tab: one fixed slot each for the ensemble and the solo assignment (BE allows one of each per class),
 // then the bonus and other assignments.
-function ClassAssignmentSections({ classId, items, canCreate, isFiltered }: ClassAssignmentSectionsProps) {
+function ClassAssignmentSections({ items, canCreate, isFiltered, onCreate }: ClassAssignmentSectionsProps) {
   const otherItems = items.filter((item) => !FEATURED_KINDS.includes(item.kind));
   return (
     <>
@@ -124,7 +133,7 @@ function ClassAssignmentSections({ classId, items, canCreate, isFiltered }: Clas
           if (assignment) return <AssignmentCard key={featuredKind} assignment={assignment} />;
           const label = ASSIGNMENT_KIND_LABELS[featuredKind];
           const slotClassName =
-            "flex min-h-[104px] flex-col items-center justify-center gap-[6px] rounded-[18px] border border-dashed border-bvc-border-strong p-[15px] text-center text-[13.5px] text-bvc-muted";
+            "flex min-h-[104px] flex-col items-center justify-center gap-[6px] rounded-bvc-xl border border-dashed border-bvc-border-strong p-[15px] text-center text-[13.5px] text-bvc-muted";
           // While searching, an empty slot only means "no match": creating from it could hit the one-per-class rule.
           if (!canCreate || isFiltered) {
             return (
@@ -134,22 +143,23 @@ function ClassAssignmentSections({ classId, items, canCreate, isFiltered }: Clas
             );
           }
           return (
-            <Link
+            <button
               key={featuredKind}
-              to={`/teacher/assignments/new?classId=${classId}&kind=${featuredKind}`}
-              className={`${slotClassName} hover:border-bvc-accent`}
+              type="button"
+              onClick={() => onCreate(featuredKind)}
+              className={`${slotClassName} cursor-pointer hover:border-bvc-accent`}
             >
               <span>Lớp chưa có bài {label}.</span>
-              <span className="inline-flex items-center gap-[6px] font-semibold text-bvc-ink">
+              <span className="inline-flex items-center gap-[6px] font-medium text-bvc-ink">
                 <Plus size={16} strokeWidth={2} aria-hidden="true" /> Tạo bài {label}
               </span>
-            </Link>
+            </button>
           );
         })}
       </div>
-      <h3 className="pt-[6px] text-[15px] font-bold text-bvc-ink">Bài tập khác</h3>
+      <h3 className="pt-[6px] text-[15px] font-semibold text-bvc-ink">Bài tập khác</h3>
       {otherItems.length === 0 ? (
-        <p className="rounded-[18px] bg-bvc-soft p-[15px] text-[13.5px] text-bvc-muted">
+        <p className="rounded-bvc-xl bg-bvc-soft p-[15px] text-[13.5px] text-bvc-muted">
           {isFiltered ? "Không tìm thấy bài tập phù hợp." : "Lớp chưa có bài bonus hoặc bài luyện ngón."}
         </p>
       ) : (

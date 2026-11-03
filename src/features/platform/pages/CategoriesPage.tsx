@@ -11,9 +11,9 @@ interface CategoryGroupProps {
 
 function CategoryGroup({ title, unit, items }: CategoryGroupProps) {
   return (
-    <section className="overflow-hidden rounded-[20px] border border-bvc-border bg-white">
+    <section className="overflow-hidden rounded-bvc-xl border border-bvc-border bg-white">
       <div className="flex items-center gap-[10px] border-b border-bvc-border px-[18px] py-[14px]">
-        <h2 className="m-0 text-[15px] font-bold text-bvc-ink">{title}</h2>
+        <h2 className="m-0 text-[15px] font-semibold text-bvc-ink">{title}</h2>
         <span className="rounded-[8px] bg-bvc-surface px-2 py-1 text-[12px] text-bvc-muted">
           {items.length} {unit}
         </span>

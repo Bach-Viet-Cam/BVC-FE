@@ -9,7 +9,9 @@ import { TeacherHomePage } from "@/features/classes/pages/TeacherHomePage";
 
 vi.mock("@/features/classes/api/classesApi", () => ({ classesApi: { listClasses: vi.fn() } }));
 vi.mock("@/features/classes/api/progressApi", () => ({ progressApi: { getProgress: vi.fn() } }));
-vi.mock("@/features/classes/api/assignmentsApi", () => ({ assignmentsApi: { listAssignments: vi.fn() } }));
+vi.mock("@/features/classes/api/assignmentsApi", () => ({
+  assignmentsApi: { listAssignments: vi.fn(), getAssignment: vi.fn() },
+}));
 
 const navigate = vi.fn();
 vi.mock("react-router-dom", async (importOriginal) => ({
@@ -40,13 +42,74 @@ function mockApis({ drafts = 2, published = 4, classes = [ACTIVE_CLASS] } = {}) 
     },
   } as never);
   vi.mocked(progressApi.getProgress).mockResolvedValue({
-    data: { data: { summary: { onTrack: 15, atRisk: 3, behind: 2 }, items: [] } },
+    data: { data: { summary: { onTrack: 15, atRisk: 3, behind: 2 }, items: PROGRESS_ITEMS } },
   } as never);
-  vi.mocked(assignmentsApi.listAssignments).mockImplementation((async (params: { status: string }) => ({
+  vi.mocked(assignmentsApi.listAssignments).mockImplementation((async (params: { status: string; limit: number }) => ({
     data: {
-      data: { items: [], pagination: { page: 1, limit: 1, total: params.status === "DRAFT" ? drafts : published } },
+      data: {
+        // The today card lists the published assignments; the stat cards only read the totals.
+        items: params.limit > 1 ? PUBLISHED_ASSIGNMENTS : [],
+        pagination: { page: 1, limit: params.limit, total: params.status === "DRAFT" ? drafts : published },
+      },
     },
   })) as never);
+  vi.mocked(assignmentsApi.getAssignment).mockResolvedValue({
+    data: {
+      data: {
+        id: "a1",
+        classId: "c1",
+        kind: "SOLO",
+        students: [
+          { studentId: "s1", lastSubmittedAt: new Date().toISOString() },
+          { studentId: "s2", lastSubmittedAt: null },
+        ],
+      },
+    },
+  } as never);
+}
+
+const PROGRESS_ITEMS = [
+  {
+    userId: "s1",
+    username: "Nguyễn An",
+    studentCode: "HE001",
+    submissionCount: 2,
+    averageAccuracy: 62,
+    status: "AT_RISK",
+  },
+  {
+    userId: "s2",
+    username: "Trần Bình",
+    studentCode: "HE002",
+    submissionCount: 1,
+    averageAccuracy: 40,
+    status: "BEHIND",
+  },
+  {
+    userId: "s3",
+    username: "Lê Chi",
+    studentCode: "HE003",
+    submissionCount: 3,
+    averageAccuracy: 90,
+    status: "ON_TRACK",
+  },
+  ...Array.from({ length: 5 }, (_, index) => ({
+    userId: `r${index}`,
+    username: `Sinh viên ${index}`,
+    studentCode: null,
+    submissionCount: 1,
+    averageAccuracy: 70 + index,
+    status: "AT_RISK",
+  })),
+];
+
+const PUBLISHED_ASSIGNMENTS = [{ id: "a1", classId: "c1", kind: "SOLO", status: "PUBLISHED" }];
+
+// The class name also shows in the attention and today cards: read the card of the "Lớp đang dạy" section.
+async function findClassCard() {
+  const section = (await screen.findByRole("button", { name: "Xem tất cả lớp" })).parentElement
+    ?.parentElement as HTMLElement;
+  return within(section).getByText("TRD301 - Nhạc cụ truyền thống").closest("button") as HTMLElement;
 }
 
 const renderPage = () =>
@@ -62,7 +125,7 @@ describe("TeacherHomePage", () => {
   it("shows the real stats, class card and today's tasks", async () => {
     mockApis();
     renderPage();
-    const card = (await screen.findByText("TRD301 - Nhạc cụ truyền thống")).closest("button") as HTMLElement;
+    const card = await findClassCard();
     expect(within(card).getByText("Chưa bắt đầu · 20 sinh viên")).toBeInTheDocument();
     expect(
       within(
@@ -70,7 +133,6 @@ describe("TeacherHomePage", () => {
       ).getByText("1")
     ).toBeInTheDocument();
     expect(screen.getByText("Bài tập đang mở").nextElementSibling).toHaveTextContent("4");
-    expect(screen.getByText("Sinh viên cần chú ý").nextElementSibling).toHaveTextContent("5");
     expect(screen.getByText("5 sinh viên cần chú ý - TRD301 - Nhạc cụ truyền thống")).toBeInTheDocument();
     expect(screen.getByText("2 bài tập nháp chưa đăng")).toBeInTheDocument();
     expect(progressApi.getProgress).toHaveBeenCalledWith("c1", expect.anything());
@@ -79,10 +141,40 @@ describe("TeacherHomePage", () => {
   it("opens the class and the task targets by their real routes", async () => {
     mockApis();
     renderPage();
-    await userEvent.click((await screen.findByText("TRD301 - Nhạc cụ truyền thống")).closest("button") as HTMLElement);
+    await userEvent.click(await findClassCard());
     expect(navigate).toHaveBeenCalledWith("/teacher/classes/c1");
     await userEvent.click(screen.getByRole("button", { name: "Xem bài tập" }));
     expect(navigate).toHaveBeenCalledWith("/teacher/assignments");
+  });
+
+  it("lists the top students to watch, opens the full list page and a student's history", async () => {
+    mockApis();
+    renderPage();
+    const card = (await screen.findByText("Sinh viên cần chú ý")).closest("section") as HTMLElement;
+    const rows = () => within(card).getAllByRole("listitem");
+    expect(rows()).toHaveLength(5);
+    expect(rows()[0]).toHaveTextContent("Trần Bình");
+    expect(rows()[0]).toHaveTextContent("Chậm tiến độ");
+    expect(within(card).queryByText("Lê Chi")).not.toBeInTheDocument();
+
+    await userEvent.click(within(card).getByRole("button", { name: "Xem tất cả" }));
+    expect(navigate).toHaveBeenCalledWith("/teacher/attention-students");
+    expect(rows()).toHaveLength(5);
+
+    await userEvent.click(within(card).getByText("Nguyễn An"));
+    expect(navigate).toHaveBeenCalledWith("/teacher/classes/c1/students/s1");
+  });
+
+  it("shows today's solo / ensemble submitters per class", async () => {
+    mockApis();
+    renderPage();
+    const card = (await screen.findByText("Lượt nộp bài mới")).closest("section") as HTMLElement;
+    const row = within(card).getByText("TRD301 - Nhạc cụ truyền thống").closest("li") as HTMLElement;
+    expect(within(row).getByText("Độc tấu").nextElementSibling).toHaveTextContent("1/20");
+    expect(within(row).getByText("Hòa tấu").nextElementSibling).toHaveTextContent("-");
+    expect(assignmentsApi.getAssignment).toHaveBeenCalledWith("a1");
+    await userEvent.click(within(card).getByRole("button", { name: "Xem tất cả" }));
+    expect(navigate).toHaveBeenCalledWith("/teacher/today-submissions");
   });
 
   it("shows the empty messages when the lecturer has no running class and no draft", async () => {
@@ -98,6 +190,6 @@ describe("TeacherHomePage", () => {
     renderPage();
     expect(await screen.findByRole("alert")).toHaveTextContent("Tải dữ liệu thất bại");
     await userEvent.click(screen.getByRole("button", { name: "Thử lại" }));
-    expect(await screen.findByText("TRD301 - Nhạc cụ truyền thống")).toBeInTheDocument();
+    expect(await findClassCard()).toBeInTheDocument();
   });
 });

@@ -54,7 +54,7 @@ function NotifRow({ notif, now, onOpen }: NotifRowProps) {
       )}
       <NotifIcon type={notif.type} />
       <div className="min-w-0 flex-1 pr-4">
-        <div className={`text-[14px] text-bvc-ink ${isUnread ? "font-bold" : "font-semibold"}`}>{notif.title}</div>
+        <div className={`text-[14px] text-bvc-ink ${isUnread ? "font-semibold" : "font-medium"}`}>{notif.title}</div>
         <div className="mt-[2px] whitespace-pre-line text-[13px] text-bvc-muted">{notif.body}</div>
         <div className="mt-[3px] font-mono text-[11px] text-bvc-faint">
           {formatNotificationTimestamp(notif.sentAt, now)}
@@ -75,7 +75,7 @@ function NotifSection({ title, items, now, onOpen }: NotifSectionProps) {
   if (items.length === 0) return null;
   return (
     <>
-      <div className="px-[14px] pb-2 pt-4 text-[11px] font-bold uppercase tracking-[0.1em] text-bvc-muted">{title}</div>
+      <div className="px-[14px] pb-2 pt-4 text-[11px] font-semibold text-bvc-muted">{title}</div>
       {items.map((notif) => (
         <NotifRow key={notif.id} notif={notif} now={now} onOpen={onOpen} />
       ))}
@@ -114,7 +114,7 @@ export function NotificationsPage() {
           type="button"
           disabled={unreadCount === 0}
           onClick={() => void markAllRead()}
-          className="min-h-[44px] cursor-pointer px-2 text-[13px] font-semibold text-bvc-accent-text disabled:cursor-not-allowed disabled:opacity-50"
+          className="min-h-[44px] cursor-pointer px-2 text-[13px] font-medium text-bvc-accent-text disabled:cursor-not-allowed disabled:opacity-50"
         >
           Đọc tất cả
         </button>
@@ -128,7 +128,7 @@ export function NotificationsPage() {
         />
       </div>
 
-      <div className="overflow-hidden rounded-[20px] border border-bvc-border bg-white">
+      <div className="overflow-hidden rounded-bvc-xl border border-bvc-border bg-white">
         {isLoading || error ? (
           <p className={cn("px-[14px] pt-6 text-center text-[14px]", error ? "text-bvc-error" : "text-bvc-muted")}>
             {error ?? "Đang tải..."}
@@ -148,7 +148,7 @@ export function NotificationsPage() {
                   type="button"
                   disabled={isLoadingMore}
                   onClick={() => void loadMore()}
-                  className="min-h-[40px] rounded-[12px] border border-bvc-border-strong px-4 text-[13px] font-semibold text-bvc-ink disabled:opacity-50"
+                  className="min-h-[40px] rounded-full border border-bvc-border-strong px-4 text-[13px] font-medium text-bvc-ink disabled:opacity-50"
                 >
                   {isLoadingMore ? "Đang tải..." : "Xem thêm"}
                 </button>

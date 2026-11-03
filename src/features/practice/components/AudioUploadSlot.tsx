@@ -57,7 +57,7 @@ export function AudioUploadSlot({ title, description, disabled, onChange }: Prop
 
   return (
     <section className="rounded-2xl border border-bvc-border bg-white p-6">
-      <h2 className="text-lg font-semibold text-bvc-ink">{title}</h2>
+      <h2 className="text-lg font-medium text-bvc-ink">{title}</h2>
       <p className="mt-1 text-sm text-bvc-muted">{description}</p>
       <label
         className={`mt-5 flex min-h-36 flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-bvc-border p-5 text-center ${disabled ? "opacity-50" : "cursor-pointer hover:bg-bvc-surface"}`}

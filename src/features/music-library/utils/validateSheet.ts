@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { FILE_RULES, LIBRARY_MESSAGES } from "@/features/music-library/constants/musicLibraryConstants";
 import { validateFile } from "@/features/music-library/utils/mediaUtils";
-import { normalizeText } from "@/features/music-library/utils/searchUtils";
+import { normalizeText } from "@/shared/utils/searchUtils";
 
 interface SheetSchemaContext {
   // Tên các bản khác trong cùng bài (không tính bản đang sửa)

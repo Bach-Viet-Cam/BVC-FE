@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CLASS_CODE_EXAMPLE, parseClassCode } from "@/features/classes/utils/classCode";
 
 const required = (field: string) => `${field} không được để trống.`;
 const tooLong = (field: string, max: number) => `${field} không được vượt quá ${max} ký tự.`;
@@ -13,3 +14,12 @@ export const classFormSchema = z.object({
 });
 
 export type ClassFormValues = z.infer<typeof classFormSchema>;
+
+// New classes must follow the coded name so the subject can be derived from it.
+export const createClassFormSchema = classFormSchema.extend({
+  name: classFormSchema.shape.name.refine(
+    (value) => parseClassCode(value) !== null,
+    `Mã lớp phải có dạng Môn.Slot.Half, ví dụ ${CLASS_CODE_EXAMPLE}.`
+  ),
+  instrumentId: z.string().min(1, "Không tìm thấy môn học khớp với mã lớp. Kiểm tra lại mã môn."),
+});

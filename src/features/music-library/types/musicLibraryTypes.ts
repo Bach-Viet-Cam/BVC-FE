@@ -106,10 +106,22 @@ export interface SavedSheet {
 export interface LibrarySongQuery {
   keyword: string;
   genreId: string;
-  instrumentId: string;
+  // Chọn nhiều nhạc cụ: bài khớp khi có bản nhạc công khai của một trong các nhạc cụ đã chọn
+  instrumentIds: string[];
   levelId: string;
   sort: LibrarySort;
   page: number;
+}
+
+// Bài đang hot: nhiều lượt nộp nhất từ thứ Hai tuần này (giờ Việt Nam)
+export interface TrendingSong extends LibrarySong {
+  weeklySubmissionCount: number;
+}
+
+export interface TrendingSongs {
+  // yyyy-MM-dd, thứ Hai của tuần đang tính
+  weekStart: string;
+  items: TrendingSong[];
 }
 
 export interface ManagedSongQuery {
@@ -125,6 +137,7 @@ export interface ManagedSongQuery {
 export interface MusicLibraryApi {
   getCategories: () => Promise<MusicCategories>;
   listLibrarySongs: (query: LibrarySongQuery) => Promise<PaginatedResponse<LibrarySong>>;
+  listTrendingSongs: () => Promise<TrendingSongs>;
   getLibrarySong: (songId: string) => Promise<LibrarySongDetail>;
   getSheetViewer: (songId: string, sheetId: string) => Promise<SheetViewerData>;
   saveSong: (songId: string) => Promise<void>;
@@ -186,6 +199,11 @@ export interface LibraryPieceTabDto {
   sheetMusicCount: number;
   main: LibraryMainSheetDto | null;
   others: LibrarySheetCardDto[];
+}
+
+export interface TrendingPieceDto extends LibraryPieceCardDto {
+  description: string | null;
+  weeklySubmissionCount: number;
 }
 
 export interface LibraryPieceDetailDto extends LibraryPieceCardDto {

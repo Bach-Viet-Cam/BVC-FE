@@ -21,7 +21,7 @@ export function Button({
       {...props}
       disabled={disabled || isLoading}
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-md font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50",
+        "inline-flex items-center justify-center gap-2 rounded-md font-medium transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
         variant === "primary" && "bg-primary text-white shadow-sm hover:brightness-110 active:scale-[0.98]",
         variant === "secondary" &&

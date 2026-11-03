@@ -12,7 +12,9 @@ import { SubmissionHistoryPage } from "@/features/practice/pages/SubmissionHisto
 import { SubmissionComparePage } from "@/features/practice/pages/SubmissionComparePage";
 
 import { LoginPage } from "@/features/auth/pages/LoginPage";
+import { LandingPage } from "@/features/landing/pages/LandingPage";
 import { ScrollToTop } from "@/shared/components/ScrollToTop";
+import { CreateRedirect } from "@/shared/components/CreateRedirect";
 import { NotFoundPage } from "@/shared/pages/NotFoundPage";
 import { ForbiddenPage } from "@/shared/pages/ForbiddenPage";
 import { DashboardPage } from "@/shared/pages/DashboardPage";
@@ -51,12 +53,12 @@ import { ReviewPage } from "@/features/classes/pages/ReviewPage";
 import { StudentProgressPage } from "@/features/classes/pages/StudentProgressPage";
 import { AssignmentFormPage } from "@/features/classes/pages/AssignmentFormPage";
 import { ClassDetailPage } from "@/features/classes/pages/ClassDetailPage";
-import { AddStudentPage } from "@/features/classes/pages/AddStudentPage";
 import { ImportStudentsPage } from "@/features/classes/pages/ImportStudentsPage";
-import { AdminRoadmapPage } from "@/features/classes/pages/AdminRoadmapPage";
 import { TeacherAssignmentDetailPage } from "@/features/classes/pages/TeacherAssignmentDetailPage";
+import { StudentHistoryPage } from "@/features/classes/pages/StudentHistoryPage";
+import { AttentionStudentsPage } from "@/features/classes/pages/AttentionStudentsPage";
+import { TodaySubmissionsPage } from "@/features/classes/pages/TodaySubmissionsPage";
 import { StudentSubmissionsPage } from "@/features/classes/pages/StudentSubmissionsPage";
-import { GradingSettingsPage } from "@/features/platform/pages/GradingSettingsPage";
 
 // Desktop - library management
 import { SongManagePage } from "@/features/music-library/pages/SongManagePage";
@@ -70,6 +72,7 @@ import { StudentReviewPage } from "@/features/platform/pages/StudentReviewPage";
 import { ContentApprovalPage } from "@/features/platform/pages/ContentApprovalPage";
 import { UserManagePage } from "@/features/platform/pages/UserManagePage";
 import { SystemConfigPage } from "@/features/platform/pages/SystemConfigPage";
+import { InstrumentConfigPage } from "@/features/platform/pages/InstrumentConfigPage";
 import { CategoriesAdminPage } from "@/features/platform/pages/CategoriesAdminPage";
 import { MonitoringPage } from "@/features/platform/pages/MonitoringPage";
 import { NotificationsManagePage } from "@/features/platform/pages/NotificationsManagePage";
@@ -95,7 +98,8 @@ export function AppRouter() {
       <ScrollToTop />
       <Routes>
         {/* Public */}
-        <Route path="/" element={<LoginPage />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/landing" element={<Navigate to="/" replace />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/403" element={<ForbiddenPage />} />
 
@@ -156,21 +160,34 @@ export function AppRouter() {
           <Route element={<DesktopLayout />}>
             <Route path="/teacher" element={<Navigate to="/teacher/home" replace />} />
             <Route path="/teacher/home" element={<TeacherHomePage />} />
+            <Route path="/teacher/attention-students" element={<AttentionStudentsPage />} />
+            <Route path="/teacher/today-submissions" element={<TodaySubmissionsPage />} />
             <Route path="/teacher/classes" element={<ClassListPage />} />
             <Route path="/teacher/roadmap" element={<RoadmapPage />} />
             <Route path="/teacher/progress" element={<StudentProgressPage />} />
             <Route path="/teacher/assignments" element={<AssignmentListPage />} />
             <Route path="/teacher/challenges" element={<LecturerChallengesPage />} />
-            <Route path="/teacher/challenges/new" element={<ChallengeFormPage />} />
+            <Route
+              path="/teacher/challenges/new"
+              element={<CreateRedirect to="/teacher/challenges" name="challenge" />}
+            />
             <Route path="/teacher/challenges/:id/edit" element={<ChallengeFormPage />} />
             <Route path="/categories" element={<CategoriesPage />} />
             {/* M03 classes & members: web-first inside the lecturer shell */}
-            <Route path="/teacher/classes/new" element={<ClassFormPage />} />
+            {/* Tạo mới mở bằng modal: đường dẫn ".../new" cũ chuyển về trang danh sách và mở sẵn modal */}
+            <Route path="/teacher/classes/new" element={<CreateRedirect to="/teacher/classes" name="class" />} />
             <Route path="/teacher/classes/:classId" element={<ClassDetailPage />} />
             <Route path="/teacher/classes/:classId/edit" element={<ClassFormPage />} />
-            <Route path="/teacher/classes/:classId/members/new" element={<AddStudentPage />} />
+            <Route
+              path="/teacher/classes/:classId/members/new"
+              element={<CreateRedirect to="/teacher/classes/:classId" name="member" />}
+            />
             <Route path="/teacher/classes/:classId/import" element={<ImportStudentsPage />} />
-            <Route path="/teacher/assignments/new" element={<AssignmentFormPage />} />
+            <Route path="/teacher/classes/:classId/students/:studentId" element={<StudentHistoryPage />} />
+            <Route
+              path="/teacher/assignments/new"
+              element={<CreateRedirect to="/teacher/assignments" name="assignment" />}
+            />
             <Route path="/teacher/assignments/:assignmentId/edit" element={<AssignmentFormPage />} />
             <Route path="/teacher/assignments/:assignmentId" element={<TeacherAssignmentDetailPage />} />
             <Route path="/teacher/assignments/:assignmentId/students/:studentId" element={<StudentSubmissionsPage />} />
@@ -180,13 +197,13 @@ export function AppRouter() {
 
           {/* M02 - quản lý bài hát (trang tự bọc TeacherShell) */}
           <Route path="/songs" element={<SongManagePage />} />
-          <Route path="/songs/new" element={<SongFormPage />} />
+          <Route path="/songs/new" element={<CreateRedirect to="/songs" name="song" />} />
           <Route path="/songs/:songId/edit" element={<SongFormPage />} />
           <Route path="/songs/:songId/sheets" element={<SheetManagePage />} />
 
           {/* Community - desktop */}
           {/* Bonus tạo bằng form bài tập chung (chọn loại Bonus) */}
-          <Route path="/community/bonus/new" element={<Navigate to="/teacher/assignments/new" replace />} />
+          <Route path="/community/bonus/new" element={<CreateRedirect to="/teacher/assignments" name="assignment" />} />
         </Route>
 
         {/* Quản trị viên - màn hình desktop */}
@@ -195,13 +212,14 @@ export function AppRouter() {
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/admin/users" element={<UserManagePage />} />
             <Route path="/admin/config" element={<SystemConfigPage />} />
+            <Route path="/admin/instruments" element={<InstrumentConfigPage />} />
             <Route path="/admin/categories" element={<CategoriesAdminPage />} />
             <Route path="/admin/monitoring" element={<MonitoringPage />} />
             <Route path="/admin/notifications" element={<NotificationsManagePage />} />
             <Route path="/community/approval" element={<ContentApprovalPage />} />
             {/* M03 roadmap & grading - System Admin */}
-            <Route path="/admin/roadmaps" element={<AdminRoadmapPage />} />
-            <Route path="/admin/grading-settings" element={<GradingSettingsPage />} />
+            <Route path="/admin/roadmaps" element={<Navigate to="/admin/instruments?tab=roadmap" replace />} />
+            <Route path="/admin/grading-settings" element={<Navigate to="/admin/config" replace />} />
           </Route>
         </Route>
 

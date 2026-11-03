@@ -1,37 +1,36 @@
 import { type TableHTMLAttributes, type HTMLAttributes, type TdHTMLAttributes, type ThHTMLAttributes } from "react";
+import { TABLE_STYLES } from "@/shared/components/bvc/tableStyles";
 import { cn } from "@/shared/utils/cn";
 
 export function Table({ className, ...props }: TableHTMLAttributes<HTMLTableElement>) {
   return (
-    <div className="overflow-x-auto rounded-lg border border-outline-variant/30">
-      <table {...props} className={cn("w-full border-collapse text-left text-sm", className)} />
+    <div className={TABLE_STYLES.frame}>
+      <table {...props} className={cn(TABLE_STYLES.table, className)} />
     </div>
   );
 }
 
 export function TableHead({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>) {
-  return <thead {...props} className={cn("bg-surface-container-low", className)} />;
+  return <thead {...props} className={className} />;
 }
 
 export function TableBody({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>) {
-  return (
-    <tbody {...props} className={cn("divide-y divide-outline-variant/20 bg-surface-container-lowest", className)} />
-  );
+  return <tbody {...props} className={className} />;
 }
 
 export function TableRow({ className, ...props }: HTMLAttributes<HTMLTableRowElement>) {
-  return <tr {...props} className={cn("transition-colors hover:bg-primary/5", className)} />;
+  return <tr {...props} className={cn(TABLE_STYLES.row, className)} />;
+}
+
+// Hàng tiêu đề: đặt trong <TableHead>
+export function TableHeaderRow({ className, ...props }: HTMLAttributes<HTMLTableRowElement>) {
+  return <tr {...props} className={cn(TABLE_STYLES.headRow, className)} />;
 }
 
 export function TableHeaderCell({ className, ...props }: ThHTMLAttributes<HTMLTableCellElement>) {
-  return (
-    <th
-      {...props}
-      className={cn("px-4 py-3 text-xs font-semibold uppercase tracking-wider text-on-surface-variant", className)}
-    />
-  );
+  return <th {...props} className={cn(TABLE_STYLES.headCell, className)} />;
 }
 
 export function TableCell({ className, ...props }: TdHTMLAttributes<HTMLTableCellElement>) {
-  return <td {...props} className={cn("px-4 py-3 text-on-surface", className)} />;
+  return <td {...props} className={cn(TABLE_STYLES.cell, className)} />;
 }

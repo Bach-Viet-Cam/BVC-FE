@@ -12,13 +12,14 @@ import {
   formatWeekday,
   scaleBarHeights,
 } from "@/features/platform/utils/adminFormat";
+import { ActionButton } from "@/shared/components/bvc/ActionButton";
 
 const LEVEL_BADGE = {
   ERROR: "bg-bvc-accent-tint text-bvc-accent-text",
   WARN: "border border-bvc-border text-bvc-muted",
 } as const;
 
-const CARD_TITLE = "text-[15px] font-extrabold tracking-[-0.025em]";
+const CARD_TITLE = "text-[15px] font-semibold tracking-[-0.025em]";
 
 function MonitoringContent({ monitoring }: { monitoring: AdminMonitoring }) {
   const { storage } = monitoring;
@@ -37,7 +38,7 @@ function MonitoringContent({ monitoring }: { monitoring: AdminMonitoring }) {
       </div>
 
       <div className="grid grid-cols-2 gap-[20px]">
-        <div className="rounded-[20px] border border-bvc-border p-[18px]">
+        <div className="rounded-bvc-xl border border-bvc-border p-[18px]">
           <div className="mb-3">
             <span className={CARD_TITLE}>Hàng đợi phân tích</span>
             <span className="ml-2 font-mono text-[13px] text-bvc-muted">{monitoring.queueCount} bản thu đang chờ</span>
@@ -67,7 +68,7 @@ function MonitoringContent({ monitoring }: { monitoring: AdminMonitoring }) {
           </div>
         </div>
 
-        <div className="rounded-[20px] border border-bvc-border p-[18px]">
+        <div className="rounded-bvc-xl border border-bvc-border p-[18px]">
           <div className="mb-3">
             <span className={CARD_TITLE}>Cảnh báo &amp; lỗi gần nhất</span>
           </div>
@@ -79,7 +80,7 @@ function MonitoringContent({ monitoring }: { monitoring: AdminMonitoring }) {
               <div key={alert.code} className="border-b border-bvc-line py-[10px] last:border-0">
                 <div className="flex items-center gap-[8px]">
                   <span className="font-mono text-[11px] text-bvc-muted">Hiện tại</span>
-                  <span className={`rounded-[8px] px-2 py-0.5 text-[11px] font-semibold ${LEVEL_BADGE[alert.level]}`}>
+                  <span className={`rounded-[8px] px-2 py-0.5 text-[11px] font-medium ${LEVEL_BADGE[alert.level]}`}>
                     {alert.level}
                   </span>
                 </div>
@@ -90,7 +91,7 @@ function MonitoringContent({ monitoring }: { monitoring: AdminMonitoring }) {
               <div key={failure.id} className="border-b border-bvc-line py-[10px] last:border-0">
                 <div className="flex items-center gap-[8px]">
                   <span className="font-mono text-[11px] text-bvc-muted">{formatDateTime(failure.occurredAt)}</span>
-                  <span className={`rounded-[8px] px-2 py-0.5 text-[11px] font-semibold ${LEVEL_BADGE.ERROR}`}>
+                  <span className={`rounded-[8px] px-2 py-0.5 text-[11px] font-medium ${LEVEL_BADGE.ERROR}`}>
                     ERROR
                   </span>
                 </div>
@@ -100,7 +101,7 @@ function MonitoringContent({ monitoring }: { monitoring: AdminMonitoring }) {
           </div>
         </div>
 
-        <div className="rounded-[20px] border border-bvc-border p-[18px]">
+        <div className="rounded-bvc-xl border border-bvc-border p-[18px]">
           <div className="mb-3">
             <span className={CARD_TITLE}>Dung lượng lưu trữ</span>
           </div>
@@ -127,7 +128,7 @@ function MonitoringContent({ monitoring }: { monitoring: AdminMonitoring }) {
           </p>
         </div>
 
-        <div className="rounded-[20px] border border-bvc-border p-[18px]">
+        <div className="rounded-bvc-xl border border-bvc-border p-[18px]">
           <div className="mb-[14px]">
             <span className={CARD_TITLE}>Lượt nộp bài ({monitoring.submissionsByDay.length} ngày)</span>
           </div>
@@ -146,7 +147,7 @@ function MonitoringContent({ monitoring }: { monitoring: AdminMonitoring }) {
             {monitoring.submissionsByDay.map((day, index) => (
               <div key={day.date} className="flex flex-1 justify-center">
                 <span
-                  className={`font-mono text-[11px] ${index === lastIndex ? "font-bold text-bvc-accent-text" : "text-bvc-muted"}`}
+                  className={`font-mono text-[11px] ${index === lastIndex ? "font-semibold text-bvc-accent-text" : "text-bvc-muted"}`}
                 >
                   {formatWeekday(day.date)}
                 </span>
@@ -163,24 +164,20 @@ export function MonitoringPage() {
   const { monitoring, error, isLoading, reload } = useAdminMonitoring();
 
   return (
-    <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
+    <div className="flex min-w-0 flex-1 flex-col">
       <DesktopPageHeader
         breadcrumb="Quản trị"
         title="Giám sát hệ thống"
         actions={
-          <button
-            type="button"
-            onClick={reload}
-            className="flex min-h-[44px] cursor-pointer items-center gap-[8px] rounded-[14px] border border-bvc-border-strong bg-white px-[16px] text-[14px] font-semibold text-bvc-ink"
-          >
+          <ActionButton variant="secondary" onClick={reload}>
             <RefreshCw size={16} />
             Làm mới
-          </button>
+          </ActionButton>
         }
       />
       <PageStatus isLoading={isLoading} error={error} onRetry={reload}>
         {monitoring && <MonitoringContent monitoring={monitoring} />}
       </PageStatus>
-    </main>
+    </div>
   );
 }

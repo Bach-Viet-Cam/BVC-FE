@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { myNotificationApi } from "@/features/platform/api/myNotificationApi";
+import { NOTIFICATIONS_ARRIVED_EVENT } from "@/shared/hooks/useNewNotificationToast";
 
 const REFRESH_INTERVAL_MS = 60_000;
 
@@ -20,10 +21,12 @@ export function useUnreadNotificationCount() {
     refresh();
     const timer = window.setInterval(refresh, REFRESH_INTERVAL_MS);
     window.addEventListener("focus", refresh);
+    window.addEventListener(NOTIFICATIONS_ARRIVED_EVENT, refresh);
     return () => {
       cancelled = true;
       window.clearInterval(timer);
       window.removeEventListener("focus", refresh);
+      window.removeEventListener(NOTIFICATIONS_ARRIVED_EVENT, refresh);
     };
   }, []);
 

@@ -65,15 +65,15 @@ export function ReviewPage() {
           type="button"
           aria-label="Quay lại"
           onClick={() => navigate("/teacher/home")}
-          className="flex size-[42px] shrink-0 cursor-pointer items-center justify-center rounded-[14px] border border-bvc-border-strong bg-white text-bvc-ink"
+          className="flex size-[42px] shrink-0 cursor-pointer items-center justify-center rounded-full border border-bvc-border-strong bg-white text-bvc-ink"
         >
           <ChevronLeft size={20} strokeWidth={1.8} />
         </button>
         <div className="flex min-w-0 flex-1 flex-col gap-[3px]">
-          <div className="text-[12px] font-bold uppercase tracking-[0.14em] text-bvc-muted">
+          <div className="text-[12.5px] font-medium text-bvc-accent">
             {selectedStudent ? `Hàng đợi nhận xét · ${selectedIndex + 1} / ${queue.length}` : "Nhận xét bài nộp"}
           </div>
-          <div className="truncate text-[19px] font-extrabold tracking-[-0.025em] lg:text-[24px]">
+          <div className="truncate font-bvc-display text-[19px] font-semibold tracking-[-0.025em] lg:text-[26px]">
             {selectedStudent && selectedAssignment
               ? `${selectedStudent.fullName} - ${selectedAssignment.title}`
               : "Chọn bài nộp để nhận xét"}
@@ -135,9 +135,7 @@ export function ReviewPage() {
             ))}
           </select>
 
-          <div className="px-[6px] pt-[4px] text-[12px] font-bold uppercase tracking-[0.1em] text-bvc-muted">
-            Đã nộp bài
-          </div>
+          <div className="px-[6px] pt-[4px] text-[12px] font-semibold text-bvc-muted">Đã nộp bài</div>
           <ListState
             isLoading={isLoading}
             error={loadError}
@@ -165,12 +163,12 @@ export function ReviewPage() {
                     )}
                   >
                     <span className="flex items-center justify-between gap-[8px]">
-                      <span className={cn("text-[14px]", isActive && "font-bold text-bvc-accent-text")}>
+                      <span className={cn("text-[14px]", isActive && "font-semibold text-bvc-accent-text")}>
                         {student.fullName}
                       </span>
                       <span
                         className={cn(
-                          "font-mono text-[13px] font-semibold",
+                          "font-mono text-[13px] font-medium",
                           student.status === "PASSED" ? "text-bvc-ok" : "text-bvc-muted"
                         )}
                       >

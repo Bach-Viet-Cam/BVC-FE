@@ -32,7 +32,7 @@ export function SongCard({ song, showSave, isSaving, onToggleSave }: SongCardPro
         )}
       </div>
       <Link to={detailHref} className="flex flex-col gap-0.5 text-bvc-ink hover:text-bvc-ink">
-        <span className="truncate text-base font-bold">{song.title}</span>
+        <span className="truncate text-base font-semibold">{song.title}</span>
         <span className="truncate text-[13px] text-bvc-muted">{song.composer || "Chưa rõ tác giả"}</span>
       </Link>
       <div className="flex flex-wrap items-center gap-2.5">

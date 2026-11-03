@@ -1,11 +1,10 @@
-import { useRef, useState } from "react";
+import { useImperativeHandle, useRef, useState, type Ref } from "react";
 import { useForm, useWatch, type Path, type PathValue, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "react-router-dom";
-import { ActionButton } from "@/features/classes/components/ActionButton";
-import { ConfirmDialog } from "@/features/classes/components/ConfirmDialog";
-import { FooterActions } from "@/features/classes/components/FooterActions";
-import { FormField, INPUT_CLASSES } from "@/features/classes/components/FormField";
+import { ActionButton } from "@/shared/components/bvc/ActionButton";
+import { FormBody, FormFooter } from "@/shared/components/bvc/FormLayout";
+import { FormField } from "@/shared/components/bvc/FormField";
+import { INPUT_CLASSES } from "@/shared/components/bvc/fieldStyles";
 import { type ClassSummary, type Instrument } from "@/features/classes/types/classTypes";
 import { applyFieldErrors } from "@/features/classes/utils/mapApiErrors";
 import { ChallengePiecePickerDialog } from "@/features/community/components/ChallengePiecePickerDialog";
@@ -23,9 +22,10 @@ import {
   type ChallengeFormValues,
 } from "@/features/community/utils/validateChallenge";
 import { toast } from "@/shared/components/ui/toast";
+import { type DraftFormHandle } from "@/shared/hooks/useLeaveGuard";
+import { useReportDirty } from "@/shared/hooks/useReportDirty";
 import { cn } from "@/shared/utils/cn";
 
-const LIST_PATH = "/teacher/challenges";
 const FORM_FIELDS = [
   "title",
   "description",
@@ -45,6 +45,12 @@ interface ChallengeFormProps {
   instruments: Instrument[];
   defaultMinAccuracy: number;
   maxSubmissionsDefault: number;
+  onCancel: () => void;
+  // Lưu (nháp hoặc đăng) thành công
+  onSaved: () => void;
+  onDirtyChange?: (isDirty: boolean) => void;
+  // Cho hộp hỏi lại khi thoát gọi "Lưu bản nháp"
+  ref?: Ref<DraftFormHandle>;
 }
 
 export function ChallengeForm({
@@ -53,11 +59,13 @@ export function ChallengeForm({
   instruments,
   defaultMinAccuracy,
   maxSubmissionsDefault,
+  onCancel,
+  onSaved,
+  onDirtyChange,
+  ref,
 }: ChallengeFormProps) {
-  const navigate = useNavigate();
   const { saveChallenge, isSaving } = useSaveChallenge(challenge?.id);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const [isLeaveOpen, setIsLeaveOpen] = useState(false);
   // Publishing validates more fields than a draft; a ref picks the schema without extra renders.
   const isPublishingRef = useRef(false);
   const isReadOnly = challenge !== null && challenge.status !== "DRAFT";
@@ -82,6 +90,7 @@ export function ChallengeForm({
     clearErrors,
     formState: { errors, isDirty },
   } = useForm<ChallengeFormValues>({ resolver, defaultValues });
+  useReportDirty(isDirty, onDirtyChange);
   const title = useWatch({ control, name: "title" }) ?? "";
   const description = useWatch({ control, name: "description" }) ?? "";
   const instrumentId = useWatch({ control, name: "instrumentId" });
@@ -115,29 +124,41 @@ export function ChallengeForm({
     update("pieceBpm", String(piece.bpm));
   };
 
-  const submitWith = (publish: boolean) =>
-    handleSubmit(async (values) => {
-      const result = await saveChallenge(values, publish);
-      if ("challenge" in result) {
-        toast.success(result.message);
-        navigate(LIST_PATH, { replace: true });
-        return;
-      }
-      const unmatched = applyFieldErrors<ChallengeFormValues>(result.error.fieldErrors, FORM_FIELDS, setError);
-      if (result.error.fieldErrors.length === 0) toast.error(result.error.message);
-      else for (const fieldError of unmatched) toast.error(fieldError.message);
-    });
+  const save = async (values: ChallengeFormValues, publish: boolean) => {
+    const result = await saveChallenge(values, publish);
+    if ("challenge" in result) {
+      toast.success(result.message);
+      onSaved();
+      return true;
+    }
+    const unmatched = applyFieldErrors<ChallengeFormValues>(result.error.fieldErrors, FORM_FIELDS, setError);
+    if (result.error.fieldErrors.length === 0) toast.error(result.error.message);
+    else for (const fieldError of unmatched) toast.error(fieldError.message);
+    return false;
+  };
 
   const submit = (publish: boolean, event: React.BaseSyntheticEvent) => {
     isPublishingRef.current = publish;
-    return submitWith(publish)(event);
+    return handleSubmit(async (values) => {
+      await save(values, publish);
+    })(event);
   };
 
-  const cancel = () => (isDirty ? setIsLeaveOpen(true) : navigate(LIST_PATH));
+  useImperativeHandle(ref, () => ({
+    saveDraft: () => {
+      isPublishingRef.current = false;
+      return new Promise<boolean>((resolve) => {
+        void handleSubmit(
+          async (values) => resolve(await save(values, false)),
+          () => resolve(false)
+        )();
+      });
+    },
+  }));
 
   return (
     <form onSubmit={(event) => submit(false, event)} noValidate className="flex grow flex-col">
-      <div className="flex grow flex-col gap-[16px] px-[18px] pb-[18px] pt-[6px] lg:m-[22px_32px] lg:max-w-[720px] lg:grow-0 lg:rounded-[20px] lg:border lg:border-bvc-border lg:p-[20px]">
+      <FormBody>
         {isReadOnly && (
           <p role="status" className="rounded-[13px] bg-bvc-soft px-[13px] py-[11px] text-[13.5px] text-bvc-ink">
             Thử thách này đã được đăng nên không thể chỉnh sửa.
@@ -145,9 +166,9 @@ export function ChallengeForm({
         )}
         <fieldset disabled={isReadOnly} className="m-0 flex min-w-0 flex-col gap-[16px] border-none p-0">
           <FormField
-            id="challenge-title"
+            htmlFor="challenge-title"
             label="Tên thử thách"
-            isRequired
+            required
             hint={`${title.length} / ${CHALLENGE_TITLE_MAX}`}
             error={errors.title?.message}
           >
@@ -159,7 +180,7 @@ export function ChallengeForm({
             />
           </FormField>
           <FormField
-            id="challenge-description"
+            htmlFor="challenge-description"
             label="Mô tả"
             hint={`${description.length} / ${CHALLENGE_DESCRIPTION_MAX}`}
             error={errors.description?.message}
@@ -172,7 +193,7 @@ export function ChallengeForm({
               className={cn(INPUT_CLASSES, "h-auto resize-y py-[11px] leading-[1.5]")}
             />
           </FormField>
-          <FormField id="challenge-instrument" label="Nhạc cụ" isRequired error={errors.instrumentId?.message}>
+          <FormField htmlFor="challenge-instrument" label="Nhạc cụ" required error={errors.instrumentId?.message}>
             <select
               id="challenge-instrument"
               {...instrumentField}
@@ -187,28 +208,28 @@ export function ChallengeForm({
               ))}
             </select>
           </FormField>
-          <FormField id="challenge-piece" label="Bài nhạc" isRequired error={errors.pieceId?.message}>
+          <FormField htmlFor="challenge-piece" label="Bài nhạc" required error={errors.pieceId?.message}>
             {pieceId ? (
               <div className="flex min-h-[46px] items-center justify-between gap-[10px] rounded-[13px] border border-bvc-border-strong px-[13px] py-[6px]">
                 <div className="flex min-w-0 flex-col">
-                  <span className="truncate text-[14.5px] font-semibold text-bvc-ink">{pieceTitle}</span>
+                  <span className="truncate text-[14.5px] font-medium text-bvc-ink">{pieceTitle}</span>
                   {pieceBpm && <span className="text-[12px] text-bvc-muted">{pieceBpm} BPM</span>}
                 </div>
                 <button
                   type="button"
                   onClick={() => setIsPickerOpen(true)}
-                  className="min-h-[44px] shrink-0 cursor-pointer px-[6px] text-[13.5px] font-semibold text-bvc-accent-text underline"
+                  className="min-h-[44px] shrink-0 cursor-pointer px-[6px] text-[13.5px] font-medium text-bvc-accent-text underline"
                 >
                   Thay đổi
                 </button>
               </div>
             ) : (
-              <ActionButton onClick={() => setIsPickerOpen(true)} disabled={!instrumentId}>
+              <ActionButton variant="secondary" onClick={() => setIsPickerOpen(true)} disabled={!instrumentId}>
                 Chọn bài nhạc
               </ActionButton>
             )}
           </FormField>
-          <FormField id="challenge-classes" label="Lớp" isRequired error={errors.classIds?.message}>
+          <FormField htmlFor="challenge-classes" label="Lớp" required error={errors.classIds?.message}>
             <ClassMultiSelect
               classes={classes}
               instrumentId={instrumentId}
@@ -216,7 +237,7 @@ export function ChallengeForm({
               onChange={(next) => update("classIds", next)}
             />
           </FormField>
-          <FormField id="challenge-week" label="Tuần" isRequired error={errors.weekStart?.message}>
+          <FormField htmlFor="challenge-week" label="Tuần" required error={errors.weekStart?.message}>
             <WeekPicker
               id="challenge-week"
               value={weekStart}
@@ -224,7 +245,7 @@ export function ChallengeForm({
               hasError={Boolean(errors.weekStart)}
             />
           </FormField>
-          <FormField id="challenge-accuracy" label="Độ chính xác tối thiểu" error={errors.minAccuracy?.message}>
+          <FormField htmlFor="challenge-accuracy" label="Độ chính xác tối thiểu" error={errors.minAccuracy?.message}>
             <input
               id="challenge-accuracy"
               inputMode="numeric"
@@ -234,7 +255,7 @@ export function ChallengeForm({
             />
           </FormField>
           <FormField
-            id="challenge-bpm"
+            htmlFor="challenge-bpm"
             label="BPM yêu cầu"
             hint="Bỏ trống để dùng BPM mặc định của bài nhạc"
             error={errors.requiredBpm?.message}
@@ -248,7 +269,11 @@ export function ChallengeForm({
               className={cn(INPUT_CLASSES, "font-bvc-mono")}
             />
           </FormField>
-          <FormField id="challenge-max-submissions" label="Số lần nộp tối đa" error={errors.maxSubmissions?.message}>
+          <FormField
+            htmlFor="challenge-max-submissions"
+            label="Số lần nộp tối đa"
+            error={errors.maxSubmissions?.message}
+          >
             <input
               id="challenge-max-submissions"
               inputMode="numeric"
@@ -258,35 +283,27 @@ export function ChallengeForm({
             />
           </FormField>
         </fieldset>
-      </div>
-      <FooterActions>
-        <ActionButton size="lg" onClick={cancel} disabled={isSaving}>
+      </FormBody>
+      <FormFooter>
+        <ActionButton variant="secondary" onClick={onCancel} disabled={isSaving}>
           {isReadOnly ? "Quay lại" : "Hủy"}
         </ActionButton>
         {!isReadOnly && (
           <>
-            <ActionButton size="lg" onClick={(event) => submit(false, event)} disabled={isSaving}>
+            <ActionButton variant="secondary" onClick={(event) => submit(false, event)} disabled={isSaving}>
               Lưu nháp
             </ActionButton>
-            <ActionButton size="lg" variant="primary" onClick={(event) => submit(true, event)} disabled={isSaving}>
+            <ActionButton variant="primary" onClick={(event) => submit(true, event)} disabled={isSaving}>
               {isSaving ? "Đang lưu…" : "Đăng thử thách"}
             </ActionButton>
           </>
         )}
-      </FooterActions>
+      </FormFooter>
       <ChallengePiecePickerDialog
         isOpen={isPickerOpen}
         instrumentId={instrumentId}
         onSelect={choosePiece}
         onClose={() => setIsPickerOpen(false)}
-      />
-      <ConfirmDialog
-        isOpen={isLeaveOpen}
-        title="Hủy thay đổi?"
-        description="Các thay đổi chưa lưu sẽ bị mất."
-        confirmLabel="Rời đi"
-        onConfirm={() => navigate(LIST_PATH)}
-        onCancel={() => setIsLeaveOpen(false)}
       />
     </form>
   );

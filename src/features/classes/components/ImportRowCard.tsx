@@ -15,7 +15,7 @@ export function ImportRowCard({ row }: ImportRowCardProps) {
       )}
     >
       <span className="flex justify-between gap-[8px]">
-        <span className="text-[14px] font-bold">{row.fullName || "-"}</span>
+        <span className="text-[14px] font-semibold">{row.fullName || "-"}</span>
         <span className="font-bvc-mono text-[11.5px] text-bvc-muted">dòng {row.rowNumber}</span>
       </span>
       <span className="break-all text-[12px] text-bvc-muted">

@@ -11,8 +11,8 @@ interface RoadmapInstrumentListProps {
 
 export function RoadmapInstrumentList({ items, selectedInstrumentId, onSelect }: RoadmapInstrumentListProps) {
   return (
-    <section className="flex flex-col gap-[12px] self-start rounded-[18px] border border-bvc-border p-[16px]">
-      <h2 className="m-0 text-[15px] font-extrabold tracking-[-0.01em]">Nhạc cụ</h2>
+    <section className="flex flex-col gap-[12px] self-start rounded-bvc-xl border border-bvc-border p-[16px]">
+      <h2 className="m-0 text-[15px] font-semibold tracking-[-0.01em]">Nhạc cụ</h2>
       {items.length === 0 && <span className="text-[13px] text-bvc-muted">Chưa có nhạc cụ đang hoạt động.</span>}
       {items.map((item) => {
         const isSelected = item.instrument.id === selectedInstrumentId;
@@ -27,7 +27,7 @@ export function RoadmapInstrumentList({ items, selectedInstrumentId, onSelect }:
               isSelected && "bg-bvc-soft"
             )}
           >
-            <span className="grow text-[14px] font-semibold">{item.instrument.name}</span>
+            <span className="grow text-[14px] font-medium">{item.instrument.name}</span>
             <StatusLabel
               tone={item.latestVersion ? "ok" : "warn"}
               label={

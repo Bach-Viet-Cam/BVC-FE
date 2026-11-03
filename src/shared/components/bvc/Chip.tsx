@@ -15,7 +15,7 @@ interface ChipProps {
 const VARIANTS: Record<ChipVariant, string> = {
   tint: "bg-bvc-accent-tint text-bvc-accent-text",
   surface: "bg-bvc-surface text-bvc-ink",
-  ink: "bg-bvc-ink font-bold text-white",
+  ink: "bg-bvc-ink font-semibold text-white",
   outline: "border border-bvc-border-strong bg-white text-bvc-muted",
 };
 

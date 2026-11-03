@@ -35,11 +35,11 @@ export function AudioAnalysisTestPage() {
           Về bảng điều khiển
         </Link>
         <header className="mb-8 mt-6">
-          <p className="mb-3 flex items-center gap-2 text-sm font-semibold text-bvc-accent">
+          <p className="mb-3 flex items-center gap-2 text-sm font-medium text-bvc-accent">
             <AudioLines size={20} />
             Thử nghiệm · Đàn bầu
           </p>
-          <h1 className="text-3xl font-bold">So sánh audio</h1>
+          <h1 className="text-3xl font-semibold">So sánh audio</h1>
           <p className="mt-3 max-w-2xl text-bvc-muted">
             Tải bản mẫu và bài nộp của học sinh. Mỗi file được lưu ngay khi chọn; bấm So sánh khi cả hai file đã sẵn
             sàng.
@@ -65,7 +65,7 @@ export function AudioAnalysisTestPage() {
           onClick={() => {
             if (template && student) void create({ templateUrl: template.url, studentUrl: student.url });
           }}
-          className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-bvc-ink px-6 py-4 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
+          className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-bvc-ink px-6 py-4 font-medium text-white disabled:cursor-not-allowed disabled:opacity-40"
         >
           {busy && <LoaderCircle className="animate-spin" size={18} />}
           {submitting ? "Đang gửi yêu cầu…" : polling ? "Đang chờ kết quả…" : "So sánh"}
@@ -77,7 +77,7 @@ export function AudioAnalysisTestPage() {
         )}
         {evaluationId && (
           <section className="mt-6 rounded-2xl border border-bvc-border bg-white p-6" aria-live="polite">
-            <h2 className="text-lg font-semibold">
+            <h2 className="text-lg font-medium">
               {evaluation ? statusLabels[evaluation.status] : "Đang kiểm tra yêu cầu đã lưu"}
             </h2>
             <p className="mt-2 break-all font-mono text-xs text-bvc-muted">Mã yêu cầu: {evaluationId}</p>
@@ -96,7 +96,7 @@ export function AudioAnalysisTestPage() {
                 <p className="text-sm text-bvc-muted">Đã tạm dừng chờ trên giao diện. Tác vụ có thể vẫn đang chạy.</p>
                 <button
                   type="button"
-                  className="mt-3 rounded-lg border border-bvc-border px-4 py-2 text-sm"
+                  className="mt-3 rounded-full border border-bvc-border px-4 py-2 text-sm"
                   onClick={resume}
                 >
                   Tiếp tục kiểm tra
@@ -110,7 +110,7 @@ export function AudioAnalysisTestPage() {
                   <ScoreBar label="Cao độ" score={result.pitchAccuracyPercent} />
                   <ScoreBar label="Nhịp" score={result.rhythmAccuracyPercent} />
                   <div>
-                    <h3 className="mb-2 text-sm font-semibold">Nhận xét AI</h3>
+                    <h3 className="mb-2 text-sm font-medium">Nhận xét AI</h3>
                     <p className="whitespace-pre-wrap text-sm leading-6 text-bvc-muted">
                       {result.aiFeedback || "Chưa có nhận xét."}
                     </p>

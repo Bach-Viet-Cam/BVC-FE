@@ -15,7 +15,7 @@ export function SheetVersionList({ title, sheets, hrefOf }: SheetVersionListProp
 
   return (
     <div className="flex flex-col">
-      <span className="flex items-center gap-2 px-1 pb-2 text-xs font-bold tracking-[0.06em] text-bvc-muted uppercase md:px-[18px]">
+      <span className="flex items-center gap-2 px-1 pb-2 text-xs font-semibold text-bvc-muted md:px-[18px]">
         {title}
         <span className="font-bvc-mono">{sheets.length}</span>
       </span>
@@ -26,7 +26,7 @@ export function SheetVersionList({ title, sheets, hrefOf }: SheetVersionListProp
           className="flex items-center gap-3 border-t border-bvc-border px-1 py-[13px] text-bvc-ink hover:bg-bvc-surface hover:text-bvc-ink md:px-[18px]"
         >
           <span className="hidden w-[18px] font-bvc-mono text-[13px] text-bvc-muted sm:inline">{index + 2}</span>
-          <span className="min-w-0 flex-1 truncate text-[15px] font-bold">{sheet.name}</span>
+          <span className="min-w-0 flex-1 truncate text-[15px] font-semibold">{sheet.name}</span>
           <Chip>{sheet.level.name}</Chip>
           {sheet.referenceRecording && (
             <span title="Có bản thu mẫu" className="text-bvc-accent">

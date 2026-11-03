@@ -37,6 +37,7 @@ import {
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
 import { Skeleton } from "@/shared/components/ui/skeleton";
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
 import { toast } from "@/shared/components/ui/toast";
 import { StudentImportDialog } from "@/features/platform/components/StudentImportDialog";
 import { UserFormDialog } from "@/features/platform/components/UserFormDialog";
@@ -46,7 +47,9 @@ import { type UserItem, type UserSortKey, type UserStatus } from "@/features/pla
 import { ROLES } from "@/shared/constants/roles";
 import { formatDateTime } from "@/shared/utils/formatDate";
 import { getInitials } from "@/shared/utils/getInitials";
+import { TABLE_STYLES } from "@/shared/components/bvc/tableStyles";
 import { cn } from "@/shared/utils/cn";
+import { ActionButton } from "@/shared/components/bvc/ActionButton";
 
 const ROLE_TABS: { value?: number; label: string; icon: LucideIcon }[] = [
   { value: undefined, label: "Tất cả vai trò", icon: Users },
@@ -122,7 +125,7 @@ export function UserManagePage() {
 
   return (
     <>
-      <main className="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#FAF9F7]">
+      <div className="flex min-w-0 flex-1 flex-col bg-[#FAF9F7]">
         <DesktopPageHeader
           breadcrumb="Quản trị"
           title="Người dùng"
@@ -133,35 +136,33 @@ export function UserManagePage() {
                 onClick={reload}
                 disabled={isLoading}
                 title="Làm mới danh sách"
-                className="flex size-[42px] cursor-pointer items-center justify-center rounded-[12px] border border-bvc-border bg-white text-bvc-muted transition-colors hover:border-bvc-border-strong hover:text-bvc-ink disabled:opacity-50"
+                className="flex size-[42px] cursor-pointer items-center justify-center rounded-full border border-bvc-border bg-white text-bvc-muted transition-colors hover:border-bvc-border-strong hover:text-bvc-ink disabled:opacity-50"
               >
                 <RotateCw size={16} className={cn(isLoading && "animate-spin text-bvc-ink")} />
               </button>
 
-              <button
-                type="button"
+              <ActionButton
+                variant="secondary"
+                title="Nhập từ Excel"
+                className="max-sm:px-3.5"
                 onClick={() => setIsImportOpen(true)}
-                className="flex min-h-[42px] cursor-pointer items-center gap-2 rounded-[12px] border border-bvc-border bg-white px-4 text-[13.5px] font-semibold text-bvc-ink transition-colors hover:border-bvc-border-strong"
               >
                 <FileSpreadsheet size={16} />
-                <span>Nhập từ Excel</span>
-              </button>
+                <span className="hidden sm:inline">Nhập từ Excel</span>
+              </ActionButton>
 
-              <button
-                type="button"
-                onClick={() => openForm(null)}
-                className="flex min-h-[42px] cursor-pointer items-center gap-2 rounded-[12px] bg-bvc-ink px-4 text-[13.5px] font-semibold text-white shadow-xs transition-colors hover:bg-black"
-              >
+              <ActionButton title="Thêm người dùng" className="max-sm:px-3.5" onClick={() => openForm(null)}>
                 <UserPlus size={16} />
-                <span>Thêm người dùng</span>
-              </button>
+                <span className="hidden sm:inline">Thêm người dùng</span>
+              </ActionButton>
             </div>
           }
         />
 
-        <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-6 md:px-8">
-          <div className="flex flex-col gap-3 rounded-[16px] border border-bvc-border bg-white p-3.5 shadow-none sm:flex-row sm:items-center sm:justify-between">
-            <div className="inline-flex flex-wrap items-center rounded-[12px] border border-bvc-border/80 bg-bvc-surface/60 p-1">
+        <div className="flex min-w-0 flex-1 flex-col gap-4 p-6 md:px-8">
+          <div className="flex flex-col gap-3 rounded-bvc-xl border border-bvc-border bg-white p-3.5 shadow-none lg:flex-row lg:items-center lg:justify-between">
+            {/* Màn lớn (>= lg): Hiện đầy đủ các tabs chọn vai trò bên trái */}
+            <div className="hidden shrink-0 items-center rounded-3xl border border-bvc-border/80 bg-bvc-surface/60 p-1 lg:inline-flex">
               {ROLE_TABS.map((tab) => {
                 const isActive = filters.role === tab.value;
                 const Icon = tab.icon;
@@ -169,39 +170,24 @@ export function UserManagePage() {
                   <button
                     key={tab.value ?? "all"}
                     type="button"
+                    role="tab"
+                    aria-selected={isActive}
                     onClick={() => updateFilters({ role: tab.value })}
                     className={cn(
-                      "flex cursor-pointer items-center gap-1.5 rounded-[9px] px-3.5 py-1.5 text-[13px] font-semibold transition-all select-none",
+                      "flex cursor-pointer items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-all select-none",
                       isActive ? "bg-white text-bvc-ink shadow-xs" : "text-bvc-muted hover:text-bvc-ink"
                     )}
                   >
-                    {Icon && <Icon size={14} className={isActive ? "text-bvc-ink" : "text-bvc-faint"} />}
+                    <Icon size={14} className={isActive ? "text-bvc-ink" : "text-bvc-faint"} />
                     <span>{tab.label}</span>
                   </button>
                 );
               })}
             </div>
 
-            <div className="flex flex-wrap items-center gap-2.5">
-              <div className="relative">
-                <select
-                  aria-label="Trạng thái tài khoản"
-                  value={filters.status ?? ""}
-                  onChange={(event) =>
-                    updateFilters({ status: (event.target.value || undefined) as UserStatus | undefined })
-                  }
-                  className="h-[38px] cursor-pointer rounded-[11px] border border-bvc-border-strong bg-white pl-3 pr-8 text-[13px] font-medium text-bvc-ink transition-colors focus:border-bvc-ink focus:outline-none"
-                >
-                  <option value="">Tất cả trạng thái</option>
-                  {USER_STATUS_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="relative flex items-center">
+            {/* Các bộ lọc phụ, tìm kiếm và dropdown vai trò khi màn nhỏ (cùng nằm chung 1 hàng) */}
+            <div className="flex flex-1 flex-wrap items-center gap-2.5 lg:justify-end">
+              <div className="relative flex flex-1 items-center min-w-[180px] sm:max-w-[260px]">
                 <Search size={15} className="pointer-events-none absolute left-3 text-bvc-muted" />
                 <input
                   type="search"
@@ -209,7 +195,7 @@ export function UserManagePage() {
                   onChange={(event) => setSearchText(event.target.value)}
                   placeholder="Tên, email hoặc mã SV..."
                   maxLength={100}
-                  className="h-[38px] w-[240px] rounded-[11px] border border-bvc-border-strong bg-white pl-8.5 pr-8 text-[13px] text-bvc-ink placeholder:text-bvc-faint transition-all focus:border-bvc-ink focus:outline-none"
+                  className="h-[38px] w-full rounded-[10px] border border-bvc-border-strong bg-white pl-8.5 pr-8 text-[13px] text-bvc-ink placeholder:text-bvc-faint transition-all focus:border-bvc-ink focus:outline-none"
                 />
                 {searchText && (
                   <button
@@ -222,11 +208,91 @@ export function UserManagePage() {
                 )}
               </div>
 
+              {/* Màn nhỏ (< lg): Thu gọn vai trò thành dropdown shadcn Select nằm CHUNG HÀNG */}
+              <div className="flex lg:hidden items-center">
+                <Select
+                  value={filters.role ? String(filters.role) : "ALL"}
+                  onValueChange={(val) => updateFilters({ role: val === "ALL" ? undefined : Number(val) })}
+                >
+                  <SelectTrigger
+                    aria-label="Chọn vai trò người dùng"
+                    className="h-[38px] min-w-[145px] rounded-[10px] border-bvc-border-strong bg-white px-3 text-[13px] font-medium text-bvc-ink shadow-2xs hover:border-bvc-ink"
+                  >
+                    <SelectValue>
+                      {(val) => {
+                        const tab = ROLE_TABS.find((t) => (t.value ? String(t.value) : "ALL") === val);
+                        const Icon = tab?.icon;
+                        return (
+                          <span className="flex items-center gap-2 truncate">
+                            {Icon && <Icon size={14} className="text-bvc-ink shrink-0" />}
+                            <span className="truncate">{tab?.label ?? "Tất cả vai trò"}</span>
+                          </span>
+                        );
+                      }}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectPopup positionerClassName="z-50">
+                    <SelectItem value="ALL">
+                      <span className="flex items-center gap-2">
+                        <Users size={14} className="text-bvc-muted shrink-0" />
+                        <span>Tất cả vai trò</span>
+                      </span>
+                    </SelectItem>
+                    <SelectItem value={String(ROLES.STUDENT)}>
+                      <span className="flex items-center gap-2">
+                        <BookOpen size={14} className="text-bvc-muted shrink-0" />
+                        <span>Sinh viên</span>
+                      </span>
+                    </SelectItem>
+                    <SelectItem value={String(ROLES.TEACHER)}>
+                      <span className="flex items-center gap-2">
+                        <GraduationCap size={14} className="text-bvc-muted shrink-0" />
+                        <span>Giảng viên</span>
+                      </span>
+                    </SelectItem>
+                    <SelectItem value={String(ROLES.SYSTEM_ADMIN)}>
+                      <span className="flex items-center gap-2">
+                        <ShieldCheck size={14} className="text-bvc-muted shrink-0" />
+                        <span>Quản trị viên</span>
+                      </span>
+                    </SelectItem>
+                  </SelectPopup>
+                </Select>
+              </div>
+
+              {/* Bộ lọc trạng thái dùng shadcn Select với SelectValue hiển thị đúng tiếng Việt */}
+              <div className="relative">
+                <Select
+                  value={filters.status ?? "ALL"}
+                  onValueChange={(val) => updateFilters({ status: val === "ALL" ? undefined : (val as UserStatus) })}
+                >
+                  <SelectTrigger
+                    aria-label="Trạng thái tài khoản"
+                    className="h-[38px] min-w-[160px] rounded-[10px] border-bvc-border-strong bg-white px-3 text-[13px] font-medium text-bvc-ink shadow-2xs hover:border-bvc-ink"
+                  >
+                    <SelectValue>
+                      {(val) => {
+                        const opt = USER_STATUS_OPTIONS.find((o) => o.value === val);
+                        return <span className="truncate">{opt?.label ?? "Tất cả trạng thái"}</span>;
+                      }}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectPopup positionerClassName="z-50">
+                    <SelectItem value="ALL">Tất cả trạng thái</SelectItem>
+                    {USER_STATUS_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectPopup>
+                </Select>
+              </div>
+
               {hasActiveFilters && (
                 <button
                   type="button"
                   onClick={resetFilters}
-                  className="flex h-[38px] cursor-pointer items-center gap-1.5 rounded-[11px] border border-bvc-border bg-bvc-surface/80 px-2.5 text-[12.5px] font-medium text-bvc-muted transition-colors hover:bg-bvc-border hover:text-bvc-ink"
+                  className="flex h-[38px] cursor-pointer items-center gap-1.5 rounded-full border border-bvc-border bg-bvc-surface/80 px-2.5 text-[12.5px] font-medium text-bvc-muted transition-colors hover:bg-bvc-border hover:text-bvc-ink"
                   title="Xóa toàn bộ bộ lọc"
                 >
                   <X size={13} />
@@ -234,22 +300,22 @@ export function UserManagePage() {
                 </button>
               )}
 
-              <span className="ml-1 font-mono text-[13px] text-bvc-muted">
+              <span className="shrink-0 font-mono text-[13px] text-bvc-muted ml-1">
                 {total} <span className="font-sans text-[12px] text-bvc-faint">người dùng</span>
               </span>
             </div>
           </div>
 
-          <div className="flex flex-col overflow-hidden rounded-[18px] border border-bvc-border bg-white shadow-none">
+          <div className="flex flex-col overflow-hidden rounded-bvc-xl border border-bvc-border bg-white">
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[980px] border-collapse text-left text-[13px]">
+              <table className={cn(TABLE_STYLES.table, TABLE_STYLES.dense, "min-w-[980px]")}>
                 <thead>
-                  <tr className="border-b border-bvc-border bg-bvc-surface/50 text-[11.5px] font-bold uppercase tracking-[0.06em] text-bvc-muted">
-                    <th className="px-5 py-3.5">
+                  <tr className={cn(TABLE_STYLES.headRow, TABLE_STYLES.headText)}>
+                    <th className="px-3 py-3">
                       <button
                         type="button"
                         onClick={() => toggleSort("username")}
-                        className="flex cursor-pointer items-center gap-1.5 text-left transition-colors hover:text-bvc-ink uppercase"
+                        className="flex cursor-pointer items-center gap-1.5 text-left transition-colors hover:text-bvc-ink"
                       >
                         <span>Người dùng</span>
                         {filters.sortBy === "username" ? (
@@ -264,11 +330,11 @@ export function UserManagePage() {
                       </button>
                     </th>
 
-                    <th className="px-4 py-3.5">
+                    <th className="px-3 py-3">
                       <button
                         type="button"
                         onClick={() => toggleSort("email")}
-                        className="flex cursor-pointer items-center gap-1.5 text-left transition-colors hover:text-bvc-ink uppercase"
+                        className="flex cursor-pointer items-center gap-1.5 text-left transition-colors hover:text-bvc-ink"
                       >
                         <span>Email</span>
                         {filters.sortBy === "email" ? (
@@ -283,11 +349,11 @@ export function UserManagePage() {
                       </button>
                     </th>
 
-                    <th className="px-4 py-3.5">
+                    <th className="px-3 py-3">
                       <button
                         type="button"
                         onClick={() => toggleSort("role")}
-                        className="flex cursor-pointer items-center gap-1.5 text-left transition-colors hover:text-bvc-ink uppercase"
+                        className="flex cursor-pointer items-center gap-1.5 text-left transition-colors hover:text-bvc-ink"
                       >
                         <span>Vai trò</span>
                         {filters.sortBy === "role" ? (
@@ -302,13 +368,13 @@ export function UserManagePage() {
                       </button>
                     </th>
 
-                    <th className="px-4 py-3.5">Mã SV</th>
+                    <th className="px-3 py-3">Mã SV</th>
 
-                    <th className="px-4 py-3.5">
+                    <th className="px-3 py-3">
                       <button
                         type="button"
                         onClick={() => toggleSort("status")}
-                        className="flex cursor-pointer items-center gap-1.5 text-left transition-colors hover:text-bvc-ink uppercase"
+                        className="flex cursor-pointer items-center gap-1.5 text-left transition-colors hover:text-bvc-ink"
                       >
                         <span>Trạng thái</span>
                         {filters.sortBy === "status" ? (
@@ -323,16 +389,16 @@ export function UserManagePage() {
                       </button>
                     </th>
 
-                    <th className="px-4 py-3.5">Đăng nhập gần nhất</th>
-                    <th className="px-5 py-3.5 text-right">Thao tác</th>
+                    <th className="px-3 py-3">Đăng nhập gần nhất</th>
+                    <th className="px-3 py-3 text-right">Thao tác</th>
                   </tr>
                 </thead>
 
-                <tbody className="divide-y divide-bvc-line">
+                <tbody className="divide-y divide-bvc-border">
                   {isLoading &&
                     Array.from({ length: 6 }).map((_, index) => (
                       <tr key={`skeleton-${index}`} className="h-[60px]">
-                        <td className="px-5 py-3">
+                        <td className="px-3 py-3.5">
                           <div className="flex items-center gap-3">
                             <Skeleton className="size-9 shrink-0 rounded-full bg-bvc-surface" />
                             <div className="flex flex-col gap-1.5">
@@ -341,22 +407,22 @@ export function UserManagePage() {
                             </div>
                           </div>
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-3 py-3.5">
                           <Skeleton className="h-4 w-40 rounded bg-bvc-surface" />
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-3 py-3.5">
                           <Skeleton className="h-6 w-24 rounded-full bg-bvc-surface" />
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-3 py-3.5">
                           <Skeleton className="h-5 w-16 rounded bg-bvc-surface" />
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-3 py-3.5">
                           <Skeleton className="h-5 w-20 rounded bg-bvc-surface" />
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-3 py-3.5">
                           <Skeleton className="h-4 w-28 rounded bg-bvc-surface" />
                         </td>
-                        <td className="px-5 py-3 text-right">
+                        <td className="px-3 py-3.5 text-right">
                           <div className="flex justify-end gap-1.5">
                             <Skeleton className="size-7 rounded bg-bvc-surface" />
                             <Skeleton className="size-7 rounded bg-bvc-surface" />
@@ -370,7 +436,7 @@ export function UserManagePage() {
                       <td colSpan={7} className="px-6 py-12 text-center">
                         <div className="flex flex-col items-center justify-center gap-2">
                           <ShieldAlert size={28} className="text-bvc-error" />
-                          <p className="text-[14px] font-semibold text-bvc-ink">Đã có lỗi xảy ra</p>
+                          <p className="text-[14px] font-medium text-bvc-ink">Đã có lỗi xảy ra</p>
                           <p className="max-w-md text-[13px] text-bvc-muted">{error}</p>
                           <Button variant="secondary" size="sm" onClick={reload} className="mt-2 rounded-[10px]">
                             Thử lại
@@ -388,7 +454,7 @@ export function UserManagePage() {
                             <SearchX size={22} />
                           </div>
                           <div className="flex flex-col gap-1">
-                            <p className="text-[15px] font-bold text-bvc-ink">Không tìm thấy người dùng</p>
+                            <p className="text-[15px] font-semibold text-bvc-ink">Không tìm thấy người dùng</p>
                             <p className="max-w-sm text-[13px] text-bvc-muted">
                               {hasActiveFilters
                                 ? "Không có tài khoản nào khớp với bộ lọc hoặc từ khóa tìm kiếm của bạn."
@@ -418,14 +484,14 @@ export function UserManagePage() {
                       const initials = getInitials(user.username);
 
                       return (
-                        <tr key={user.id} className="h-[60px] transition-colors hover:bg-bvc-surface/40 group">
-                          <td className="px-5 py-3">
+                        <tr key={user.id} className="h-[60px] transition-colors hover:bg-bvc-soft/70 group">
+                          <td className="px-3 py-3.5">
                             <div className="flex items-center gap-3">
-                              <div className="flex size-9 shrink-0 items-center justify-center rounded-full border border-bvc-border bg-bvc-surface text-[12px] font-bold text-bvc-ink">
+                              <div className="flex size-9 shrink-0 items-center justify-center rounded-full border border-bvc-border bg-bvc-surface text-[12px] font-semibold text-bvc-ink">
                                 {initials}
                               </div>
-                              <div className="flex flex-col min-w-0">
-                                <span className="truncate font-semibold text-bvc-ink">{user.username}</span>
+                              <div className="flex max-w-[180px] min-w-0 flex-col">
+                                <span className="truncate font-medium text-bvc-ink">{user.username}</span>
                                 <span className="truncate font-mono text-[11px] text-bvc-faint">
                                   ID: {user.id.slice(0, 8)}
                                 </span>
@@ -433,8 +499,8 @@ export function UserManagePage() {
                             </div>
                           </td>
 
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-1.5 max-w-[280px]">
+                          <td className="px-3 py-3.5">
+                            <div className="flex max-w-[200px] items-center gap-1.5">
                               <span className="truncate text-bvc-muted select-all" title={user.email}>
                                 {user.email}
                               </span>
@@ -453,28 +519,28 @@ export function UserManagePage() {
                             </div>
                           </td>
 
-                          <td className="px-4 py-3 whitespace-nowrap">
+                          <td className="px-3 py-3.5 whitespace-nowrap">
                             {user.role === ROLES.SYSTEM_ADMIN && (
-                              <span className="inline-flex items-center gap-1.5 rounded-[8px] border border-bvc-ink/20 bg-bvc-ink/10 px-2.5 py-1 text-[11.5px] font-semibold text-bvc-ink">
+                              <span className="inline-flex items-center gap-1.5 rounded-[8px] border border-bvc-ink/20 bg-bvc-ink/10 px-2.5 py-1 text-[11.5px] font-medium text-bvc-ink">
                                 <ShieldCheck size={13} />
                                 <span>{USER_ROLE_LABELS[user.role] ?? "Quản trị viên"}</span>
                               </span>
                             )}
                             {user.role === ROLES.TEACHER && (
-                              <span className="inline-flex items-center gap-1.5 rounded-[8px] border border-[#C8E6D3] bg-[#EBF5EE] px-2.5 py-1 text-[11.5px] font-semibold text-bvc-ok">
+                              <span className="inline-flex items-center gap-1.5 rounded-[8px] border border-[#C8E6D3] bg-[#EBF5EE] px-2.5 py-1 text-[11.5px] font-medium text-bvc-ok">
                                 <GraduationCap size={13} />
                                 <span>{USER_ROLE_LABELS[user.role] ?? "Giảng viên"}</span>
                               </span>
                             )}
                             {user.role === ROLES.STUDENT && (
-                              <span className="inline-flex items-center gap-1.5 rounded-[8px] border border-bvc-border bg-bvc-surface px-2.5 py-1 text-[11.5px] font-semibold text-bvc-muted">
+                              <span className="inline-flex items-center gap-1.5 rounded-[8px] border border-bvc-border bg-bvc-surface px-2.5 py-1 text-[11.5px] font-medium text-bvc-muted">
                                 <BookOpen size={13} />
                                 <span>{USER_ROLE_LABELS[user.role] ?? "Sinh viên"}</span>
                               </span>
                             )}
                           </td>
 
-                          <td className="px-4 py-3 whitespace-nowrap">
+                          <td className="px-3 py-3.5 whitespace-nowrap">
                             {user.studentCode ? (
                               <span className="font-mono text-[12px] font-medium text-bvc-ink rounded-[6px] border border-bvc-line bg-bvc-surface px-2 py-0.5">
                                 {user.studentCode}
@@ -484,7 +550,7 @@ export function UserManagePage() {
                             )}
                           </td>
 
-                          <td className="px-4 py-3 whitespace-nowrap">
+                          <td className="px-3 py-3.5 whitespace-nowrap">
                             <div className="flex items-center gap-2">
                               <span
                                 className={cn(
@@ -511,7 +577,7 @@ export function UserManagePage() {
                             </div>
                           </td>
 
-                          <td className="px-4 py-3 whitespace-nowrap">
+                          <td className="px-3 py-3.5 whitespace-nowrap">
                             {user.lastLoginAt ? (
                               <span className="font-mono text-[12px] text-bvc-muted">
                                 {formatDateTime(user.lastLoginAt)}
@@ -521,13 +587,13 @@ export function UserManagePage() {
                             )}
                           </td>
 
-                          <td className="px-5 py-3 text-right whitespace-nowrap">
-                            <div className="flex items-center justify-end gap-1 font-semibold">
+                          <td className="px-3 py-3.5 text-right whitespace-nowrap">
+                            <div className="flex items-center justify-end gap-1 font-medium">
                               <button
                                 type="button"
                                 onClick={() => openForm(user)}
                                 title="Sửa tài khoản"
-                                className="flex size-[30px] cursor-pointer items-center justify-center rounded-[8px] text-bvc-muted transition-colors hover:bg-bvc-surface hover:text-bvc-ink"
+                                className="flex size-[30px] cursor-pointer items-center justify-center rounded-full text-bvc-muted transition-colors hover:bg-bvc-surface hover:text-bvc-ink"
                               >
                                 <Pencil size={14} />
                               </button>
@@ -537,7 +603,7 @@ export function UserManagePage() {
                                 onClick={() => setLockTarget(user)}
                                 title={isLocked ? "Mở khóa tài khoản" : "Khóa tài khoản"}
                                 className={cn(
-                                  "flex size-[30px] cursor-pointer items-center justify-center rounded-[8px] transition-colors",
+                                  "flex size-[30px] cursor-pointer items-center justify-center rounded-full transition-colors",
                                   isLocked
                                     ? "text-bvc-ok hover:bg-[#EBF5EE]"
                                     : "text-bvc-accent-text hover:bg-bvc-accent-tint"
@@ -623,7 +689,7 @@ export function UserManagePage() {
                 <span>Trước</span>
               </Button>
 
-              <span className="font-mono text-[12.5px] font-semibold text-bvc-ink px-2.5 py-1 rounded-[8px] border border-bvc-border bg-white">
+              <span className="font-mono text-[12.5px] font-medium text-bvc-ink px-2.5 py-1 rounded-[8px] border border-bvc-border bg-white">
                 {filters.page} / {lastPage}
               </span>
 
@@ -639,9 +705,8 @@ export function UserManagePage() {
               </Button>
             </div>
           </div>
-
         </div>
-      </main>
+      </div>
 
       <StudentImportDialog isOpen={isImportOpen} onOpenChange={setIsImportOpen} onImported={reload} />
 
@@ -653,7 +718,7 @@ export function UserManagePage() {
       />
 
       <Dialog open={lockTarget !== null} onOpenChange={(isOpen) => !isOpen && setLockTarget(null)}>
-        <DialogPopup className="max-w-[460px] rounded-[18px] p-6 border-bvc-border">
+        <DialogPopup className="max-w-[460px] rounded-bvc-xl p-6 border-bvc-border">
           <div className="flex items-start gap-3.5">
             <div
               className={cn(
@@ -664,7 +729,7 @@ export function UserManagePage() {
               {lockTarget?.status === "LOCKED" ? <Unlock size={20} /> : <AlertTriangle size={20} />}
             </div>
             <div className="flex flex-col gap-1">
-              <DialogTitle className="text-[17px] font-bold text-bvc-ink">
+              <DialogTitle className="text-[17px] font-semibold text-bvc-ink">
                 {lockTarget?.status === "LOCKED" ? "Mở khóa tài khoản" : "Khóa tài khoản người dùng"}
               </DialogTitle>
               <DialogDescription className="text-[13px] leading-relaxed text-bvc-muted">
@@ -694,7 +759,7 @@ export function UserManagePage() {
             <Button
               variant={lockTarget?.status === "LOCKED" ? "primary" : "danger"}
               onClick={confirmLockChange}
-              className="rounded-[11px] font-semibold"
+              className="rounded-[11px] font-medium"
             >
               {lockTarget?.status === "LOCKED" ? "Xác nhận mở khóa" : "Xác nhận khóa"}
             </Button>

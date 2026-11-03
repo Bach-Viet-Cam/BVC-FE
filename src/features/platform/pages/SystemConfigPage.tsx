@@ -1,39 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
-import {
-  ArrowDown,
-  ArrowUp,
-  ArrowUpDown,
-  Info,
-  Layers,
-  Music2,
-  Pencil,
-  Plus,
-  Power,
-  RotateCw,
-  Search,
-  Sliders,
-  SlidersHorizontal,
-  X,
-} from "lucide-react";
+import { useEffect, useState } from "react";
+import { Info, Pencil, RotateCw, Search, X } from "lucide-react";
 import { DesktopPageHeader } from "@/shared/components/bvc";
-import { Tabs, TabsList, TabsPanel, TabsTab } from "@/shared/components/ui/tabs";
+import { TABLE_STYLES } from "@/shared/components/bvc/tableStyles";
 import { cn } from "@/shared/utils/cn";
-import { InstrumentFormDialog } from "@/features/platform/components/InstrumentFormDialog";
-import { InstrumentTunesDialog } from "@/features/platform/components/InstrumentTunesDialog";
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
 import { formatConfigDate, parseSemesters, SEMESTERS_CONFIG_KEY } from "@/features/platform/utils/configValue";
 import { SettingFormDialog } from "@/features/platform/components/SettingFormDialog";
-import {
-  CONFIG_GROUP_LABELS,
-  CONFIG_GROUP_OPTIONS,
-  INSTRUMENT_STATUS_OPTIONS,
-} from "@/features/platform/constants/configConstants";
-import { useInstruments } from "@/features/platform/hooks/useInstruments";
+import { CONFIG_GROUP_LABELS, CONFIG_GROUP_OPTIONS } from "@/features/platform/constants/configConstants";
 import { useSystemConfigs } from "@/features/platform/hooks/useSystemConfigs";
-import {
-  type InstrumentItem,
-  type InstrumentSortKey,
-  type SystemConfigItem,
-} from "@/features/platform/types/configTypes";
+import { type ConfigGroup, type SystemConfigItem } from "@/features/platform/types/configTypes";
 
 const SEMESTERS_DESCRIPTION = "Các học kỳ dùng khi tạo lớp: mỗi học kỳ có tên, ngày bắt đầu và ngày kết thúc.";
 
@@ -54,307 +29,7 @@ function formatBytes(bytesStr: string): string {
   return `${(bytes / Math.pow(1024, i)).toFixed(i === 0 ? 0 : 0)} ${units[i]}`;
 }
 
-interface SortHeaderProps {
-  label: string;
-  isActive: boolean;
-  direction: "asc" | "desc";
-  onClick: () => void;
-}
-
-function SortHeader({ label, isActive, direction, onClick }: SortHeaderProps) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="flex cursor-pointer items-center gap-1.5 text-left transition-colors hover:text-bvc-ink uppercase"
-    >
-      <span>{label}</span>
-      {isActive ? (
-        direction === "asc" ? (
-          <ArrowUp size={13} className="text-bvc-ink" />
-        ) : (
-          <ArrowDown size={13} className="text-bvc-ink" />
-        )
-      ) : (
-        <ArrowUpDown size={12} className="opacity-40" />
-      )}
-    </button>
-  );
-}
-
-function InstrumentsTab() {
-  const { filters, updateFilters, items, error, isLoading, saveInstrument, toggleActive, reload } = useInstruments();
-  const [searchText, setSearchText] = useState("");
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [formTarget, setFormTarget] = useState<InstrumentItem | null>(null);
-  const [isTunesDialogOpen, setIsTunesDialogOpen] = useState(false);
-  const [tunesTarget, setTunesTarget] = useState<InstrumentItem | null>(null);
-  const appliedQuery = filters.q;
-
-  useEffect(() => {
-    const nextQuery = searchText.trim();
-    if (nextQuery === appliedQuery) return;
-    const timer = window.setTimeout(() => updateFilters({ q: nextQuery }), 300);
-    return () => window.clearTimeout(timer);
-  }, [searchText, appliedQuery, updateFilters]);
-
-  const openForm = (instrument: InstrumentItem | null) => {
-    setFormTarget(instrument);
-    setIsFormOpen(true);
-  };
-
-  const openTunesDialog = (instrument: InstrumentItem) => {
-    setTunesTarget(instrument);
-    setIsTunesDialogOpen(true);
-  };
-
-  const toggleSort = (key: InstrumentSortKey) => {
-    updateFilters({ sortBy: key, sortDir: filters.sortBy === key && filters.sortDir === "asc" ? "desc" : "asc" });
-  };
-
-  const hasActiveFilters = Boolean(filters.status !== "all" || filters.q);
-
-  const resetFilters = () => {
-    setSearchText("");
-    updateFilters({ status: "all", q: "" });
-  };
-
-  const activeCount = useMemo(() => items.filter((item) => item.isActive).length, [items]);
-
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-3 rounded-[16px] border border-bvc-border bg-white p-3.5 sm:flex-row sm:items-center sm:justify-between">
-        <div className="inline-flex flex-wrap items-center rounded-[12px] border border-bvc-border/80 bg-bvc-surface/60 p-1">
-          {INSTRUMENT_STATUS_OPTIONS.map((opt) => {
-            const isActive = filters.status === opt.value;
-            return (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => updateFilters({ status: opt.value })}
-                className={`cursor-pointer rounded-[9px] px-3.5 py-1.5 text-[13px] font-semibold transition-all select-none ${
-                  isActive ? "bg-white text-bvc-ink shadow-xs" : "text-bvc-muted hover:text-bvc-ink"
-                }`}
-              >
-                {opt.label}
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2.5">
-          <div className="relative flex items-center">
-            <Search size={15} className="pointer-events-none absolute left-3 text-bvc-muted" />
-            <input
-              type="search"
-              value={searchText}
-              onChange={(event) => setSearchText(event.target.value)}
-              placeholder="Mã hoặc tên nhạc cụ..."
-              maxLength={100}
-              className="h-[38px] w-[240px] rounded-[11px] border border-bvc-border-strong bg-white pl-8.5 pr-8 text-[13px] text-bvc-ink placeholder:text-bvc-faint transition-all focus:border-bvc-ink focus:outline-none"
-            />
-            {searchText && (
-              <button
-                type="button"
-                onClick={() => setSearchText("")}
-                className="absolute right-2.5 cursor-pointer text-bvc-muted hover:text-bvc-ink"
-              >
-                <X size={14} />
-              </button>
-            )}
-          </div>
-
-          {hasActiveFilters && (
-            <button
-              type="button"
-              onClick={resetFilters}
-              className="flex h-[38px] cursor-pointer items-center gap-1.5 rounded-[11px] border border-bvc-border bg-bvc-surface/80 px-2.5 text-[12.5px] font-medium text-bvc-muted transition-colors hover:bg-bvc-border hover:text-bvc-ink"
-              title="Xóa bộ lọc"
-            >
-              <X size={13} />
-              <span>Xóa lọc</span>
-            </button>
-          )}
-
-          <button
-            type="button"
-            onClick={reload}
-            disabled={isLoading}
-            title="Làm mới danh sách"
-            className="flex size-[38px] cursor-pointer items-center justify-center rounded-[11px] border border-bvc-border bg-white text-bvc-muted transition-colors hover:border-bvc-border-strong hover:text-bvc-ink disabled:opacity-50"
-          >
-            <RotateCw size={15} className={isLoading ? "animate-spin text-bvc-ink" : ""} />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => openForm(null)}
-            className="flex min-h-[38px] cursor-pointer items-center gap-2 rounded-[11px] bg-bvc-ink px-4 text-[13.5px] font-semibold text-white transition-colors hover:bg-black"
-          >
-            <Plus size={15} />
-            <span>Thêm nhạc cụ</span>
-          </button>
-        </div>
-      </div>
-
-      <div className="flex flex-col overflow-hidden rounded-[18px] border border-bvc-border bg-white shadow-none">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[960px] border-collapse text-left text-[13px]">
-            <thead>
-              <tr className="border-b border-bvc-border bg-bvc-surface/50 text-[11.5px] font-bold uppercase tracking-[0.06em] text-bvc-muted">
-                <th className="px-5 py-3.5 w-[180px]">
-                  <SortHeader
-                    label="Mã nhạc cụ (Slug)"
-                    isActive={filters.sortBy === "code"}
-                    direction={filters.sortDir}
-                    onClick={() => toggleSort("code")}
-                  />
-                </th>
-                <th className="px-5 py-3.5 w-[200px]">
-                  <SortHeader
-                    label="Tên hiển thị"
-                    isActive={filters.sortBy === "name"}
-                    direction={filters.sortDir}
-                    onClick={() => toggleSort("name")}
-                  />
-                </th>
-                <th className="px-5 py-3.5">Mô tả</th>
-                <th className="px-5 py-3.5 w-[160px]">Cấu hình dây</th>
-                <th className="px-5 py-3.5 w-[160px]">Trạng thái</th>
-                <th className="px-5 py-3.5 w-[160px] text-right">Thao tác</th>
-              </tr>
-            </thead>
-
-            <tbody className="divide-y divide-bvc-line">
-              {isLoading && (
-                <tr>
-                  <td colSpan={6} className="px-5 py-10 text-center text-[13.5px] text-bvc-muted">
-                    Đang tải dữ liệu nhạc cụ...
-                  </td>
-                </tr>
-              )}
-
-              {!isLoading && error && (
-                <tr>
-                  <td colSpan={6} className="px-5 py-10 text-center text-[13.5px] text-bvc-error">
-                    {error}
-                  </td>
-                </tr>
-              )}
-
-              {!isLoading && !error && items.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="px-5 py-12 text-center">
-                    <p className="text-[14px] font-bold text-bvc-ink">Không tìm thấy nhạc cụ phù hợp</p>
-                    <p className="mt-1 text-[12.5px] text-bvc-muted">
-                      {hasActiveFilters
-                        ? "Thử thay đổi từ khóa tìm kiếm hoặc bỏ chọn bộ lọc trạng thái."
-                        : "Bấm “Thêm nhạc cụ” để tạo mới danh mục nhạc cụ."}
-                    </p>
-                  </td>
-                </tr>
-              )}
-
-              {!isLoading &&
-                !error &&
-                items.map((instrument) => (
-                  <tr key={instrument.id} className="transition-colors hover:bg-bvc-surface/40">
-                    <td className="px-5 py-3.5">
-                      <span className="font-mono text-[12.5px] font-semibold text-bvc-ink bg-bvc-surface border border-bvc-border px-2 py-0.5 rounded-[6px]">
-                        {instrument.code}
-                      </span>
-                    </td>
-
-                    <td className="px-5 py-3.5 font-bold text-bvc-ink text-[13.5px]">{instrument.name}</td>
-
-                    <td className="px-5 py-3.5 text-bvc-muted">{instrument.description || "-"}</td>
-
-                    <td className="px-5 py-3.5">
-                      <button
-                        type="button"
-                        onClick={() => openTunesDialog(instrument)}
-                        className="flex h-[32px] cursor-pointer items-center gap-1.5 rounded-[8px] border border-bvc-border bg-bvc-surface/60 px-3 text-[12.5px] font-semibold text-bvc-ink transition-all hover:border-bvc-ink hover:bg-white hover:shadow-2xs"
-                      >
-                        <SlidersHorizontal size={13} className="text-bvc-muted" />
-                        <span>Cấu hình dây</span>
-                      </button>
-                    </td>
-
-                    <td className="px-5 py-3.5">
-                      <span className="inline-flex items-center gap-2">
-                        <span
-                          className={`size-[7px] shrink-0 rounded-full ${
-                            instrument.isActive ? "bg-bvc-ok" : "bg-bvc-bar-strong"
-                          }`}
-                        />
-                        <span
-                          className={`text-[13px] ${instrument.isActive ? "font-semibold text-bvc-ink" : "text-bvc-muted"}`}
-                        >
-                          {instrument.isActive ? "Đang hoạt động" : "Ngừng hoạt động"}
-                        </span>
-                      </span>
-                    </td>
-
-                    <td className="px-5 py-3.5 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => openForm(instrument)}
-                          title="Sửa nhạc cụ"
-                          className="flex h-[32px] cursor-pointer items-center gap-1.5 rounded-[8px] border border-bvc-border bg-white px-2.5 text-[12.5px] font-semibold text-bvc-ink transition-colors hover:border-bvc-ink hover:bg-bvc-surface"
-                        >
-                          <Pencil size={13} />
-                          <span>Sửa</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => void toggleActive(instrument)}
-                          title={instrument.isActive ? "Ngừng hoạt động" : "Kích hoạt lại"}
-                          className={`flex h-[32px] cursor-pointer items-center gap-1 rounded-[8px] border border-bvc-border px-2.5 text-[12.5px] font-semibold transition-colors hover:bg-white ${
-                            instrument.isActive
-                              ? "bg-bvc-surface/60 text-bvc-muted hover:border-bvc-error hover:text-bvc-error"
-                              : "bg-bvc-surface text-bvc-ok hover:border-bvc-ok hover:text-bvc-ok"
-                          }`}
-                        >
-                          <Power size={13} />
-                          <span>{instrument.isActive ? "Ngừng" : "Bật"}</span>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="flex items-center justify-between border-t border-bvc-border bg-bvc-surface/30 px-5 py-3 text-[12px] text-bvc-muted">
-          <span>
-            Tổng cộng <strong className="font-mono text-bvc-ink">{items.length}</strong> nhạc cụ (
-            <strong className="font-mono text-bvc-ink">{activeCount}</strong> đang hoạt động)
-          </span>
-          <span>Dữ liệu nhạc cụ được đồng bộ với bài tập, thư viện tác phẩm và module thu âm</span>
-        </div>
-      </div>
-
-      <InstrumentFormDialog
-        isOpen={isFormOpen}
-        instrument={formTarget}
-        onOpenChange={setIsFormOpen}
-        onSubmit={(values) => saveInstrument(formTarget?.id ?? null, values)}
-      />
-
-      <InstrumentTunesDialog
-        isOpen={isTunesDialogOpen}
-        instrument={tunesTarget}
-        onOpenChange={setIsTunesDialogOpen}
-        onSaved={reload}
-      />
-    </div>
-  );
-}
-
-function SettingsTab() {
+export function SettingsPanel() {
   const { filters, updateFilters, items, error, isLoading, saveValue, reload } = useSystemConfigs();
   const [searchText, setSearchText] = useState("");
   const [editTarget, setEditTarget] = useState<SystemConfigItem | null>(null);
@@ -376,41 +51,9 @@ function SettingsTab() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-3 rounded-[16px] border border-bvc-border bg-white p-3.5 sm:flex-row sm:items-center sm:justify-between">
-        <div className="inline-flex flex-wrap items-center rounded-[12px] border border-bvc-border/80 bg-bvc-surface/60 p-1">
-          <button
-            type="button"
-            onClick={() => updateFilters({ group: undefined })}
-            className={cn(
-              "flex cursor-pointer items-center gap-1.5 rounded-[9px] px-3.5 py-1.5 text-[13px] font-semibold transition-all select-none",
-              filters.group === undefined ? "bg-white text-bvc-ink shadow-xs" : "text-bvc-muted hover:text-bvc-ink"
-            )}
-          >
-            <Layers size={14} className={filters.group === undefined ? "text-bvc-ink" : "text-bvc-faint"} />
-            <span>Tất cả nhóm</span>
-          </button>
-          {CONFIG_GROUP_OPTIONS.map((opt) => {
-            const isActive = filters.group === opt.value;
-            const Icon = opt.icon;
-            return (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => updateFilters({ group: opt.value })}
-                className={cn(
-                  "flex cursor-pointer items-center gap-1.5 rounded-[9px] px-3.5 py-1.5 text-[13px] font-semibold transition-all select-none",
-                  isActive ? "bg-white text-bvc-ink shadow-xs" : "text-bvc-muted hover:text-bvc-ink"
-                )}
-              >
-                {Icon && <Icon size={14} className={isActive ? "text-bvc-ink" : "text-bvc-faint"} />}
-                <span>{opt.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2.5">
-          <div className="relative flex items-center">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-bvc-border bg-white p-3 shadow-none">
+        <div className="flex flex-1 flex-wrap items-center gap-2.5">
+          <div className="relative flex flex-1 items-center sm:max-w-[300px]">
             <Search size={15} className="pointer-events-none absolute left-3 text-bvc-muted" />
             <input
               type="search"
@@ -418,7 +61,7 @@ function SettingsTab() {
               onChange={(event) => setSearchText(event.target.value)}
               placeholder="Khóa kỹ thuật, nhãn, giá trị..."
               maxLength={100}
-              className="h-[38px] w-[260px] rounded-[11px] border border-bvc-border-strong bg-white pl-8.5 pr-8 text-[13px] text-bvc-ink placeholder:text-bvc-faint transition-all focus:border-bvc-ink focus:outline-none"
+              className="h-[38px] w-full rounded-[10px] border border-bvc-border-strong bg-white pl-8.5 pr-8 text-[13px] text-bvc-ink placeholder:text-bvc-faint transition-all focus:border-bvc-ink focus:outline-none"
             />
             {searchText && (
               <button
@@ -431,11 +74,38 @@ function SettingsTab() {
             )}
           </div>
 
+          <div className="relative">
+            <Select
+              value={filters.group ?? "ALL"}
+              onValueChange={(val) => updateFilters({ group: val === "ALL" ? undefined : (val as ConfigGroup) })}
+            >
+              <SelectTrigger
+                aria-label="Lọc theo nhóm cấu hình"
+                className="h-[38px] min-w-[160px] rounded-[10px] border-bvc-border-strong bg-white px-3 text-[13px] font-medium text-bvc-ink shadow-2xs hover:border-bvc-ink"
+              >
+                <SelectValue>
+                  {(val) => {
+                    const opt = CONFIG_GROUP_OPTIONS.find((o) => o.value === val);
+                    return <span className="truncate">{opt?.label ?? "Tất cả nhóm"}</span>;
+                  }}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectPopup positionerClassName="z-50">
+                <SelectItem value="ALL">Tất cả nhóm</SelectItem>
+                {CONFIG_GROUP_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectPopup>
+            </Select>
+          </div>
+
           {hasActiveFilters && (
             <button
               type="button"
               onClick={resetFilters}
-              className="flex h-[38px] cursor-pointer items-center gap-1.5 rounded-[11px] border border-bvc-border bg-bvc-surface/80 px-2.5 text-[12.5px] font-medium text-bvc-muted transition-colors hover:bg-bvc-border hover:text-bvc-ink"
+              className="flex h-[38px] cursor-pointer items-center gap-1.5 rounded-[10px] border border-bvc-border bg-bvc-surface/80 px-2.5 text-[12.5px] font-medium text-bvc-muted transition-colors hover:bg-bvc-border hover:text-bvc-ink"
               title="Xóa bộ lọc"
             >
               <X size={13} />
@@ -448,22 +118,22 @@ function SettingsTab() {
             onClick={reload}
             disabled={isLoading}
             title="Làm mới tham số"
-            className="flex size-[38px] cursor-pointer items-center justify-center rounded-[11px] border border-bvc-border bg-white text-bvc-muted transition-colors hover:border-bvc-border-strong hover:text-bvc-ink disabled:opacity-50"
+            className="flex size-[38px] cursor-pointer items-center justify-center rounded-[10px] border border-bvc-border bg-white text-bvc-muted transition-colors hover:border-bvc-border-strong hover:text-bvc-ink disabled:opacity-50"
           >
             <RotateCw size={15} className={isLoading ? "animate-spin text-bvc-ink" : ""} />
           </button>
-
-          <span className="ml-1 font-mono text-[13px] text-bvc-muted">
-            {items.length} <span className="font-sans text-[12px] text-bvc-faint">tham số</span>
-          </span>
         </div>
+
+        <span className="shrink-0 font-mono text-[13px] text-bvc-muted">
+          {items.length} <span className="font-sans text-[12px] text-bvc-faint">tham số</span>
+        </span>
       </div>
 
-      <div className="flex flex-col overflow-hidden rounded-[18px] border border-bvc-border bg-white shadow-none">
+      <div className="flex flex-col overflow-hidden rounded-bvc-xl border border-bvc-border bg-white shadow-none">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[920px] border-collapse text-left text-[13px]">
+          <table className={cn(TABLE_STYLES.table, TABLE_STYLES.dense, "min-w-[920px]")}>
             <thead>
-              <tr className="border-b border-bvc-border bg-bvc-surface/50 text-[11.5px] font-bold uppercase tracking-[0.06em] text-bvc-muted">
+              <tr className={cn(TABLE_STYLES.headRow, TABLE_STYLES.headText)}>
                 <th className="px-5 py-3.5 w-[380px]">Tham số & Khóa kỹ thuật</th>
                 <th className="px-5 py-3.5 w-[180px]">Nhóm nghiệp vụ</th>
                 <th className="px-5 py-3.5">Giá trị cấu hình</th>
@@ -471,7 +141,7 @@ function SettingsTab() {
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-bvc-line">
+            <tbody>
               {isLoading && (
                 <tr>
                   <td colSpan={4} className="px-5 py-10 text-center text-[13.5px] text-bvc-muted">
@@ -491,7 +161,7 @@ function SettingsTab() {
               {!isLoading && !error && items.length === 0 && (
                 <tr>
                   <td colSpan={4} className="px-5 py-12 text-center">
-                    <p className="text-[14px] font-bold text-bvc-ink">Không tìm thấy tham số phù hợp</p>
+                    <p className="text-[14px] font-semibold text-bvc-ink">Không tìm thấy tham số phù hợp</p>
                     <p className="mt-1 text-[12.5px] text-bvc-muted">
                       Thử thay đổi từ khóa tìm kiếm hoặc lọc theo nhóm khác.
                     </p>
@@ -507,7 +177,8 @@ function SettingsTab() {
                   const jsonItems = isJson
                     ? isSemesters
                       ? parseSemesters(config.value).map(
-                          (semester) => `${semester.name} · ${formatConfigDate(semester.startDate)} – ${formatConfigDate(semester.endDate)}`
+                          (semester) =>
+                            `${semester.name} · ${formatConfigDate(semester.startDate)} – ${formatConfigDate(semester.endDate)}`
                         )
                       : parseJsonArray(config.value)
                     : [];
@@ -515,12 +186,12 @@ function SettingsTab() {
                   const isAccuracy = config.key.includes("ACCURACY");
 
                   return (
-                    <tr key={config.id} className="transition-colors hover:bg-bvc-surface/40">
+                    <tr key={config.id} className={TABLE_STYLES.row}>
                       <td className="px-5 py-3.5">
                         <div className="flex flex-col gap-1">
                           <div className="flex items-center gap-2">
-                            <span className="font-bold text-bvc-ink text-[13.5px]">{config.label}</span>
-                            <span className="font-mono text-[11px] font-semibold text-bvc-muted bg-bvc-surface border border-bvc-border px-1.5 py-0.5 rounded-[5px]">
+                            <span className="font-semibold text-bvc-ink text-[13.5px]">{config.label}</span>
+                            <span className="font-mono text-[11px] font-medium text-bvc-muted bg-bvc-surface border border-bvc-border px-1.5 py-0.5 rounded-[5px]">
                               {config.key}
                             </span>
                           </div>
@@ -533,14 +204,14 @@ function SettingsTab() {
                       </td>
 
                       <td className="px-5 py-3.5">
-                        <span className="inline-block rounded-[7px] border border-bvc-border bg-bvc-surface/70 px-2 py-0.5 text-[11.5px] font-semibold text-bvc-muted">
+                        <span className="inline-block rounded-[7px] border border-bvc-border bg-bvc-surface/70 px-2 py-0.5 text-[11.5px] font-medium text-bvc-muted">
                           {CONFIG_GROUP_LABELS[config.group]}
                         </span>
                       </td>
 
                       <td className="px-5 py-3.5">
                         {config.valueType === "BOOLEAN" && (
-                          <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold">
+                          <span className="inline-flex items-center gap-1.5 text-[13px] font-medium">
                             <span
                               className={`size-[7px] rounded-full ${
                                 config.value === "true" ? "bg-bvc-ok" : "bg-bvc-bar-strong"
@@ -557,7 +228,7 @@ function SettingsTab() {
                             {jsonItems.map((val) => (
                               <span
                                 key={val}
-                                className="font-mono text-[11.5px] font-semibold text-bvc-ink bg-bvc-surface border border-bvc-border px-2 py-0.5 rounded-[6px]"
+                                className="font-mono text-[11.5px] font-medium text-bvc-ink bg-bvc-surface border border-bvc-border px-2 py-0.5 rounded-[6px]"
                               >
                                 {val}
                               </span>
@@ -568,7 +239,7 @@ function SettingsTab() {
 
                         {!isJson && config.valueType !== "BOOLEAN" && isBytes && (
                           <div className="flex items-baseline gap-2">
-                            <span className="font-mono text-[13.5px] font-bold text-bvc-ink">
+                            <span className="font-mono text-[13.5px] font-semibold text-bvc-ink">
                               {formatBytes(config.value)}
                             </span>
                             <span className="font-mono text-[11px] text-bvc-muted">
@@ -579,7 +250,7 @@ function SettingsTab() {
 
                         {!isJson && config.valueType !== "BOOLEAN" && isAccuracy && (
                           <div className="flex items-baseline gap-2">
-                            <span className="font-mono text-[13.5px] font-bold text-bvc-ink">
+                            <span className="font-mono text-[13.5px] font-semibold text-bvc-ink">
                               {Math.round(Number(config.value) * 100)}%
                             </span>
                             <span className="font-mono text-[11px] text-bvc-muted">({config.value})</span>
@@ -587,7 +258,7 @@ function SettingsTab() {
                         )}
 
                         {!isJson && config.valueType !== "BOOLEAN" && !isBytes && !isAccuracy && (
-                          <span className="font-mono text-[13px] font-bold text-bvc-ink">
+                          <span className="font-mono text-[13px] font-semibold text-bvc-ink">
                             {config.value}
                             {config.key.includes("ATTEMPTS") ? " lần" : ""}
                             {config.key.includes("DAYS") ? " ngày" : ""}
@@ -600,7 +271,7 @@ function SettingsTab() {
                         <button
                           type="button"
                           onClick={() => setEditTarget(config)}
-                          className="inline-flex h-[32px] cursor-pointer items-center gap-1.5 rounded-[8px] border border-bvc-border bg-white px-3 text-[12.5px] font-semibold text-bvc-ink transition-colors hover:border-bvc-ink hover:bg-bvc-surface"
+                          className="inline-flex h-[32px] cursor-pointer items-center gap-1.5 rounded-[8px] border border-bvc-border bg-white px-3 text-[12.5px] font-medium text-bvc-ink transition-colors hover:border-bvc-ink hover:bg-bvc-surface"
                         >
                           <Pencil size={13} />
                           <span>Sửa</span>
@@ -633,104 +304,12 @@ function SettingsTab() {
 }
 
 export function SystemConfigPage() {
-  const instruments = useInstruments();
-  const configs = useSystemConfigs();
-  const [activeTab, setActiveTab] = useState<"settings" | "instruments">("settings");
-
-  const isSettingsActive = activeTab === "settings";
-  const isInstrumentsActive = activeTab === "instruments";
-
   return (
-    <main className="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#FAF9F7]">
+    <div className="flex min-w-0 flex-1 flex-col bg-[#FAF9F7]">
       <DesktopPageHeader breadcrumb="Quản trị" title="Cấu hình hệ thống" />
-
-      <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-6 md:px-8">
-        <Tabs
-          value={activeTab}
-          onValueChange={(val) => setActiveTab(val as "settings" | "instruments")}
-          className="flex flex-1 flex-col gap-4"
-        >
-          <div className="inline-flex self-start rounded-[16px] border border-bvc-border bg-white/95 p-1.5 shadow-2xs backdrop-blur-md">
-            <TabsList className="bg-transparent p-0 gap-1.5">
-              <TabsTab
-                value="settings"
-                className={cn(
-                  "group relative flex cursor-pointer items-center gap-2.5 rounded-[12px] px-4 py-2.5 text-[13.5px] transition-all duration-150 select-none",
-                  "hover:bg-bvc-surface/80 hover:text-bvc-ink",
-                  "data-selected:bg-bvc-ink data-selected:text-white data-selected:shadow-sm data-selected:ring-1 data-selected:ring-black/5",
-                  isSettingsActive
-                    ? "bg-bvc-ink font-bold text-white shadow-sm ring-1 ring-black/5"
-                    : "font-semibold text-bvc-muted"
-                )}
-              >
-                <div
-                  className={cn(
-                    "flex size-7 items-center justify-center rounded-[8px] transition-all duration-150",
-                    isSettingsActive
-                      ? "bg-white/15 text-emerald-300 shadow-2xs"
-                      : "bg-bvc-surface text-bvc-muted group-hover:bg-bvc-border group-hover:text-bvc-ink"
-                  )}
-                >
-                  <Sliders size={15} strokeWidth={isSettingsActive ? 2.3 : 1.9} />
-                </div>
-                <span className="tracking-[-0.01em]">Tham số hệ thống</span>
-                <span
-                  className={cn(
-                    "flex h-[22px] min-w-[24px] items-center justify-center rounded-full px-2 text-[11.5px] font-bold font-mono tracking-tight transition-all duration-150",
-                    isSettingsActive
-                      ? "border border-white/15 bg-white/20 text-white shadow-2xs"
-                      : "border border-bvc-border bg-bvc-surface text-bvc-muted group-hover:border-bvc-border-strong group-hover:text-bvc-ink"
-                  )}
-                >
-                  {configs.items.length}
-                </span>
-              </TabsTab>
-
-              <TabsTab
-                value="instruments"
-                className={cn(
-                  "group relative flex cursor-pointer items-center gap-2.5 rounded-[12px] px-4 py-2.5 text-[13.5px] transition-all duration-150 select-none",
-                  "hover:bg-bvc-surface/80 hover:text-bvc-ink",
-                  "data-selected:bg-bvc-ink data-selected:text-white data-selected:shadow-sm data-selected:ring-1 data-selected:ring-black/5",
-                  isInstrumentsActive
-                    ? "bg-bvc-ink font-bold text-white shadow-sm ring-1 ring-black/5"
-                    : "font-semibold text-bvc-muted"
-                )}
-              >
-                <div
-                  className={cn(
-                    "flex size-7 items-center justify-center rounded-[8px] transition-all duration-150",
-                    isInstrumentsActive
-                      ? "bg-white/15 text-emerald-300 shadow-2xs"
-                      : "bg-bvc-surface text-bvc-muted group-hover:bg-bvc-border group-hover:text-bvc-ink"
-                  )}
-                >
-                  <Music2 size={15} strokeWidth={isInstrumentsActive ? 2.3 : 1.9} />
-                </div>
-                <span className="tracking-[-0.01em]">Nhạc cụ truyền thống</span>
-                <span
-                  className={cn(
-                    "flex h-[22px] min-w-[24px] items-center justify-center rounded-full px-2 text-[11.5px] font-bold font-mono tracking-tight transition-all duration-150",
-                    isInstrumentsActive
-                      ? "border border-white/15 bg-white/20 text-white shadow-2xs"
-                      : "border border-bvc-border bg-bvc-surface text-bvc-muted group-hover:border-bvc-border-strong group-hover:text-bvc-ink"
-                  )}
-                >
-                  {instruments.items.length}
-                </span>
-              </TabsTab>
-            </TabsList>
-          </div>
-
-          <TabsPanel value="settings">
-            <SettingsTab />
-          </TabsPanel>
-
-          <TabsPanel value="instruments">
-            <InstrumentsTab />
-          </TabsPanel>
-        </Tabs>
+      <div className="flex min-w-0 flex-1 flex-col gap-4 p-6 md:px-8">
+        <SettingsPanel />
       </div>
-    </main>
+    </div>
   );
 }

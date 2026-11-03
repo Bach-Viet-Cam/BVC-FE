@@ -50,16 +50,16 @@ function SegmentGroup<T extends string | number>({
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-[13px] font-semibold text-bvc-ink">{title}</span>
-      <div className="flex gap-1 rounded-bvc-md bg-bvc-surface p-0.75">
+      <span className="text-[13px] font-medium text-bvc-ink">{title}</span>
+      <div className="flex gap-1 rounded-full bg-bvc-surface p-0.75">
         {options.map((option) => (
           <button
             key={option.value}
             type="button"
             onClick={() => onPick(option.value)}
             className={cn(
-              "min-h-10 flex-1 cursor-pointer rounded-[10px] text-[13px]",
-              option.value === value ? "bg-bvc-ink font-semibold text-white" : "text-bvc-muted"
+              "min-h-10 flex-1 cursor-pointer rounded-full text-[13px]",
+              option.value === value ? "bg-bvc-ink font-medium text-white" : "text-bvc-muted"
             )}
           >
             {option.label}
@@ -79,7 +79,7 @@ export function DemoPanel() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="shrink-0 cursor-pointer rounded-full border border-bvc-warn bg-bvc-accent-tint px-3 py-1.5 text-[13px] font-bold text-bvc-accent-text"
+        className="shrink-0 cursor-pointer rounded-full border border-bvc-warn bg-bvc-accent-tint px-3 py-1.5 text-[13px] font-semibold text-bvc-accent-text"
       >
         Demo
       </button>
@@ -94,11 +94,11 @@ export function DemoPanel() {
           />
           <div className="absolute inset-x-0 top-[70px] bottom-0 z-[80] flex flex-col overflow-y-auto rounded-t-3xl bg-white md:inset-x-auto md:top-1/2 md:left-1/2 md:bottom-auto md:max-h-[80dvh] md:w-130 md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-3xl md:shadow-[0_12px_40px_rgba(18,63,51,0.18)]">
             <div className="flex items-center gap-2 px-4 pt-5 pb-3">
-              <span className="flex-1 text-[18px] font-extrabold text-bvc-ink">Demo</span>
+              <span className="flex-1 text-[18px] font-semibold text-bvc-ink">Demo</span>
               <button
                 type="button"
                 onClick={resetDemo}
-                className="cursor-pointer rounded-bvc-sm border border-bvc-border-strong px-3 py-2 text-[13px] font-semibold text-bvc-ink"
+                className="cursor-pointer rounded-full border border-bvc-border-strong px-3 py-2 text-[13px] font-medium text-bvc-ink"
               >
                 Đặt lại
               </button>
@@ -106,7 +106,7 @@ export function DemoPanel() {
                 type="button"
                 aria-label="Đóng"
                 onClick={() => setOpen(false)}
-                className="flex size-10 cursor-pointer items-center justify-center rounded-xl text-bvc-ink"
+                className="flex size-10 cursor-pointer items-center justify-center rounded-full text-bvc-ink"
               >
                 <X size={20} strokeWidth={1.8} />
               </button>
