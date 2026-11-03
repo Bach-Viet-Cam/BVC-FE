@@ -146,6 +146,7 @@ export function ProcessingPage() {
         {submission?.status === "FAILED" && !exhausted && (
           <div className="mt-3 flex flex-col gap-3">
             <p className={WARN_BOX}>
+              {submission.errorMessage && <span className="mb-1 block">{submission.errorMessage}</span>}
               {MSG.failed}
               {retrySec > 0 && ` ${MSG.retryWait(retrySec)}`}
             </p>
@@ -163,7 +164,7 @@ export function ProcessingPage() {
                   : "cursor-pointer bg-bvc-ink text-white"
               )}
             >
-              Thử lại
+              {retrying ? "Đang gửi yêu cầu..." : "Thử lại"}
             </button>
           </div>
         )}

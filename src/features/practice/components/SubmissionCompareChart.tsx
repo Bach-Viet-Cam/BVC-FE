@@ -1,25 +1,45 @@
-import {
-  COMPARE_CHART_BANDS,
-  COMPARE_CHART_NOTES,
-  COMPARE_CHART_TICKS,
-  COMPARE_NEWER_PATH,
-  COMPARE_OLDER_PATH,
-  COMPARE_TOTAL_BARS,
-} from "@/features/practice/constants/submissionHistoryMockData";
-import type { CompareChartBand } from "@/features/practice/types/submissionHistoryTypes";
+import { useId, useState } from "react";
+import { Maximize2, ZoomIn, ZoomOut } from "lucide-react";
+import { ChartFullscreen } from "@/features/practice/components/ChartFullscreen";
+import { useElementWidth } from "@/features/practice/hooks/useElementWidth";
+import type {
+  CompareSegment,
+  CompareSegmentBand,
+  SubmissionCompare,
+} from "@/features/practice/types/submissionHistoryTypes";
+import { formatTick, isZoomed, zoomView } from "@/features/practice/utils/chartView";
+import { hzToMidiFloat, midiToNoteInfo } from "@/features/practice/utils/noteMath";
+import { toCompareChartPaths, toSegmentBands } from "@/features/practice/utils/submissionCompare";
 
 const ACCENT = "#2f7a62";
+const TEACHER = "#c3cfc7";
+const OLDER = "#93a399";
 
-function bandBadge(status: CompareChartBand["status"]) {
+const HEIGHT = 300;
+const PLOT = { left: 34, right: 8, top: 26, bottom: 30 };
+const TIME_TICKS = 5;
+const MAX_NOTE_LINES = 6;
+// Thêm nửa cung mỗi đầu cho đường không chạm mép
+const MIDI_PADDING = 0.5;
+
+function bandBadge(status: CompareSegmentBand["status"]) {
   return status === "IMPROVED"
     ? { label: "Đã cải thiện", width: 74, fill: "#3a6b44", stroke: "none", text: "#ffffff" }
     : { label: "Lỗi lặp lại", width: 66, fill: "#fbf3de", stroke: "#e6d29a", text: "#8a6a12" };
 }
 
+export function TeacherLineSwatch() {
+  return (
+    <svg width="30" height="8" viewBox="0 0 30 8" className="shrink-0" aria-hidden>
+      <line x1="1" y1="4" x2="29" y2="4" stroke={TEACHER} strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function OlderLineSwatch() {
   return (
     <svg width="30" height="8" viewBox="0 0 30 8" className="shrink-0" aria-hidden>
-      <line x1="1" y1="4" x2="29" y2="4" stroke="#93a399" strokeWidth="2" strokeDasharray="5 4" strokeLinecap="round" />
+      <line x1="2" y1="4" x2="28" y2="4" stroke={OLDER} strokeOpacity="0.5" strokeWidth="7" strokeLinecap="round" />
     </svg>
   );
 }
@@ -27,89 +47,167 @@ export function OlderLineSwatch() {
 export function NewerLineSwatch() {
   return (
     <svg width="30" height="8" viewBox="0 0 30 8" className="shrink-0" aria-hidden>
-      <line x1="1" y1="4" x2="29" y2="4" stroke={ACCENT} strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="1" y1="4" x2="29" y2="4" stroke={ACCENT} strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }
 
-// Biểu đồ cao độ chồng nhau của hai bài nộp (chế độ so sánh, không phát âm thanh). Dữ liệu mẫu.
-export function SubmissionCompareChart() {
+interface SubmissionCompareChartProps {
+  chart: SubmissionCompare["chart"];
+  segments: CompareSegment[];
+  selectedId: string | null;
+  visible: { teacher: boolean; older: boolean; newer: boolean };
+  onSelectSegment: (id: string) => void;
+}
+
+// Biểu đồ cao độ chồng nhau của hai bài nộp trên trục thời gian bản mẫu (không zoom, không phát âm thanh)
+export function SubmissionCompareChart(props: SubmissionCompareChartProps) {
+  const [fullscreen, setFullscreen] = useState(false);
+  return <>
+    <ComparePlot {...props} onFullscreen={() => setFullscreen(true)} />
+    {fullscreen && <ChartFullscreen onClose={() => setFullscreen(false)}><ComparePlot {...props} onFullscreen={() => setFullscreen(false)} /></ChartFullscreen>}
+  </>;
+}
+
+function ComparePlot({ chart, segments, selectedId, visible, onSelectSegment, onFullscreen }: SubmissionCompareChartProps & { onFullscreen: () => void }) {
+  const clipId = useId();
+  const { ref, width } = useElementWidth<HTMLDivElement>();
+
+  const duration = Math.max(chart.durationSec, 0.1);
+  const lowMidi = hzToMidiFloat(chart.minHz) - MIDI_PADDING;
+  const highMidi = hzToMidiFloat(chart.maxHz) + MIDI_PADDING;
+  const base = { t0: 0, t1: duration, m0: lowMidi, m1: highMidi };
+  const [view, setView] = useState(base);
+  const zoomed = isZoomed(view, base);
+  const zoom = (factor: number) => setView(current => zoomView(current, factor, { seconds: (current.t0 + current.t1) / 2, midi: (current.m0 + current.m1) / 2 }, base));
+  const plotWidth = Math.max(width - PLOT.left - PLOT.right, 1);
+  const plotHeight = HEIGHT - PLOT.top - PLOT.bottom;
+  const xAt = (seconds: number) => PLOT.left + ((seconds - view.t0) / (view.t1 - view.t0)) * plotWidth;
+  const yAtMidi = (midi: number) => PLOT.top + (1 - (midi - view.m0) / (view.m1 - view.m0)) * plotHeight;
+  const yAt = (hz: number) => yAtMidi(hzToMidiFloat(hz));
+
+  const noteStep = Math.max(1, Math.ceil((view.m1 - view.m0) / MAX_NOTE_LINES));
+  const noteLines: number[] = [];
+  for (let midi = Math.ceil(view.m0); midi <= view.m1; midi += noteStep) noteLines.push(midi);
+  const ticks = Array.from({ length: TIME_TICKS }, (_, index) => view.t0 + ((view.t1 - view.t0) * index) / (TIME_TICKS - 1));
+
+  const paths = toCompareChartPaths(chart, xAt, yAt);
+  const bands = toSegmentBands(segments.filter(segment => segment.endSec >= view.t0 && segment.startSec <= view.t1), xAt);
+  const kindById = new Map(segments.map((segment) => [segment.id, segment.kind]));
+  const axisY = HEIGHT - PLOT.bottom;
+
   return (
-    <svg
-      viewBox="0 0 396 200"
-      width="100%"
-      role="img"
-      aria-label={`Biểu đồ cao độ theo thời gian của hai bài nộp, ô nhịp 1 đến ${COMPARE_TOTAL_BARS}`}
-      className="block"
-    >
-      {COMPARE_CHART_NOTES.map((note) => (
-        <g key={note.label}>
-          <line x1="34" y1={note.y} x2="388" y2={note.y} stroke="#e2eae4" strokeWidth="1" />
-          <text x="28" y={note.y + 3.5} textAnchor="end" fontSize="11" fill="#5e6f66">
-            {note.label}
-          </text>
-        </g>
-      ))}
+    <div ref={ref} className="w-full">
+      {width > 0 && (
+        <svg
+          viewBox={`0 0 ${width} ${HEIGHT}`}
+          width={width}
+          height={HEIGHT}
+          role="img"
+          aria-label="Biểu đồ cao độ theo thời gian của hai bài nộp và bản mẫu"
+          className="block"
+        >
+          <defs><clipPath id={clipId}><rect x={PLOT.left} y={PLOT.top} width={plotWidth} height={plotHeight} /></clipPath></defs>
+          {noteLines.map((midi) => (
+            <g key={midi}>
+              <line
+                x1={PLOT.left}
+                y1={yAtMidi(midi)}
+                x2={width - PLOT.right}
+                y2={yAtMidi(midi)}
+                stroke="#e2eae4"
+                strokeWidth="1"
+              />
+              <text x={PLOT.left - 6} y={yAtMidi(midi) + 3.5} textAnchor="end" fontSize="11" fill="#5e6f66">
+                {midiToNoteInfo(midi).vn}
+              </text>
+            </g>
+          ))}
 
-      {COMPARE_CHART_BANDS.map((band) => (
-        <rect
-          key={band.id}
-          x={band.x}
-          y="26"
-          width={band.width}
-          height="144"
-          fill={band.status === "IMPROVED" ? "#3a6b44" : "#c8a63c"}
-          fillOpacity={band.status === "IMPROVED" ? 0.1 : 0.18}
-        />
-      ))}
+          <g clipPath={`url(#${clipId})`}>
+          {bands.map((band) => (
+            <rect
+              key={band.id}
+              x={band.x}
+              y={PLOT.top}
+              width={Math.max(band.width, 2)}
+              height={plotHeight}
+              fill={band.status === "IMPROVED" ? "#3a6b44" : "#c8a63c"}
+              fillOpacity={(band.status === "IMPROVED" ? 0.1 : 0.18) + (band.id === selectedId ? 0.12 : 0)}
+            />
+          ))}
 
-      <line x1="34" y1="170" x2="388" y2="170" stroke="#cfdcd3" strokeWidth="1" />
-      {COMPARE_CHART_TICKS.map((tick) => (
-        <g key={tick.label}>
-          <line x1={tick.x} y1="170" x2={tick.x} y2="174" stroke="#93a399" strokeWidth="1" />
-          <text x={tick.x} y="186" textAnchor="middle" fontSize="10.5" fill="#5e6f66">
-            {tick.label}
-          </text>
-        </g>
-      ))}
-
-      <path
-        d={COMPARE_OLDER_PATH}
-        fill="none"
-        stroke="#93a399"
-        strokeWidth="2"
-        strokeDasharray="5 4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d={COMPARE_NEWER_PATH}
-        fill="none"
-        stroke={ACCENT}
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-
-      {COMPARE_CHART_BANDS.map((band) => {
-        const badge = bandBadge(band.status);
-        const x = band.x + band.width / 2 - badge.width / 2;
-        return (
-          <g key={`${band.id}-badge`}>
-            <rect x={x} y="5" width={badge.width} height="17" rx="8.5" fill={badge.fill} stroke={badge.stroke} />
-            <text
-              x={x + badge.width / 2}
-              y="16.8"
-              textAnchor="middle"
-              fontSize="10.5"
-              fontWeight="600"
-              fill={badge.text}
-            >
-              {badge.label}
-            </text>
           </g>
-        );
-      })}
-    </svg>
+          <line x1={PLOT.left} y1={axisY} x2={width - PLOT.right} y2={axisY} stroke="#cfdcd3" strokeWidth="1" />
+          {ticks.map((seconds) => (
+            <g key={seconds}>
+              <line x1={xAt(seconds)} y1={axisY} x2={xAt(seconds)} y2={axisY + 4} stroke="#93a399" strokeWidth="1" />
+              <text x={xAt(seconds)} y={axisY + 16} textAnchor="middle" fontSize="10.5" fill="#5e6f66">
+                {formatTick(seconds, view.t1 - view.t0)}
+              </text>
+            </g>
+          ))}
+
+          <g clipPath={`url(#${clipId})`}>
+          {visible.teacher && paths.teacher && (
+            <path d={paths.teacher} fill="none" stroke={TEACHER} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          )}
+          {/* Bài cũ là dải dày, nhạt nằm dưới; bài mới là nét mảnh nằm trên. Hai đường trùng nhau vẫn thấy dải xám bao quanh nét xanh. */}
+          {visible.older && paths.older && (
+            <path
+              d={paths.older}
+              fill="none"
+              stroke={OLDER}
+              strokeOpacity="0.5"
+              strokeWidth="7"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          )}
+          {visible.newer && paths.newer && (
+            <path d={paths.newer} fill="none" stroke={ACCENT} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          )}
+
+          </g>
+          {bands.map((band) => {
+            const badge = bandBadge(band.status);
+            const bandLeft = Math.max(PLOT.left, band.x);
+            const bandWidth = Math.max(2, Math.min(width - PLOT.right, band.x + band.width) - bandLeft);
+            const x = Math.min(
+              Math.max(bandLeft + bandWidth / 2 - badge.width / 2, PLOT.left),
+              width - PLOT.right - badge.width
+            );
+            return (
+              <g
+                key={`${band.id}-badge`}
+                role="button"
+                tabIndex={0}
+                aria-label={`${badge.label}, lỗi ${kindById.get(band.id) === "rhythm" ? "nhịp" : "cao độ"}`}
+                className="cursor-pointer outline-none focus-visible:opacity-80"
+                onClick={() => onSelectSegment(band.id)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onSelectSegment(band.id);
+                  }
+                }}
+              >
+                {/* Vùng chạm phủ cả dải để dễ bấm trên điện thoại */}
+                <rect x={bandLeft} y={5} width={bandWidth} height={axisY - 5} fill="transparent" />
+                <rect x={x} y="5" width={badge.width} height="17" rx="8.5" fill={badge.fill} stroke={badge.stroke} />
+                <text x={x + badge.width / 2} y="16.8" textAnchor="middle" fontSize="10.5" fontWeight="600" fill={badge.text}>
+                  {badge.label}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+      )}
+      <div className="flex justify-end gap-1 pt-1">
+        <button type="button" aria-label="Thu nh?" title="Thu nh?" disabled={!zoomed} onClick={() => zoom(1 / 1.6)} className="flex size-9 items-center justify-center rounded-full border border-bvc-border bg-white disabled:opacity-40"><ZoomOut className="size-4" /></button>
+        <button type="button" aria-label="Ph?ng to" title="Ph?ng to" onClick={() => zoom(1.6)} className="flex size-9 items-center justify-center rounded-full border border-bvc-border bg-white"><ZoomIn className="size-4" /></button>
+        <button type="button" aria-label="Xem to?n b?" title="Xem to?n b?" onClick={onFullscreen} className="flex size-9 items-center justify-center rounded-full border border-bvc-border bg-white"><Maximize2 className="size-4" /></button>
+      </div>
+    </div>
   );
 }

@@ -1,5 +1,6 @@
 import { SubmissionRow } from "@/features/practice/components/SubmissionRow";
 import type { SubmissionDayGroup, SubmissionHistoryItem } from "@/features/practice/types/submissionHistoryTypes";
+import type { SelectionBlock } from "@/features/practice/utils/submissionHistory";
 import { TABLE_STYLES } from "@/shared/components/bvc/tableStyles";
 import { cn } from "@/shared/utils/cn";
 
@@ -7,9 +8,9 @@ interface SubmissionDayTableProps {
   group: SubmissionDayGroup;
   isSelecting: boolean;
   selectedIds: string[];
-  isSelectable: (item: SubmissionHistoryItem) => boolean;
+  selectionBlock: (item: SubmissionHistoryItem) => SelectionBlock | null;
   onOpen: (item: SubmissionHistoryItem) => void;
-  onToggle: (id: string) => void;
+  onToggle: (item: SubmissionHistoryItem) => void;
 }
 
 const HEAD_CELL = TABLE_STYLES.headCell;
@@ -20,7 +21,7 @@ export function SubmissionDayTable({
   group,
   isSelecting,
   selectedIds,
-  isSelectable,
+  selectionBlock,
   onOpen,
   onToggle,
 }: SubmissionDayTableProps) {
@@ -61,17 +62,21 @@ export function SubmissionDayTable({
             </tr>
           </thead>
           <tbody>
-            {group.items.map((item) => (
-              <SubmissionRow
-                key={item.id}
-                item={item}
-                isSelecting={isSelecting}
-                isSelected={selectedIds.includes(item.id)}
-                isSelectable={isSelectable(item)}
-                onOpen={onOpen}
-                onToggle={onToggle}
-              />
-            ))}
+            {group.items.map((item) => {
+              const block = selectionBlock(item);
+              return (
+                <SubmissionRow
+                  key={item.id}
+                  item={item}
+                  isSelecting={isSelecting}
+                  isSelected={selectedIds.includes(item.id)}
+                  isSelectable={block === null}
+                  isDifferentSheet={block === "DIFFERENT_SHEET"}
+                  onOpen={onOpen}
+                  onToggle={onToggle}
+                />
+              );
+            })}
           </tbody>
         </table>
       </div>

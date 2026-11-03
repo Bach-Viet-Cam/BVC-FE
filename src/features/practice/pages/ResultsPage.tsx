@@ -11,11 +11,14 @@ import { PracticeTitleRow } from "@/features/practice/components/PracticeTitleRo
 import { ResultBanner } from "@/features/practice/components/ResultBanner";
 import { ProgressHistoryCard } from "@/features/practice/components/ProgressHistoryCard";
 import { ResultOverviewCard } from "@/features/practice/components/ResultOverviewCard";
+import { SegmentAttemptsCard } from "@/features/practice/components/SegmentAttemptsCard";
 import { SegmentPickerSheet } from "@/features/practice/components/SegmentPickerSheet";
 import { MSG } from "@/features/practice/constants/practiceConstants";
 import { useResultPart } from "@/features/practice/hooks/useResultPart";
+import type { PracticeSegment } from "@/features/practice/components/SegmentPickerSheet";
 import type { PracticeResult } from "@/features/practice/types/practiceResultTypes";
 import { formatDurationLabel } from "@/features/practice/utils/resultFormat";
+import { buildSegmentPath } from "@/features/practice/utils/segmentFormat";
 import { StudentShell } from "@/shared/components/bvc/StudentShell";
 
 type OpenSheet = "mode" | "segment" | null;
@@ -46,11 +49,16 @@ export function ResultsPage() {
       navigate(`/practice/submissions/${encodeURIComponent(submissionId)}/processing`, { replace: true });
   }, [data, isCompleted, navigate, submissionId]);
 
-  // TODO(BE): truyền đoạn đã chọn (start/end giây, count-in) sang màn ghi âm khi hỗ trợ luyện theo đoạn
   function startPractice() {
     setSheet(null);
     if (data?.sheetMusic) navigate(`/practice/sheets/${data.sheetMusic.id}/record`);
     else navigate(-1);
+  }
+
+  // UC-03: luyện riêng đoạn đã chọn, không tạo bản nộp mới
+  function startSegment(segment: PracticeSegment) {
+    setSheet(null);
+    navigate(buildSegmentPath(submissionId, segment));
   }
 
   const durationSec = data?.recording.durationSec ?? chart.data?.durationSec ?? null;
@@ -108,6 +116,9 @@ export function ResultsPage() {
                 <ProgressHistoryCard history={history.data} />
               </div>
             )}
+            <div className="empty:hidden lg:col-span-12 lg:row-start-4">
+              <SegmentAttemptsCard submissionId={submissionId} />
+            </div>
           </div>
         )}
       </div>
@@ -138,7 +149,7 @@ export function ResultsPage() {
               open
               onOpenChange={(open) => setSheet(open ? "segment" : null)}
               onBack={() => setSheet("mode")}
-              onStart={startPractice}
+              onStart={startSegment}
               durationSec={chart.data?.durationSec ?? durationSec ?? 0}
               issues={data.issues}
               chart={chart.data}

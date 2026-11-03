@@ -1,13 +1,14 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { PointerEvent } from "react";
 import { Maximize2, ZoomIn, ZoomOut } from "lucide-react";
+import { ChartFullscreen } from "@/features/practice/components/ChartFullscreen";
 import { ChartTooltip } from "@/features/practice/components/ChartTooltip";
 import { MSG } from "@/features/practice/constants/practiceConstants";
 import { useChartPointer } from "@/features/practice/hooks/useChartPointer";
 import { useElementWidth } from "@/features/practice/hooks/useElementWidth";
 import type { PitchChart, PitchPoint, PitchSegment } from "@/features/practice/types/practiceResultTypes";
 import type { ChartView } from "@/features/practice/utils/chartView";
-import { clampView, formatTick, isZoomed, panView, zoomView } from "@/features/practice/utils/chartView";
+import { formatTick, isZoomed, panView, zoomView } from "@/features/practice/utils/chartView";
 import { hzToMidiFloat, midiToNoteInfo } from "@/features/practice/utils/noteMath";
 import { fmtTime, signed } from "@/features/practice/utils/practiceFormat";
 import {
@@ -65,7 +66,7 @@ const MIN_SMOOTH_SIGMA = 1;
 // Mỗi lần bấm phóng to / thu nhỏ; Ctrl + cuộn chuột (hoặc chụm hai ngón trên touchpad) phóng mịn hơn
 const BUTTON_ZOOM = 1.6;
 const WHEEL_ZOOM_PER_PIXEL = 0.002;
-const PLOT_CLIP_ID = "pitchContourPlot";
+
 
 type SeriesMode = "both" | "teacher" | "student";
 const SERIES_OPTIONS: { value: SeriesMode; label: string }[] = [
@@ -183,6 +184,7 @@ interface PitchContourCardProps {
 // Có thể chỉ xem một đường, phóng to theo thời gian và cao độ để thấy rõ hai đường lệch nhau bao nhiêu.
 export function PitchContourCard({ chart, loading, error }: PitchContourCardProps) {
   const [mode, setMode] = useState<SeriesMode>("both");
+  const [fullscreen, setFullscreen] = useState(false);
 
   return (
     <section className="flex flex-col gap-3 rounded-bvc-xl border border-bvc-border bg-white p-4 md:rounded-bvc-xl md:p-5.5">
@@ -218,8 +220,9 @@ export function PitchContourCard({ chart, loading, error }: PitchContourCardProp
           {error || MSG.pitchUnavailable}
         </p>
       )}
-      {!loading && !error && chart && <PitchContourChart chart={chart} mode={mode} />}
+      {!loading && !error && chart && <PitchContourChart chart={chart} mode={mode} onFullscreen={() => setFullscreen(true)} />}
 
+      {fullscreen && chart && <ChartFullscreen onClose={() => setFullscreen(false)}><PitchContourChart chart={chart} mode={mode} onFullscreen={() => setFullscreen(false)} /></ChartFullscreen>}
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] font-medium text-bvc-muted">
         {mode !== "student" && (
           <span className="flex items-center gap-1.5">
@@ -246,12 +249,12 @@ export function PitchContourCard({ chart, loading, error }: PitchContourCardProp
   );
 }
 
-function PitchContourChart({ chart, mode }: { chart: PitchChart; mode: SeriesMode }) {
+function PitchContourChart({ chart, mode, onFullscreen }: { chart: PitchChart; mode: SeriesMode; onFullscreen: () => void }) {
   const { ref, width } = useElementWidth<HTMLDivElement>();
   return (
     <div className="overflow-hidden rounded-xl border border-bvc-border bg-bvc-soft p-2.5 pt-3">
       <div ref={ref} className="relative" style={{ height: CHART_HEIGHT + 40 }}>
-        {width > LEFT + RIGHT && <PitchContourPlot chart={chart} width={width} mode={mode} />}
+        {width > LEFT + RIGHT && <PitchContourPlot chart={chart} width={width} mode={mode} onFullscreen={onFullscreen} />}
       </div>
     </div>
   );
@@ -276,7 +279,8 @@ function prepareChart(chart: PitchChart): PreparedChart {
   return { shown, base, bounds };
 }
 
-function PitchContourPlot({ chart, width, mode }: { chart: PitchChart; width: number; mode: SeriesMode }) {
+function PitchContourPlot({ chart, width, mode, onFullscreen }: { chart: PitchChart; width: number; mode: SeriesMode; onFullscreen: () => void }) {
+  const clipId = useId();
   const { x: pointerX, pointerProps } = useChartPointer(width);
   const frame: Frame = { xStart: LEFT, xEnd: width - RIGHT };
   const { shown, base, bounds } = useMemo(() => prepareChart(chart), [chart]);
@@ -387,12 +391,12 @@ function PitchContourPlot({ chart, width, mode }: { chart: PitchChart; width: nu
         aria-label="So sánh cao độ bản thu với bản mẫu theo thời gian; rê chuột hoặc chạm để xem giá trị, Ctrl + cuộn để phóng to"
       >
         <defs>
-          <clipPath id={PLOT_CLIP_ID}>
+          <clipPath id={clipId}>
             <rect x={frame.xStart} y={ZONE_TOP} width={plotWidth} height={PITCH_BOTTOM - ZONE_TOP + 4} />
           </clipPath>
         </defs>
 
-        <g clipPath={`url(#${PLOT_CLIP_ID})`}>
+        <g clipPath={`url(#${clipId})`}>
           {chart.segments.map((segment) => (
             <SegmentZone key={segment.id} segment={segment} xAt={xAt} />
           ))}
@@ -425,7 +429,7 @@ function PitchContourPlot({ chart, width, mode }: { chart: PitchChart; width: nu
 
         {/* Hai đường: GV dày ở dưới, sinh viên mảnh ở trên để chỗ trùng nhau vẫn thấy viền tối của GV.
             Xem riêng một đường thì vẽ đậm vừa phải. */}
-        <g clipPath={`url(#${PLOT_CLIP_ID})`}>
+        <g clipPath={`url(#${clipId})`}>
           <path
             d={teacherPath}
             stroke="var(--color-bvc-ink)"
@@ -520,7 +524,7 @@ function PitchContourPlot({ chart, width, mode }: { chart: PitchChart; width: nu
           <ZoomButton label="Phóng to" onClick={() => zoomCenter(BUTTON_ZOOM)}>
             <ZoomIn className="size-4" />
           </ZoomButton>
-          <ZoomButton label="Xem toàn bộ" disabled={!zoomed} onClick={() => setView(clampView(base, bounds))}>
+          <ZoomButton label="Xem toàn bộ" onClick={onFullscreen}>
             <Maximize2 className="size-4" />
           </ZoomButton>
         </div>

@@ -14,15 +14,16 @@ import {
   countActiveFilters,
   countAdvancedFilters,
   countQuickFilters,
+  SELECTION_LIMIT,
   groupByDay,
+  selectionBlock,
   toHistoryQuery,
 } from "@/features/practice/utils/submissionHistory";
 import { useAsyncData } from "@/shared/hooks/useAsyncData";
 import { getErrorMessage } from "@/shared/utils/getErrorMessage";
 
-const REQUIRED_SELECTION = 2;
 const LOAD_ERROR = "Tải danh sách bài nộp thất bại. Vui lòng thử lại.";
-const EMPTY_OVERALL: SubmissionHistoryOverall = { total: 0, completed: 0, processing: 0, rejected: 0, failed: 0 };
+const EMPTY_OVERALL: SubmissionHistoryOverall = { total: 0, completed: 0, processing: 0, rejected: 0, failed: 0, canCompare: false };
 
 interface LoadedHistory {
   // Bộ lọc (dạng query trang 1) mà các trang đã tải thuộc về
@@ -58,7 +59,8 @@ export function useSubmissionHistory() {
   const [reloadCount, setReloadCount] = useState(0);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
   const [isSelecting, setIsSelecting] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  // Giữ cả bài đã chọn (không chỉ id): bài có thể rời trang hiện tại khi đổi bộ lọc nhưng vẫn phải biết bản nhạc của nó
+  const [selectedItems, setSelectedItems] = useState<SubmissionHistoryItem[]>([]);
   const [showInvalid, setShowInvalid] = useState(false);
 
   const filterQuery = useMemo(() => toHistoryQuery(filter, 1, today), [filter, today]);
@@ -113,9 +115,9 @@ export function useSubmissionHistory() {
 
   const summary = activeFilterCount > 0 ? `${visibleCount} trong ${stats.total} bài nộp khớp bộ lọc` : toSummary(stats);
 
-  // GBR-15: chỉ cho so sánh khi có từ 2 bài đã phân tích xong
-  const canCompare = stats.completed >= REQUIRED_SELECTION;
-  const isSelectionFull = selectedIds.length >= REQUIRED_SELECTION;
+  // GBR-15: chỉ cho so sánh khi có một bản nhạc với từ 2 bài đã phân tích xong
+  const canCompare = stats.canCompare;
+  const selectedIds = useMemo(() => selectedItems.map((item) => item.id), [selectedItems]);
 
   // Mọi thay đổi bộ lọc đều tải lại từ trang 1
   function updateFilter(update: (current: SubmissionFilter) => SubmissionFilter) {
@@ -123,39 +125,38 @@ export function useSubmissionHistory() {
     setPage(1);
   }
 
-  function isSelectable(item: SubmissionHistoryItem) {
-    if (item.status !== "COMPLETED") return false;
-    return isSelectionFull ? selectedIds.includes(item.id) : true;
+  function getSelectionBlock(item: SubmissionHistoryItem) {
+    return selectionBlock(item, selectedItems);
   }
 
   function startSelecting() {
     setIsSelecting(true);
-    setSelectedIds([]);
+    setSelectedItems([]);
     setShowInvalid(false);
   }
 
   function cancelSelecting() {
     setIsSelecting(false);
-    setSelectedIds([]);
+    setSelectedItems([]);
     setShowInvalid(false);
   }
 
-  function toggleSelected(id: string) {
+  function toggleSelected(item: SubmissionHistoryItem) {
     setShowInvalid(false);
-    setSelectedIds((selected) => {
-      if (selected.includes(id)) return selected.filter((value) => value !== id);
-      return selected.length >= REQUIRED_SELECTION ? selected : [...selected, id];
+    setSelectedItems((selected) => {
+      if (selected.some((chosen) => chosen.id === item.id)) return selected.filter((chosen) => chosen.id !== item.id);
+      return selectionBlock(item, selected) === null ? [...selected, item] : selected;
     });
   }
 
   // MSG-25 khi bấm "Xem so sánh" mà chưa đủ 2 bài (Alt 4)
   function submitCompare() {
-    if (selectedIds.length !== REQUIRED_SELECTION) {
+    if (selectedItems.length !== SELECTION_LIMIT) {
       setShowInvalid(true);
       return;
     }
     const [a, b] = selectedIds;
-    navigate(`/practice/submissions/compare?a=${a}&b=${b}`);
+    navigate(`/practice/submissions/compare?a=${encodeURIComponent(a)}&b=${encodeURIComponent(b)}`);
   }
 
   // Bài đã phân tích mở màn kết quả; bài bị từ chối hoặc lỗi mở màn xử lý (lý do, thử lại)
@@ -227,7 +228,7 @@ export function useSubmissionHistory() {
     selectedIds,
     showInvalid,
     canCompare,
-    isSelectable,
+    getSelectionBlock,
     startSelecting,
     cancelSelecting,
     toggleSelected,

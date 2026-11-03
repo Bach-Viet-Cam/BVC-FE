@@ -14,8 +14,10 @@ interface SubmissionRowProps {
   isSelecting: boolean;
   isSelected: boolean;
   isSelectable: boolean;
+  // Bị chặn chỉ vì khác bản nhạc với bài đã chọn: hiện gợi ý thay vì để dòng mờ không lời giải thích
+  isDifferentSheet: boolean;
   onOpen: (item: SubmissionHistoryItem) => void;
-  onToggle: (id: string) => void;
+  onToggle: (item: SubmissionHistoryItem) => void;
 }
 
 const KIND_CLASS: Record<SubmissionKind, string> = {
@@ -35,7 +37,15 @@ function scoreClass(accuracy: number) {
 
 // Một dòng của bảng ngày: độ chính xác, tên bài hát, ngày giờ nộp, loại bài, phạm vi (hiện luôn là cả bài).
 // Cột cố định theo SubmissionDayTable nên các bảng của các ngày thẳng hàng với nhau.
-export function SubmissionRow({ item, isSelecting, isSelected, isSelectable, onOpen, onToggle }: SubmissionRowProps) {
+export function SubmissionRow({
+  item,
+  isSelecting,
+  isSelected,
+  isSelectable,
+  isDifferentSheet,
+  onOpen,
+  onToggle,
+}: SubmissionRowProps) {
   const isProcessing = item.status === "PROCESSING";
   // Bị từ chối hoặc lỗi: chưa có accuracy, mở màn xử lý để xem lý do hoặc thử lại
   const isUnscored = item.status === "REJECTED" || item.status === "FAILED";
@@ -43,7 +53,7 @@ export function SubmissionRow({ item, isSelecting, isSelected, isSelectable, onO
   const isClickable = isSelecting ? isSelectable : isOpenable;
 
   function handleRowClick() {
-    if (isSelecting && isSelectable) onToggle(item.id);
+    if (isSelecting && isSelectable) onToggle(item);
     else if (isOpenable) onOpen(item);
   }
 
@@ -79,6 +89,9 @@ export function SubmissionRow({ item, isSelecting, isSelected, isSelectable, onO
             Đang xử lý
           </span>
         )}
+        {isSelecting && isDifferentSheet && (
+          <span className="mt-0.5 block text-[11px] text-bvc-muted">Chỉ so sánh được bài cùng bản nhạc</span>
+        )}
         {isUnscored && (
           <span className="mt-0.5 flex items-center gap-1 text-[11px] text-bvc-accent-text">
             <span className="size-[7px] rounded-full bg-bvc-accent" aria-hidden />
@@ -102,7 +115,7 @@ export function SubmissionRow({ item, isSelecting, isSelected, isSelectable, onO
             checked={isSelected}
             disabled={!isSelectable}
             onClick={(event) => event.stopPropagation()}
-            onChange={() => onToggle(item.id)}
+            onChange={() => onToggle(item)}
             aria-label={`Chọn ${item.pieceTitle} ${formatSubmittedAt(item.submittedAt)}`}
             className="size-5 cursor-[inherit] align-middle accent-bvc-ink"
           />

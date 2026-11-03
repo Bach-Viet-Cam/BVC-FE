@@ -138,10 +138,11 @@ export function useRecorder({ audio, session, timelineOffsetSec, onAutoStop }: U
     await ctx.resume();
     const beat = 60 / session.targetBpm;
     const countStart = ctx.currentTime + COUNT_IN_LEAD_S;
-    const recordStart = countStart + COUNT_IN_BEATS * beat;
+    const countInBeats = session.countInBeats ?? COUNT_IN_BEATS;
+    const recordStart = countStart + countInBeats * beat;
     const lengthSec = session.pieceLenSec - timelineOffsetSec;
     // Đếm vào luôn phát tiếng, không phụ thuộc nút click (UC Normal 6)
-    countInNodes.current = Array.from({ length: COUNT_IN_BEATS }, (_, i) =>
+    countInNodes.current = Array.from({ length: countInBeats }, (_, i) =>
       playClick(ctx, i === 0, countStart + i * beat)
     );
     chunks.current = [];
