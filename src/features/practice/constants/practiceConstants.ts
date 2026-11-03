@@ -166,3 +166,8 @@ export const TEMPO_MIN_IOI_S = 0.1;
 export const TEMPO_MAX_BEATS = 4;
 export const TEMPO_SMOOTHING = 0.3;
 export const TEMPO_UI_TICK_MS = 500;
+
+// UC-04 So sánh bài nộp
+export const MSG_25 = "Vui lòng chọn 2 bài nộp khác nhau để so sánh.";
+export const MSG_27 = "Không có đoạn lỗi nào để so sánh giữa hai bài nộp này.";
+export const MSG_28 = "Đoạn này vẫn sai giống lần trước - nên luyện lại trước.";

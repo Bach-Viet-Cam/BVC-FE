@@ -3,7 +3,7 @@ import { SubmissionPageTitle } from "@/features/practice/components/SubmissionPa
 import { SubmissionFilterBar } from "@/features/practice/components/SubmissionFilterBar";
 import { SubmissionFilterSheet } from "@/features/practice/components/SubmissionFilterSheet";
 import { SubmissionDayTable } from "@/features/practice/components/SubmissionDayTable";
-import { MSG_25 } from "@/features/practice/constants/submissionHistoryMockData";
+import { MSG_25 } from "@/features/practice/constants/practiceConstants";
 import { useSubmissionHistory } from "@/features/practice/hooks/useSubmissionHistory";
 import { cn } from "@/shared/utils/cn";
 import { StudentShell } from "@/shared/components/bvc/StudentShell";
@@ -141,7 +141,7 @@ export function SubmissionHistoryPage() {
               group={group}
               isSelecting={isSelecting}
               selectedIds={selectedIds}
-              isSelectable={history.isSelectable}
+              selectionBlock={history.getSelectionBlock}
               onOpen={history.openSubmission}
               onToggle={history.toggleSelected}
             />

@@ -1,29 +1,43 @@
+import { useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { SUBMISSION_COMPARE_MOCK } from "@/features/practice/constants/submissionHistoryMockData";
-import { orderByDate } from "@/features/practice/utils/submissionHistory";
+import { submissionCompareApi } from "@/features/practice/api/submissionCompareApi";
+import type { CompareSegment } from "@/features/practice/types/submissionHistoryTypes";
+import { useResultPart } from "@/features/practice/hooks/useResultPart";
+import { buildSegmentPath } from "@/features/practice/utils/segmentFormat";
 
-// Mockup: đường cao độ và đoạn lỗi là dữ liệu mẫu cố định của cặp #2 và #5, chỉ tên/ngày/điểm đổi theo hai bài được chọn.
-const FALLBACK_PAIR = ["2", "5"] as const;
+const LOAD_ERROR = "Tải kết quả so sánh thất bại. Vui lòng thử lại.";
 
+// SCR-02: so sánh hai bài nộp (GET /practice/submissions/compare). Thiếu bài hoặc hai bài trùng nhau thì không gọi API.
 export function useSubmissionCompare() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const a = searchParams.get("a") ?? "";
+  const b = searchParams.get("b") ?? "";
+  const invalid = !a || !b || a === b;
 
-  const find = (id: string | null, fallback: string) =>
-    SUBMISSION_COMPARE_MOCK.find((item) => item.id === id && item.status === "COMPLETED") ??
-    SUBMISSION_COMPARE_MOCK.find((item) => item.id === fallback);
-
-  const first = find(searchParams.get("a"), FALLBACK_PAIR[0]);
-  const second = find(searchParams.get("b"), FALLBACK_PAIR[1]);
-  const pair = first && second && first.id !== second.id ? orderByDate(first, second) : null;
+  // useResultPart gọi lại khi fetcher đổi nên fetcher chỉ đổi theo cặp bài; khóa truyền vào chỉ để nhận biết yêu cầu
+  const fetcher = useCallback((_key: string, signal?: AbortSignal) => submissionCompareApi.get(a, b, signal), [a, b]);
+  const part = useResultPart(fetcher, `${a},${b}`, !invalid, LOAD_ERROR);
 
   function backToSelect() {
     navigate("/practice/submissions");
   }
 
-  function practiceSegment() {
-    navigate(`/practice/sheets/${pair?.newer.sheetMusicId ?? ""}/record`);
+  // Luyện lại đúng đoạn trên bài mới hơn (UC-03)
+  function practiceSegment(segment: CompareSegment) {
+    if (!part.data) return;
+    navigate(
+      buildSegmentPath(part.data.newer.submissionId, { start: segment.startSec, end: segment.endSec, countIn: false })
+    );
   }
 
-  return { older: pair?.older, newer: pair?.newer, backToSelect, practiceSegment };
+  return {
+    invalid,
+    data: part.data,
+    loading: part.loading,
+    error: part.error,
+    reload: part.reload,
+    backToSelect,
+    practiceSegment,
+  };
 }
