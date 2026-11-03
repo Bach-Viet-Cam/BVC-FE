@@ -49,9 +49,26 @@ export function encodeWavPcm16(samples: Float32Array, sampleRate: number): Blob 
   return new Blob([buffer], { type: "audio/wav" });
 }
 
+// Micro tắt AGC nên PCM thô thường rất nhỏ. Nâng đỉnh lên NORMALIZE_TARGET_PEAK, một hệ số cho cả bản
+// (giữ nguyên động học). Chặn bằng NORMALIZE_MAX_GAIN và bỏ qua bản gần như im lặng để không khuếch đại nhiễu.
+const NORMALIZE_TARGET_PEAK = 0.9;
+const NORMALIZE_MAX_GAIN = 16;
+const NORMALIZE_MIN_PEAK = 0.005;
+
+export function normalizePeak(samples: Float32Array): Float32Array {
+  let peak = 0;
+  for (let i = 0; i < samples.length; i++) peak = Math.max(peak, Math.abs(samples[i]));
+  if (peak < NORMALIZE_MIN_PEAK || peak >= NORMALIZE_TARGET_PEAK) return samples;
+  const gain = Math.min(NORMALIZE_MAX_GAIN, NORMALIZE_TARGET_PEAK / peak);
+  const out = new Float32Array(samples.length);
+  for (let i = 0; i < samples.length; i++) out[i] = samples[i] * gain;
+  return out;
+}
+
 export function encodeRecording(samples: Float32Array, sampleRate: number): Blob {
-  if (sampleRate <= MAX_WAV_SAMPLE_RATE) return encodeWavPcm16(samples, sampleRate);
-  return encodeWavPcm16(resampleLinear(samples, sampleRate, MAX_WAV_SAMPLE_RATE), MAX_WAV_SAMPLE_RATE);
+  const normalized = normalizePeak(samples);
+  if (sampleRate <= MAX_WAV_SAMPLE_RATE) return encodeWavPcm16(normalized, sampleRate);
+  return encodeWavPcm16(resampleLinear(normalized, sampleRate, MAX_WAV_SAMPLE_RATE), MAX_WAV_SAMPLE_RATE);
 }
 
 // Đỉnh biên độ theo từng đoạn, chuẩn hoá 0..1 cho Waveform

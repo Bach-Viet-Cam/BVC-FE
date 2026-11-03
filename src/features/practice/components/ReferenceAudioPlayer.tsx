@@ -8,8 +8,8 @@ interface ReferenceAudioPlayerProps {
   isFallback: boolean;
 }
 
-// Nghe bản thu mẫu của bản nhạc trước khi ghi. Chỉ hiện khi chưa ghi: bắt đầu đếm nhịp thì khối này
-// bị gỡ khỏi màn hình nên tiếng mẫu dừng, không lọt vào micro.
+// Nghe bản thu mẫu của bản nhạc trước khi ghi và sau khi ghi xong (chưa gửi). Khi đang đếm nhịp hoặc ghi
+// thì khối này bị gỡ khỏi màn hình nên tiếng mẫu dừng, không lọt vào micro.
 export function ReferenceAudioPlayer({ url, isFallback }: ReferenceAudioPlayerProps) {
   const audio = useReferenceAudio(url);
 

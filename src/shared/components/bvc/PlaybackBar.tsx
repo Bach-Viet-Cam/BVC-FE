@@ -53,7 +53,7 @@ export function PlaybackBar({
   const VolumeIcon = silent ? VolumeX : volume < 0.5 ? Volume1 : Volume2;
 
   return (
-    <div className="flex min-w-0 flex-1 basis-80 items-center gap-2">
+    <div className="flex w-full min-w-0 flex-1 basis-80 flex-wrap items-center gap-x-1.5 gap-y-2 sm:gap-x-2">
       <button
         type="button"
         aria-label={playing ? "Tạm dừng" : "Phát bản thu"}
@@ -75,7 +75,7 @@ export function PlaybackBar({
           const rect = event.currentTarget.getBoundingClientRect();
           if (rect.width > 0 && takeLen > 0) onSeek(((event.clientX - rect.left) / rect.width) * takeLen);
         }}
-        className="flex min-w-0 flex-1 cursor-pointer flex-col gap-1 rounded-bvc-md border border-bvc-border bg-white px-3 pt-2 pb-1"
+        className="flex min-w-0 flex-1 basis-56 cursor-pointer flex-col gap-1 overflow-hidden rounded-bvc-md border border-bvc-border bg-white px-3 pt-2 pb-1"
       >
         <Waveform
           height={44}
@@ -89,49 +89,52 @@ export function PlaybackBar({
         </span>
       </button>
 
-      {/* Loa: bấm để tắt/bật tiếng, rê chuột hoặc focus thì thanh âm lượng trượt ra */}
-      <div className="group/volume flex shrink-0 items-center">
-        <button
-          type="button"
-          aria-label={silent ? "Bật tiếng" : "Tắt tiếng"}
-          onClick={onToggleMute}
-          className={ICON_BUTTON}
-        >
-          <VolumeIcon size={19} strokeWidth={1.9} />
-        </button>
-        <input
-          type="range"
-          aria-label="Âm lượng"
-          min={0}
-          max={1}
-          step={0.05}
-          value={muted ? 0 : volume}
-          onChange={(event) => onVolumeChange(Number(event.target.value))}
-          className="h-1 w-0 cursor-pointer accent-bvc-accent opacity-0 transition-all duration-200 group-focus-within/volume:w-16 group-focus-within/volume:opacity-100 group-hover/volume:w-16 group-hover/volume:opacity-100"
-        />
-      </div>
+      {/* Loa và tốc độ gói chung một nhóm: trên điện thoại nhóm này xuống dòng riêng, đẩy sang phải */}
+      <div className="ml-auto flex shrink-0 items-center gap-1.5">
+        {/* Loa: bấm để tắt/bật tiếng, rê chuột hoặc focus thì thanh âm lượng trượt ra */}
+        <div className="group/volume flex shrink-0 items-center">
+          <button
+            type="button"
+            aria-label={silent ? "Bật tiếng" : "Tắt tiếng"}
+            onClick={onToggleMute}
+            className={ICON_BUTTON}
+          >
+            <VolumeIcon size={19} strokeWidth={1.9} />
+          </button>
+          <input
+            type="range"
+            aria-label="Âm lượng"
+            min={0}
+            max={1}
+            step={0.05}
+            value={muted ? 0 : volume}
+            onChange={(event) => onVolumeChange(Number(event.target.value))}
+            className="h-1 w-0 cursor-pointer accent-bvc-accent opacity-0 transition-all duration-200 group-focus-within/volume:w-16 group-focus-within/volume:opacity-100 group-hover/volume:w-16 group-hover/volume:opacity-100"
+          />
+        </div>
 
-      {/* Đồng hồ: chọn tốc độ phát */}
-      <DropdownMenu>
-        <DropdownMenuTrigger aria-label="Tốc độ phát" className={cn(ICON_BUTTON, "gap-1 px-2")}>
-          <Clock size={19} strokeWidth={1.9} />
-          {rate !== 1 && <span className="text-xs font-medium text-bvc-accent-text">{rate}×</span>}
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-32 rounded-[12px] border-bvc-border bg-white p-1.5 shadow-level-1">
-          {PLAYBACK_RATES.map((value) => (
-            <DropdownMenuItem
-              key={value}
-              onClick={() => onRateChange(value)}
-              className={cn(
-                "cursor-pointer rounded-[8px] px-2.5 py-1.5 text-[13px] text-bvc-ink data-highlighted:bg-bvc-surface data-highlighted:text-bvc-ink",
-                value === rate && "font-medium text-bvc-accent"
-              )}
-            >
-              {value === 1 ? "Bình thường" : `${value}×`}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
+        {/* Đồng hồ: chọn tốc độ phát */}
+        <DropdownMenu>
+          <DropdownMenuTrigger aria-label="Tốc độ phát" className={cn(ICON_BUTTON, "gap-1 px-2")}>
+            <Clock size={19} strokeWidth={1.9} />
+            {rate !== 1 && <span className="text-xs font-medium text-bvc-accent-text">{rate}×</span>}
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-32 rounded-[12px] border-bvc-border bg-white p-1.5 shadow-level-1">
+            {PLAYBACK_RATES.map((value) => (
+              <DropdownMenuItem
+                key={value}
+                onClick={() => onRateChange(value)}
+                className={cn(
+                  "cursor-pointer rounded-[8px] px-2.5 py-1.5 text-[13px] text-bvc-ink data-highlighted:bg-bvc-surface data-highlighted:text-bvc-ink",
+                  value === rate && "font-medium text-bvc-accent"
+                )}
+              >
+                {value === 1 ? "Bình thường" : `${value}×`}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </div>
   );
 }

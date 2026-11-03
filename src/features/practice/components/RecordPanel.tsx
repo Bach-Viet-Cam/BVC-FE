@@ -79,6 +79,13 @@ export function RecordPanel({
   if (rec === "preview") {
     return (
       <div className="mt-auto flex flex-col gap-3 md:mx-auto md:my-auto md:w-full md:min-w-0 md:max-w-[760px] xl:max-w-[920px]">
+        {referenceAudio && (
+          <ReferenceAudioPlayer
+            key={referenceAudio.url}
+            url={referenceAudio.url}
+            isFallback={referenceAudio.isFallback}
+          />
+        )}
         <div className="flex flex-wrap items-center gap-3">
           <PlaybackBar
             peaks={previewPeaks}
