@@ -98,10 +98,10 @@ export function AppRouter() {
       <ScrollToTop />
       <Routes>
         {/* Public */}
-        <Route path="/" element={<LoginPage />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/landing" element={<Navigate to="/" replace />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/403" element={<ForbiddenPage />} />
-        <Route path="/landing" element={<LandingPage />} />
 
         {/* M02 - thư viện mở cho cả khách; khách bấm Lưu thì được mời đăng nhập */}
         <Route path="/library" element={<LibraryPage />} />

@@ -13,7 +13,7 @@ interface StatusScreenProps {
 // Màn báo lỗi toàn trang (404, 403) trên nền ảnh BVC: mã lỗi lớn, lời giải thích và lối quay về
 export function StatusScreen({ code, title, description }: StatusScreenProps) {
   const { user } = useAuth();
-  const homePath = user ? getRoleHome(user.role) : "/landing";
+  const homePath = user ? getRoleHome(user.role) : "/";
 
   return (
     <main className="relative isolate flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-bvc-ink px-6 py-12 text-center text-white">

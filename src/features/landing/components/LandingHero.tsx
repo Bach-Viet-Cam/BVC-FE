@@ -45,7 +45,7 @@ export function LandingHero() {
           aria-label="Điều hướng trang giới thiệu"
           className="flex items-center justify-between gap-4"
         >
-          <Link to="/landing" className="shrink-0 transition-opacity hover:opacity-80">
+          <Link to="/"className="shrink-0 transition-opacity hover:opacity-80">
             <img src={logoImage} alt="Bách Việt Cầm" className="h-12 w-auto lg:h-14" />
           </Link>
 

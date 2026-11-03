@@ -95,10 +95,10 @@ export function StudentShell({ children, className }: StudentShellProps) {
               <Link
                 to="/profile"
                 aria-label={`Hồ sơ ${displayName}`}
-                className="hidden h-11 items-center gap-2.5 rounded-full border border-white/20 bg-white/10 pr-4 pl-1 text-white transition-colors hover:bg-white/20 hover:text-white md:flex"
+                className="flex size-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition-colors hover:bg-white/20 hover:text-white md:h-11 md:w-auto md:justify-start md:gap-2.5 md:pr-4 md:pl-1"
               >
                 <UserAvatar name={displayName} />
-                <span className="max-w-[160px] truncate text-sm font-medium">{displayName}</span>
+                <span className="hidden max-w-[160px] truncate text-sm font-medium md:inline">{displayName}</span>
               </Link>
             </div>
           )}

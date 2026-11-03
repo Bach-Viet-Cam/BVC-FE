@@ -39,10 +39,10 @@ export function LoginPage() {
       />
 
       <header className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 pt-6 sm:px-6 lg:px-8">
-        <Link to="/landing" className="shrink-0 transition-opacity hover:opacity-80">
+        <Link to="/"className="shrink-0 transition-opacity hover:opacity-80">
           <img src={logoImage} alt="Bách Việt Cầm" className="h-11 w-auto lg:h-12" />
         </Link>
-        <PillLink to="/landing" label="Tìm hiểu thêm" variant="glass" size="md" className="hidden sm:inline-flex" />
+        <PillLink to="/"label="Tìm hiểu thêm" variant="glass" size="md" className="hidden sm:inline-flex" />
       </header>
 
       <main className="flex flex-1 items-center justify-center px-4 py-10">
