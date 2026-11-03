@@ -1,7 +1,11 @@
-import { IssueCard } from "@/features/practice/components/IssueCard";
+import { AiFeedbackCard } from "@/features/practice/components/AiFeedbackCard";
+import { PitchContourCard } from "@/features/practice/components/PitchContourCard";
+import { ResultOverviewCard } from "@/features/practice/components/ResultOverviewCard";
 import { StageTracker } from "@/features/practice/components/StageTracker";
+import { practiceSegmentApi } from "@/features/practice/api/practiceSegmentApi";
 import { MSG } from "@/features/practice/constants/practiceConstants";
-import type { SegmentAttempt, SegmentScores } from "@/features/practice/types/practiceSegmentTypes";
+import { useResultPart } from "@/features/practice/hooks/useResultPart";
+import type { SegmentAttempt } from "@/features/practice/types/practiceSegmentTypes";
 import { fmtTime } from "@/features/practice/utils/practiceFormat";
 import { formatScoreDelta } from "@/features/practice/utils/segmentFormat";
 import { toStageIndex } from "@/features/practice/utils/submissionStatus";
@@ -14,24 +18,6 @@ interface SegmentResultCardProps {
 const CARD = "flex flex-col gap-3.5 rounded-bvc-xl border border-bvc-border bg-white p-4 md:p-5.5";
 
 const scoreText = (score: number | null) => (score === null ? "—" : `${score}%`);
-
-function ScoreTiles({ scores }: { scores: SegmentScores }) {
-  const tiles = [
-    { label: "Tổng", value: scores.overall },
-    { label: "Cao độ", value: scores.pitch },
-    { label: "Nhịp", value: scores.rhythm },
-  ];
-  return (
-    <div className="grid grid-cols-3 gap-2.5">
-      {tiles.map((tile) => (
-        <div key={tile.label} className="flex flex-col items-center gap-0.5 rounded-bvc-lg bg-bvc-surface py-3">
-          <span className="text-xl font-semibold text-bvc-ink">{scoreText(tile.value)}</span>
-          <span className="text-xs text-bvc-muted">{tile.label}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 function ComparisonLines({ attempt }: { attempt: SegmentAttempt }) {
   const current = attempt.scores?.overall ?? null;
@@ -55,6 +41,8 @@ function ComparisonLines({ attempt }: { attempt: SegmentAttempt }) {
 // Kết quả của một lượt luyện đoạn, theo trạng thái (UC-03)
 export function SegmentResultCard({ attempt, onRetake }: SegmentResultCardProps) {
   const isFinal = attempt.status !== "PROCESSING";
+  const hasScores = attempt.status === "COMPLETED" && attempt.scores?.overall != null;
+  const chart = useResultPart(practiceSegmentApi.getPitchChart, attempt.id, hasScores, MSG.pitchUnavailable);
 
   return (
     <section className={CARD} aria-live="polite">
@@ -66,31 +54,21 @@ export function SegmentResultCard({ attempt, onRetake }: SegmentResultCardProps)
 
       {attempt.status === "COMPLETED" && attempt.scores && (
         <>
-          {attempt.scores.overall === null ? (
+          {attempt.scores.overall === null || attempt.scores.pitch === null || attempt.scores.rhythm === null ? (
             <p className="text-[13.5px] text-bvc-muted">{MSG.segmentNoNotes}</p>
           ) : (
-            <ScoreTiles scores={attempt.scores} />
+            <ResultOverviewCard
+              scores={{
+                overall: attempt.scores.overall,
+                pitch: attempt.scores.pitch,
+                rhythm: attempt.scores.rhythm,
+                tempo: null,
+              }}
+            />
           )}
           <ComparisonLines attempt={attempt} />
-          {attempt.issues.length > 0 && (
-            <div className="flex flex-col gap-2">
-              {attempt.issues.map((issue) => (
-                <IssueCard
-                  key={issue.id}
-                  rangeLabel={`${fmtTime(issue.startSec)}–${fmtTime(issue.endSec)}`}
-                  title={issue.label}
-                  description={issue.kind === "pitch" ? "Cao độ" : "Nhịp"}
-                  onClick={() => undefined}
-                />
-              ))}
-            </div>
-          )}
-          {attempt.aiFeedback && (
-            <details className="rounded-bvc-lg border border-bvc-border px-3.5 py-3">
-              <summary className="cursor-pointer text-sm font-medium text-bvc-ink">Nhận xét của AI</summary>
-              <p className="mt-2 text-[13.5px] leading-normal text-bvc-muted">{attempt.aiFeedback.text}</p>
-            </details>
-          )}
+          {attempt.aiFeedback && <AiFeedbackCard feedback={attempt.aiFeedback} warnings={[]} />}
+          {hasScores && <PitchContourCard chart={chart.data} loading={chart.loading} error={chart.error} />}
         </>
       )}
 
