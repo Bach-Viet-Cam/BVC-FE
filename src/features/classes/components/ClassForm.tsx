@@ -155,7 +155,7 @@ export function ClassForm({
           required
           hint={
             isCreate
-              ? `Dạng Môn.Slot.Half, ví dụ ${CLASS_CODE_EXAMPLE} (M2 = slot 2 buổi sáng, H1 = half 1)`
+              ? `Dạng Môn.Slot.Half, ví dụ ${CLASS_CODE_EXAMPLE} (M1, M2, M3 = slot 1, 2, 3; E1, E2, E3 = slot 4, 5, 6; H1 = half 1)`
               : "Tối đa 100 ký tự, không trùng trong cùng học kỳ"
           }
           error={errors.name?.message}

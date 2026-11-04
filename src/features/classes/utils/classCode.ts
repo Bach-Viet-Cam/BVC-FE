@@ -1,7 +1,7 @@
 import type { Instrument } from "@/features/classes/types/classTypes";
 
 // Class code: <subject>.<slot>.<half>, e.g. DNH103.M2.H1
-// (subject DNH103 starts with the instrument code DNH, M2 = slot 2, H1 = half 1 of the semester).
+// (subject DNH103 starts with the instrument code DNH, M1-M3 = slot 1-3, E1-E3 = slot 4-6, H1 = half 1 of the semester).
 export const CLASS_CODE_EXAMPLE = "DNH103.M2.H1";
 
 export interface ParsedClassCode {
@@ -13,11 +13,19 @@ export interface ParsedClassCode {
 // "M2" -> "2", "H1" -> "1"; a part without a letter prefix is kept as typed.
 const stripPrefix = (part: string) => part.replace(/^[A-Z]+/, "") || part;
 
+// M1-M3 -> slot 1-3, E1-E3 -> slot 4-6; anything else falls back to the number after the letter prefix.
+const ENSEMBLE_SLOT_OFFSET = 3;
+function toSlot(part: string): string {
+  const match = /^([ME])([1-3])$/.exec(part);
+  if (!match) return stripPrefix(part);
+  return String(Number(match[2]) + (match[1] === "E" ? ENSEMBLE_SLOT_OFFSET : 0));
+}
+
 export function parseClassCode(value: string): ParsedClassCode | null {
   const parts = value.trim().toUpperCase().split(".");
   if (parts.length !== 3 || parts.some((part) => part === "")) return null;
   const [subject, slot, half] = parts;
-  return { subject, slot: stripPrefix(slot), half: stripPrefix(half) };
+  return { subject, slot: toSlot(slot), half: stripPrefix(half) };
 }
 
 // The subject starts with the instrument code; the longest matching code wins (e.g. DNH over DN).
