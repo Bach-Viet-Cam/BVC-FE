@@ -1,3 +1,4 @@
+import { SubmissionSharing } from "@/features/community/components/SubmissionVerification";
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { RotateCw } from "lucide-react";
@@ -86,6 +87,7 @@ export function ResultsPage() {
           </div>
         )}
 
+        {data && isCompleted && <div className="px-3.5 pt-3.5 md:px-0 md:pt-6"><SubmissionSharing key={submissionId} submissionId={submissionId} /></div>}
         {data && isCompleted && data.scores && (
           // Dưới lg: một cột (điểm, AI, biểu đồ, vị trí, tiến trình). Từ lg: điểm bên trái, AI bên phải;
           // biểu đồ cao độ trải hết bề ngang ở hàng 2; vị trí + tiến trình ở hàng dưới

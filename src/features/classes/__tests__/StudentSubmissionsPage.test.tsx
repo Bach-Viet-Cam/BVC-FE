@@ -8,6 +8,11 @@ import { assignmentsApi } from "@/features/classes/api/assignmentsApi";
 vi.mock("@/features/classes/api/assignmentsApi", () => ({
   assignmentsApi: { getStudentSubmissions: vi.fn(), saveComment: vi.fn() },
 }));
+vi.mock("@/features/community/api/verifiedApi", () => ({
+  verifiedApi: {
+    review: vi.fn().mockResolvedValue({ review: null, shareConsent: false, canReview: false, verifiedContentId: null }),
+  },
+}));
 vi.mock("@/shared/components/ui/toast", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 
 const submission = (id: string, attemptNumber: number) => ({

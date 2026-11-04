@@ -1,3 +1,4 @@
+import { VerifiedRecordingList } from "@/features/community/components/VerifiedRecordingList";
 import { useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { ChevronLeft, Plus, Users } from "lucide-react";
@@ -212,6 +213,8 @@ export function SongDetailPage() {
           </div>
         )}
       </section>
+
+      {activeGroup && <div className="px-[18px] pb-6 md:px-14"><VerifiedRecordingList key={`${song.id}-${activeGroup.instrument.id}`} pieceId={song.id} instrumentId={activeGroup.instrument.id} /></div>}
 
       <GuestSaveDialog open={save.isGuestPromptOpen} onOpenChange={save.setGuestPromptOpen} />
     </LibraryShell>

@@ -68,6 +68,7 @@ export function RecordPage() {
   const blocked = demoBlocked || Boolean(active); // GBR-49: chỉ khóa bài đang có bản xử lý
   const [drawer, setDrawer] = useState<DrawerKind | null>(() => drawerFromState(location.state));
 
+  const [shareAfterVerification, setShareAfterVerification] = useState(false);
   const [mode, setMode] = useState<SubmitMode>("record");
   const [tempoOpen, setTempoOpen] = useState(true);
   const [tunerOpen, setTunerOpen] = useState(true);
@@ -206,7 +207,7 @@ export function RecordPage() {
     if (blocked || uploading || errorKind || !sheetId) return;
     const source = mode === "record" ? (rec === "preview" ? recorder.take?.file : undefined) : pickedFile;
     if (!source) return;
-    const submission = await submit(source, { sheetMusicId: sheetId, assignmentId });
+    const submission = await submit(source, { sheetMusicId: sheetId, assignmentId, shareAfterVerification });
     if (!submission) {
       refreshActive();
       return;
@@ -416,6 +417,7 @@ export function RecordPage() {
                     onSend={() => void handleSend()}
                   />
                 )}
+                {assignmentId && <label className="flex min-h-11 items-start gap-3 py-3 text-sm leading-relaxed text-bvc-muted"><input type="checkbox" className="mt-1 size-5 shrink-0 accent-bvc-ink" checked={shareAfterVerification} disabled={uploading} onChange={(event) => setShareAfterVerification(event.target.checked)} /><span>Tôi đồng ý chia sẻ bản thu sau khi giảng viên xác minh, để người học các khóa khác tham khảo tại bài nhạc. Có thể rút đồng ý ở trang kết quả.</span></label>}
                 <input
                   ref={fileInput}
                   type="file"

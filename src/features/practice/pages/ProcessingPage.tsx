@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { SubmissionSharing } from "@/features/community/components/SubmissionVerification";
 import { useNavigate, useParams } from "react-router-dom";
 import { PracticeFrame } from "@/features/practice/components/PracticeFrame";
 import { PracticeTopBar } from "@/features/practice/components/PracticeTopBar";
@@ -114,6 +115,7 @@ export function ProcessingPage() {
         )}
 
         {error && <p className="mt-3 text-[13px] text-bvc-muted">{error}</p>}
+        {submission && (submission.status === 'FAILED' || submission.status === 'REJECTED') && <div className="mt-4"><SubmissionSharing key={submissionId} submissionId={submissionId} /></div>}
 
         {submission?.status === "PROCESSING" && (
           <p className="mt-3 text-[13px] leading-normal text-bvc-muted">{MSG.leaveHint}</p>

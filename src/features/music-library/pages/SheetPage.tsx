@@ -1,3 +1,4 @@
+import { VerifiedRecordingList } from "@/features/community/components/VerifiedRecordingList";
 import { useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Mic, Minus, Plus } from "lucide-react";
@@ -236,6 +237,7 @@ export function SheetPage() {
         <div className={cn(panel !== "video" && "hidden", "lg:block")}>
           <TutorialVideoCard video={sheet.tutorialVideo} />
         </div>
+        <VerifiedRecordingList key={sheet.id} pieceId={song.id} instrumentId={sheet.instrument.id} sourceSheetMusicId={sheet.id} />
       </aside>
 
       <GuestSaveDialog open={save.isGuestPromptOpen} onOpenChange={save.setGuestPromptOpen} />

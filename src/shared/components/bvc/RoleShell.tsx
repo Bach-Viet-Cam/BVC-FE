@@ -14,10 +14,11 @@ interface RoleShellProps {
   children: ReactNode;
   // Bề rộng tối đa của vùng nội dung trên web
   contentClassName?: string;
+  hideHeader?: boolean;
 }
 
 // Trang dùng chung cho mọi vai trò (thông báo, hồ sơ, trợ giúp): giữ đúng menu của người đang xem
-export function RoleShell({ title, subtitle, actions, children, contentClassName }: RoleShellProps) {
+export function RoleShell({ title, subtitle, actions, children, contentClassName, hideHeader = false }: RoleShellProps) {
   const { user } = useAuth();
   const role = useViewerRole();
 
@@ -28,7 +29,7 @@ export function RoleShell({ title, subtitle, actions, children, contentClassName
         contentClassName
       )}
     >
-      <PageHeader title={title} description={subtitle} actions={actions} />
+      {!hideHeader && <PageHeader title={title} description={subtitle} actions={actions} />}
       {children}
     </div>
   );

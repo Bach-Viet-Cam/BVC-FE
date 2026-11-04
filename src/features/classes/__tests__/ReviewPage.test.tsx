@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -13,6 +13,11 @@ vi.mock("@/features/classes/api/assignmentsApi", () => ({
     getAssignment: vi.fn(),
     getStudentSubmissions: vi.fn(),
     saveComment: vi.fn(),
+  },
+}));
+vi.mock("@/features/community/api/verifiedApi", () => ({
+  verifiedApi: {
+    review: vi.fn().mockResolvedValue({ review: null, shareConsent: false, canReview: false, verifiedContentId: null }),
   },
 }));
 vi.mock("@/shared/components/ui/toast", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
@@ -125,7 +130,7 @@ describe("ReviewPage", () => {
     expect(await screen.findByText("Hàng đợi nhận xét · 1 / 2")).toBeInTheDocument();
     expect(screen.getByText("Cao Minh Quân - Độc tấu - Lý ngựa ô")).toBeInTheDocument();
     expect(screen.queryByText("Chưa Nộp")).not.toBeInTheDocument();
-    expect(assignmentsApi.getStudentSubmissions).toHaveBeenCalledWith("a1", "s2");
+    await waitFor(() => expect(assignmentsApi.getStudentSubmissions).toHaveBeenCalledWith("a1", "s2"));
     expect(await screen.findByLabelText("Nhận xét")).toBeInTheDocument();
   });
 

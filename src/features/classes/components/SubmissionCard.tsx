@@ -1,3 +1,5 @@
+import { SubmissionVerification } from "@/features/community/components/SubmissionVerification";
+import { AuthenticatedAudio } from "@/shared/components/bvc/AuthenticatedAudio";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -27,6 +29,8 @@ const commentSchema = z.object({
 type CommentValues = z.infer<typeof commentSchema>;
 
 interface SubmissionCardProps {
+  studentName?: string;
+  targetName?: string;
   submission: StudentSubmission;
   canComment: boolean;
   onSaveComment: (content: string) => Promise<ApiFieldError[] | null>;
@@ -39,7 +43,13 @@ const STATUS_TONES: Record<SubmissionStatus, "ok" | "warn" | "muted"> = {
   FAILED: "warn",
 };
 
-export function SubmissionCard({ submission, canComment, onSaveComment }: SubmissionCardProps) {
+export function SubmissionCard({
+  submission,
+  studentName,
+  targetName,
+  canComment,
+  onSaveComment,
+}: SubmissionCardProps) {
   const {
     control,
     register,
@@ -77,9 +87,13 @@ export function SubmissionCard({ submission, canComment, onSaveComment }: Submis
           {submission.tempoDeviation !== null && <span>Lệch tempo {formatPercent(submission.tempoDeviation)}</span>}
         </div>
       )}
-      <audio controls preload="none" src={submission.audioUrl} className="w-full">
-        Trình duyệt không phát được bản thu.
-      </audio>
+      {/^\/samples\/[a-z0-9_-]+\.(wav|mp3)$/i.test(submission.audioUrl ?? "") ? (
+        <audio controls preload="none" src={submission.audioUrl} className="w-full">
+          Trình duyệt không phát được bản thu.
+        </audio>
+      ) : (
+        <AuthenticatedAudio key={submission.id} endpoint={`/submissions/${submission.id}/audio`} />
+      )}
       <form onSubmit={submit} noValidate className="flex flex-col gap-[6px]">
         <div className="flex justify-between">
           <label htmlFor={commentId} className="text-[13.5px] font-medium">
@@ -102,15 +116,22 @@ export function SubmissionCard({ submission, canComment, onSaveComment }: Submis
             {errors.content.message}
           </span>
         )}
-        {canComment ? (
-          <div className="flex justify-end">
-            <ActionButton type="submit" variant="primary" disabled={isSubmitting}>
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+          <SubmissionVerification
+            studentName={studentName}
+            targetName={targetName}
+            key={`verification-${submission.id}`}
+            submissionId={submission.id}
+            submissionLabel={`Lần nộp ${submission.attemptNumber} · phiên bản v${submission.version}`}
+            manual={submission.status !== "COMPLETED"}
+          />
+          {canComment && (
+            <ActionButton type="submit" variant="primary" disabled={isSubmitting} className="px-3 text-[13px]">
               {submission.comment ? "Cập nhật nhận xét" : "Gửi nhận xét"}
             </ActionButton>
-          </div>
-        ) : (
-          <span className="text-[12px] text-bvc-muted">{COMMENT_LOCKED_MESSAGE}</span>
-        )}
+          )}
+        </div>
+        {!canComment && <span className="text-[12px] text-bvc-muted">{COMMENT_LOCKED_MESSAGE}</span>}
       </form>
     </article>
   );
