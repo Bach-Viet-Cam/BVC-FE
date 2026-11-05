@@ -14,6 +14,7 @@ import { useTakePlayback } from "@/features/ensemble/hooks/useTakePlayback";
 import { useTrackPeaks } from "@/features/ensemble/hooks/useTrackPeaks";
 import { type ListeningMode } from "@/features/ensemble/types/ensembleTypes";
 import { formatDate } from "@/features/ensemble/utils/formatClock";
+import { ConfirmDialog } from "@/shared/components/bvc/ConfirmDialog";
 
 const LEAVE_CONFIRM_MESSAGE = "Rời màn hình sẽ hủy bản thu đang thực hiện. Bạn có muốn rời đi?";
 
@@ -36,6 +37,7 @@ export function EnsemblePage() {
   const [isPromptForced, setIsPromptForced] = useState(false);
   const [startAfterChoice, setStartAfterChoice] = useState(false);
   const [isPromptDismissed, setIsPromptDismissed] = useState(false);
+  const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
 
   // Tự hiện khi không thấy tai nghe và chưa chọn — nhưng chỉ lúc sẵn sàng, không chen ngang khi đang thu/nghe lại (H3).
   const isPromptOpen = isPromptForced || (listening.needsChoice && status === "ready" && !isPromptDismissed);
@@ -126,6 +128,7 @@ export function EnsemblePage() {
   // Phím tắt bàn phím chuẩn phòng thu DAW (Space, R, S)
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (isLeaveDialogOpen) return;
       const target = event.target as HTMLElement | null;
       if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) {
         return;
@@ -151,14 +154,33 @@ export function EnsemblePage() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [status, isBusy, handleSubmit, playback, requestStart, submitBlockedReason, stop, discardTake]);
+  }, [status, isBusy, handleSubmit, playback, requestStart, submitBlockedReason, stop, discardTake, isLeaveDialogOpen]);
 
   const leave = () => {
-    const message = hasUnsavedTake ? "Bản thu chưa được lưu sẽ mất. Bạn có muốn rời đi?" : LEAVE_CONFIRM_MESSAGE;
-    if ((isBusy || hasUnsavedTake) && !window.confirm(message)) return;
+    if (isBusy || hasUnsavedTake) {
+      setIsLeaveDialogOpen(true);
+      return;
+    }
+    finishLeaving();
+  };
+
+  const finishLeaving = () => {
+    setIsLeaveDialogOpen(false);
     cancel();
     navigate(backTarget);
   };
+
+  const leaveDialog = (
+    <ConfirmDialog
+      open={isLeaveDialogOpen}
+      onOpenChange={setIsLeaveDialogOpen}
+      title="Rời phòng hòa tấu?"
+      description={hasUnsavedTake ? "Bản thu chưa được lưu sẽ mất. Bạn có muốn rời đi?" : LEAVE_CONFIRM_MESSAGE}
+      confirmLabel="Rời phòng"
+      cancelLabel="Ở lại"
+      onConfirm={finishLeaving}
+    />
+  );
 
   const { tracksResult, isLoading, error } = practice;
   if (isLoading || !tracksResult) {
@@ -173,6 +195,7 @@ export function EnsemblePage() {
             {isLoading ? "Đang kết nối phòng thu và chuẩn bị các bè mẫu..." : error}
           </p>
         </div>
+        {leaveDialog}
       </EnsembleFrame>
     );
   }
@@ -226,7 +249,7 @@ export function EnsemblePage() {
               onSubmit={() => void handleSubmit()}
               onDiscard={practice.discardTake}
               onPracticeAgain={practice.reset}
-              onBack={() => navigate(backTarget)}
+              onBack={leave}
               backLabel={assignmentId ? "Về bài tập" : "Về danh sách bài tập"}
               uploadPercent={practice.uploadPercent}
               submitBlockedReason={submitBlockedReason}
@@ -272,6 +295,7 @@ export function EnsemblePage() {
       </main>
 
       <HeadphonePrompt isOpen={isPromptOpen} onOpenChange={changePromptOpen} onChoose={chooseMode} />
+      {leaveDialog}
     </EnsembleFrame>
   );
 }

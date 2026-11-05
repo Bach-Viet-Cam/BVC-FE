@@ -31,7 +31,7 @@ export function PillTabs<T extends string>({ label, tabs, value, onChange, class
             aria-selected={isActive}
             onClick={() => onChange(tab.value)}
             className={cn(
-              "inline-flex min-h-10 shrink-0 cursor-pointer items-center gap-[7px] rounded-full px-4 text-[13.5px] whitespace-nowrap",
+              "inline-flex min-h-11 shrink-0 cursor-pointer items-center gap-[7px] rounded-full px-4 text-[13.5px] whitespace-nowrap",
               isActive
                 ? "bg-bvc-ink font-medium text-white"
                 : "border border-bvc-border-strong text-bvc-ink hover:bg-bvc-surface"

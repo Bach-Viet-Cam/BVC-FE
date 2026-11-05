@@ -17,11 +17,11 @@ export function useMyAssignments(type: MyAssignmentsParams["type"]) {
   }, [searchText, query]);
 
   const params: MyAssignmentsParams = { type, q: query || undefined, sortBy: "deadline", sortDir: "asc" };
-  const { data, error, isLoading } = useAsyncData<AssignmentListItem[]>(
+  const { data, error, isLoading, reload } = useAsyncData<AssignmentListItem[]>(
     () => assignmentApi.listMine(params).then(({ data: body }) => body.data),
     JSON.stringify(params),
     LOAD_ERROR
   );
 
-  return { items: data ?? [], error, isLoading, searchText, setSearchText };
+  return { items: data ?? [], error, isLoading, reload, searchText, setSearchText };
 }
