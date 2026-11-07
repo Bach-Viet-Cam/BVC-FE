@@ -5,11 +5,14 @@ import { Menu, Music2, X } from "lucide-react";
 import bannerImage from "@/assets/image/Artboard 3.png";
 import logoImage from "@/assets/image/logo.png";
 import { PillLink } from "@/shared/components/bvc/PillLink";
+import { useLandingAccount } from "@/features/landing/hooks/useLandingAccount";
+import { cn } from "@/shared/utils/cn";
 import { LANDING_INSTRUMENTS, LANDING_NAV } from "@/features/landing/constants/landingContent";
 
 // Phần đầu trang: thanh điều hướng, tiêu đề, nút bắt đầu và dải tên nhạc cụ chạy ngang trên nền ảnh BVC
 export function LandingHero() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isLoading: isAccountLoading, accountLabel, homePath } = useLandingAccount();
 
   // Mở menu mobile thì khóa cuộn trang phía sau
   useEffect(() => {
@@ -45,7 +48,7 @@ export function LandingHero() {
           aria-label="Điều hướng trang giới thiệu"
           className="flex items-center justify-between gap-4"
         >
-          <Link to="/"className="shrink-0 transition-opacity hover:opacity-80">
+          <Link to="/" className="shrink-0 transition-opacity hover:opacity-80">
             <img src={logoImage} alt="Bách Việt Cầm" className="h-12 w-auto lg:h-14" />
           </Link>
 
@@ -63,7 +66,13 @@ export function LandingHero() {
           </ul>
 
           <div className="flex items-center gap-3">
-            <PillLink to="/login" label="Đăng nhập" variant="glass" size="md" className="hidden sm:inline-flex" />
+            <PillLink
+              to={homePath}
+              label={accountLabel}
+              variant="glass"
+              size="md"
+              className={cn("hidden max-w-[260px] sm:inline-flex", isAccountLoading && "invisible")}
+            />
             <button
               type="button"
               aria-label={isMenuOpen ? "Đóng menu" : "Mở menu"}
@@ -118,10 +127,13 @@ export function LandingHero() {
                 ))}
               </ul>
               <Link
-                to="/login"
-                className="mt-auto rounded-full bg-bvc-ink py-4 text-center text-lg font-medium text-white hover:text-white"
+                to={homePath}
+                className={cn(
+                  "mt-auto truncate rounded-full bg-bvc-ink px-6 py-4 text-center text-lg font-medium text-white hover:text-white",
+                  isAccountLoading && "invisible"
+                )}
               >
-                Đăng nhập
+                {accountLabel}
               </Link>
             </motion.div>
           )}
@@ -162,7 +174,7 @@ export function LandingHero() {
             transition={{ delay: 1, duration: 0.8, ease: "easeOut" }}
             className="mt-9 flex flex-col items-center gap-3 sm:flex-row lg:mt-12"
           >
-            <PillLink to="/login" label="Bắt đầu luyện tập" variant="light" />
+            <PillLink to={homePath} label="Bắt đầu luyện tập" variant="light" />
             <PillLink to="/library" label="Xem thư viện bài hát" variant="glass" />
           </motion.div>
 

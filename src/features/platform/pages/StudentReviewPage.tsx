@@ -21,8 +21,8 @@ export function StudentReviewPage() {
               <Link to="/teacher/review" className={actionButtonClass("primary", "md", "hover:text-white")}>
                 Duyệt bài nộp
               </Link>
-              <Link to="/teacher/progress" className={actionButtonClass("secondary", "md")}>
-                Xem tiến độ sinh viên
+              <Link to="/teacher/classes" className={actionButtonClass("secondary", "md")}>
+                Xem tiến độ theo lớp
               </Link>
             </>
           }

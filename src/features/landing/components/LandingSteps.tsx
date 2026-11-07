@@ -4,6 +4,7 @@ import { Check } from "lucide-react";
 import bannerImage from "@/assets/image/Artboard 3.png";
 import studentImage from "@/assets/image/student.png";
 import { PillLink } from "@/shared/components/bvc/PillLink";
+import { useLandingAccount } from "@/features/landing/hooks/useLandingAccount";
 import { Accent, SectionBadge, SectionHeading } from "@/shared/components/bvc/SectionIntro";
 import { LANDING_STEPS } from "@/features/landing/constants/landingContent";
 import { cn } from "@/shared/utils/cn";
@@ -13,6 +14,7 @@ export function LandingSteps() {
   const [activeId, setActiveId] = useState(LANDING_STEPS[0].id);
   const active = LANDING_STEPS.find((step) => step.id === activeId) ?? LANDING_STEPS[0];
   const ActiveIcon = active.icon;
+  const { homePath } = useLandingAccount();
 
   return (
     <section id="steps" aria-labelledby="steps-heading" className="w-full scroll-mt-6 bg-bvc-soft py-20 lg:py-28">
@@ -117,7 +119,7 @@ export function LandingSteps() {
                   </motion.li>
                 ))}
               </ul>
-              <PillLink to="/login" label="Bắt đầu luyện tập" />
+              <PillLink to={homePath} label="Bắt đầu luyện tập" />
             </div>
 
             <div className="relative flex h-[380px] w-full items-center justify-center overflow-hidden rounded-[24px] sm:h-[460px] lg:h-[540px] lg:w-[520px] lg:shrink-0">

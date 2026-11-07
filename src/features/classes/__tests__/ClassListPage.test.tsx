@@ -61,24 +61,32 @@ describe("ClassListPage", () => {
     isMobile.mockReturnValue(false);
   });
 
-  it("lists the classes returned by the API with stats computed from them", async () => {
+  it("lists the classes returned by the API with a one-line summary", async () => {
     mockClasses([CLASS_FA26, CLASS_SP26]);
     renderPage();
     expect(await screen.findByText("TRD301 - Nhạc cụ truyền thống")).toBeInTheDocument();
     expect(screen.getByText("TRD101 - Nhập môn")).toBeInTheDocument();
-    expect(within(screen.getByText("Tổng lớp").parentElement as HTMLElement).getByText("2")).toBeInTheDocument();
-    expect(within(screen.getByText("Sinh viên").parentElement as HTMLElement).getByText("25")).toBeInTheDocument();
+    expect(screen.getByText("2 lớp · 1 đang học · 25 sinh viên")).toBeInTheDocument();
     expect(classesApi.listClasses).toHaveBeenCalledWith(expect.objectContaining({ status: "ALL" }));
   });
 
-  it("filters by cohort chip and opens a class by its id", async () => {
+  it("filters by cohort, status and name, and opens a class by clicking its row", async () => {
     mockClasses([CLASS_FA26, CLASS_SP26]);
     renderPage();
     await screen.findByText("TRD301 - Nhạc cụ truyền thống");
-    await userEvent.click(screen.getByRole("button", { name: "SP26" }));
+    await userEvent.selectOptions(screen.getByLabelText("Khóa"), "SP26");
     expect(screen.queryByText("TRD301 - Nhạc cụ truyền thống")).not.toBeInTheDocument();
-    await userEvent.click(screen.getByRole("button", { name: "Xem lớp" }));
+    await userEvent.click(screen.getByText("SP26"));
     expect(navigate).toHaveBeenCalledWith("/teacher/classes/c2");
+    expect(screen.getByRole("link", { name: "TRD101 - Nhập môn" })).toHaveAttribute("href", "/teacher/classes/c2");
+
+    await userEvent.selectOptions(screen.getByLabelText("Khóa"), "ALL");
+    await userEvent.selectOptions(screen.getByLabelText("Trạng thái"), "ACTIVE");
+    expect(screen.queryByText("TRD101 - Nhập môn")).not.toBeInTheDocument();
+    expect(screen.getByText("TRD301 - Nhạc cụ truyền thống")).toBeInTheDocument();
+
+    await userEvent.type(screen.getByLabelText("Tìm tên lớp"), "nhập môn");
+    expect(await screen.findByText("Không tìm thấy lớp phù hợp.")).toBeInTheDocument();
   });
 
   it("shows the empty message when the lecturer has no class", async () => {
@@ -92,9 +100,12 @@ describe("ClassListPage", () => {
     mockClasses([CLASS_FA26, CLASS_SP26]);
     renderPage();
     expect(await screen.findByText("TRD301 - Nhạc cụ truyền thống")).toBeInTheDocument();
-    expect(screen.getByText("1 lớp đang hoạt động")).toBeInTheDocument();
+    expect(screen.getByText("2 lớp · 1 đang học · 25 sinh viên")).toBeInTheDocument();
     expect(screen.queryByText("Tuần hiện tại")).not.toBeInTheDocument();
-    expect(screen.getAllByRole("link", { name: "Mở lớp" })[0]).toHaveAttribute("href", "/teacher/classes/c1");
+    expect(screen.getByRole("link", { name: /TRD301 - Nhạc cụ truyền thống/ })).toHaveAttribute(
+      "href",
+      "/teacher/classes/c1"
+    );
     await userEvent.click(screen.getByRole("button", { name: "Tạo mới" }));
     const dialog = await screen.findByRole("dialog");
     expect(within(dialog).getByRole("heading", { name: "Tạo lớp học" })).toBeInTheDocument();

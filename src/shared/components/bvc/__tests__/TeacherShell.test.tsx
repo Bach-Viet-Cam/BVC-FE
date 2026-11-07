@@ -44,11 +44,20 @@ describe("TeacherShell menu", () => {
     expect(nav.getByRole("link", { name: "Bảng xếp hạng" })).toBeInTheDocument();
   });
 
-  it("keeps Danh sách lớp active on class sub-pages, review pages are separate items", () => {
-    const [sidebar] = renderAt("/teacher/assignments/a1");
+  it("keeps Danh sách lớp active on class sub-pages", () => {
+    const [sidebar] = renderAt("/teacher/classes/c1/students/s1");
     const nav = within(sidebar);
     expect(nav.getByRole("button", { name: "Lớp học" })).toHaveAttribute("aria-expanded", "true");
     expect(nav.getByRole("link", { name: "Danh sách lớp" })).toHaveAttribute("aria-current", "page");
+    expect(nav.getByRole("link", { name: "Bài tập" })).not.toHaveAttribute("aria-current");
+  });
+
+  it("has its own Bài tập item for all classes' assignments, review pages are separate items", () => {
+    const [sidebar] = renderAt("/teacher/assignments/a1");
+    const nav = within(sidebar);
+    expect(nav.getByRole("button", { name: "Lớp học" })).toHaveAttribute("aria-expanded", "true");
+    expect(nav.getByRole("link", { name: "Bài tập" })).toHaveAttribute("aria-current", "page");
+    expect(nav.getByRole("link", { name: "Danh sách lớp" })).not.toHaveAttribute("aria-current");
     expect(nav.getByRole("link", { name: "Duyệt bài nộp" })).not.toHaveAttribute("aria-current");
     expect(nav.getByRole("link", { name: "Đánh giá sinh viên" })).not.toHaveAttribute("aria-current");
   });

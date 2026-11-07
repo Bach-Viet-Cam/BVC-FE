@@ -5,6 +5,13 @@ import {
   type SubmissionStatus,
 } from "@/features/classes/types/teacherAssignmentTypes";
 
+// Không dùng "classId": modal tạo bài tập dùng tên này và xóa nó khi đóng
+export const ASSIGNMENT_CLASS_PARAM = "class";
+
+export function classAssignmentsPath(classId: string): string {
+  return `/teacher/assignments?${ASSIGNMENT_CLASS_PARAM}=${encodeURIComponent(classId)}`;
+}
+
 // A piece has several sheets (per instrument / level), so the piece title alone is ambiguous.
 export function sheetMusicLabel(sheet: { pieceTitle: string; name: string }): string {
   return `${sheet.pieceTitle} — ${sheet.name}`;

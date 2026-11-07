@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Plus } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
 import { AssignmentCard } from "@/features/classes/components/AssignmentCard";
 import { AssignmentCreateDialog } from "@/features/classes/components/AssignmentCreateDialog";
 import { FilterSelect } from "@/features/classes/components/FilterSelect";
@@ -13,13 +14,15 @@ import {
   type AssignmentListItem,
   type AssignmentStatus,
 } from "@/features/classes/types/teacherAssignmentTypes";
-import { ASSIGNMENT_KIND_LABELS, ASSIGNMENT_STATUS_LABELS } from "@/features/classes/utils/teacherAssignmentFormat";
+import {
+  ASSIGNMENT_CLASS_PARAM,
+  ASSIGNMENT_KIND_LABELS,
+  ASSIGNMENT_STATUS_LABELS,
+} from "@/features/classes/utils/teacherAssignmentFormat";
 import { useCreateDialog } from "@/shared/hooks/useCreateDialog";
 import { useDebouncedValue } from "@/shared/hooks/useDebouncedValue";
 
 interface AssignmentListProps {
-  // Set in the class hub tab: the list is fixed to that class.
-  classId?: string;
   canCreate: boolean;
 }
 
@@ -35,17 +38,19 @@ const STATUS_OPTIONS = [
   ...Object.entries(ASSIGNMENT_STATUS_LABELS).map(([value, label]) => ({ value, label })),
 ];
 
-export function AssignmentList({ classId, canCreate }: AssignmentListProps) {
+export function AssignmentList({ canCreate }: AssignmentListProps) {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchText, setSearchText] = useState("");
-  const [selectedClassId, setSelectedClassId] = useState(ALL);
   const [kind, setKind] = useState(ALL);
   const [status, setStatus] = useState(ALL);
   const debouncedSearch = useDebouncedValue(searchText.trim());
   const { classes } = useLecturerClasses();
-  const effectiveClassId = classId ?? (selectedClassId === ALL ? undefined : selectedClassId);
+  const classId = searchParams.get(ASSIGNMENT_CLASS_PARAM) ?? undefined;
+  const selectedClass = classes.find((item) => item.id === classId);
+  const isClassView = Boolean(classId);
   const { result, isLoading, error, reload } = useAssignmentList({
-    classId: effectiveClassId,
-    kind: kind === ALL ? undefined : (kind as AssignmentKind),
+    classId,
+    kind: isClassView || kind === ALL ? undefined : (kind as AssignmentKind),
     status: status === ALL ? undefined : (status as AssignmentStatus),
     q: debouncedSearch || undefined,
   });
@@ -54,8 +59,18 @@ export function AssignmentList({ classId, canCreate }: AssignmentListProps) {
     () => [ALL_OPTION, ...classes.map((item) => ({ value: item.id, label: item.name }))],
     [classes]
   );
-  const isFiltered =
-    Boolean(debouncedSearch) || kind !== ALL || status !== ALL || (!classId && selectedClassId !== ALL);
+  const selectClass = (value: string) =>
+    setSearchParams(
+      (previous) => {
+        const next = new URLSearchParams(previous);
+        if (value === ALL) next.delete(ASSIGNMENT_CLASS_PARAM);
+        else next.set(ASSIGNMENT_CLASS_PARAM, value);
+        return next;
+      },
+      { replace: true }
+    );
+  const isFiltered = Boolean(debouncedSearch) || status !== ALL || (!isClassView && kind !== ALL);
+  const canCreateInClass = canCreate && selectedClass?.status === "ACTIVE";
   const items = result?.items ?? [];
   const createDialog = useCreateDialog("assignment", ["classId", "kind"] as const);
   const openCreate = (presetKind?: AssignmentKind) => createDialog.open({ classId, kind: presetKind });
@@ -66,7 +81,6 @@ export function AssignmentList({ classId, canCreate }: AssignmentListProps) {
         <div className="flex min-w-0 grow lg:max-w-[720px]">
           <SearchInput id="assignment-search" label="Tìm bài tập" value={searchText} onChange={setSearchText} />
         </div>
-        <FilterSelect label="Trạng thái" value={status} allValue={ALL} options={STATUS_OPTIONS} onChange={setStatus} />
         {canCreate && (
           <ActionButton className="max-sm:px-3.5 lg:ml-auto" onClick={() => openCreate()}>
             <Plus size={16} strokeWidth={2} aria-hidden="true" />
@@ -74,21 +88,29 @@ export function AssignmentList({ classId, canCreate }: AssignmentListProps) {
           </ActionButton>
         )}
       </div>
-      {!classId && (
-        <div className="no-scrollbar flex gap-[7px] overflow-x-auto">
-          <FilterSelect
-            label="Lớp"
-            value={selectedClassId}
-            allValue={ALL}
-            options={classOptions}
-            onChange={setSelectedClassId}
-          />
+      <div className="no-scrollbar flex shrink-0 gap-[7px] overflow-x-auto">
+        <FilterSelect label="Lớp" value={classId ?? ALL} allValue={ALL} options={classOptions} onChange={selectClass} />
+        {!isClassView && (
           <FilterSelect label="Loại" value={kind} allValue={ALL} options={KIND_OPTIONS} onChange={setKind} />
-        </div>
-      )}
-      {classId ? (
+        )}
+        <FilterSelect label="Trạng thái" value={status} allValue={ALL} options={STATUS_OPTIONS} onChange={setStatus} />
+        {classId && (
+          <Link
+            to={`/teacher/classes/${classId}`}
+            className="inline-flex min-h-[44px] shrink-0 items-center px-[6px] text-[13px] font-medium whitespace-nowrap text-bvc-accent-text"
+          >
+            Mở trang lớp →
+          </Link>
+        )}
+      </div>
+      {isClassView ? (
         <ListState isLoading={isLoading} error={error} isEmpty={false} emptyMessage="" onRetry={reload}>
-          <ClassAssignmentSections items={items} canCreate={canCreate} isFiltered={isFiltered} onCreate={openCreate} />
+          <ClassAssignmentSections
+            items={items}
+            canCreate={canCreateInClass}
+            isFiltered={isFiltered}
+            onCreate={openCreate}
+          />
         </ListState>
       ) : (
         <ListState
@@ -121,7 +143,7 @@ interface ClassAssignmentSectionsProps {
   onCreate: (kind: AssignmentKind) => void;
 }
 
-// Class tab: one fixed slot each for the ensemble and the solo assignment (BE allows one of each per class),
+// Class view: one fixed slot each for the ensemble and the solo assignment (BE allows one of each per class),
 // then the bonus and other assignments.
 function ClassAssignmentSections({ items, canCreate, isFiltered, onCreate }: ClassAssignmentSectionsProps) {
   const otherItems = items.filter((item) => !FEATURED_KINDS.includes(item.kind));

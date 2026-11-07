@@ -12,6 +12,7 @@ import {
   LibraryBig,
   Megaphone,
   Music2,
+  NotebookPen,
   Settings2,
   Trophy,
   UserCheck,
@@ -23,7 +24,7 @@ export interface NavItem {
   label: string;
   to: string;
   icon?: LucideIcon;
-  // Các đường dẫn khác vẫn tính là đang ở mục này (vd. trang bài tập mở từ tab của lớp)
+  // Các đường dẫn khác vẫn tính là đang ở mục này
   activePrefixes?: string[];
 }
 
@@ -44,19 +45,14 @@ export function flattenNav(entries: NavEntry[]): NavItem[] {
 }
 
 // Menu duy nhất của giảng viên, TeacherShell render cho mọi trang có sidebar.
-// Lộ trình, bài tập, tiến độ nằm trong tab của trang chi tiết lớp.
 export const TEACHER_NAV: NavEntry[] = [
   { label: "Trang chủ", to: "/teacher/home", icon: LayoutDashboard },
   {
     label: "Lớp học",
     icon: GraduationCap,
     children: [
-      {
-        label: "Danh sách lớp",
-        to: "/teacher/classes",
-        icon: Users,
-        activePrefixes: ["/teacher/assignments", "/teacher/roadmap", "/teacher/progress"],
-      },
+      { label: "Danh sách lớp", to: "/teacher/classes", icon: Users },
+      { label: "Bài tập", to: "/teacher/assignments", icon: NotebookPen },
       { label: "Duyệt bài nộp", to: "/teacher/review", icon: ClipboardCheck },
       { label: "Đánh giá sinh viên", to: "/teacher/student-review", icon: UserCheck },
     ],

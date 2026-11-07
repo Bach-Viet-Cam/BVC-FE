@@ -50,9 +50,7 @@ import { HelpCenterPage } from "@/features/platform/pages/HelpCenterPage";
 import { TeacherHomePage } from "@/features/classes/pages/TeacherHomePage";
 import { ClassListPage } from "@/features/classes/pages/ClassListPage";
 import { ClassFormPage } from "@/features/classes/pages/ClassFormPage";
-import { RoadmapPage } from "@/features/classes/pages/RoadmapPage";
 import { ReviewPage } from "@/features/classes/pages/ReviewPage";
-import { StudentProgressPage } from "@/features/classes/pages/StudentProgressPage";
 import { AssignmentFormPage } from "@/features/classes/pages/AssignmentFormPage";
 import { ClassDetailPage } from "@/features/classes/pages/ClassDetailPage";
 import { ImportStudentsPage } from "@/features/classes/pages/ImportStudentsPage";
@@ -167,8 +165,8 @@ export function AppRouter() {
             <Route path="/teacher/attention-students" element={<AttentionStudentsPage />} />
             <Route path="/teacher/today-submissions" element={<TodaySubmissionsPage />} />
             <Route path="/teacher/classes" element={<ClassListPage />} />
-            <Route path="/teacher/roadmap" element={<RoadmapPage />} />
-            <Route path="/teacher/progress" element={<StudentProgressPage />} />
+            <Route path="/teacher/roadmap" element={<Navigate to="/teacher/classes" replace />} />
+            <Route path="/teacher/progress" element={<Navigate to="/teacher/classes" replace />} />
             <Route path="/teacher/assignments" element={<AssignmentListPage />} />
             <Route path="/teacher/challenges" element={<LecturerChallengesPage />} />
             <Route
