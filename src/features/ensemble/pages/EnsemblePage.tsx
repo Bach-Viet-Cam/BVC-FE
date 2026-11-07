@@ -42,7 +42,31 @@ export function EnsemblePage() {
   // Tự hiện khi không thấy tai nghe và chưa chọn — nhưng chỉ lúc sẵn sàng, không chen ngang khi đang thu/nghe lại (H3).
   const isPromptOpen = isPromptForced || (listening.needsChoice && status === "ready" && !isPromptDismissed);
 
+  // Nghe thử các bè trước khi thu: phát mọi bè mẫu từ đầu, không mở micro
+  const [isPreviewingParts, setIsPreviewingParts] = useState(false);
+  const { pauseTracks, playTracksFrom, durationSec } = practice;
+  const stopPartsPreview = useCallback(() => {
+    pauseTracks();
+    setIsPreviewingParts(false);
+  }, [pauseTracks]);
+  const togglePartsPreview = useCallback(() => {
+    if (isPreviewingParts) {
+      stopPartsPreview();
+      return;
+    }
+    playTracksFrom(0, 1);
+    setIsPreviewingParts(true);
+  }, [isPreviewingParts, playTracksFrom, stopPartsPreview]);
+
+  // Tự tắt trạng thái nghe thử khi hết bài (bắt đầu thu đã tắt qua requestStart)
+  useEffect(() => {
+    if (!isPreviewingParts) return;
+    const timerId = window.setTimeout(() => setIsPreviewingParts(false), durationSec * 1000);
+    return () => window.clearTimeout(timerId);
+  }, [isPreviewingParts, durationSec]);
+
   const requestStart = useCallback(() => {
+    stopPartsPreview();
     if (!listening.hasMic) {
       void listening.requestAccess();
       return;
@@ -57,7 +81,7 @@ export function EnsemblePage() {
     }
     setStartAfterChoice(true);
     setIsPromptForced(true);
-  }, [listening, practice]);
+  }, [listening, practice, stopPartsPreview]);
 
   const chooseMode = (mode: ListeningMode) => {
     listening.choose(mode);
@@ -244,6 +268,8 @@ export function EnsemblePage() {
               micPermission={listening.permission}
               onChangeListeningMode={() => setIsPromptForced(true)}
               onRequestMicAccess={() => void listening.requestAccess()}
+              isPreviewingParts={isPreviewingParts}
+              onTogglePartsPreview={togglePartsPreview}
               onStart={requestStart}
               onStop={() => void practice.stop()}
               onSubmit={() => void handleSubmit()}

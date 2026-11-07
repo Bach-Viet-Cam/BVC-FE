@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Check, Headphones, Loader2, Mic, RotateCcw, Send, Speaker, Square } from "lucide-react";
+import { Check, Headphones, Loader2, Mic, Play, RotateCcw, Send, Speaker, Square } from "lucide-react";
 import { type ListeningMode, type MicPermission, type PracticeStatus } from "@/features/ensemble/types/ensembleTypes";
 import { formatClock } from "@/features/ensemble/utils/formatClock";
 import { Switch } from "@/shared/components/ui/switch";
@@ -39,6 +39,8 @@ interface TransportBarProps {
   micPermission: MicPermission;
   onChangeListeningMode: () => void;
   onRequestMicAccess: () => void;
+  isPreviewingParts: boolean;
+  onTogglePartsPreview: () => void;
   onStart: () => void;
   onStop: () => void;
   onSubmit: () => void;
@@ -168,6 +170,22 @@ export function TransportBar(props: TransportBarProps) {
 
       {/* Hàng 2: Nút hành động chính chuẩn DAW */}
       <div className="flex flex-col gap-2">
+        {status === "ready" && (
+          <button
+            type="button"
+            onClick={props.onTogglePartsPreview}
+            aria-pressed={props.isPreviewingParts}
+            className="flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-bvc-border bg-white text-[13px] font-semibold text-bvc-ink transition-colors hover:bg-bvc-surface active:scale-[0.99]"
+          >
+            {props.isPreviewingParts ? (
+              <Square size={14} fill="currentColor" strokeWidth={0} />
+            ) : (
+              <Play size={15} fill="currentColor" strokeWidth={0} />
+            )}
+            <span>{props.isPreviewingParts ? "Dừng nghe thử" : "Nghe thử các bè"}</span>
+          </button>
+        )}
+
         {status === "ready" && (
           <button
             type="button"
