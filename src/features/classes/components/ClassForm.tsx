@@ -16,6 +16,7 @@ import {
 } from "@/features/classes/utils/classCode";
 import { formatIsoDate } from "@/features/classes/utils/classFormat";
 import { applyFieldErrors } from "@/features/classes/utils/mapApiErrors";
+import { resolveSemesterForHalf, toSemesterHalf, type SemesterTarget } from "@/features/classes/utils/semesterHalf";
 import {
   classFormSchema,
   createClassFormSchema,
@@ -101,6 +102,22 @@ export function ClassForm({
       : null;
   const lastAutoDescription = useRef("");
 
+  // Create flow: the half in the class code picks the semester entry (FA26-H1, FA26-H2, ...).
+  // During FA26-H2, H2 keeps FA26-H2 and H1 jumps to SP27-H1; during FA26-H1, H2 moves to FA26-H2.
+  const codeHalf = isCreate ? toSemesterHalf(parsedCode?.half) : null;
+  const semesterTarget: SemesterTarget | null = codeHalf ? resolveSemesterForHalf(semesters, codeHalf) : null;
+  const targetCohort = semesterTarget?.kind === "found" ? semesterTarget.semester.name : "";
+  // Apply only when the target changes, so a semester picked by hand is kept until the code's half changes.
+  const targetKey = semesterTarget ? `${semesterTarget.kind}:${targetCohort}` : null;
+  const lastAppliedTarget = useRef<string | null>(null);
+
+  useEffect(() => {
+    const previous = lastAppliedTarget.current;
+    lastAppliedTarget.current = targetKey;
+    if (targetKey === null || targetKey === previous) return;
+    setValue("cohort", targetCohort, { shouldDirty: true, shouldValidate: isSubmitted });
+  }, [targetKey, targetCohort, isSubmitted, setValue]);
+
   useEffect(() => {
     if (!isCreate) return;
     setValue("instrumentId", matchedInstrument?.id ?? "", { shouldValidate: isSubmitted });
@@ -115,6 +132,13 @@ export function ClassForm({
     }
     lastAutoDescription.current = autoDescription;
   }, [autoDescription, isSubmitted, getValues, setValue]);
+
+  const semesterHint =
+    semesterTarget?.kind === "missing"
+      ? `Mã H${semesterTarget.half} cần half ${semesterTarget.half} tiếp theo, nhưng quản trị viên chưa cấu hình. Liên hệ quản trị viên.`
+      : semesterTarget && selectedCohort === targetCohort
+        ? "Tự động theo half trong mã lớp. Ngày bắt đầu và kết thúc lấy theo học kỳ"
+        : "Ngày bắt đầu và kết thúc lấy theo học kỳ";
 
   const instrumentHint = isLocked
     ? "Đã khóa vì lớp đã bắt đầu"
@@ -225,7 +249,7 @@ export function ClassForm({
               ? "Đã khóa vì lớp đã bắt đầu"
               : semesters.length === 0
                 ? "Chưa có học kỳ nào. Liên hệ quản trị viên để cấu hình."
-                : "Ngày bắt đầu và kết thúc lấy theo học kỳ"
+                : semesterHint
           }
           error={errors.cohort?.message}
         >
