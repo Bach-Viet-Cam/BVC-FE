@@ -74,7 +74,7 @@ export function SongCreateDialog({ open, onClose, onCreated }: SongCreateDialogP
       open={open}
       onClose={close}
       title="Thêm bài hát"
-      description="Bài mới mặc định ẩn với sinh viên. Thêm bản nhạc rồi chuyển sang công khai."
+      description="Bài mới mặc định ẩn với sinh viên."
       size="xl"
       isDirty={isDirty}
     >

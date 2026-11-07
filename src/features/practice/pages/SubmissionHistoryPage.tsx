@@ -116,7 +116,6 @@ export function SubmissionHistoryPage() {
             {isNeverSubmitted ? (
               <>
                 <p className="text-[15px] font-semibold text-bvc-ink">Chưa có bài nộp nào</p>
-                <p className="text-[13px] leading-normal text-bvc-muted">Bài bạn nộp khi luyện tập sẽ hiện ở đây.</p>
               </>
             ) : (
               <>
@@ -165,7 +164,7 @@ export function SubmissionHistoryPage() {
       </div>
 
       {(isSelecting || history.canCompare) && (
-        <div className="sticky bottom-0 z-10 border-t border-bvc-border-strong bg-white">
+        <div className="sticky bottom-(--bvc-bottom-nav-h) z-10 border-t border-bvc-border-strong bg-white">
           <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-2.5 px-[18px] pt-3.5 pb-6 md:flex-row md:items-center md:gap-6 md:px-14 md:py-4">
             {isSelecting && (
               <div className="flex flex-col gap-2 md:flex-1 md:flex-row md:items-center md:gap-4">

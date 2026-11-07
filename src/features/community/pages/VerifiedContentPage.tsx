@@ -140,7 +140,7 @@ export function VerifiedContentPage() {
   return (
     <TeacherScreen>
       <div className="mx-auto flex w-full max-w-[1200px] flex-1 flex-col gap-7 px-[18px] pt-4 pb-10 md:px-8 md:pt-8">
-        <PageHero title="Bản thu đã xác minh" description="Quản lý bản thu tham khảo trong thư viện bài nhạc." />
+        <PageHero title="Bản thu đã xác minh" />
         <section aria-labelledby="verified-management-heading" className="flex min-w-0 flex-col gap-4">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <SectionTitle id="verified-management-heading">Kho bản thu tham khảo</SectionTitle>
@@ -247,10 +247,7 @@ export function VerifiedContentPage() {
               actions={<ActionButton onClick={list.reload}>Thử lại</ActionButton>}
             />
           ) : !list.data?.items.length ? (
-            <EmptyState
-              title="Chưa có bản thu phù hợp"
-              description="Thử thay đổi bộ lọc. Bản thu được giảng viên duyệt sẽ xuất hiện tại đây."
-            />
+            <EmptyState title="Chưa có bản thu phù hợp" description="Thử thay đổi bộ lọc." />
           ) : (
             <ul className="grid gap-3 lg:grid-cols-2">
               {list.data.items.map((item) => (

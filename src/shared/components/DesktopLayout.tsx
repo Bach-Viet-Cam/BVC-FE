@@ -4,7 +4,8 @@ import { NAV_BY_ROLE } from "@/shared/config/navConfig";
 import { ROLES } from "@/shared/constants/roles";
 import { useAuth } from "@/shared/context/AuthContext";
 
-// Giảng viên và quản trị viên dùng chung khung TeacherShell: sidebar trên desktop, thanh trên + menu cuộn ngang trên mobile
+// Giảng viên và quản trị viên dùng chung khung TeacherShell: sidebar trên desktop; mobile có thanh trên + sidebar trượt (☰),
+// riêng giảng viên có thêm thanh tab dưới đáy
 export function DesktopLayout() {
   const { user } = useAuth();
   if (!user) return null;

@@ -10,7 +10,8 @@ export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
   const { user, isLoading, hasAnyRole } = useAuth();
 
   if (isLoading) return null;
-  if (!user) return <Navigate to="/login" replace />;
+  // Chưa đăng nhập thì về trang giới thiệu (landing), bấm Đăng nhập ở đó để vào
+  if (!user) return <Navigate to="/" replace />;
   if (allowedRoles && !hasAnyRole([...allowedRoles])) return <Navigate to="/403" replace />;
 
   return <Outlet />;

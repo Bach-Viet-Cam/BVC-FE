@@ -5,10 +5,7 @@ import { ListState } from "@/features/classes/components/ListState";
 import { MyAssignmentCard } from "@/features/classes/components/MyAssignmentCard";
 import { NextAssignmentCard } from "@/features/classes/components/NextAssignmentCard";
 import { useMyAssignments } from "@/features/classes/hooks/useMyAssignments";
-import {
-  type AssignmentListItem,
-  type StudentAssignmentStatus,
-} from "@/features/classes/types/assignmentTypes";
+import { type AssignmentListItem, type StudentAssignmentStatus } from "@/features/classes/types/assignmentTypes";
 import { ASSIGNMENT_TYPE_LABELS } from "@/features/classes/utils/assignmentFormat";
 import { groupAssignments, type AssignmentSort } from "@/features/classes/utils/myAssignmentGroups";
 import { ActionButton } from "@/shared/components/bvc/ActionButton";
@@ -103,7 +100,7 @@ export function MyAssignmentsPage() {
   const todoCount = useMemo(() => groupAssignments(items, now, "deadline").todo.length, [items, now]);
   const description =
     isLoading || items.length === 0
-      ? "Theo dõi hạn nộp và hoàn thành các bài tập được giao."
+      ? undefined
       : todoCount > 0
         ? `Bạn còn ${todoCount} bài cần làm.`
         : "Bạn không còn bài nào cần làm lúc này.";
@@ -145,9 +142,21 @@ export function MyAssignmentsPage() {
             <PillTabs label="Trạng thái bài tập" tabs={statusTabs} value={statusFilter} onChange={setStatusFilter} />
             <div className="flex gap-2 overflow-x-auto [scrollbar-width:none]">
               {classOptions.length > 2 && (
-                <FilterSelect label="Lớp" value={classFilter} allValue={ALL} options={classOptions} onChange={setClassFilter} />
+                <FilterSelect
+                  label="Lớp"
+                  value={classFilter}
+                  allValue={ALL}
+                  options={classOptions}
+                  onChange={setClassFilter}
+                />
               )}
-              <FilterSelect label="Loại bài" value={typeFilter} allValue={ALL} options={TYPE_OPTIONS} onChange={setTypeFilter} />
+              <FilterSelect
+                label="Loại bài"
+                value={typeFilter}
+                allValue={ALL}
+                options={TYPE_OPTIONS}
+                onChange={setTypeFilter}
+              />
               <FilterSelect
                 label="Sắp xếp"
                 value={sort}

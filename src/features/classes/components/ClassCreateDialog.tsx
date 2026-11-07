@@ -70,13 +70,7 @@ export function ClassCreateDialog({ open, onClose }: ClassCreateDialogProps) {
   };
 
   return (
-    <FormDialog
-      open={open}
-      onClose={close}
-      title="Tạo lớp học"
-      description="Sau khi tạo lớp, bạn thêm sinh viên hoặc nhập danh sách từ file trong trang chi tiết lớp."
-      isDirty={isDirty}
-    >
+    <FormDialog open={open} onClose={close} title="Tạo lớp học" isDirty={isDirty}>
       {(requestClose) => <ClassCreateContent onCancel={requestClose} onDirtyChange={setIsDirty} />}
     </FormDialog>
   );

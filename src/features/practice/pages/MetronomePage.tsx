@@ -20,12 +20,7 @@ export function MetronomePage() {
 
   return (
     <PracticeFrame>
-      <PracticeTopBar
-        variant="close"
-        title="Metronome"
-        subtitle="Chỉnh tốc độ, số chỉ nhịp và phân phách khi luyện"
-        onBack={() => navigate(-1)}
-      />
+      <PracticeTopBar variant="close" title="Metronome" onBack={() => navigate(-1)} />
       <MetronomeView key={targetBpm} targetBpm={targetBpm} />
     </PracticeFrame>
   );

@@ -22,10 +22,10 @@ import { SectionTitle } from "@/shared/components/bvc/SectionTitle";
 const UPCOMING_LIMIT = 3;
 
 const QUICK_LINKS = [
-  { label: "Thư viện bài hát", description: "Tìm bản nhạc để luyện", to: "/library", icon: LibraryBig },
-  { label: "Bài tập của tôi", description: "Xem hạn nộp và kết quả", to: "/assignments", icon: ClipboardList },
-  { label: "Đã lưu", description: "Bài hát và bản nhạc đã lưu", to: "/saved", icon: Bookmark },
-  { label: "Bảng xếp hạng", description: "Thứ hạng của bạn trong học kỳ", to: "/community/leaderboard", icon: Trophy },
+  { label: "Thư viện bài hát", to: "/library", icon: LibraryBig },
+  { label: "Bài tập của tôi", to: "/assignments", icon: ClipboardList },
+  { label: "Đã lưu", to: "/saved", icon: Bookmark },
+  { label: "Bảng xếp hạng", to: "/community/leaderboard", icon: Trophy },
 ];
 
 // Trang "Hôm nay" của sinh viên: số liệu luyện tập trong ngày, lần nộp gần nhất, bài tập sắp đến hạn
@@ -48,7 +48,6 @@ export function HomePage() {
         <PageHero
           eyebrow={`Hôm nay · ${formatDate(new Date().toISOString(), "EEEE, dd/MM")}`}
           title={`Xin chào, ${user?.username ?? "bạn"}`}
-          description="Luyện một bài mỗi ngày, nộp bản thu và theo dõi sự tiến bộ của bạn ngay tại đây."
           actions={
             <>
               <PillLink to="/library" label="Luyện tập ngay" variant="light" size="md" />
@@ -121,18 +120,15 @@ export function HomePage() {
 
         <section aria-labelledby="quick-heading" className="flex flex-col gap-3">
           <SectionTitle id="quick-heading">Truy cập nhanh</SectionTitle>
-          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {QUICK_LINKS.map(({ label, description, to, icon: Icon }) => (
+          <ul className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            {QUICK_LINKS.map(({ label, to, icon: Icon }) => (
               <li key={to}>
                 <Link
                   to={to}
                   className="flex h-full items-center gap-3 rounded-bvc-xl bg-bvc-surface p-4 text-bvc-ink hover:bg-bvc-border hover:text-bvc-ink"
                 >
                   <Icon className="size-5 shrink-0 text-bvc-accent-text" strokeWidth={1.8} aria-hidden />
-                  <span className="flex min-w-0 flex-col">
-                    <span className="text-[14.5px] font-semibold">{label}</span>
-                    <span className="text-[12.5px] text-bvc-muted">{description}</span>
-                  </span>
+                  <span className="min-w-0 text-[14.5px] font-semibold">{label}</span>
                 </Link>
               </li>
             ))}

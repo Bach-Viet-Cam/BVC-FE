@@ -60,7 +60,6 @@ export function LibraryPage() {
         <div className="flex flex-col gap-2">
           <Eyebrow>Thư viện</Eyebrow>
           <PageTitle>Thư viện bài hát</PageTitle>
-          <p className="hidden text-[15px] text-bvc-muted md:block">Bài hát và bản nhạc giảng viên đã công khai.</p>
         </div>
 
         {showTrending && <TrendingCarousel songs={trending.songs} />}

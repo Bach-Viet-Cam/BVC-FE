@@ -191,10 +191,7 @@ export function SongDetailPage() {
             />
           </>
         ) : (
-          <EmptyState
-            title="Chưa có bản nhạc công khai"
-            description="Giảng viên chưa công khai bản nhạc nào cho bài hát này."
-          />
+          <EmptyState title="Chưa có bản nhạc công khai" />
         )}
 
         {role === "teacher" && (
@@ -214,7 +211,15 @@ export function SongDetailPage() {
         )}
       </section>
 
-      {activeGroup && <div className="px-[18px] pb-6 md:px-14"><VerifiedRecordingList key={`${song.id}-${activeGroup.instrument.id}`} pieceId={song.id} instrumentId={activeGroup.instrument.id} /></div>}
+      {activeGroup && (
+        <div className="px-[18px] pb-6 md:px-14">
+          <VerifiedRecordingList
+            key={`${song.id}-${activeGroup.instrument.id}`}
+            pieceId={song.id}
+            instrumentId={activeGroup.instrument.id}
+          />
+        </div>
+      )}
 
       <GuestSaveDialog open={save.isGuestPromptOpen} onOpenChange={save.setGuestPromptOpen} />
     </LibraryShell>

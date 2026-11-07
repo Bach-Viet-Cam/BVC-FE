@@ -52,7 +52,7 @@ export function HelpCenterPage() {
 
   return (
     <RoleShell title="Câu hỏi thường gặp" hideHeader contentClassName="max-w-[1200px] gap-7 md:gap-8">
-      <PageHero title="Câu hỏi thường gặp" description="Hướng dẫn về bài tập, nhạc cụ và cách sử dụng Bách Việt Cầm.">
+      <PageHero title="Câu hỏi thường gặp">
         <label className="flex max-w-[640px] flex-col gap-2">
           <span className="text-sm font-medium text-white">Bạn muốn tìm hiểu điều gì?</span>
           <span className="relative block">
@@ -176,11 +176,7 @@ export function HelpCenterPage() {
           ) : !data?.items.length ? (
             <EmptyState
               title={hasFilters ? "Không tìm thấy câu hỏi phù hợp" : "Chưa có câu hỏi thường gặp"}
-              description={
-                hasFilters
-                  ? "Thử từ khóa khác hoặc bỏ bớt bộ lọc."
-                  : "Các hướng dẫn sẽ xuất hiện tại đây khi được cập nhật."
-              }
+              description={hasFilters ? "Thử từ khóa khác hoặc bỏ bớt bộ lọc." : undefined}
               actions={
                 hasFilters ? (
                   <ActionButton variant="secondary" onClick={() => setSearchParams({})}>

@@ -122,6 +122,19 @@
     }
   }
 
+  /* Thanh tab dưới đáy: nền viên thuốc của tab đang chọn bật nhẹ ra */
+  --animate-nav-pop: nav-pop 260ms cubic-bezier(0.16, 1, 0.3, 1);
+  @keyframes nav-pop {
+    from {
+      opacity: 0;
+      transform: scale(0.85);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
   /* Popup tai nghe (màn hòa tấu): vẽ nét, kéo dây, cắm jack, sóng âm, dấu tích */
   --animate-hp-draw: hp-draw 900ms ease-out both;
   --animate-hp-cable: hp-cable 4.2s ease-in-out 900ms infinite both;
@@ -285,6 +298,16 @@
   --sidebar-accent-foreground: #f1f5f9;
   --sidebar-border: #1e293b;
   --sidebar-ring: #14b8a6;
+
+  /* Chiều cao thanh tab dưới đáy (StudentBottomNav); 0 khi không có thanh */
+  --bvc-bottom-nav-h: 0px;
+}
+
+/* Chỉ điện thoại (dưới md) mới có thanh tab: nội dung, toast và thanh dính đáy đẩy lên trên nó */
+@media (width < 48rem) {
+  :root:has([data-bvc-bottom-nav]) {
+    --bvc-bottom-nav-h: calc(68px + max(env(safe-area-inset-bottom), 10px));
+  }
 }
 
 @layer base {

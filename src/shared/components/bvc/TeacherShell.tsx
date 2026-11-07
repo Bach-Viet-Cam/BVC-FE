@@ -3,12 +3,14 @@ import { Link, useLocation } from "react-router-dom";
 import { Dialog } from "@base-ui/react/dialog";
 import { ChevronDown, LogOut, Menu, X } from "lucide-react";
 import logoImage from "@/assets/image/logo.png";
+import { BottomTabBar } from "@/shared/components/bvc/BottomTabBar";
 import { NotificationBell } from "@/shared/components/bvc/NotificationBell";
 import { useAuth } from "@/shared/context/AuthContext";
 import { useNewNotificationToast } from "@/shared/hooks/useNewNotificationToast";
 import {
   NAV_BY_ROLE,
   TEACHER_NAV,
+  TEACHER_TABS,
   flattenNav,
   isNavGroup,
   type NavEntry,
@@ -18,6 +20,7 @@ import {
 import { ROLES } from "@/shared/constants/roles";
 import { UserAvatar } from "@/shared/components/bvc/UserAvatar";
 import { cn } from "@/shared/utils/cn";
+import { getRoleHome } from "@/shared/utils/roleHome";
 
 interface TeacherShellProps {
   children: ReactNode;
@@ -30,6 +33,9 @@ interface TeacherShellProps {
 // Nút chuông dạng kính mờ trên nền sidebar / header tối
 const bellClass =
   "flex size-10 shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white transition-colors hover:bg-white/20 hover:text-white";
+
+// Màn sửa / nhập dữ liệu và xem bản nhạc: tập trung vào một việc, có thanh nút riêng ở đáy
+const FOCUSED_PATHS = [/\/edit$/, /\/import$/, /^\/library\/[^/]+\/sheets\//];
 
 function matchesPath(pathname: string, to: string, end: boolean) {
   return pathname === to || (!end && pathname.startsWith(`${to}/`));
@@ -189,6 +195,10 @@ export function TeacherShell({ children, className, navItems, roleLabel }: Teach
   const flatItems = flattenNav(effectiveNavItems);
   const displayName = user?.username ?? effectiveRoleLabel;
   const navLabel = `Điều hướng ${effectiveRoleLabel.toLowerCase()}`;
+  const homePath = user?.role ? getRoleHome(user.role) : "/teacher/home";
+  // Thanh tab dưới đáy chỉ dành cho giảng viên (quản trị viên dùng ☰ + sidebar), ẩn ở màn sửa / nhập có nút lưu dính đáy
+  const showBottomNav =
+    user?.role === ROLES.TEACHER && !FOCUSED_PATHS.some((pattern) => pattern.test(location.pathname));
   const panelProps = {
     entries: effectiveNavItems,
     allItems: flatItems,
@@ -210,36 +220,55 @@ export function TeacherShell({ children, className, navItems, roleLabel }: Teach
         <NavPanel {...panelProps} />
       </aside>
 
-      {/* Mobile / tablet: thanh trên gọn; menu nhóm nằm trong ngăn kéo thay cho dải tab cuộn ngang */}
-      <header className="sticky top-0 z-20 shrink-0 bg-bvc-ink text-white lg:hidden">
-        <div className="flex items-center gap-2.5 px-[18px] pt-[max(env(safe-area-inset-top),14px)] pb-[14px]">
-          <img src={logoImage} alt="Bách Việt Cầm" className="mr-auto h-10 w-auto" />
-          <NotificationBell className={bellClass} iconClassName="size-[18px]" />
+      {/* Mobile / tablet: thanh trên gọn, nút ☰ bên trái bật sidebar trượt ra từ mép trái (cùng nội dung sidebar desktop) */}
+      <header className="sticky top-0 z-20 shrink-0 bg-bvc-ink/95 text-white backdrop-blur-md lg:hidden">
+        <div className="flex items-center gap-2.5 px-[14px] pt-[max(env(safe-area-inset-top),12px)] pb-3 sm:px-[18px]">
           <Dialog.Root open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-            <Dialog.Trigger aria-label="Mở menu" className={cn(bellClass, "size-11 cursor-pointer")}>
+            <Dialog.Trigger
+              aria-label="Mở menu"
+              // Khi có thanh tab dưới đáy, tab "Menu" thay cho nút này trên điện thoại
+              className={cn(
+                bellClass,
+                "size-11 cursor-pointer active:scale-95 data-popup-open:bg-white/20",
+                showBottomNav && "hidden md:flex"
+              )}
+            >
               <Menu className="size-[19px]" strokeWidth={1.9} />
             </Dialog.Trigger>
             <Dialog.Portal>
-              <Dialog.Backdrop className="fixed inset-0 z-50 bg-bvc-ink/45 transition-opacity duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0 lg:hidden" />
+              <Dialog.Backdrop className="fixed inset-0 z-50 bg-bvc-ink/50 backdrop-blur-[2px] transition-opacity duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0 lg:hidden" />
               <Dialog.Popup
-                // Đóng ngăn kéo ngay khi chọn một liên kết bên trong
+                // Đóng sidebar ngay khi chọn một liên kết bên trong
                 onClick={(event) => {
                   if ((event.target as HTMLElement).closest("a")) setIsMenuOpen(false);
                 }}
-                className="fixed inset-y-0 right-0 z-50 flex w-[min(320px,86vw)] flex-col gap-5 overflow-y-auto bg-bvc-ink px-3.5 pt-[max(env(safe-area-inset-top),14px)] pb-[max(env(safe-area-inset-bottom),18px)] text-white transition-transform duration-[260ms] ease-[cubic-bezier(0.16,1,0.3,1)] data-ending-style:translate-x-full data-starting-style:translate-x-full motion-reduce:transition-none lg:hidden [scrollbar-width:thin] [scrollbar-color:rgb(255_255_255/0.2)_transparent]"
+                className="fixed inset-y-0 left-0 z-50 flex w-[min(300px,84vw)] flex-col gap-6 overflow-y-auto rounded-r-[28px] bg-bvc-ink px-3.5 pt-[max(env(safe-area-inset-top),14px)] pb-[max(env(safe-area-inset-bottom),18px)] text-white shadow-[12px_0_40px_-12px_rgb(0_0_0/0.45)] transition-transform duration-[280ms] ease-[cubic-bezier(0.16,1,0.3,1)] data-ending-style:-translate-x-full data-starting-style:-translate-x-full motion-reduce:transition-none lg:hidden [scrollbar-width:thin] [scrollbar-color:rgb(255_255_255/0.2)_transparent]"
               >
                 <div className="flex items-center justify-between gap-2 px-1">
-                  <Dialog.Title className="m-0 text-[15px] font-semibold tracking-[-0.02em] text-white">
-                    Menu
-                  </Dialog.Title>
-                  <Dialog.Close aria-label="Đóng menu" className={cn(bellClass, "size-11 cursor-pointer")}>
-                    <X className="size-[19px]" strokeWidth={1.9} />
+                  <Dialog.Title className="sr-only">Menu</Dialog.Title>
+                  <img src={logoImage} alt="Bách Việt Cầm" className="h-10 w-auto min-w-0 object-contain" />
+                  <Dialog.Close
+                    aria-label="Đóng menu"
+                    className={cn(bellClass, "size-10 cursor-pointer active:scale-95")}
+                  >
+                    <X className="size-[18px]" strokeWidth={1.9} />
                   </Dialog.Close>
                 </div>
                 <NavPanel {...panelProps} />
               </Dialog.Popup>
             </Dialog.Portal>
           </Dialog.Root>
+          <Link to={homePath} className="mr-auto shrink-0 transition-opacity hover:opacity-85">
+            <img src={logoImage} alt="Bách Việt Cầm" className="h-9 w-auto sm:h-10" />
+          </Link>
+          <NotificationBell className={bellClass} iconClassName="size-[18px]" />
+          <Link
+            to="/profile"
+            aria-label={`Hồ sơ ${displayName}`}
+            className="flex size-10 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 transition-colors hover:bg-white/20"
+          >
+            <UserAvatar name={displayName} size="sm" className="size-[30px] text-[12px]" />
+          </Link>
         </div>
       </header>
 
@@ -248,11 +277,21 @@ export function TeacherShell({ children, className, navItems, roleLabel }: Teach
         key={location.pathname}
         className={cn(
           "flex min-w-0 min-h-0 flex-1 flex-col motion-safe:animate-page-enter lg:overflow-y-auto",
+          showBottomNav && "pb-(--bvc-bottom-nav-h)",
           className
         )}
       >
         {children}
       </main>
+
+      {showBottomNav && (
+        <BottomTabBar
+          tabs={TEACHER_TABS}
+          displayName={displayName}
+          onOpenMenu={() => setIsMenuOpen(true)}
+          isMenuOpen={isMenuOpen}
+        />
+      )}
     </div>
   );
 }

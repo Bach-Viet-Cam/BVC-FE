@@ -8,6 +8,8 @@ import {
   Flame,
   FolderTree,
   GraduationCap,
+  History,
+  House,
   LayoutDashboard,
   LibraryBig,
   Megaphone,
@@ -16,6 +18,7 @@ import {
   Settings2,
   Trophy,
   UserCheck,
+  UserRound,
   Users,
 } from "lucide-react";
 import { ROLES } from "@/shared/constants/roles";
@@ -90,6 +93,29 @@ const ADMIN_NAV: NavEntry[] = [
   { label: "Quản lý thông báo", to: "/admin/notifications", icon: Megaphone },
   { label: "Nội dung đã xác minh", to: "/community/verified", icon: BadgeCheck },
   { label: "Bảng xếp hạng", to: "/leaderboard", icon: Trophy },
+];
+
+// Thanh tab dưới đáy (mobile) của sinh viên: chỉ 5 mục chính. Trợ giúp, thông báo, đã lưu
+// được gom vào trang Hồ sơ / thanh trên, nên vẫn tính là đang ở tab tương ứng.
+export const STUDENT_TABS: NavItem[] = [
+  { label: "Hôm nay", to: "/home", icon: House },
+  { label: "Thư viện", to: "/library", icon: LibraryBig, activePrefixes: ["/saved"] },
+  { label: "Bài tập", to: "/assignments", icon: NotebookPen, activePrefixes: ["/assignment", "/community/bonus"] },
+  { label: "Lịch sử", to: "/practice/submissions", icon: History },
+  { label: "Hồ sơ", to: "/profile", icon: UserRound, activePrefixes: ["/help", "/notifications"] },
+];
+
+// Thanh tab dưới đáy (mobile) của giảng viên: 4 việc dùng nhiều nhất, tab thứ 5 "Menu" mở sidebar đầy đủ
+export const TEACHER_TABS: NavItem[] = [
+  {
+    label: "Trang chủ",
+    to: "/teacher/home",
+    icon: LayoutDashboard,
+    activePrefixes: ["/teacher/attention-students", "/teacher/today-submissions"],
+  },
+  { label: "Lớp học", to: "/teacher/classes", icon: GraduationCap },
+  { label: "Bài tập", to: "/teacher/assignments", icon: NotebookPen },
+  { label: "Duyệt bài", to: "/teacher/review", icon: ClipboardCheck, activePrefixes: ["/teacher/student-review"] },
 ];
 
 export const NAV_BY_ROLE: Record<number, NavEntry[]> = {
