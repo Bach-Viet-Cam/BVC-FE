@@ -4,7 +4,8 @@ import { EnsembleFrame } from "@/features/ensemble/components/EnsembleFrame";
 import { EnsembleHeader } from "@/features/ensemble/components/EnsembleHeader";
 import { HeadphonePrompt } from "@/features/ensemble/components/HeadphonePrompt";
 import { MyTakeLane } from "@/features/ensemble/components/MyTakeLane";
-import { PieceBriefCard } from "@/features/ensemble/components/PieceBriefCard";
+import { EnsemblePreparation } from "@/features/ensemble/components/EnsemblePreparation";
+import { usePartsPreview } from "@/features/ensemble/hooks/usePartsPreview";
 import { ScoreLanes } from "@/features/ensemble/components/ScoreLanes";
 import { TransportBar } from "@/features/ensemble/components/TransportBar";
 import { useEnsembleAssignment } from "@/features/ensemble/hooks/useEnsembleAssignment";
@@ -42,28 +43,9 @@ export function EnsemblePage() {
   // Tự hiện khi không thấy tai nghe và chưa chọn — nhưng chỉ lúc sẵn sàng, không chen ngang khi đang thu/nghe lại (H3).
   const isPromptOpen = isPromptForced || (listening.needsChoice && status === "ready" && !isPromptDismissed);
 
-  // Nghe thử các bè trước khi thu: phát mọi bè mẫu từ đầu, không mở micro
-  const [isPreviewingParts, setIsPreviewingParts] = useState(false);
-  const { pauseTracks, playTracksFrom, durationSec } = practice;
-  const stopPartsPreview = useCallback(() => {
-    pauseTracks();
-    setIsPreviewingParts(false);
-  }, [pauseTracks]);
-  const togglePartsPreview = useCallback(() => {
-    if (isPreviewingParts) {
-      stopPartsPreview();
-      return;
-    }
-    playTracksFrom(0, 1);
-    setIsPreviewingParts(true);
-  }, [isPreviewingParts, playTracksFrom, stopPartsPreview]);
-
-  // Tự tắt trạng thái nghe thử khi hết bài (bắt đầu thu đã tắt qua requestStart)
-  useEffect(() => {
-    if (!isPreviewingParts) return;
-    const timerId = window.setTimeout(() => setIsPreviewingParts(false), durationSec * 1000);
-    return () => window.clearTimeout(timerId);
-  }, [isPreviewingParts, durationSec]);
+  const partsPreview = usePartsPreview(practice.durationSec, practice.playTracksFrom, practice.pauseTracks);
+  const isPreviewingParts = partsPreview.playing;
+  const stopPartsPreview = partsPreview.stop;
 
   const requestStart = useCallback(() => {
     stopPartsPreview();
@@ -111,6 +93,18 @@ export function EnsemblePage() {
     play: practice.playTracksFrom,
     pause: practice.pauseTracks,
   });
+  const togglePartsPreview = () => {
+    if (playback.playing) playback.togglePlay();
+    partsPreview.toggle();
+  };
+  const seekParts = (seconds: number) => {
+    if (playback.playing) {
+      playback.seek(seconds);
+      return;
+    }
+    partsPreview.seek(seconds);
+    if (!partsPreview.playing) partsPreview.toggle();
+  };
   const changeAccompaniment = (enabled: boolean) => {
     setIsAccompanied(enabled);
     playback.syncAccompaniment(enabled);
@@ -149,12 +143,20 @@ export function EnsemblePage() {
     return () => window.removeEventListener("beforeunload", warn);
   }, [isBusy, hasUnsavedTake]);
 
-  // Phím tắt bàn phím chuẩn phòng thu DAW (Space, R, S)
+  // Phím tắt thu âm; không chiếm phím của các nút và thanh tua.
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (isLeaveDialogOpen) return;
       const target = event.target as HTMLElement | null;
-      if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) {
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.tagName === "BUTTON" ||
+          target.tagName === "SELECT" ||
+          target.tagName === "A" ||
+          target.isContentEditable)
+      ) {
         return;
       }
 
@@ -237,18 +239,62 @@ export function EnsemblePage() {
         onClose={leave}
       />
 
-      {/* Workspace 2 cột 50/50 - Vừa khít 1 màn hình laptop, không bị scroll */}
-      <main className="flex min-h-0 flex-1 flex-col overflow-y-auto p-2.5 sm:p-3 lg:overflow-hidden md:p-3.5">
-        <div className="grid min-h-0 grid-cols-1 gap-2.5 sm:gap-3 lg:h-full lg:grid-cols-2 lg:overflow-hidden md:gap-3.5">
-          {/* CỘT TRÁI (50%): BÀN THU & TẬP LUYỆN (STUDIO WORKSTATION) */}
-          <div className="flex min-h-0 flex-col gap-2.5 sm:gap-3 lg:h-full lg:overflow-hidden md:gap-3.5">
-            <PieceBriefCard
-              pieceTitle={tracksResult.pieceTitle}
-              myInstrumentName={tracksResult.myInstrumentName}
-              targetBpm={tracksResult.targetBpm}
+      {/* Nghe tổng phổ trước, sau đó chuẩn bị và thu âm. */}
+      <main className="min-h-0 flex-1 overflow-y-auto p-3 sm:p-5">
+        <div className="mx-auto flex w-full max-w-[1200px] min-w-0 flex-col gap-5">
+          {/* Tổng phổ */}
+          <div className="min-w-0">
+            <ScoreLanes
+              myInstrumentId={tracksResult.myInstrumentId}
+              isRecording={status === "recording"}
+              recordingPositionSec={practice.elapsedSec}
+              isPlaying={isPreviewingParts || playback.playing}
+              onTogglePlay={togglePartsPreview}
+              onSeek={seekParts}
+              disabled={isBusy}
+              tracks={practice.tracks}
+              settings={practice.mixer.settings}
+              anySolo={practice.mixer.anySolo}
+              trackAnalysers={practice.trackAnalysers}
+              peaksByTrack={peaksByTrack}
               durationSec={practice.durationSec}
-              subtitle={subtitle}
+              recordingStartedAt={practice.recordingStartedAt}
+              previewPositionSec={playback.playing && isAccompanied ? playback.playPos : partsPreview.position}
+              onVolumeChange={practice.mixer.setVolume}
+              onToggleMute={practice.mixer.toggleMute}
+              onToggleSolo={practice.mixer.toggleSolo}
+              onReset={practice.mixer.reset}
             />
+          </div>
+          {/* Thu âm hoặc chọn file */}
+          <div className="flex min-w-0 flex-col gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-[17px] font-semibold text-bvc-ink">Bản thu của bạn</h2>
+              <EnsemblePreparation
+                sheetId={tracksResult.mySheetMusicId}
+                targetBpm={tracksResult.targetBpm}
+                disabled={isBusy || Boolean(practice.take)}
+                onOpen={stopPartsPreview}
+              />
+            </div>
+            {status === "ready" && (
+              <label className="flex min-h-11 cursor-pointer flex-wrap items-center gap-2 rounded-bvc-lg border border-bvc-border bg-white px-4 py-3 text-sm font-medium text-bvc-ink">
+                Chọn file bản thu
+                <input
+                  type="file"
+                  accept="audio/wav,audio/mpeg,audio/mp4,audio/x-m4a,.wav,.mp3,.m4a"
+                  className="sr-only"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    event.target.value = "";
+                    if (file) {
+                      stopPartsPreview();
+                      void practice.selectFile(file);
+                    }
+                  }}
+                />
+              </label>
+            )}
 
             <TransportBar
               status={status}
@@ -292,29 +338,17 @@ export function EnsemblePage() {
               micAnalyser={practice.micAnalyser}
               isCountInOn={practice.isCountInOn}
               take={practice.take}
-              playback={playback}
+              playback={{
+                ...playback,
+                togglePlay: () => {
+                  stopPartsPreview();
+                  playback.togglePlay();
+                },
+              }}
               isAccompanied={isAccompanied}
               onAccompanimentChange={changeAccompaniment}
               onDownload={downloadTake}
               onDiscard={practice.discardTake}
-            />
-          </div>
-
-          {/* CỘT PHẢI (50%): TỔNG PHỔ CÁC BÈ HÒA TẤU (SCORE MULTI-TRACK) */}
-          <div className="flex min-h-0 flex-col lg:h-full lg:overflow-hidden">
-            <ScoreLanes
-              tracks={practice.tracks}
-              settings={practice.mixer.settings}
-              anySolo={practice.mixer.anySolo}
-              trackAnalysers={practice.trackAnalysers}
-              peaksByTrack={peaksByTrack}
-              durationSec={practice.durationSec}
-              recordingStartedAt={practice.recordingStartedAt}
-              previewPositionSec={practice.take && isAccompanied ? playback.playPos : null}
-              onVolumeChange={practice.mixer.setVolume}
-              onToggleMute={practice.mixer.toggleMute}
-              onToggleSolo={practice.mixer.toggleSolo}
-              onReset={practice.mixer.reset}
             />
           </div>
         </div>

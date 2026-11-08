@@ -10,8 +10,8 @@ interface EnsembleHeaderProps {
 
 export function EnsembleHeader({ title, subtitle, deadline, onClose }: EnsembleHeaderProps) {
   return (
-    <header className="flex h-13 shrink-0 items-center justify-between bg-bvc-ink px-4 text-white md:h-14 md:px-6">
-      <div className="flex min-w-0 items-center gap-3">
+    <header className="flex min-h-14 flex-wrap gap-2 py-2 shrink-0 items-center justify-between bg-bvc-ink px-4 text-white md:h-14 md:px-6">
+      <div className="flex min-w-0 flex-1 items-center gap-3">
         <button
           type="button"
           aria-label="Đóng"
@@ -26,7 +26,7 @@ export function EnsembleHeader({ title, subtitle, deadline, onClose }: EnsembleH
             Hòa tấu
           </span>
           <div className="flex min-w-0 flex-col">
-            <PageTitle size="compact" tone="dark">
+            <PageTitle size="compact" tone="dark" className="whitespace-normal break-words">
               {title}
             </PageTitle>
             {subtitle && <p className="hidden truncate text-[11.5px] text-white/70 sm:block">{subtitle}</p>}
