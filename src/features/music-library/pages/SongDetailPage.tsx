@@ -18,6 +18,7 @@ import { useSongDetail } from "@/features/music-library/hooks/useSongDetail";
 import { libraryFilterHref } from "@/features/music-library/utils/libraryLinks";
 import { groupSheetsByInstrument, sheetViewerHref } from "@/features/music-library/utils/sheetUtils";
 import { PageTitle } from "@/shared/components/bvc/PageTitle";
+import { usePageMeta } from "@/shared/hooks/usePageMeta";
 
 function DetailSkeleton() {
   return (
@@ -40,6 +41,7 @@ export function SongDetailPage() {
   const assignmentId = useSearchParams()[0].get("assignmentId") ?? undefined;
   const role = useViewerRole();
   const { song, error, isLoading, setSongSaved } = useSongDetail(songId);
+  usePageMeta({ title: song?.title, description: song?.description || undefined });
   const save = useSaveToggle();
   const [selectedInstrumentId, setSelectedInstrumentId] = useState("");
 

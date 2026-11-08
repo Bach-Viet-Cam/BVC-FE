@@ -3,8 +3,10 @@ import { LogOut } from "lucide-react";
 import { useAuth } from "@/shared/context/AuthContext";
 import { AppSidebar } from "@/shared/components/AppSidebar";
 import { Button } from "@/shared/components/ui/button";
+import { usePageMeta } from "@/shared/hooks/usePageMeta";
 
 export function AppLayout() {
+  usePageMeta({ noindex: true });
   const { user, logout } = useAuth();
 
   return (

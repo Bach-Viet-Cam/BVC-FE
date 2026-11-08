@@ -20,6 +20,7 @@ import { useTrendingSongs } from "@/features/music-library/hooks/useTrendingSong
 import { TrendingCarousel } from "@/features/music-library/components/TrendingCarousel";
 import { KEYWORD_MAX_LENGTH, LIBRARY_MESSAGES } from "@/features/music-library/constants/musicLibraryConstants";
 import { PageTitle } from "@/shared/components/bvc/PageTitle";
+import { usePageMeta } from "@/shared/hooks/usePageMeta";
 
 function describeNoResult(filterCount: number, hasKeyword: boolean) {
   const conditions = filterCount + (hasKeyword ? 1 : 0);
@@ -31,6 +32,7 @@ function describeNoResult(filterCount: number, hasKeyword: boolean) {
 }
 
 export function LibraryPage() {
+  usePageMeta({ title: "Thư viện nhạc", description: "Khám phá thư viện bản nhạc và bài hát nhạc cụ truyền thống công khai trên Bách Việt Cầm." });
   const { query, update, clearFilters, activeFilterCount } = useLibraryQuery();
   const { options } = useMusicCategories();
   const { result, error, isLoading, isFirstLoad, reload, setSongSaved } = useLibrarySongs(query);

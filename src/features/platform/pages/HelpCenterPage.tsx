@@ -10,8 +10,10 @@ import { RoleShell } from "@/shared/components/bvc/RoleShell";
 import { INPUT_CLASSES } from "@/shared/components/bvc/fieldStyles";
 import { useAsyncData } from "@/shared/hooks/useAsyncData";
 import { useDebouncedValue } from "@/shared/hooks/useDebouncedValue";
+import { usePageMeta } from "@/shared/hooks/usePageMeta";
 
 export function HelpCenterPage() {
+  usePageMeta({ title: "Câu hỏi thường gặp", description: "Giải đáp các câu hỏi thường gặp khi luyện tập, nộp bài và sử dụng nền tảng Bách Việt Cầm." });
   const [searchParams, setSearchParams] = useSearchParams();
   const q = searchParams.get("q") ?? "";
   const topic = searchParams.get("topic") ?? "";
