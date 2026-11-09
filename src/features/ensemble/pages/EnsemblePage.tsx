@@ -302,11 +302,11 @@ export function EnsemblePage() {
                   take={
                     hasTake && practice.take
                       ? {
-                          peaks: practice.take.peaks,
-                          durationSec: practice.take.durationSec,
-                          volume: Math.round(playback.volume * 100),
-                          muted: playback.muted,
-                        }
+                        peaks: practice.take.peaks,
+                        durationSec: practice.take.durationSec,
+                        volume: Math.round(playback.volume * 100),
+                        muted: playback.muted,
+                      }
                       : null
                   }
                   onTakeVolumeChange={(value) => playback.setVolume(value / 100)}
@@ -333,7 +333,9 @@ export function EnsemblePage() {
                               ))}
                             </div>
                             <p className="shrink-0 text-xs leading-normal text-bvc-muted md:text-right md:text-[12.5px]">
-                              Định dạng MP3, WAV, M4A · tối đa 20 MB · thời lượng từ 00:10 đến 03:00
+                              Định dạng MP3, WAV, M4A - tối đa 20 MB
+                              <br />
+                              Thời lượng từ 00:10 đến 03:00
                             </p>
                           </div>
                         )}
