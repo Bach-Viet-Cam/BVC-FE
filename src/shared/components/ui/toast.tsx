@@ -31,7 +31,7 @@ export function Toaster() {
   return (
     <BaseToast.Provider toastManager={toastManager}>
       <BaseToast.Portal>
-        <BaseToast.Viewport className="fixed bottom-4 right-4 z-[100] flex w-96 max-w-[calc(100vw-2rem)] flex-col gap-2 outline-none">
+        <BaseToast.Viewport className="fixed right-4 bottom-[calc(var(--bvc-bottom-nav-h,0px)+1rem)] z-[100] flex w-96 max-w-[calc(100vw-2rem)] flex-col gap-2 outline-none">
           <ToastList />
         </BaseToast.Viewport>
       </BaseToast.Portal>

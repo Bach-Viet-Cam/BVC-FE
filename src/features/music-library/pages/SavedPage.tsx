@@ -38,7 +38,6 @@ export function SavedPage() {
       <div className="mx-auto flex w-full max-w-[1200px] flex-1 flex-col gap-5 px-[18px] pt-4 pb-8 md:px-14 md:pt-8">
         <div className="flex flex-col gap-1">
           <PageTitle>Nội dung đã lưu</PageTitle>
-          <p className="text-sm text-bvc-muted md:text-[15px]">Mới lưu nằm trên cùng.</p>
         </div>
 
         <PillTabs<SavedTab>
@@ -67,7 +66,6 @@ export function SavedPage() {
           <EmptyState
             icon={<Bookmark className="size-10" strokeWidth={1.5} />}
             title={tab === "songs" ? "Bạn chưa lưu bài hát nào" : "Bạn chưa lưu bản nhạc nào"}
-            description="Bấm biểu tượng lưu ở thư viện, trang bài hát hoặc khi xem bản nhạc để xem lại nhanh ở đây."
             actions={
               <Link to="/library" className={actionButtonClass("primary", "md", "hover:text-white")}>
                 Mở thư viện

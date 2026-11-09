@@ -18,6 +18,7 @@ import { useSongDetail } from "@/features/music-library/hooks/useSongDetail";
 import { libraryFilterHref } from "@/features/music-library/utils/libraryLinks";
 import { groupSheetsByInstrument, sheetViewerHref } from "@/features/music-library/utils/sheetUtils";
 import { PageTitle } from "@/shared/components/bvc/PageTitle";
+import { usePageMeta } from "@/shared/hooks/usePageMeta";
 
 function DetailSkeleton() {
   return (
@@ -40,6 +41,7 @@ export function SongDetailPage() {
   const assignmentId = useSearchParams()[0].get("assignmentId") ?? undefined;
   const role = useViewerRole();
   const { song, error, isLoading, setSongSaved } = useSongDetail(songId);
+  usePageMeta({ title: song?.title, description: song?.description || undefined });
   const save = useSaveToggle();
   const [selectedInstrumentId, setSelectedInstrumentId] = useState("");
 
@@ -191,10 +193,7 @@ export function SongDetailPage() {
             />
           </>
         ) : (
-          <EmptyState
-            title="Chưa có bản nhạc công khai"
-            description="Giảng viên chưa công khai bản nhạc nào cho bài hát này."
-          />
+          <EmptyState title="Chưa có bản nhạc công khai" />
         )}
 
         {role === "teacher" && (
@@ -214,7 +213,15 @@ export function SongDetailPage() {
         )}
       </section>
 
-      {activeGroup && <div className="px-[18px] pb-6 md:px-14"><VerifiedRecordingList key={`${song.id}-${activeGroup.instrument.id}`} pieceId={song.id} instrumentId={activeGroup.instrument.id} /></div>}
+      {activeGroup && (
+        <div className="px-[18px] pb-6 md:px-14">
+          <VerifiedRecordingList
+            key={`${song.id}-${activeGroup.instrument.id}`}
+            pieceId={song.id}
+            instrumentId={activeGroup.instrument.id}
+          />
+        </div>
+      )}
 
       <GuestSaveDialog open={save.isGuestPromptOpen} onOpenChange={save.setGuestPromptOpen} />
     </LibraryShell>

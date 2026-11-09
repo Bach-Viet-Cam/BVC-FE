@@ -12,7 +12,6 @@ export function ContentApprovalPage() {
         <EmptyState
           icon={<ClipboardCheck className="size-8" strokeWidth={1.5} />}
           title="Không có nội dung chờ duyệt"
-          description="Nội dung sinh viên đóng góp cho cộng đồng sẽ hiện ở đây để duyệt khi hệ thống mở tính năng này."
         />
       </div>
     </TeacherScreen>

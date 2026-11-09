@@ -149,13 +149,7 @@ function FaqEditor({
             {...register("question")}
           />
         </FormField>
-        <FormField
-          label="Câu trả lời"
-          htmlFor="faq-answer"
-          required
-          error={errors.answer?.message}
-          hint="Có thể xuống dòng. Nội dung hiển thị dưới dạng văn bản."
-        >
+        <FormField label="Câu trả lời" htmlFor="faq-answer" required error={errors.answer?.message}>
           <textarea
             id="faq-answer"
             rows={7}
@@ -175,11 +169,7 @@ function FaqEditor({
               ))}
             </select>
           </FormField>
-          <FormField
-            label="Áp dụng cho nhạc cụ"
-            htmlFor="faq-instrument"
-            hint="Chọn một nhạc cụ cụ thể hoặc áp dụng cho tất cả."
-          >
+          <FormField label="Áp dụng cho nhạc cụ" htmlFor="faq-instrument">
             <select id="faq-instrument" className={INPUT_CLASSES} {...register("instrumentId")}>
               <option value="">Tất cả nhạc cụ</option>
               {instruments
@@ -195,7 +185,7 @@ function FaqEditor({
           <FormField
             label="Thứ tự hiển thị"
             htmlFor="faq-order"
-            hint="Số nhỏ xuất hiện trước. 0 là vị trí đầu; có thể dùng cùng số."
+            hint="Số nhỏ hiện trước"
             error={errors.displayOrder?.message}
           >
             <input

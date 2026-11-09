@@ -15,7 +15,6 @@ export function ChallengeDetailPage() {
         <EmptyState
           icon={<Trophy className="size-8" strokeWidth={1.5} />}
           title="Không tìm thấy thử thách"
-          description="Thông tin thử thách sẽ hiện ở đây khi hệ thống mở tính năng thử thách cho sinh viên."
           actions={
             <Link to="/community/challenges" className={actionButtonClass("primary", "md", "hover:text-white")}>
               Về danh sách thử thách

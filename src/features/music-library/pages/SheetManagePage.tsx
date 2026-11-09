@@ -87,7 +87,6 @@ export function SheetManagePage() {
           ) : groups.length === 0 ? (
             <EmptyState
               title="Bài hát chưa có bản nhạc"
-              description="Nhạc cụ của bài hát được lấy từ các bản nhạc. Thêm bản nhạc đầu tiên và chọn nhạc cụ cho bản đó."
               actions={<ActionButton onClick={() => setPanel({ mode: "create" })}>Thêm bản nhạc</ActionButton>}
             />
           ) : (

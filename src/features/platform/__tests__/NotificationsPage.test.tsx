@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -57,7 +57,7 @@ describe("NotificationsPage", () => {
       ])
     );
     renderPage();
-    expect(await screen.findByText("Hôm nay")).toBeInTheDocument();
+    expect(await within(screen.getByRole("main")).findByText("Hôm nay")).toBeInTheDocument();
     expect(screen.getByText("Trước đó")).toBeInTheDocument();
     expect(screen.getAllByLabelText("Chưa đọc")).toHaveLength(1);
 

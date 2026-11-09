@@ -15,7 +15,6 @@ export function StudentReviewPage() {
         <EmptyState
           icon={<UserCheck className="size-8" strokeWidth={1.5} />}
           title="Chưa có đánh giá sinh viên"
-          description="Đánh giá tổng quát cho từng sinh viên sẽ hiện ở đây khi hệ thống mở. Hiện có thể nhận xét từng bài nộp ở màn Duyệt bài nộp."
           actions={
             <>
               <Link to="/teacher/review" className={actionButtonClass("primary", "md", "hover:text-white")}>

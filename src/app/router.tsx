@@ -107,13 +107,13 @@ export function AppRouter() {
         <Route path="/library" element={<LibraryPage />} />
         <Route path="/library/:songId" element={<SongDetailPage />} />
         <Route path="/library/:songId/sheets/:sheetId" element={<SheetPage />} />
+        <Route path="/help" element={<HelpCenterPage />} />
 
         {/* Mọi người dùng đã đăng nhập */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dev/audio-analysis" element={<AudioAnalysisTestPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
-          <Route path="/help" element={<HelpCenterPage />} />
           <Route element={<AppLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
           </Route>

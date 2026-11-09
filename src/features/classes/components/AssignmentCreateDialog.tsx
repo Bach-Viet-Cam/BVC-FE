@@ -112,7 +112,6 @@ export function AssignmentCreateDialog({
       open={open}
       onClose={close}
       title="Tạo bài tập"
-      description="Lưu nháp để chỉnh tiếp sau, hoặc lưu và giao bài ngay cho lớp."
       size="lg"
       isDirty={isDirty}
       onSaveDraft={saveDraftAndLeave}

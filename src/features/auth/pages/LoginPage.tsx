@@ -1,19 +1,19 @@
 import { GoogleLogin } from "@react-oauth/google";
 import { Link, Navigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { LibraryBig } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import bannerImage from "@/assets/image/Artboard 3.png";
 import logoImage from "@/assets/image/logo.png";
 import { CreateAccountDialog } from "@/features/auth/components/CreateAccountDialog";
 import { useGoogleButtonWidth } from "@/features/auth/hooks/useGoogleButtonWidth";
 import { useLogin } from "@/features/auth/hooks/useLogin";
-import { PillLink } from "@/shared/components/bvc/PillLink";
 import { Eyebrow } from "@/shared/components/bvc/SectionIntro";
 import { useAuth } from "@/shared/context/AuthContext";
 import { getRoleHome } from "@/shared/utils/roleHome";
+import { usePageMeta } from "@/shared/hooks/usePageMeta";
 
-// Đăng nhập trên nền ảnh BVC như trang giới thiệu: thẻ trắng ở giữa, nút Google, lối sang thư viện cho khách
 export function LoginPage() {
+  usePageMeta({ title: "Đăng nhập", description: "Đăng nhập Bách Việt Cầm để luyện tập, nộp bài và theo dõi tiến độ." });
   const { login, isLoading, error, setError, isCreateAccountOpen, confirmCreateAccount, cancelCreateAccount } =
     useLogin();
   const { user, isLoading: isAuthLoading } = useAuth();
@@ -39,10 +39,16 @@ export function LoginPage() {
       />
 
       <header className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 pt-6 sm:px-6 lg:px-8">
-        <Link to="/"className="shrink-0 transition-opacity hover:opacity-80">
+        <Link to="/" className="shrink-0 transition-opacity hover:opacity-80">
           <img src={logoImage} alt="Bách Việt Cầm" className="h-11 w-auto lg:h-12" />
         </Link>
-        <PillLink to="/"label="Tìm hiểu thêm" variant="glass" size="md" className="hidden sm:inline-flex" />
+        <Link
+          to="/"
+          className="group inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-white/40 bg-white/15 pr-5 pl-4 text-sm font-medium text-white backdrop-blur-md transition-colors hover:bg-white/25 hover:text-white"
+        >
+          <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-0.5" strokeWidth={2} aria-hidden />
+          Về trang chủ
+        </Link>
       </header>
 
       <main className="flex flex-1 items-center justify-center px-4 py-10">
@@ -57,9 +63,6 @@ export function LoginPage() {
             <h1 className="font-bvc-display text-[30px] leading-[1.1] font-semibold tracking-[-0.03em] text-balance text-bvc-ink sm:text-[34px]">
               Đăng nhập để luyện đàn mỗi ngày
             </h1>
-            <p className="text-[15px] leading-relaxed text-bvc-muted">
-              Dùng tài khoản Google của bạn. Email chưa có trong hệ thống sẽ được hỏi tạo tài khoản sinh viên.
-            </p>
           </div>
 
           <div className="flex w-full flex-col gap-3">
@@ -85,19 +88,6 @@ export function LoginPage() {
               </p>
             )}
           </div>
-
-          <Link
-            to="/library"
-            className="flex items-center gap-3 rounded-bvc-xl border border-bvc-border bg-bvc-soft p-4 text-bvc-ink transition-colors hover:bg-bvc-surface hover:text-bvc-ink"
-          >
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white text-bvc-accent">
-              <LibraryBig className="size-5" aria-hidden />
-            </span>
-            <span className="flex flex-col">
-              <span className="text-[14.5px] font-semibold">Xem thư viện bài hát</span>
-              <span className="text-[13px] text-bvc-muted">Không cần đăng nhập</span>
-            </span>
-          </Link>
         </motion.div>
       </main>
 

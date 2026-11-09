@@ -1,7 +1,7 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { PointerEvent } from "react";
-import { Maximize2, ZoomIn, ZoomOut } from "lucide-react";
-import { ChartFullscreen } from "@/features/practice/components/ChartFullscreen";
+import { Maximize2, Minimize2, ZoomIn, ZoomOut } from "lucide-react";
+import { ChartFullscreen, useFullscreenChartHeight } from "@/features/practice/components/ChartFullscreen";
 import { ChartTooltip } from "@/features/practice/components/ChartTooltip";
 import { MSG } from "@/features/practice/constants/practiceConstants";
 import { useChartPointer } from "@/features/practice/hooks/useChartPointer";
@@ -185,6 +185,7 @@ interface PitchContourCardProps {
 export function PitchContourCard({ chart, loading, error }: PitchContourCardProps) {
   const [mode, setMode] = useState<SeriesMode>("both");
   const [fullscreen, setFullscreen] = useState(false);
+  const [fullscreenView, setFullscreenView] = useState<ChartView | undefined>();
 
   return (
     <section className="flex flex-col gap-3 rounded-bvc-xl border border-bvc-border bg-white p-4 md:rounded-bvc-xl md:p-5.5">
@@ -220,9 +221,9 @@ export function PitchContourCard({ chart, loading, error }: PitchContourCardProp
           {error || MSG.pitchUnavailable}
         </p>
       )}
-      {!loading && !error && chart && <PitchContourChart chart={chart} mode={mode} onFullscreen={() => setFullscreen(true)} />}
+      {!loading && !error && chart && <PitchContourChart chart={chart} mode={mode} onFullscreen={(view) => { setFullscreenView(view); setFullscreen(true); }} />}
 
-      {fullscreen && chart && <ChartFullscreen onClose={() => setFullscreen(false)}><PitchContourChart chart={chart} mode={mode} onFullscreen={() => setFullscreen(false)} /></ChartFullscreen>}
+      {fullscreen && chart && <ChartFullscreen onClose={() => setFullscreen(false)}><PitchContourChart chart={chart} mode={mode} fullscreen initialView={fullscreenView} onFullscreen={() => setFullscreen(false)} /></ChartFullscreen>}
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] font-medium text-bvc-muted">
         {mode !== "student" && (
           <span className="flex items-center gap-1.5">
@@ -249,12 +250,13 @@ export function PitchContourCard({ chart, loading, error }: PitchContourCardProp
   );
 }
 
-function PitchContourChart({ chart, mode, onFullscreen }: { chart: PitchChart; mode: SeriesMode; onFullscreen: () => void }) {
+function PitchContourChart({ chart, mode, onFullscreen, fullscreen = false, initialView }: { chart: PitchChart; mode: SeriesMode; onFullscreen: (view?: ChartView) => void; fullscreen?: boolean; initialView?: ChartView }) {
+  const height = useFullscreenChartHeight(fullscreen, CHART_HEIGHT);
   const { ref, width } = useElementWidth<HTMLDivElement>();
   return (
     <div className="overflow-hidden rounded-xl border border-bvc-border bg-bvc-soft p-2.5 pt-3">
-      <div ref={ref} className="relative" style={{ height: CHART_HEIGHT + 40 }}>
-        {width > LEFT + RIGHT && <PitchContourPlot chart={chart} width={width} mode={mode} onFullscreen={onFullscreen} />}
+      <div ref={ref} className="relative" style={{ height: height + 60 }}>
+        {width > LEFT + RIGHT && <PitchContourPlot chart={chart} width={width} mode={mode} onFullscreen={onFullscreen} fullscreen={fullscreen} initialView={initialView} height={height} />}
       </div>
     </div>
   );
@@ -279,20 +281,23 @@ function prepareChart(chart: PitchChart): PreparedChart {
   return { shown, base, bounds };
 }
 
-function PitchContourPlot({ chart, width, mode, onFullscreen }: { chart: PitchChart; width: number; mode: SeriesMode; onFullscreen: () => void }) {
+function PitchContourPlot({ chart, width, mode, onFullscreen, fullscreen, initialView, height }: { chart: PitchChart; width: number; mode: SeriesMode; onFullscreen: (view?: ChartView) => void; fullscreen: boolean; initialView?: ChartView; height: number }) {
+  const pitchBottom = height - (CHART_HEIGHT - PITCH_BOTTOM);
+  const tickTop = height - (CHART_HEIGHT - TICK_TOP);
+  const tickLabelY = height - (CHART_HEIGHT - TICK_LABEL_Y);
   const clipId = useId();
   const { x: pointerX, pointerProps } = useChartPointer(width);
   const frame: Frame = { xStart: LEFT, xEnd: width - RIGHT };
   const { shown, base, bounds } = useMemo(() => prepareChart(chart), [chart]);
-  const [view, setView] = useState<ChartView>(base);
+  const [view, setView] = useState<ChartView>(initialView ?? base);
   const drag = useRef<{ x: number; y: number; view: ChartView } | null>(null);
   const zoomed = isZoomed(view, base);
 
   const plotWidth = frame.xEnd - frame.xStart;
-  const plotHeight = PITCH_BOTTOM - PITCH_TOP;
+  const plotHeight = pitchBottom - PITCH_TOP;
   const xAt = (seconds: number) => frame.xStart + ((seconds - view.t0) / (view.t1 - view.t0)) * plotWidth;
   const secondsAt = (x: number) => view.t0 + ((x - frame.xStart) / plotWidth) * (view.t1 - view.t0);
-  const yAtMidi = (midi: number) => PITCH_BOTTOM - ((midi - view.m0) / (view.m1 - view.m0)) * plotHeight;
+  const yAtMidi = (midi: number) => pitchBottom - ((midi - view.m0) / (view.m1 - view.m0)) * plotHeight;
   const yAt = (hz: number) => yAtMidi(hzToMidiFloat(hz));
 
   // Ctrl + cuộn (hoặc chụm touchpad) phóng quanh con trỏ; cuộn thường vẫn cuộn trang
@@ -305,19 +310,19 @@ function PitchContourPlot({ chart, width, mode, onFullscreen }: { chart: PitchCh
       event.preventDefault();
       const box = svg.getBoundingClientRect();
       const x = ((event.clientX - box.left) / box.width) * width;
-      const y = Math.min(PITCH_BOTTOM, Math.max(PITCH_TOP, event.clientY - box.top));
+      const y = Math.min(pitchBottom, Math.max(PITCH_TOP, event.clientY - box.top));
       const plotSpan = width - RIGHT - LEFT;
       setView((current) => {
         const anchor = {
           seconds: current.t0 + ((x - LEFT) / plotSpan) * (current.t1 - current.t0),
-          midi: current.m0 + ((PITCH_BOTTOM - y) / (PITCH_BOTTOM - PITCH_TOP)) * (current.m1 - current.m0),
+          midi: current.m0 + ((pitchBottom - y) / (pitchBottom - PITCH_TOP)) * (current.m1 - current.m0),
         };
         return zoomView(current, Math.exp(-event.deltaY * WHEEL_ZOOM_PER_PIXEL), anchor, bounds);
       });
     };
     svg.addEventListener("wheel", listener, { passive: false });
     return () => svg.removeEventListener("wheel", listener);
-  }, [pointerProps.ref, width, bounds]);
+  }, [pointerProps.ref, width, bounds, pitchBottom]);
 
   const zoomCenter = (factor: number) =>
     setView((current) =>
@@ -383,8 +388,8 @@ function PitchContourPlot({ chart, width, mode, onFullscreen }: { chart: PitchCh
         onPointerCancel={endDrag}
         style={{ touchAction: zoomed ? "none" : "pan-y" }}
         width={width}
-        height={CHART_HEIGHT}
-        viewBox={`0 0 ${width} ${CHART_HEIGHT}`}
+        height={height}
+        viewBox={`0 0 ${width} ${height}`}
         fill="none"
         className={cn("block overflow-visible", zoomed ? "cursor-grab active:cursor-grabbing" : "cursor-crosshair")}
         role="img"
@@ -392,13 +397,13 @@ function PitchContourPlot({ chart, width, mode, onFullscreen }: { chart: PitchCh
       >
         <defs>
           <clipPath id={clipId}>
-            <rect x={frame.xStart} y={ZONE_TOP} width={plotWidth} height={PITCH_BOTTOM - ZONE_TOP + 4} />
+            <rect x={frame.xStart} y={ZONE_TOP} width={plotWidth} height={pitchBottom - ZONE_TOP + 4} />
           </clipPath>
         </defs>
 
         <g clipPath={`url(#${clipId})`}>
           {chart.segments.map((segment) => (
-            <SegmentZone key={segment.id} segment={segment} xAt={xAt} />
+            <SegmentZone key={segment.id} segment={segment} xAt={xAt} bottom={pitchBottom} />
           ))}
         </g>
 
@@ -459,15 +464,15 @@ function PitchContourPlot({ chart, width, mode, onFullscreen }: { chart: PitchCh
           <g key={`${tick.seconds}-${tick.color}`}>
             <line
               x1={xAt(tick.seconds)}
-              y1={TICK_TOP}
+              y1={tickTop}
               x2={xAt(tick.seconds)}
-              y2={TICK_TOP + 5}
+              y2={tickTop + 5}
               stroke={tick.color}
               strokeWidth="1"
             />
             <text
               x={xAt(tick.seconds)}
-              y={TICK_LABEL_Y}
+              y={tickLabelY}
               fontSize="11"
               fill={tick.color}
               fontWeight="600"
@@ -484,7 +489,7 @@ function PitchContourPlot({ chart, width, mode, onFullscreen }: { chart: PitchCh
               x1={hover.x}
               y1={ZONE_TOP}
               x2={hover.x}
-              y2={PITCH_BOTTOM}
+              y2={pitchBottom}
               stroke="var(--color-bvc-ink)"
               strokeWidth="1"
               strokeDasharray="3 2"
@@ -521,11 +526,11 @@ function PitchContourPlot({ chart, width, mode, onFullscreen }: { chart: PitchCh
           <ZoomButton label="Thu nhỏ" disabled={!zoomed} onClick={() => zoomCenter(1 / BUTTON_ZOOM)}>
             <ZoomOut className="size-4" />
           </ZoomButton>
-          <ZoomButton label="Phóng to" onClick={() => zoomCenter(BUTTON_ZOOM)}>
+          <ZoomButton label="Phóng to" onClick={() => { if (fullscreen) zoomCenter(BUTTON_ZOOM); else onFullscreen(zoomView(view, BUTTON_ZOOM, { seconds: (view.t0 + view.t1) / 2, midi: (view.m0 + view.m1) / 2 }, bounds)); }}>
             <ZoomIn className="size-4" />
           </ZoomButton>
-          <ZoomButton label="Xem toàn bộ" onClick={onFullscreen}>
-            <Maximize2 className="size-4" />
+          <ZoomButton label={fullscreen ? "Thu nhỏ biểu đồ" : "Xem toàn bộ"} onClick={() => onFullscreen(view)}>
+            {fullscreen ? <Minimize2 className="size-4" /> : <Maximize2 className="size-4" />}
           </ZoomButton>
         </div>
       </div>
@@ -581,7 +586,7 @@ function ZoomButton({ label, disabled = false, onClick, children }: ZoomButtonPr
   );
 }
 
-function SegmentZone({ segment, xAt }: { segment: PitchSegment; xAt: (seconds: number) => number }) {
+function SegmentZone({ segment, xAt, bottom }: { segment: PitchSegment; xAt: (seconds: number) => number; bottom: number }) {
   const style = SEGMENT_STYLE[segment.kind];
   const x = xAt(segment.startSec);
   const width = Math.max(4, xAt(segment.endSec) - x);
@@ -590,7 +595,7 @@ function SegmentZone({ segment, xAt }: { segment: PitchSegment; xAt: (seconds: n
       x={x}
       y={ZONE_TOP}
       width={width}
-      height={PITCH_BOTTOM - ZONE_TOP}
+      height={bottom - ZONE_TOP}
       rx="4"
       fill={style.fill}
       stroke={style.stroke}

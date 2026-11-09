@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Allow: /library
+Allow: /help
+Disallow: /dashboard
+Disallow: /home
+Disallow: /profile
+Disallow: /notifications
+Disallow: /assignments
+Disallow: /assignment/
+Disallow: /community/
+Disallow: /ensemble/
+Disallow: /practice/
+Disallow: /dev/

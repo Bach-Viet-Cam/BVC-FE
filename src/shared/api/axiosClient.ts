@@ -47,7 +47,7 @@ axiosClient.interceptors.response.use(
       return axiosClient(originalRequest);
     } catch (refreshError) {
       localStorage.removeItem("accessToken");
-      window.location.href = "/login";
+      window.location.href = "/";
       return Promise.reject(refreshError);
     }
   },

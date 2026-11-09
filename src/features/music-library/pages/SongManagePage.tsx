@@ -127,11 +127,7 @@ export function SongManagePage() {
         ) : result && result.items.length === 0 ? (
           <EmptyState
             title={hasFilters ? "Không có bài hát khớp bộ lọc" : "Bạn chưa có bài hát nào"}
-            description={
-              hasFilters
-                ? "Thử bỏ bớt từ khóa hoặc bộ lọc."
-                : "Thêm bài hát đầu tiên, rồi tải lên bản nhạc cho từng nhạc cụ."
-            }
+            description={hasFilters ? "Thử bỏ bớt từ khóa hoặc bộ lọc." : undefined}
             actions={
               hasFilters ? (
                 <ActionButton onClick={resetFilters}>Xóa bộ lọc</ActionButton>
