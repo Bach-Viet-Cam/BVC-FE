@@ -16,6 +16,12 @@ export interface Pagination {
   total: number;
 }
 
+export interface Lecturer {
+  id: string;
+  fullName: string;
+  email: string;
+}
+
 export interface ClassSummary {
   id: string;
   name: string;
@@ -25,9 +31,12 @@ export interface ClassSummary {
   startDate: string;
   endDate: string;
   memberCount: number;
+  isPrimaryLecturer: boolean;
 }
 
 export interface ClassDetail extends ClassSummary {
+  owner: Lecturer;
+  coLecturers: Lecturer[];
   description: string | null;
   hasStarted: boolean;
   isReadOnly: boolean;
@@ -55,6 +64,7 @@ export interface ClassPayload {
   cohort: string;
   instrumentId: string;
   description: string | null;
+  coLecturerIds?: string[];
 }
 
 // Configured by System Admin; a class runs exactly from startDate to endDate of its semester.

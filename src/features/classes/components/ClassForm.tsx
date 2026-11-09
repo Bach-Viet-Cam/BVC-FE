@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -6,6 +6,7 @@ import {
   type ClassDetail,
   type ClassPayload,
   type Instrument,
+  type Lecturer,
   type Semester,
 } from "@/features/classes/types/classTypes";
 import {
@@ -15,6 +16,7 @@ import {
   parseClassCode,
 } from "@/features/classes/utils/classCode";
 import { formatIsoDate } from "@/features/classes/utils/classFormat";
+import { LecturerPicker } from "@/features/classes/components/LecturerPicker";
 import { applyFieldErrors } from "@/features/classes/utils/mapApiErrors";
 import { resolveSemesterForHalf, toSemesterHalf, type SemesterTarget } from "@/features/classes/utils/semesterHalf";
 import {
@@ -79,7 +81,9 @@ export function ClassForm({
     resolver: zodResolver(isCreate ? createClassFormSchema : classFormSchema),
     defaultValues: toFormValues(classDetail, defaultSemesterName),
   });
-  useReportDirty(isDirty, onDirtyChange);
+  const [coLecturers, setCoLecturers] = useState<Lecturer[]>([]);
+  const [coLecturerError, setCoLecturerError] = useState<string | undefined>();
+  useReportDirty(isDirty || coLecturers.length > 0, onDirtyChange);
   const instrumentOptions =
     classDetail && !instruments.some((item) => item.id === classDetail.instrument.id)
       ? [...instruments, { ...classDetail.instrument, code: "", isActive: false }]
@@ -163,10 +167,18 @@ export function ClassForm({
       name: values.name,
       description: values.description || null,
       ...(isLocked ? {} : { instrumentId: values.instrumentId, cohort: values.cohort }),
+      ...(isCreate ? { coLecturerIds: coLecturers.map((lecturer) => lecturer.id) } : {}),
     };
+    setCoLecturerError(undefined);
     const fieldErrors = await onSubmit(payload);
     if (!fieldErrors) return;
-    const unmatched = applyFieldErrors<ClassFormValues>(fieldErrors, FORM_FIELDS, setError);
+    const coLecturerFieldError = fieldErrors.find((fieldError) => fieldError.field === "coLecturerIds");
+    setCoLecturerError(coLecturerFieldError?.message);
+    const unmatched = applyFieldErrors<ClassFormValues>(
+      fieldErrors.filter((fieldError) => fieldError !== coLecturerFieldError),
+      FORM_FIELDS,
+      setError
+    );
     unmatched.forEach((fieldError) => toast.error(fieldError.message));
   });
 
@@ -287,6 +299,26 @@ export function ClassForm({
             className={cn(INPUT_CLASSES, "h-auto min-h-[72px] resize-none py-3")}
           />
         </FormField>
+
+        {isCreate && (
+          <FormField
+            htmlFor="class-co-lecturers"
+            label="Giảng viên cùng dạy"
+            hint="Nhập email để tìm giảng viên. Có thể bỏ trống và thêm sau trong trang chi tiết lớp."
+            error={coLecturerError}
+          >
+            <LecturerPicker
+              id="class-co-lecturers"
+              label="Giảng viên cùng dạy"
+              value={coLecturers}
+              onChange={(lecturers) => {
+                setCoLecturers(lecturers);
+                setCoLecturerError(undefined);
+              }}
+              disabled={isSaving}
+            />
+          </FormField>
+        )}
 
         <div className="grid gap-[14px] sm:grid-cols-2">
           <FormField htmlFor="class-start-date" label="Ngày bắt đầu" hint="Theo học kỳ đã chọn">

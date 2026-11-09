@@ -35,7 +35,14 @@ export function useApiQuery<T>(requestKey: string | null, fetcher: () => Promise
   }, [effectiveKey]);
 
   const reload = useCallback(() => setReloadCount((count) => count + 1), []);
-  const setData = useCallback((data: T) => setState((previous) => ({ ...previous, data })), []);
+  const setData = useCallback(
+    (next: T | null | ((previous: T | null) => T | null)) =>
+      setState((previous) => ({
+        ...previous,
+        data: typeof next === "function" ? (next as (previous: T | null) => T | null)(previous.data) : next,
+      })),
+    []
+  );
 
   return {
     data: state.data,
