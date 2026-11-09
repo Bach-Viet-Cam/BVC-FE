@@ -21,6 +21,7 @@ const mockAssignments: AssignmentListItem[] = [
     title: "Lý ngựa ô",
     className: "Lớp Đàn tranh K1",
     type: "RECORDING",
+    kind: "SOLO",
     deadline: "2099-11-10T10:00:00Z",
     status: "NOT_SUBMITTED",
     usedSubmissions: 0,
@@ -34,6 +35,7 @@ const mockAssignments: AssignmentListItem[] = [
     title: "Luyện nhịp phách",
     className: "Lớp Đàn tranh K1",
     type: "RHYTHM",
+    kind: "ENSEMBLE",
     deadline: "2099-11-15T10:00:00Z",
     status: "SUBMITTED",
     usedSubmissions: 1,
@@ -47,6 +49,7 @@ const mockAssignments: AssignmentListItem[] = [
     title: "Bản nhạc hòa tấu",
     className: "Lớp Hòa tấu",
     type: "SHEET",
+    kind: "ENSEMBLE",
     deadline: "2020-01-01T10:00:00Z",
     status: "OVERDUE",
     usedSubmissions: 0,
@@ -60,12 +63,27 @@ const mockAssignments: AssignmentListItem[] = [
     title: "Thi kết thúc",
     className: "Lớp Đàn tranh K1",
     type: "EXAM",
+    kind: "OTHER",
     deadline: "2020-02-01T10:00:00Z",
     status: "PASSED",
     usedSubmissions: 2,
     maxSubmissions: 3,
     minAccuracy: 75,
     bonusPoints: null,
+  },
+  {
+    id: "b1",
+    classId: "c1",
+    title: "Thử thách vuốt dây",
+    className: "Lớp Đàn tranh K1",
+    type: "BONUS",
+    kind: "BONUS",
+    deadline: "2099-12-01T10:00:00Z",
+    status: "NOT_SUBMITTED",
+    usedSubmissions: 0,
+    maxSubmissions: 3,
+    minAccuracy: 70,
+    bonusPoints: 5,
   },
 ];
 
@@ -75,14 +93,21 @@ function mockListMine(items: AssignmentListItem[] = mockAssignments) {
   } as never);
 }
 
-function renderPage() {
+function renderPage(path = "/assignments") {
   return render(
-    <MemoryRouter initialEntries={["/assignments"]}>
+    <MemoryRouter initialEntries={[path]}>
       <Routes>
         <Route path="/assignments" element={<MyAssignmentsPage />} />
       </Routes>
     </MemoryRouter>
   );
+}
+
+async function tickKinds(...labels: string[]) {
+  await userEvent.click(screen.getByRole("button", { name: "Lọc theo Loại bài" }));
+  for (const label of labels) {
+    await userEvent.click(await screen.findByRole("checkbox", { name: label }));
+  }
 }
 
 describe("MyAssignmentsPage", () => {
@@ -98,7 +123,6 @@ describe("MyAssignmentsPage", () => {
     expect(await screen.findByText("Làm tiếp")).toBeInTheDocument();
     expect(screen.getByText("Lý ngựa ô")).toBeInTheDocument();
 
-    // Check sections
     expect(screen.getByRole("heading", { name: /Cần làm/ })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /Đã nộp/ })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /Quá hạn/ })).toBeInTheDocument();
@@ -109,12 +133,8 @@ describe("MyAssignmentsPage", () => {
     renderPage();
 
     await screen.findByText("Lý ngựa ô");
+    await userEvent.click(screen.getByRole("tab", { name: /Quá hạn/ }));
 
-    // Click 'Quá hạn' tab
-    const overdueTab = screen.getByRole("tab", { name: /Quá hạn/ });
-    await userEvent.click(overdueTab);
-
-    // Overdue items should be visible, others filtered out
     expect(screen.getByText("Bản nhạc hòa tấu")).toBeInTheDocument();
     expect(screen.queryByText("Lý ngựa ô")).not.toBeInTheDocument();
   });
@@ -129,25 +149,46 @@ describe("MyAssignmentsPage", () => {
   it("handles filter and clear filters", async () => {
     mockListMine();
     renderPage();
-
     await screen.findByText("Lý ngựa ô");
 
-    // Filter to class with no overdue assignments
-    const typeSelect = screen.getByLabelText("Loại bài");
-    await userEvent.selectOptions(typeSelect, "EXAM");
+    await tickKinds("Bài tập khác");
+    await userEvent.click(screen.getByRole("tab", { name: /Chưa nộp/ }));
 
-    // Click 'Chưa nộp' tab
-    const notSubmittedTab = screen.getByRole("tab", { name: /Chưa nộp/ });
-    await userEvent.click(notSubmittedTab);
-
-    // EXAM is PASSED, so NOT_SUBMITTED with EXAM should be empty
     expect(await screen.findByText("Không tìm thấy bài tập phù hợp")).toBeInTheDocument();
 
-    // Click Xóa bộ lọc
-    const clearBtn = screen.getByRole("button", { name: "Xóa bộ lọc" });
-    await userEvent.click(clearBtn);
-
-    // Everything is shown again
+    await userEvent.click(screen.getByRole("button", { name: "Xóa bộ lọc" }));
     expect(await screen.findByText("Lý ngựa ô")).toBeInTheDocument();
+  });
+
+  it("loads bonus and regular assignments together, tagged by kind", async () => {
+    mockListMine();
+    renderPage();
+
+    expect(await screen.findByText("Thử thách vuốt dây")).toBeInTheDocument();
+    expect(assignmentApi.listMine).toHaveBeenCalledWith(expect.objectContaining({ type: undefined }));
+    expect(screen.getByRole("link", { name: /Thử thách vuốt dây/ })).toHaveAttribute("href", "/community/bonus/b1");
+    expect(screen.getAllByText("Bonus").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Hòa tấu").length).toBeGreaterThan(0);
+  });
+
+  it("lets the student tick several kinds at once", async () => {
+    mockListMine();
+    renderPage();
+    await screen.findByText("Lý ngựa ô");
+
+    await tickKinds("Độc tấu", "Bonus");
+
+    expect(screen.getByText("Lý ngựa ô")).toBeInTheDocument();
+    expect(screen.getByText("Thử thách vuốt dây")).toBeInTheDocument();
+    expect(screen.queryByText("Luyện nhịp phách")).not.toBeInTheDocument();
+    expect(screen.queryByText("Thi kết thúc")).not.toBeInTheDocument();
+  });
+
+  it("opens with only bonus work when coming from the old bonus page", async () => {
+    mockListMine();
+    renderPage("/assignments?kind=BONUS");
+
+    expect(await screen.findByText("Thử thách vuốt dây")).toBeInTheDocument();
+    expect(screen.queryByText("Lý ngựa ô")).not.toBeInTheDocument();
   });
 });

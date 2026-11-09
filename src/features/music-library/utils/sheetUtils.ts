@@ -32,6 +32,38 @@ export function sheetViewerHref(songId: string, sheetId: string, assignmentId?: 
   return `/library/${songId}/sheets/${sheetId}${query}`;
 }
 
+export function pickMainSheet<T extends SheetVersion>(sheets: T[]): T | undefined {
+  return sheets.find((sheet) => sheet.isMain) ?? [...sheets].sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
+}
+
+interface InstrumentCardOptions {
+  assignedSheetId?: string | null;
+  classInstrumentId?: string | null;
+}
+
+export function buildInstrumentCards<T extends SheetVersion>(sheets: T[], options: InstrumentCardOptions) {
+  const assigned = sheets.find((sheet) => sheet.id === options.assignedSheetId);
+  const priorityInstrumentId = assigned?.instrument.id ?? options.classInstrumentId ?? null;
+  return groupSheetsByInstrument(sheets)
+    .filter((group) => group.sheets.length > 0)
+    .sort((a, b) => Number(b.instrument.id === priorityInstrumentId) - Number(a.instrument.id === priorityInstrumentId))
+    .map(({ instrument, sheets: groupSheets }) => {
+      const isAssigned = assigned?.instrument.id === instrument.id;
+      const featured = (isAssigned ? assigned : pickMainSheet(groupSheets))!;
+      return {
+        instrument,
+        featured,
+        isFeaturedAssigned: isAssigned,
+        secondary: groupSheets.filter((sheet) => sheet !== featured),
+      };
+    });
+}
+
+export function practiceHref(sheetId: string, assignmentId?: string) {
+  const query = assignmentId ? `?assignmentId=${encodeURIComponent(assignmentId)}` : "";
+  return `/practice/sheets/${sheetId}/record${query}`;
+}
+
 export interface LecturerInstrumentGroup {
   instrument: CategoryRef;
   sheets: LecturerSheetMusic[];

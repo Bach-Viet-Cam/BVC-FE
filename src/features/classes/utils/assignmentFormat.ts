@@ -1,4 +1,8 @@
-import { type AssignmentType, type StudentAssignmentStatus } from "@/features/classes/types/assignmentTypes";
+import {
+  type AssignmentListItem,
+  type AssignmentType,
+  type StudentAssignmentStatus,
+} from "@/features/classes/types/assignmentTypes";
 
 type TagVariant = "ok" | "warn" | "muted" | "error" | "pending";
 
@@ -8,6 +12,24 @@ export const ASSIGNMENT_STATUS_META: Record<StudentAssignmentStatus, { label: st
   OVERDUE: { label: "Quá hạn", variant: "error" },
   NOT_SUBMITTED: { label: "Chưa nộp", variant: "muted" },
 };
+
+export type AssignmentKind = "SOLO" | "ENSEMBLE" | "BONUS" | "OTHER";
+
+export const ASSIGNMENT_KIND_LABELS: Record<AssignmentKind, string> = {
+  SOLO: "Độc tấu",
+  ENSEMBLE: "Hòa tấu",
+  BONUS: "Bonus",
+  OTHER: "Bài tập khác",
+};
+
+export function assignmentKindOf(item: Pick<AssignmentListItem, "type" | "kind">): AssignmentKind {
+  if (item.type === "BONUS" || item.kind === "BONUS") return "BONUS";
+  return item.kind ?? "OTHER";
+}
+
+export function assignmentHref(item: Pick<AssignmentListItem, "id" | "type" | "kind">) {
+  return assignmentKindOf(item) === "BONUS" ? `/community/bonus/${item.id}` : `/assignment/${item.id}`;
+}
 
 export const ASSIGNMENT_TYPE_LABELS: Record<AssignmentType, string> = {
   PRACTICE: "Luyện ngón",

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Search } from "lucide-react";
 import { FilterSelect } from "@/features/classes/components/FilterSelect";
 import { ListState } from "@/features/classes/components/ListState";
@@ -6,12 +7,12 @@ import { MyAssignmentCard } from "@/features/classes/components/MyAssignmentCard
 import { NextAssignmentCard } from "@/features/classes/components/NextAssignmentCard";
 import { useMyAssignments } from "@/features/classes/hooks/useMyAssignments";
 import { type AssignmentListItem, type StudentAssignmentStatus } from "@/features/classes/types/assignmentTypes";
-import { ASSIGNMENT_TYPE_LABELS } from "@/features/classes/utils/assignmentFormat";
+import { ASSIGNMENT_KIND_LABELS, assignmentKindOf } from "@/features/classes/utils/assignmentFormat";
 import { groupAssignments, type AssignmentSort } from "@/features/classes/utils/myAssignmentGroups";
 import { ActionButton } from "@/shared/components/bvc/ActionButton";
 import { EmptyState } from "@/shared/components/bvc/EmptyState";
 import { PageHero } from "@/shared/components/bvc/PageHero";
-import { PillLink } from "@/shared/components/bvc/PillLink";
+import { MultiFilterPill } from "@/shared/components/bvc/MultiFilterPill";
 import { PillTabs } from "@/shared/components/bvc/PillTabs";
 import { RoleShell } from "@/shared/components/bvc/RoleShell";
 import { SearchField } from "@/shared/components/bvc/SearchField";
@@ -19,12 +20,11 @@ import { SearchField } from "@/shared/components/bvc/SearchField";
 type StatusFilter = "all" | StudentAssignmentStatus;
 
 const ALL = "all";
-const TYPE_OPTIONS = [
-  { value: ALL, label: "Tất cả" },
-  ...Object.entries(ASSIGNMENT_TYPE_LABELS)
-    .filter(([value]) => value !== "BONUS")
-    .map(([value, label]) => ({ value, label })),
-];
+const KIND_OPTIONS = Object.entries(ASSIGNMENT_KIND_LABELS).map(([value, label]) => ({ value, label }));
+
+function kindsFromUrl(value: string | null) {
+  return (value ?? "").split(",").filter((kind) => kind in ASSIGNMENT_KIND_LABELS);
+}
 const SORT_OPTIONS = [
   { value: "deadline", label: "Hạn nộp" },
   { value: "title", label: "Tên A-Z" },
@@ -53,9 +53,10 @@ function AssignmentSection({ title, items, now }: AssignmentSectionProps) {
 }
 
 export function MyAssignmentsPage() {
-  const { items, error, isLoading, reload, searchText, setSearchText } = useMyAssignments("NON_BONUS");
+  const { items, error, isLoading, reload, searchText, setSearchText } = useMyAssignments();
+  const [searchParams] = useSearchParams();
   const [statusFilter, setStatusFilter] = useState<StatusFilter>(ALL);
-  const [typeFilter, setTypeFilter] = useState(ALL);
+  const [kindFilter, setKindFilter] = useState<string[]>(() => kindsFromUrl(searchParams.get("kind")));
   const [classFilter, setClassFilter] = useState(ALL);
   const [sort, setSort] = useState<AssignmentSort>("deadline");
   const [now] = useState(() => new Date());
@@ -76,9 +77,10 @@ export function MyAssignmentsPage() {
     () =>
       items.filter(
         (item) =>
-          (classFilter === ALL || item.classId === classFilter) && (typeFilter === ALL || item.type === typeFilter)
+          (classFilter === ALL || item.classId === classFilter) &&
+          (kindFilter.length === 0 || kindFilter.includes(assignmentKindOf(item)))
       ),
-    [items, classFilter, typeFilter]
+    [items, classFilter, kindFilter]
   );
   const countOf = (status: StudentAssignmentStatus) => scoped.filter((item) => item.status === status).length;
   const statusTabs: { value: StatusFilter; label: string; count: number }[] = [
@@ -92,7 +94,7 @@ export function MyAssignmentsPage() {
   const visible = scoped.filter((item) => statusFilter === ALL || item.status === statusFilter);
   const groups = useMemo(() => groupAssignments(visible, now, sort), [visible, now, sort]);
 
-  const hasFilters = statusFilter !== ALL || typeFilter !== ALL || classFilter !== ALL;
+  const hasFilters = statusFilter !== ALL || kindFilter.length > 0 || classFilter !== ALL;
   const isBrowsingAll = !hasFilters && !searchText.trim() && sort === "deadline";
   const [nextAssignment, ...otherTodo] = groups.todo;
   const todoInList = isBrowsingAll ? otherTodo : groups.todo;
@@ -107,17 +109,13 @@ export function MyAssignmentsPage() {
 
   const clearFilters = () => {
     setStatusFilter(ALL);
-    setTypeFilter(ALL);
+    setKindFilter([]);
     setClassFilter(ALL);
   };
 
   return (
     <RoleShell title="Bài tập của tôi" hideHeader contentClassName="max-w-[1200px] gap-6 md:gap-7">
-      <PageHero
-        title="Bài tập của tôi"
-        description={description}
-        actions={<PillLink to="/community/bonus" label="Bài bonus" variant="glass" size="md" />}
-      >
+      <PageHero title="Bài tập của tôi" description={description}>
         <SearchField
           value={searchText}
           onChange={setSearchText}
@@ -150,13 +148,7 @@ export function MyAssignmentsPage() {
                   onChange={setClassFilter}
                 />
               )}
-              <FilterSelect
-                label="Loại bài"
-                value={typeFilter}
-                allValue={ALL}
-                options={TYPE_OPTIONS}
-                onChange={setTypeFilter}
-              />
+              <MultiFilterPill label="Loại bài" values={kindFilter} options={KIND_OPTIONS} onChange={setKindFilter} />
               <FilterSelect
                 label="Sắp xếp"
                 value={sort}

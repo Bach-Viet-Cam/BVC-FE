@@ -5,7 +5,7 @@ import { useAsyncData } from "@/shared/hooks/useAsyncData";
 
 const LOAD_ERROR = "Tải dữ liệu thất bại. Vui lòng thử lại.";
 
-export function useMyAssignments(type: MyAssignmentsParams["type"]) {
+export function useMyAssignments(type?: MyAssignmentsParams["type"]) {
   const [searchText, setSearchText] = useState("");
   const [query, setQuery] = useState("");
 

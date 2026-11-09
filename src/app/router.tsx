@@ -78,7 +78,6 @@ import { MonitoringPage } from "@/features/platform/pages/MonitoringPage";
 import { NotificationsManagePage } from "@/features/platform/pages/NotificationsManagePage";
 
 // Community - mobile
-import { BonusListPage } from "@/features/community/pages/BonusListPage";
 import { BonusDetailPage } from "@/features/community/pages/BonusDetailPage";
 import { BonusSubmitPage } from "@/features/community/pages/BonusSubmitPage";
 import { LeaderboardPage } from "@/features/community/pages/LeaderboardPage";
@@ -125,7 +124,7 @@ export function AppRouter() {
 
           <Route path="/assignments" element={<MyAssignmentsPage />} />
           <Route path="/assignment/:assignmentId" element={<AssignmentPage />} />
-          <Route path="/community/bonus" element={<BonusListPage />} />
+          <Route path="/community/bonus" element={<Navigate to="/assignments?kind=BONUS" replace />} />
           <Route path="/community/bonus/:bonusId" element={<BonusDetailPage />} />
 
           {/* Hòa tấu tự dựng khung responsive (EnsembleFrame) */}

@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AudioLines, FileText, Video } from "lucide-react";
 import { ActionButton } from "@/shared/components/bvc/ActionButton";
 import { ChoiceCards } from "@/shared/components/bvc/ChoiceCards";
+import { cn } from "@/shared/utils/cn";
 import { FileField } from "@/shared/components/bvc/FileField";
 import { FormDialog } from "@/shared/components/bvc/FormDialog";
 import { FormField } from "@/shared/components/bvc/FormField";
@@ -85,6 +86,7 @@ export function SheetFormDialog({
     handleSubmit,
     control,
     setValue,
+    getValues,
     setError,
     formState: { errors, isSubmitting, isDirty },
   } = useForm<SheetFormValues>({
@@ -112,6 +114,16 @@ export function SheetFormDialog({
   const instrumentName =
     availableInstruments.find((instrument) => instrument.id === instrumentId)?.name ?? "Nhạc cụ này";
   const rule = mainRuleFor(instrumentId, sheets, editing);
+  const mainName = instrumentId ? `${instrumentName} - Bản chính` : "";
+  const isNameLocked = isMain && Boolean(instrumentId);
+
+  useEffect(() => {
+    if (isNameLocked) {
+      setValue("name", mainName, { shouldValidate: true, shouldDirty: true });
+    } else if (getValues("name").endsWith(" - Bản chính")) {
+      setValue("name", "", { shouldDirty: true });
+    }
+  }, [isNameLocked, mainName, setValue, getValues]);
   const kindHint = rule.canBeMain
     ? `${instrumentName} chưa có bản chính, có thể tạo bản theo độ khó trước.`
     : `${instrumentName} đã có bản chính nên chỉ thêm được bản theo độ khó.`;
@@ -203,15 +215,19 @@ export function SheetFormDialog({
               label="Tên bản"
               htmlFor="sheet-name"
               required
-              hint="1–100 ký tự · không trùng trong cùng bài"
+              hint={isNameLocked ? "Bản chính được đặt tên tự động" : "1–100 ký tự · không trùng trong cùng bài"}
               error={errors.name?.message}
             >
               <input
                 {...register("name")}
                 id="sheet-name"
                 maxLength={100}
-                placeholder={`${instrumentName} - ${isMain ? "bản chính" : "bản cơ bản"}`}
-                className={fieldClass(Boolean(errors.name), "h-[46px]")}
+                readOnly={isNameLocked}
+                placeholder={`${instrumentName} - bản cơ bản`}
+                className={fieldClass(
+                  Boolean(errors.name),
+                  cn("h-[46px]", isNameLocked && "cursor-not-allowed bg-bvc-soft text-bvc-muted")
+                )}
               />
             </FormField>
 

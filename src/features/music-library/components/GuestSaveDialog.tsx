@@ -8,7 +8,7 @@ interface GuestSaveDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title?: string;
-  description?: string;
+  description?: string | null;
   // Trang mở sau khi đăng nhập; mặc định quay lại trang đang xem
   redirectTo?: string;
 }
@@ -27,7 +27,9 @@ export function GuestSaveDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <BvcDialogPopup>
         <DialogTitle className="text-2xl font-semibold tracking-[-0.02em] text-bvc-ink">{title}</DialogTitle>
-        <DialogDescription className="text-[15px] leading-relaxed text-bvc-muted">{description}</DialogDescription>
+        {description && (
+          <DialogDescription className="text-[15px] leading-relaxed text-bvc-muted">{description}</DialogDescription>
+        )}
         <div className="mt-2 flex flex-col gap-2">
           <Link
             to="/login"
