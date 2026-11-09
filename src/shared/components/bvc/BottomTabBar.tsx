@@ -8,7 +8,6 @@ import { cn } from "@/shared/utils/cn";
 interface BottomTabBarProps {
   tabs: NavItem[];
   displayName: string;
-  // Tab cuối mở sidebar đầy đủ (giảng viên); sáng lên khi trang hiện tại không thuộc tab nào ở trên
   onOpenMenu?: () => void;
   isMenuOpen?: boolean;
 }
@@ -36,7 +35,6 @@ interface TabContentProps {
 function TabContent({ isActive, label, icon }: TabContentProps) {
   return (
     <>
-      {/* Lớp kính xanh nhạt phủ cả ô tab (icon lẫn chữ) khi đang chọn, mép trên phản quang */}
       {isActive && (
         <span
           aria-hidden
@@ -58,8 +56,6 @@ function TabContent({ isActive, label, icon }: TabContentProps) {
 
 const iconClass = (isActive: boolean) => cn("relative size-[20px] transition-colors", isActive && "text-bvc-accent");
 
-// Thanh tab nổi dưới đáy màn hình điện thoại (ẩn từ md, khi đó menu nằm trên thanh trên / sidebar).
-// data-bvc-bottom-nav bật biến --bvc-bottom-nav-h (index.css) để nội dung, toast, thanh dính đáy chừa chỗ.
 export function BottomTabBar({ tabs, displayName, onOpenMenu, isMenuOpen = false }: BottomTabBarProps) {
   const { pathname } = useLocation();
   const activeTo = tabs.find((tab) => isTabActive(tab, pathname))?.to;
@@ -71,7 +67,6 @@ export function BottomTabBar({ tabs, displayName, onOpenMenu, isMenuOpen = false
       data-bvc-bottom-nav=""
       className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(env(safe-area-inset-bottom),10px)] md:hidden"
     >
-      {/* Bo góc đồng tâm: khung cao 68px (tab 56 + đệm 6×2) bo 34px, tab bo 34 − 6 = 28px = nửa chiều cao, nên cả hai đều là viên thuốc song song nhau. Viền vẽ bằng inset shadow để không làm lệch hình. */}
       <div className="pointer-events-auto mx-auto flex max-w-[440px] items-stretch gap-0.5 rounded-full bg-white/70 p-1.5 shadow-[inset_0_0_0_1px_rgb(255_255_255/0.7),inset_0_1px_0_rgb(255_255_255),0_0_0_1px_rgb(18_63_51/0.07),0_14px_34px_-12px_rgb(18_63_51/0.28)] backdrop-blur-2xl backdrop-saturate-[1.8]">
         {tabs.map((tab) => {
           const isActive = !isMenuOpen && tab.to === activeTo;

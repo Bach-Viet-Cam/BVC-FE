@@ -12,7 +12,6 @@ import { useAuth } from "@/shared/context/AuthContext";
 import { getRoleHome } from "@/shared/utils/roleHome";
 import { usePageMeta } from "@/shared/hooks/usePageMeta";
 
-// Đăng nhập trên nền ảnh BVC như trang giới thiệu: thẻ trắng ở giữa, nút Google, nút quay về trang chủ (landing)
 export function LoginPage() {
   usePageMeta({ title: "Đăng nhập", description: "Đăng nhập Bách Việt Cầm để luyện tập, nộp bài và theo dõi tiến độ." });
   const { login, isLoading, error, setError, isCreateAccountOpen, confirmCreateAccount, cancelCreateAccount } =

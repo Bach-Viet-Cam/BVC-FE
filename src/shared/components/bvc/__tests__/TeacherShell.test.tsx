@@ -49,6 +49,20 @@ describe("TeacherShell menu", () => {
     expect(nav.getByRole("link", { name: "Bảng xếp hạng" })).toBeInTheDocument();
   });
 
+  it("keeps only one group open at a time so the sidebar fits short laptop screens", async () => {
+    const [sidebar] = renderAt("/teacher/classes");
+    const nav = within(sidebar);
+    expect(nav.getByRole("button", { name: "Lớp học" })).toHaveAttribute("aria-expanded", "true");
+
+    await userEvent.click(nav.getByRole("button", { name: "Thư viện học liệu" }));
+    expect(nav.getByRole("button", { name: "Thư viện học liệu" })).toHaveAttribute("aria-expanded", "true");
+    expect(nav.getByRole("button", { name: "Lớp học" })).toHaveAttribute("aria-expanded", "false");
+    expect(nav.queryByRole("link", { name: "Danh sách lớp" })).not.toBeInTheDocument();
+
+    await userEvent.click(nav.getByRole("button", { name: "Thư viện học liệu" }));
+    expect(nav.getByRole("button", { name: "Thư viện học liệu" })).toHaveAttribute("aria-expanded", "false");
+  });
+
   it("keeps Danh sách lớp active on class sub-pages", () => {
     const [sidebar] = renderAt("/teacher/classes/c1/students/s1");
     const nav = within(sidebar);

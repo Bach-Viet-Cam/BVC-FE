@@ -95,8 +95,6 @@ const ADMIN_NAV: NavEntry[] = [
   { label: "Bảng xếp hạng", to: "/leaderboard", icon: Trophy },
 ];
 
-// Thanh tab dưới đáy (mobile) của sinh viên: chỉ 5 mục chính. Trợ giúp, thông báo, đã lưu
-// được gom vào trang Hồ sơ / thanh trên, nên vẫn tính là đang ở tab tương ứng.
 export const STUDENT_TABS: NavItem[] = [
   { label: "Hôm nay", to: "/home", icon: House },
   { label: "Thư viện", to: "/library", icon: LibraryBig, activePrefixes: ["/saved"] },
@@ -105,7 +103,6 @@ export const STUDENT_TABS: NavItem[] = [
   { label: "Hồ sơ", to: "/profile", icon: UserRound, activePrefixes: ["/help", "/notifications"] },
 ];
 
-// Thanh tab dưới đáy (mobile) của giảng viên: 4 việc dùng nhiều nhất, tab thứ 5 "Menu" mở sidebar đầy đủ
 export const TEACHER_TABS: NavItem[] = [
   {
     label: "Trang chủ",

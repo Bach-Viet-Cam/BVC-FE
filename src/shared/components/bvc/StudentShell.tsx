@@ -31,8 +31,6 @@ const STAFF_NAV_ITEMS = [{ label: "Thư viện", to: "/library" }];
 
 const ROLE_FALLBACK_NAMES = { student: "Sinh viên", teacher: "Giảng viên", admin: "Quản trị viên", guest: "Khách" };
 
-// Màn tập trung (luyện tập, chi tiết bài nộp / bài tập, xem bản nhạc) có nút quay lại và thanh hành động
-// dính đáy riêng, nên không hiện thanh tab dưới đáy để khỏi che nhau
 const FOCUSED_PATHS = [
   /^\/practice\/sheets\//,
   /^\/practice\/submissions\/[^/]+/,
@@ -66,7 +64,6 @@ export function StudentShell({ children, className }: StudentShellProps) {
             <img src={logoImage} alt="Bách Việt Cầm" className="h-10 w-auto md:h-11" />
           </Link>
 
-          {/* Sinh viên trên điện thoại dùng thanh tab dưới đáy, dải menu này chỉ hiện từ md */}
           <nav
             aria-label="Điều hướng chính"
             className={cn(
@@ -113,7 +110,6 @@ export function StudentShell({ children, className }: StudentShellProps) {
                   <LibraryBig className="size-[19px]" strokeWidth={1.6} />
                 </Link>
               )}
-              {/* Khi có thanh tab dưới đáy, hồ sơ đã nằm ở tab cuối nên ẩn nút này trên điện thoại */}
               <Link
                 to="/profile"
                 aria-label={`Hồ sơ ${displayName}`}

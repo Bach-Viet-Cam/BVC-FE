@@ -57,7 +57,6 @@ describe("NotificationsPage", () => {
       ])
     );
     renderPage();
-    // "Hôm nay" cũng là tên tab dưới đáy, nên chỉ tìm trong vùng nội dung
     expect(await within(screen.getByRole("main")).findByText("Hôm nay")).toBeInTheDocument();
     expect(screen.getByText("Trước đó")).toBeInTheDocument();
     expect(screen.getAllByLabelText("Chưa đọc")).toHaveLength(1);

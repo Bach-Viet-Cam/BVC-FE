@@ -13,7 +13,6 @@ interface AccountLink {
   icon: LucideIcon;
 }
 
-// Các mục không có chỗ trên thanh tab dưới đáy được gom về đây
 function accountLinksFor(role: number): AccountLink[] {
   return [
     ...(role === ROLES.STUDENT ? [{ label: "Nội dung đã lưu", to: "/saved", icon: Bookmark }] : []),

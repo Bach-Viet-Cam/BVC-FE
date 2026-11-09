@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant short (@media (max-height: 760px));
+
 @theme inline {
   /* Một font duy nhất cho cả ứng dụng: Be Vietnam Pro (thiết kế cho tiếng Việt, dấu đặt chuẩn).
      Tiêu đề chỉ khác về độ đậm / cỡ chữ; các token cũ giữ tên để không phải sửa class ở từng màn */
@@ -122,7 +124,6 @@
     }
   }
 
-  /* Thanh tab dưới đáy: nền viên thuốc của tab đang chọn bật nhẹ ra */
   --animate-nav-pop: nav-pop 260ms cubic-bezier(0.16, 1, 0.3, 1);
   @keyframes nav-pop {
     from {
@@ -299,11 +300,9 @@
   --sidebar-border: #1e293b;
   --sidebar-ring: #14b8a6;
 
-  /* Chiều cao thanh tab dưới đáy (StudentBottomNav); 0 khi không có thanh */
   --bvc-bottom-nav-h: 0px;
 }
 
-/* Chỉ điện thoại (dưới md) mới có thanh tab: nội dung, toast và thanh dính đáy đẩy lên trên nó */
 @media (width < 48rem) {
   :root:has([data-bvc-bottom-nav]) {
     --bvc-bottom-nav-h: calc(68px + max(env(safe-area-inset-bottom), 10px));
