@@ -189,7 +189,7 @@ export function SubmissionVerification({
   );
 }
 
-export function SubmissionSharing({ submissionId }: { submissionId: string }) {
+export function SubmissionSharing({ submissionId, showAudio = true }: { submissionId: string; showAudio?: boolean }) {
   const state = useAsyncData(() => verifiedApi.review(submissionId), `sharing:${submissionId}`);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -208,13 +208,17 @@ export function SubmissionSharing({ submissionId }: { submissionId: string }) {
   return (
     <section aria-label="Quyền chia sẻ bản thu" className="rounded-bvc-xl border border-bvc-border bg-white p-4 md:p-5">
       <h2 className="text-[17px] font-semibold">Bản thu của bạn</h2>
-      <div className="my-3">
-        <AuthenticatedAudio
-          key={submissionId}
-          endpoint={`/submissions/${submissionId}/audio`}
-          label="Nghe lại bản thu"
-        />
-      </div>
+      {showAudio ? (
+        <div className="my-3">
+          <AuthenticatedAudio
+            key={submissionId}
+            endpoint={`/submissions/${submissionId}/audio`}
+            label="Nghe lại bản thu"
+          />
+        </div>
+      ) : (
+        <div className="my-3" />
+      )}
       {state.error ? (
         <div role="alert">
           <p className="text-sm text-bvc-accent-text">{state.error}</p>
