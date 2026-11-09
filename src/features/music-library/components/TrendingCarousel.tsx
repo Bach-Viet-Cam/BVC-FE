@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Flame, Music } from "lucide-react";
-import { COVER_TONE_CLASSES } from "@/features/music-library/constants/musicLibraryConstants";
+import { ChevronLeft, ChevronRight, Flame } from "lucide-react";
+import backgroundImage from "@/assets/image/background.webp";
+import { CoverArt } from "@/features/music-library/components/CoverArt";
 import type { TrendingSong } from "@/features/music-library/types/musicLibraryTypes";
 import { cn } from "@/shared/utils/cn";
 import { SectionTitle } from "@/shared/components/bvc/SectionTitle";
@@ -23,66 +24,56 @@ interface TrendingSlideProps {
   total: number;
 }
 
-// Một slide: ảnh bìa phóng to làm nền (mờ), ảnh bìa rõ bên trái và thông tin bài bên phải
+// Một slide: ảnh nền chung của thư viện, ảnh bìa bên trái và thông tin bài bên phải
 function TrendingSlide({ song, rank, total }: TrendingSlideProps) {
-  const tone = COVER_TONE_CLASSES[song.coverTone];
-
   return (
     <Link
       to={`/library/${song.id}`}
       aria-roledescription="slide"
       aria-label={`Hạng ${rank} trên ${total}: ${song.title}`}
       className={cn(
-        "group relative flex h-full w-full shrink-0 snap-center overflow-hidden rounded-bvc-xl text-white hover:text-white",
-        song.coverUrl ? "bg-bvc-ink" : tone.bg
+        "group relative flex h-full w-full shrink-0 snap-center overflow-hidden rounded-bvc-xl bg-bvc-ok-tint text-bvc-ink hover:text-bvc-ink"
       )}
     >
-      {song.coverUrl && (
-        <img
-          src={song.coverUrl}
-          alt=""
-          aria-hidden
-          className="absolute inset-0 size-full scale-110 object-cover opacity-55 blur-2xl"
-        />
-      )}
-      <span className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/30 to-black/10" aria-hidden />
+      <img
+        src={backgroundImage}
+        alt=""
+        aria-hidden
+        className="absolute inset-0 size-full object-cover object-right-bottom"
+      />
+      <span
+        className="absolute inset-0 bg-linear-to-t from-white/85 via-white/40 to-transparent md:bg-linear-to-r md:from-white/10 md:via-white/55 md:to-white/15"
+        aria-hidden
+      />
 
       <span className="relative flex w-full flex-col justify-end gap-4 p-5 md:flex-row md:items-center md:justify-start md:gap-8 md:p-8">
-        <span className="hidden aspect-square h-full max-h-[260px] shrink-0 overflow-hidden rounded-bvc-xl shadow-2xl ring-1 ring-white/15 md:block">
-          {song.coverUrl ? (
-            <img
-              src={song.coverUrl}
-              alt=""
-              className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-          ) : (
-            <span className={cn("flex size-full items-center justify-center", tone.bg, tone.fg)}>
-              <Music className="size-16 opacity-70" strokeWidth={1.5} aria-hidden />
-            </span>
-          )}
-        </span>
+        <CoverArt
+          title={song.title}
+          tone={song.coverTone}
+          url={song.coverUrl}
+          size="hero"
+          className="hidden h-full max-h-[260px] w-auto shadow-2xl ring-1 ring-white/60 md:flex"
+        />
 
         <span className="flex min-w-0 flex-col gap-2">
-          <span className="inline-flex items-center gap-1.5 self-start rounded-full bg-white/15 px-3 py-1 text-[12px] font-semibold backdrop-blur">
+          <span className="inline-flex items-center gap-1.5 self-start rounded-full bg-white/75 px-3 py-1 text-[12px] font-semibold text-bvc-accent-text backdrop-blur">
             <Flame className="size-3.5" strokeWidth={2.2} aria-hidden />
             Top {rank} tuần này
           </span>
           <span className="line-clamp-2 text-[26px] leading-tight font-semibold tracking-[-0.025em] md:text-[40px]">
             {song.title}
           </span>
-          <span className="truncate text-[14px] text-white/80 md:text-[15px]">
+          <span className="truncate text-[14px] text-bvc-ink/75 md:text-[15px]">
             {song.composer || "Chưa rõ tác giả"} · {song.genre.name}
           </span>
           {song.description && (
-            <span className="line-clamp-2 hidden max-w-[560px] text-[14px] text-white/75 md:block">
+            <span className="line-clamp-2 hidden max-w-[560px] text-[14px] text-bvc-ink/70 md:block">
               {song.description}
             </span>
           )}
           <span className="mt-1 flex flex-wrap items-center gap-3 text-[13px] font-medium">
-            <span className="font-bvc-mono">{song.weeklySubmissionCount} lượt nộp</span>
-            <span className="text-white/60">·</span>
             <span>{song.instrumentCount} nhạc cụ</span>
-            <span className="ml-auto rounded-full bg-white px-4 py-2 text-[13.5px] font-semibold text-bvc-ink md:ml-2">
+            <span className="ml-auto rounded-full bg-bvc-ink px-4 py-2 text-[13.5px] font-semibold text-white md:ml-2">
               Luyện bài này
             </span>
           </span>

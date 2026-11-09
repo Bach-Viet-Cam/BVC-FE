@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Music } from "lucide-react";
 import { COVER_TONE_CLASSES } from "@/features/music-library/constants/musicLibraryConstants";
 import type { CoverTone } from "@/features/music-library/types/musicLibraryTypes";
@@ -17,10 +18,12 @@ const SIZES = {
   hero: { box: "w-full rounded-bvc-xl", icon: "size-14" },
 };
 
-// Không có ảnh thì dùng ảnh mặc định theo tông màu của bài
+// Không có ảnh hoặc ảnh không tải được thì dùng ảnh mặc định theo tông màu của bài
 export function CoverArt({ title, tone, url, size = "card", className }: CoverArtProps) {
   const config = SIZES[size];
   const colors = COVER_TONE_CLASSES[tone];
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  const showImage = Boolean(url) && failedUrl !== url;
 
   return (
     <span
@@ -34,8 +37,8 @@ export function CoverArt({ title, tone, url, size = "card", className }: CoverAr
         className
       )}
     >
-      {url ? (
-        <img src={url} alt="" className="size-full object-cover" />
+      {showImage ? (
+        <img src={url} alt="" onError={() => setFailedUrl(url ?? null)} className="size-full object-cover" />
       ) : (
         <Music className={cn(config.icon, "opacity-70")} strokeWidth={1.5} aria-hidden />
       )}

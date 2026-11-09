@@ -10,6 +10,7 @@ import { useViewerRole } from "@/shared/hooks/useViewerRole";
 import { cn } from "@/shared/utils/cn";
 import { CoverArt } from "@/features/music-library/components/CoverArt";
 import { GuestSaveDialog } from "@/features/music-library/components/GuestSaveDialog";
+import { practiceHref } from "@/features/music-library/utils/sheetUtils";
 import { LibraryShell } from "@/features/music-library/components/LibraryShell";
 import { ReferencePlayer } from "@/features/music-library/components/ReferencePlayer";
 import { SaveToggleButton } from "@/features/music-library/components/SaveToggleButton";
@@ -71,7 +72,7 @@ export function SheetPage() {
   const zoomBase = zoom ?? SHEET_ZOOM.initial;
 
   // Màn luyện tập chỉ dành cho sinh viên; khách đăng nhập xong quay lại đúng bản này
-  const practicePath = `/practice/sheets/${sheet.id}/record${assignmentId ? `?assignmentId=${encodeURIComponent(assignmentId)}` : ""}`;
+  const practicePath = practiceHref(sheet.id, assignmentId ?? undefined);
   const practiceClass = actionButtonClass(
     "primary",
     "md",
@@ -245,7 +246,7 @@ export function SheetPage() {
         open={isPracticePromptOpen}
         onOpenChange={setPracticePromptOpen}
         title={LIBRARY_MESSAGES.guestPracticeTitle}
-        description={LIBRARY_MESSAGES.guestPracticeBody}
+        description={null}
         redirectTo={practicePath}
       />
     </LibraryShell>

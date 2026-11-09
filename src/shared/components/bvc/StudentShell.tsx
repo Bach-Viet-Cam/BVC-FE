@@ -29,6 +29,11 @@ const NAV_ITEMS = [
 // Giảng viên / quản trị viên chỉ ghé thư viện công khai, các mục sinh viên ở trên sẽ trả 403
 const STAFF_NAV_ITEMS = [{ label: "Thư viện", to: "/library" }];
 
+const GUEST_NAV_ITEMS = [
+  { label: "Thư viện", to: "/library" },
+  { label: "Trợ giúp", to: "/help" },
+];
+
 const ROLE_FALLBACK_NAMES = { student: "Sinh viên", teacher: "Giảng viên", admin: "Quản trị viên", guest: "Khách" };
 
 const FOCUSED_PATHS = [
@@ -53,7 +58,11 @@ export function StudentShell({ children, className }: StudentShellProps) {
   const isStaff = role === "teacher" || role === "admin";
   const isStudent = role === "student";
   const homePath = user ? getRoleHome(user.role) : "/library";
-  const navItems = isStaff ? [{ label: "Trang chủ", to: homePath }, ...STAFF_NAV_ITEMS] : NAV_ITEMS;
+  const navItems = isStaff
+    ? [{ label: "Trang chủ", to: homePath }, ...STAFF_NAV_ITEMS]
+    : role === "guest"
+      ? GUEST_NAV_ITEMS
+      : NAV_ITEMS;
   const showBottomNav = isStudent && !FOCUSED_PATHS.some((pattern) => pattern.test(location.pathname));
 
   return (

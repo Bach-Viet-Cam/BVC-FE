@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "@/shared/components/ui/toast";
 import { useAudioSource } from "@/features/music-library/hooks/useAudioSource";
 import type { MediaFile } from "@/features/music-library/types/musicLibraryTypes";
 import { claimPlayback, releasePlayback } from "@/features/music-library/utils/exclusivePlayback";
@@ -54,7 +55,11 @@ export function useReferencePlayer(recording: MediaFile | undefined, rate = 1) {
     audio.playbackRate = rate;
     claimPlayback(audio);
     setPlaying(true);
-    audio.play().catch(() => setPlaying(false));
+    audio.play().catch((error: unknown) => {
+      setPlaying(false);
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      toast.error("Không phát được bản thu", "File bản thu không đọc được hoặc không còn tồn tại.");
+    });
   }, [isPlaying, rate]);
 
   const seek = useCallback((seconds: number) => {

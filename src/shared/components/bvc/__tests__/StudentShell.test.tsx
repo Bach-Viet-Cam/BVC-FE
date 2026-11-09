@@ -49,4 +49,11 @@ describe("StudentShell bottom tab bar", () => {
     auth.user = null;
     expect(renderAt("/library")).not.toBeInTheDocument();
   });
+
+  it("only offers the library and help pages to guests", () => {
+    auth.user = null;
+    renderAt("/library");
+    const nav = within(screen.getByRole("navigation", { name: "Điều hướng chính" }));
+    expect(nav.getAllByRole("link").map((link) => link.textContent)).toEqual(["Thư viện", "Trợ giúp"]);
+  });
 });

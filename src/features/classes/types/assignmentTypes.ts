@@ -42,7 +42,7 @@ export interface AssignmentDetail extends AssignmentListItem {
 }
 
 export interface MyAssignmentsParams {
-  type: "BONUS" | "NON_BONUS";
+  type?: "BONUS" | "NON_BONUS";
   q?: string;
   sortBy: "deadline" | "title";
   sortDir: "asc" | "desc";

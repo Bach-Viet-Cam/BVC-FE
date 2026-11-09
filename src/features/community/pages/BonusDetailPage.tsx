@@ -33,11 +33,11 @@ export function BonusDetailPage() {
       <StudentShell>
         <div className="mx-auto flex w-full max-w-[1100px] flex-1 flex-col gap-4 px-3.5 py-4 sm:px-6 md:gap-6 md:px-10 md:py-8">
           <Link
-            to="/community/bonus"
+            to="/assignments?kind=BONUS"
             className="group inline-flex items-center gap-1.5 text-[13px] font-semibold text-bvc-accent transition-colors hover:text-bvc-ink"
           >
             <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-0.5" />
-            <span>Quay lại danh sách bài bonus</span>
+            <span>Quay lại bài tập</span>
           </Link>
           <div className="py-20 text-center">
             {isLoading ? (
@@ -62,11 +62,11 @@ export function BonusDetailPage() {
         {/* Navigation / Breadcrumb */}
         <div className="flex items-center justify-between">
           <Link
-            to="/community/bonus"
+            to="/assignments?kind=BONUS"
             className="group inline-flex items-center gap-1.5 text-[13px] font-semibold text-bvc-accent transition-colors hover:text-bvc-ink"
           >
             <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-0.5" />
-            <span>Quay lại danh sách bài bonus</span>
+            <span>Quay lại bài tập</span>
           </Link>
           <span className="text-[12.5px] font-medium text-bvc-muted">{assignment.className}</span>
         </div>

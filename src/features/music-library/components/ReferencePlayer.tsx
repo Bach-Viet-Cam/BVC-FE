@@ -45,12 +45,56 @@ function toBars(peaks: number[], barCount: number) {
   });
 }
 
-export function ReferencePlayer({ recording, title, subtitle, rate = 1, className }: ReferencePlayerProps) {
-  const player = useReferencePlayer(recording, rate);
+type ReferencePlayerState = ReturnType<typeof useReferencePlayer>;
+
+interface ReferenceWaveformProps {
+  player: ReferencePlayerState;
+  className?: string;
+}
+
+export function ReferenceWaveform({ player, className }: ReferenceWaveformProps) {
   const { ref, barCount } = useBarCount();
   const progress = player.duration ? player.position / player.duration : 0;
   // Chưa có hình sóng (đang tải / không giải mã được) thì vẽ các cột thấp đều làm khung
   const bars = player.peaks ? toBars(player.peaks, barCount) : Array<number>(barCount).fill(MIN_BAR_HEIGHT * 2);
+
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        "relative flex h-11 items-center justify-between",
+        player.isLoading && !player.peaks && "animate-pulse",
+        className
+      )}
+    >
+      {bars.map((height, index) => (
+        <span
+          key={index}
+          aria-hidden
+          className={cn(
+            "w-[3px] rounded-full transition-colors",
+            index / bars.length < progress ? "bg-bvc-accent" : "bg-bvc-bar-strong"
+          )}
+          style={{ height: `${height * 100}%` }}
+        />
+      ))}
+      <input
+        type="range"
+        min={0}
+        max={player.duration || 1}
+        step={0.1}
+        value={player.position}
+        disabled={!player.isAvailable}
+        onChange={(event) => player.seek(Number(event.target.value))}
+        aria-label="Tua bản thu mẫu"
+        className="absolute inset-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
+      />
+    </div>
+  );
+}
+
+export function ReferencePlayer({ recording, title, subtitle, rate = 1, className }: ReferencePlayerProps) {
+  const player = useReferencePlayer(recording, rate);
 
   return (
     // Bố cục theo bề rộng của chính player (container query), không theo màn hình: đặt trong cột hẹp vẫn đủ chỗ cho sóng
@@ -80,36 +124,7 @@ export function ReferencePlayer({ recording, title, subtitle, rate = 1, classNam
         </span>
 
         {/* Khung hẹp: sóng xuống dòng riêng, rộng hết khung; khung rộng: nằm giữa tiêu đề và thời lượng */}
-        <div
-          ref={ref}
-          className={cn(
-            "relative flex h-11 basis-full items-center justify-between @xl:min-w-0 @xl:flex-1 @xl:basis-0",
-            player.isLoading && !player.peaks && "animate-pulse"
-          )}
-        >
-          {bars.map((height, index) => (
-            <span
-              key={index}
-              aria-hidden
-              className={cn(
-                "w-[3px] rounded-full transition-colors",
-                index / bars.length < progress ? "bg-bvc-accent" : "bg-bvc-bar-strong"
-              )}
-              style={{ height: `${height * 100}%` }}
-            />
-          ))}
-          <input
-            type="range"
-            min={0}
-            max={player.duration || 1}
-            step={0.1}
-            value={player.position}
-            disabled={!player.isAvailable}
-            onChange={(event) => player.seek(Number(event.target.value))}
-            aria-label="Tua bản thu mẫu"
-            className="absolute inset-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
-          />
-        </div>
+        <ReferenceWaveform player={player} className="basis-full @xl:min-w-0 @xl:flex-1 @xl:basis-0" />
       </div>
     </div>
   );
