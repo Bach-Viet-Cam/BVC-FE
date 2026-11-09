@@ -9,9 +9,19 @@ interface CollapsibleCardProps {
   onToggle: () => void;
   children: ReactNode;
   className?: string;
+  // Thu nhỏ theo điện thoại (dưới md) để hai thẻ nằm chung một dòng; từ md giữ cỡ thường
+  compact?: boolean;
 }
 
-export function CollapsibleCard({ label, summary, open, onToggle, children, className }: CollapsibleCardProps) {
+export function CollapsibleCard({
+  label,
+  summary,
+  open,
+  onToggle,
+  children,
+  className,
+  compact,
+}: CollapsibleCardProps) {
   return (
     <section
       className={cn(
@@ -19,7 +29,12 @@ export function CollapsibleCard({ label, summary, open, onToggle, children, clas
         className
       )}
     >
-      <div className="flex min-h-11 items-center gap-2 pr-1.5 pl-3.5 md:min-h-14 md:pl-6">
+      <div
+        className={cn(
+          "flex min-h-11 items-center gap-2 pr-1.5 pl-3.5 md:min-h-14 md:pl-6",
+          compact && "max-md:min-h-9 max-md:pr-0.5 max-md:pl-2.5"
+        )}
+      >
         <span className="text-[11.5px] font-semibold text-bvc-muted">{label}</span>
         <span className="flex-1" />
         {summary}
@@ -28,7 +43,10 @@ export function CollapsibleCard({ label, summary, open, onToggle, children, clas
           aria-label={`Thu gọn hoặc mở rộng phần ${label.toLowerCase()}`}
           aria-expanded={open}
           onClick={onToggle}
-          className="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full text-bvc-ink"
+          className={cn(
+            "flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full text-bvc-ink",
+            compact && "max-md:size-8"
+          )}
         >
           <ChevronDown size={18} strokeWidth={2} className={cn("transition-transform", open && "rotate-180")} />
         </button>
@@ -36,7 +54,14 @@ export function CollapsibleCard({ label, summary, open, onToggle, children, clas
 
       {/* flex-1: khi thẻ được kéo cao bằng thẻ bên cạnh, phần nội dung giãn theo */}
       {open && (
-        <div className="flex flex-1 flex-col gap-[11px] px-3.5 pb-3.5 md:gap-4.5 md:px-6 md:pb-6">{children}</div>
+        <div
+          className={cn(
+            "flex flex-1 flex-col gap-[11px] px-3.5 pb-3.5 md:gap-4.5 md:px-6 md:pb-6",
+            compact && "max-md:gap-3.5 max-md:px-2.5 max-md:pb-2.5"
+          )}
+        >
+          {children}
+        </div>
       )}
     </section>
   );

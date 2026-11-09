@@ -1,10 +1,10 @@
+import type { ReactNode } from "react";
 import { Download, Trash2, Volume2 } from "lucide-react";
 import { COUNT_IN_BEATS, PRACTICE_DEFAULTS } from "@/features/practice/constants/practiceConstants";
 import { NoticeBanner } from "@/features/practice/components/NoticeBanner";
 import { PlaybackBar } from "@/shared/components/bvc/PlaybackBar";
 import { LiveWaveform } from "@/shared/components/bvc/LiveWaveform";
 import { RecordButton } from "@/features/practice/components/RecordButton";
-import { ReferenceAudioPlayer } from "@/features/practice/components/ReferenceAudioPlayer";
 import { fmtTime } from "@/features/practice/utils/practiceFormat";
 import type { RecordState } from "@/features/practice/types/practiceTypes";
 import { cn } from "@/shared/utils/cn";
@@ -38,10 +38,16 @@ interface RecordPanelProps {
   onRerecord: () => void;
   onDownload: () => void;
   onSend: () => void;
-  // Bản thu mẫu của bản nhạc, nghe được khi chưa ghi; null khi bản nhạc chưa có bản thu mẫu
-  referenceAudio: { url: string; isFallback: boolean } | null;
   // Tốc độ đếm nhịp: BPM bài tập của lớp hoặc mặc định 60
   targetBpm: number;
+  // Độ dài bài (giây) hiện cạnh đồng hồ khi ghi; mặc định theo bài luyện tập riêng
+  pieceLen?: number;
+  // Thay dòng hướng dẫn lúc chờ ghi (vd. khi tắt đếm nhịp)
+  idleNote?: string;
+  // Nội dung thêm dưới dòng hướng dẫn lúc chờ ghi (vd. nút chọn file)
+  idleExtra?: ReactNode;
+  // Ẩn dòng trạng thái "Sẵn sàng ghi âm" lúc chờ ghi
+  hideIdleStatus?: boolean;
 }
 
 export function RecordPanel({
@@ -73,19 +79,15 @@ export function RecordPanel({
   onRerecord,
   onDownload,
   onSend,
-  referenceAudio,
   targetBpm,
+  pieceLen = PRACTICE_DEFAULTS.pieceLen,
+  idleExtra,
+  hideIdleStatus,
+  idleNote = "Chạm nút ghi để bắt đầu. Có 4 tiếng đếm nhịp trước khi ghi, phần đếm không được ghi lại.",
 }: RecordPanelProps) {
   if (rec === "preview") {
     return (
       <div className="mt-auto flex flex-col gap-3 md:mx-auto md:my-auto md:w-full md:min-w-0 md:max-w-[760px] xl:max-w-[920px]">
-        {referenceAudio && (
-          <ReferenceAudioPlayer
-            key={referenceAudio.url}
-            url={referenceAudio.url}
-            isFallback={referenceAudio.isFallback}
-          />
-        )}
         <div className="flex flex-wrap items-center gap-3">
           <PlaybackBar
             peaks={previewPeaks}
@@ -154,35 +156,28 @@ export function RecordPanel({
     <div className="mt-auto flex flex-col gap-3 md:mx-auto md:my-auto md:w-full md:min-w-0 md:max-w-[760px] xl:max-w-[920px]">
       {micDenied && <NoticeBanner message="Cần cho phép truy cập micro để dùng tính năng này." />}
 
-      {rec === "idle" && referenceAudio && (
-        <ReferenceAudioPlayer
-          key={referenceAudio.url}
-          url={referenceAudio.url}
-          isFallback={referenceAudio.isFallback}
-        />
-      )}
-
       <div className="flex items-center gap-3.5">
         <div className="flex min-w-0 flex-1 flex-col gap-[7px]">
           {rec === "idle" && (
             <>
-              <div className="flex items-center gap-[7px]">
-                <span
-                  className={cn("size-2 shrink-0 rounded-full", blocked || micDenied ? "bg-bvc-warn" : "bg-bvc-ok")}
-                />
-                <span
-                  className={cn(
-                    "text-[13.5px] font-semibold",
-                    blocked || micDenied ? "text-bvc-accent-text" : "text-bvc-ok"
-                  )}
-                >
-                  {micDenied ? "Chưa thể ghi âm" : blocked ? "Tạm thời chưa ghi âm được" : "Sẵn sàng ghi âm"}
-                </span>
-              </div>
+              {!hideIdleStatus && (
+                <div className="flex items-center gap-[7px]">
+                  <span
+                    className={cn("size-2 shrink-0 rounded-full", blocked || micDenied ? "bg-bvc-warn" : "bg-bvc-ok")}
+                  />
+                  <span
+                    className={cn(
+                      "text-[13.5px] font-semibold",
+                      blocked || micDenied ? "text-bvc-accent-text" : "text-bvc-ok"
+                    )}
+                  >
+                    {micDenied ? "Chưa thể ghi âm" : blocked ? "Tạm thời chưa ghi âm được" : "Sẵn sàng ghi âm"}
+                  </span>
+                </div>
+              )}
               <LiveWaveform analyser={analyser} active={false} height={96} />
-              <p className="text-[12.5px] leading-[1.45] text-bvc-muted">
-                Chạm nút ghi để bắt đầu. Có 4 tiếng đếm nhịp trước khi ghi, phần đếm không được ghi lại.
-              </p>
+              <p className="text-[12.5px] leading-[1.45] text-bvc-muted">{idleNote}</p>
+              {idleExtra}
             </>
           )}
 
@@ -219,7 +214,7 @@ export function RecordPanel({
                   Đang ghi
                 </span>
                 <span className="text-[15px] font-medium text-bvc-ink">
-                  {fmtTime(elapsed)} / {fmtTime(PRACTICE_DEFAULTS.pieceLen)}
+                  {fmtTime(elapsed)} / {fmtTime(pieceLen)}
                 </span>
               </div>
               <LiveWaveform analyser={analyser} active height={96} />

@@ -26,11 +26,19 @@ export const ensembleApi = {
     });
   },
   createSubmission: (body: { sheetMusicId: string; assignmentId?: string; studentUploadId: string }) =>
-    axiosClient.post<ApiResponse<EnsembleSubmission>>("/practice/submissions", { ...body, practiceMode: "ENSEMBLE" }, { timeout: 30_000 }),
+    axiosClient.post<ApiResponse<EnsembleSubmission>>(
+      "/practice/submissions",
+      { ...body, practiceMode: "ENSEMBLE" },
+      { timeout: 30_000 }
+    ),
   getSubmission: (id: string) =>
-    axiosClient.get<ApiResponse<EnsembleSubmission>>(`/practice/submissions/${encodeURIComponent(id)}`, { timeout: 15_000 }),
+    axiosClient.get<ApiResponse<EnsembleSubmission>>(`/practice/submissions/${encodeURIComponent(id)}`, {
+      timeout: 15_000,
+    }),
   retrySubmission: (id: string) =>
-    axiosClient.post<ApiResponse<EnsembleSubmission>>(`/practice/submissions/${encodeURIComponent(id)}/retry`, null, { timeout: 30_000 }),
+    axiosClient.post<ApiResponse<EnsembleSubmission>>(`/practice/submissions/${encodeURIComponent(id)}/retry`, null, {
+      timeout: 30_000,
+    }),
   getSession: (sessionId: string) =>
     axiosClient.get<ApiResponse<EnsembleSessionDetail>>(`/ensemble-sessions/${sessionId}`),
 };

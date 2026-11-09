@@ -20,6 +20,8 @@ interface TunerCardProps {
   canOpenDetail: boolean;
   onOpenTuner: () => void;
   micDenied: boolean;
+  // Thu nhỏ theo điện thoại để đứng cạnh thẻ Nhịp trên một dòng
+  compact?: boolean;
 }
 
 export function TunerCard({
@@ -32,6 +34,7 @@ export function TunerCard({
   canOpenDetail,
   onOpenTuner,
   micDenied,
+  compact,
 }: TunerCardProps) {
   const color = centsColor(cents, live);
   const centsWord = !live
@@ -51,11 +54,16 @@ export function TunerCard({
   return (
     <CollapsibleCard
       label="Tuner"
-      className="md:h-full"
+      className="h-full"
+      compact={compact}
       open={open}
       onToggle={onToggle}
       summary={
-        open ? <span className="text-xs text-bvc-muted">{live ? `${signed(cents)} cent` : "-- cent"}</span> : null
+        open ? (
+          <span className={cn("text-xs text-bvc-muted", compact && "max-md:text-[10.5px]")}>
+            {live ? `${signed(cents)} cent` : "-- cent"}
+          </span>
+        ) : null
       }
     >
       <button
@@ -72,20 +80,37 @@ export function TunerCard({
             nên nốt to cỡ số BPM của thẻ Nhịp và chiếm giữa phần trống */}
         <span className="flex min-w-0 flex-1 flex-col items-center gap-0.5 text-center md:gap-2">
           <span className="text-[11px] font-semibold text-bvc-faint">Đang đo</span>
-          <span className="flex items-baseline justify-center gap-2.5 md:flex-col md:items-center md:gap-2">
+          <span
+            className={cn(
+              "flex items-baseline justify-center gap-2.5 md:flex-col md:items-center md:gap-2",
+              compact && "max-md:flex-col max-md:items-center max-md:gap-0.5"
+            )}
+          >
             <span
-              className="text-[40px] leading-none font-semibold tracking-[-0.03em] md:text-[72px]"
+              className={cn(
+                "text-[40px] leading-none font-semibold tracking-[-0.03em] md:text-[72px]",
+                compact && "max-md:text-[28px]"
+              )}
               style={{ color: live ? color : "var(--color-bvc-faint)" }}
             >
               {live && detectedNote ? detectedNote.vn : "--"}
             </span>
-            <span className="flex flex-col gap-px text-left md:flex-row md:items-center md:gap-2 md:text-center">
-              <span className="text-[12.5px] text-bvc-muted md:text-sm">{subText}</span>
-              {centsWord && (
-                <span className="text-[12.5px] font-semibold md:text-sm" style={{ color }}>
-                  {centsWord}
-                </span>
+            <span
+              className={cn(
+                "flex flex-col gap-px text-left md:flex-row md:items-center md:gap-2 md:text-center",
+                compact && "max-md:items-center max-md:text-center"
               )}
+            >
+              <span className={cn("text-[12.5px] text-bvc-muted md:text-sm", compact && "max-md:text-[10.5px]")}>
+                {subText}
+              </span>
+              {/* Luôn chiếm chỗ (nbsp khi chưa đo) để thẻ không đổi chiều cao khi bắt đầu đo được tiếng */}
+              <span
+                className={cn("text-[12.5px] font-semibold md:text-sm", compact && "max-md:text-[10.5px]")}
+                style={{ color }}
+              >
+                {centsWord || " "}
+              </span>
             </span>
           </span>
         </span>
@@ -98,7 +123,13 @@ export function TunerCard({
         </span>
         */}
 
-        {canOpenDetail && <ChevronRight size={16} strokeWidth={2} className="shrink-0 text-bvc-muted" />}
+        {canOpenDetail && (
+          <ChevronRight
+            size={16}
+            strokeWidth={2}
+            className={cn("shrink-0 text-bvc-muted", compact && "max-md:hidden")}
+          />
+        )}
       </button>
 
       <CentsMeter cents={cents} live={live} />

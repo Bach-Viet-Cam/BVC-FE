@@ -218,7 +218,6 @@ function SegmentPractice({ submissionId, query }: SegmentPracticeProps) {
             onRerecord={recorder.reset}
             onDownload={handleDownload}
             onSend={() => void handleSend()}
-            referenceAudio={null}
             targetBpm={targetBpm}
           />
           {(rec === "countin" || rec === "recording") && (

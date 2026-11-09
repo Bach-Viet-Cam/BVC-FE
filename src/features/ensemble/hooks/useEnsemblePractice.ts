@@ -24,11 +24,9 @@ const TAKE_PEAK_BUCKETS = 96;
 export const MIC_DENIED_MESSAGE = "Không thể truy cập micro. Hãy cho phép quyền micro rồi thử lại.";
 const LOAD_ERROR = "Không thể tải các bè hòa tấu. Vui lòng thử lại.";
 const COUNT_IN_BEATS = 4;
+const COUNT_IN_LEAD_S = 0.15; // khoảng đệm trước phách đếm đầu tiên
+const COUNT_IN_TICK_MS = 30;
 const EMPTY_ANALYSERS: ReadonlyMap<string, AnalyserNode> = new Map();
-
-function sleep(milliseconds: number): Promise<void> {
-  return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
-}
 
 export function useEnsemblePractice(pieceId: string, assignmentId: string | undefined) {
   const tracksQuery = useAsyncData<EnsembleTracksResult>(
@@ -76,6 +74,7 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const timersRef = useRef<number[]>([]);
+  const countInNodesRef = useRef<OscillatorNode[]>([]);
   const abortedRef = useRef(false);
 
   const changeStatus = useCallback((next: PracticeStatus) => {
@@ -191,9 +190,21 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
     [ensureContext, pauseTracks, tracks]
   );
 
+  const stopCountIn = useCallback(() => {
+    countInNodesRef.current.forEach((node) => {
+      try {
+        node.stop();
+      } catch {
+        // đã dừng
+      }
+    });
+    countInNodesRef.current = [];
+  }, []);
+
   const releaseRecording = useCallback(() => {
     timersRef.current.forEach((timerId) => window.clearInterval(timerId));
     timersRef.current = [];
+    stopCountIn();
     pauseTracks();
     suppressOwnRef.current = false;
     applyVolumes();
@@ -206,7 +217,7 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
     streamRef.current = null;
     setMicAnalyser(null);
     setRecordingStartedAt(null);
-  }, [pauseTracks, applyVolumes]);
+  }, [pauseTracks, applyVolumes, stopCountIn]);
 
   const cancel = useCallback(() => {
     abortedRef.current = true;
@@ -392,13 +403,29 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
       setMicAnalyser(analyser);
       const beatMs = 60000 / tracksResult.targetBpm;
       if (isCountInOn) {
+        // Như trang luyện tập: xếp 4 tiếng đếm theo đồng hồ AudioContext, chỉ bắt đầu thu khi đếm xong phách cuối
+        const beatSec = beatMs / 1000;
+        const countStart = context.currentTime + COUNT_IN_LEAD_S;
+        const recordStart = countStart + COUNT_IN_BEATS * beatSec;
+        countInNodesRef.current = Array.from({ length: COUNT_IN_BEATS }, (_, beat) =>
+          playClick(context, beat === 0, countStart + beat * beatSec)
+        );
+        setCountBeat(0);
         changeStatus("countIn");
-        for (let beat = 0; beat < COUNT_IN_BEATS; beat += 1) {
-          setCountBeat(beat);
-          playClick(context, beat === 0);
-          await sleep(beatMs);
-          if (abortedRef.current) return;
-        }
+        await new Promise<void>((resolve) => {
+          const timer = window.setInterval(() => {
+            const now = context.currentTime;
+            if (abortedRef.current || now >= recordStart) {
+              window.clearInterval(timer);
+              resolve();
+              return;
+            }
+            setCountBeat(Math.min(COUNT_IN_BEATS - 1, Math.max(0, Math.floor((now - countStart) / beatSec))));
+          }, COUNT_IN_TICK_MS);
+          timersRef.current.push(timer);
+        });
+        if (abortedRef.current) return;
+        countInNodesRef.current = [];
       }
       beginRecording(stream, beatMs);
     },
