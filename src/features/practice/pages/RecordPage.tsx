@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { AssignmentInfoCard } from "@/features/practice/components/AssignmentInfoCard";
+import { ReferenceAudioPlayer } from "@/features/practice/components/ReferenceAudioPlayer";
+import { SheetPanel } from "@/features/practice/components/SheetPanel";
 import { MetronomeView } from "@/features/practice/components/MetronomeView";
 import { PracticeDrawer } from "@/features/practice/components/PracticeDrawer";
 import { PracticeTitleRow } from "@/features/practice/components/PracticeTitleRow";
@@ -35,7 +36,6 @@ import { useFilePreview } from "@/features/practice/hooks/useFilePreview";
 import { readAudioFile } from "@/features/practice/utils/readAudioFile";
 import { midiToNoteInfo, noteAtTime } from "@/features/practice/utils/noteMath";
 import { noteGridBeats } from "@/features/practice/utils/tempoEstimator";
-import { DEADLINE_NOTE, assignmentStatusText } from "@/features/practice/utils/practiceContextFormat";
 import { buildDemoSession } from "@/features/practice/utils/practiceSession";
 import { fileErrorMessage, takeToRecordingFile, validateFile } from "@/features/practice/utils/validateRecording";
 import type { RecordingFile, SubmitMode } from "@/features/practice/types/practiceTypes";
@@ -45,7 +45,6 @@ import { Dialog } from "@/shared/components/ui/dialog";
 import { toast } from "@/shared/components/ui/toast";
 import { useIsMobile } from "@/shared/hooks/use-mobile";
 import { cn } from "@/shared/utils/cn";
-import { formatDate } from "@/shared/utils/formatDate";
 
 type DrawerKind = "tuner" | "metronome";
 
@@ -63,7 +62,7 @@ export function RecordPage() {
   const assignmentId = searchParams.get("assignmentId") ?? undefined;
   const isMobile = useIsMobile();
   const { demo, blocked: demoBlocked, submit, uploading, uploadWeak } = usePracticeDemo();
-  const { context, error: contextError, isLoading: contextLoading } = usePracticeContext(sheetId, assignmentId);
+  const { context, isLoading: contextLoading } = usePracticeContext(sheetId, assignmentId);
   const { active, refresh: refreshActive } = useActiveSubmission(sheetId);
   const blocked = demoBlocked || Boolean(active); // GBR-49: chỉ khóa bài đang có bản xử lý
   const [drawer, setDrawer] = useState<DrawerKind | null>(() => drawerFromState(location.state));
@@ -262,15 +261,10 @@ export function RecordPage() {
   const sendLabel = uploading ? "Đang tải lên..." : "Gửi";
 
   const assignment = context?.assignment ?? null;
+  const referenceAudio = context?.sheet.referenceAudio ?? null;
   const subtitle = context
     ? [context.sheet.name, context.sheet.instrument.name, context.classRecord?.name].filter(Boolean).join(" · ")
     : undefined;
-  // Dưới lg thẻ "Bài tập" ẩn, nên tóm tắt thành một dòng
-  const summary = context
-    ? assignment?.state === "OPEN"
-      ? `Hạn nộp ${formatDate(assignment.deadline)} · Còn ${assignment.remainingSubmissions} lượt nộp`
-      : assignmentStatusText(context)
-    : null;
 
   return (
     <StudentShell>
@@ -278,7 +272,7 @@ export function RecordPage() {
       <div className="mx-auto flex w-full max-w-[428px] flex-1 flex-col md:max-w-none md:gap-5 md:px-14 md:pt-6 md:pb-7">
         {/* Điện thoại: `contents` giữ nguyên bố cục cũ; từ md thành cột của bản laptop.
             Từ lg: cột trái là tiêu đề + thẻ Bài tập; cột phải là tempo + tuner ở trên, khu ghi âm ở dưới */}
-        <div className="contents md:flex md:flex-col md:gap-5 lg:grid lg:min-h-0 lg:flex-1 lg:grid-cols-[1fr_3fr] lg:items-start">
+        <div className="contents md:flex md:flex-col md:gap-5 lg:grid lg:min-h-0 lg:flex-1 lg:grid-cols-[2fr_3fr] lg:items-start">
           <div className="contents lg:flex lg:min-w-0 lg:flex-col lg:gap-5">
             <PracticeTitleRow
               title={context?.piece.title ?? (contextLoading ? "Đang tải..." : "Luyện tập")}
@@ -286,17 +280,11 @@ export function RecordPage() {
               // Tạm ẩn nút Demo (mô phỏng luồng ghi âm); bật lại bằng rightSlot={<DemoPanel />}
               // rightSlot={<DemoPanel />}
             />
-            {summary && (
-              <div className="px-3.5 pt-2.5 pb-2.5 text-[13px] leading-normal text-bvc-muted md:px-0 md:pt-0 md:pb-0 lg:hidden">
-                <p>{summary}</p>
-                {assignment && <p className="mt-1 text-[12px]">{DEADLINE_NOTE}</p>}
-              </div>
-            )}
-            <AssignmentInfoCard context={context} isLoading={contextLoading} error={contextError} />
+            {context && <SheetPanel songId={context.piece.id} sheetId={context.sheet.id} />}
           </div>
 
           <div className="contents md:flex md:min-h-0 md:flex-1 md:flex-col md:gap-5">
-            <div className={cn("contents md:grid md:gap-5", tunerShown ? "md:grid-cols-2" : "md:grid-cols-1")}>
+            <div className={cn("contents md:grid md:gap-5", tunerShown ? "md:grid-cols-[2fr_1fr]" : "md:grid-cols-1")}>
               <div className="mx-3.5 md:mx-0">
                 {mode === "record" && (
                   <TempoCard
@@ -337,6 +325,17 @@ export function RecordPage() {
               )}
             </div>
 
+            {/* Bản thu mẫu nằm trên thẻ ghi âm; gỡ khỏi màn hình khi đang đếm nhịp/ghi để tiếng mẫu không lọt vào micro */}
+            {referenceAudio && mode === "record" && (rec === "idle" || rec === "preview") && (
+              <div className="mx-3.5 mt-3 md:mx-0 md:mt-0">
+                <ReferenceAudioPlayer
+                  key={referenceAudio.url}
+                  url={referenceAudio.url}
+                  isFallback={referenceAudio.isFallback}
+                />
+              </div>
+            )}
+
             <div className="contents">
               <div className="mx-3.5 mt-3 flex min-h-0 flex-1 flex-col gap-2.75 pb-5.5 md:mx-0 md:mt-0 md:min-h-98 md:rounded-bvc-xl md:border md:border-bvc-border md:bg-white md:p-5.5 md:pb-5.5">
                 <div className="contents md:flex md:shrink-0 md:items-center md:justify-between md:gap-4">
@@ -359,7 +358,9 @@ export function RecordPage() {
                   </div>
 
                   <p className="shrink-0 text-xs leading-normal text-bvc-muted md:text-right md:text-[12.5px]">
-                    Định dạng MP3, WAV, M4A · tối đa 20 MB · thời lượng từ 00:10 đến 03:00
+                    Định dạng MP3, WAV, M4A - tối đa 20 MB
+                    <br />
+                    Thời lượng từ 00:10 đến 03:00
                   </p>
                 </div>
 
@@ -397,7 +398,6 @@ export function RecordPage() {
                     onRerecord={recorder.reset}
                     onDownload={handleDownload}
                     onSend={() => void handleSend()}
-                    referenceAudio={context?.sheet.referenceAudio ?? null}
                     targetBpm={targetBpm}
                   />
                 ) : (

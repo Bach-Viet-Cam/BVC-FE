@@ -1,0 +1,181 @@
+===== 1. MARKUP (template) — phần "Các bè" =====
+<!-- Tiêu đề timeline + zoom -->
+<div style="flex-shrink:0;padding:10px 14px 6px 16px;display:flex;align-items:center;gap:8px;">
+<span style="font-size:14px;font-weight:700;">Các bè</span><span style="font-size:12.5px;color:#5E6F66;">{{ trackSummary }}</span>
+<span style="flex-grow:1;"></span>
+<span style="font-size:11.5px;color:#5E6F66;display:flex;align-items:center;gap:5px;">↔ Kéo waveform để tua</span>
+</div>
+
+<!-- ===== Multitrack Audio Timeline ===== -->
+<div style="flex-shrink:0;margin:0 14px;position:relative;display:flex;border:1px solid #E6DFC8;background:#FAF8EF;border-radius:18px;overflow:hidden;height:{{ cardH }}px;">
+
+<!-- Cột tên bè -->
+<div style="width: 85px; flex-shrink: 0; display: flex; flex-direction: column; background: #FAF8EF">
+<div style="height:32px;flex-shrink:0;"></div>
+<div style="flex-grow:1;background:#145B43;padding-top:6px;box-sizing:border-box;">
+<sc-for list="{{ rows }}" as="r" hint-placeholder-count="4">
+<button type="button" aria-pressed="{{ r.muted }}" aria-label="{{ r.ariaLabel }}" onClick="{{ r.toggleMute }}" style="{{ r.labelStyle }}">
+<span style="{{ r.iconWrap }}">
+<sc-if value="{{ r.isBau }}" hint-placeholder-val="{{ true }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 14.5 19 5"></path><circle cx="6.8" cy="17.2" r="3.2"></circle><path d="M17 3.5l3.5 3.5"></path></svg></sc-if>
+<sc-if value="{{ r.isNhi }}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5v12.5"></path><circle cx="12" cy="18.2" r="3.3"></circle><path d="M5 9l14 5.5"></path></svg></sc-if>
+<sc-if value="{{ r.isSao }}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 20.5 20.5 3.5"></path><circle cx="9.5" cy="14.5" r="0.7"></circle><circle cx="12.3" cy="11.7" r="0.7"></circle><circle cx="15.1" cy="8.9" r="0.7"></circle></svg></sc-if>
+<sc-if value="{{ r.isTrong }}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="8" rx="7" ry="3"></ellipse><path d="M5 8v8c0 1.7 3.1 3 7 3s7-1.3 7-3V8"></path><path d="M9 11.5v6M15 11.5v6"></path></svg></sc-if>
+<sc-if value="{{ r.isYou }}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0"></path><path d="M12 18v3"></path></svg></sc-if>
+</span>
+<span style="{{ r.nameWrap }}"><span style="width: 33px">{{ r.name }}</span><sc-if value="{{ r.tag }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px;font-weight:700;color:#E6D29A;">{{ r.tag }}</span></sc-if></span>
+</button>
+</sc-for>
+</div>
+</div>
+
+<!-- Vùng timeline cuộn ngang -->
+<div id="ens-scroll" style="flex-grow: 1; min-width: 0; overflow: hidden; position: relative; width: 375px">
+<div id="ens-content" onPointerDown="{{ onDown }}" onPointerMove="{{ onMove }}" onPointerUp="{{ onUp }}" onPointerCancel="{{ onCancel }}" style="{{ contentStyle }}">
+
+<!-- Thước thời gian -->
+<div style="position:absolute;left:0;top:0;width:{{ WC }}px;height:32px;touch-action:none;cursor:grab;background:#FAF8EF;border-bottom:1px solid #E6DFC8;">
+<sc-for list="{{ ticks }}" as="k" hint-placeholder-count="12"><span style="{{ k.style }}"></span></sc-for>
+<sc-for list="{{ tickLabels }}" as="k" hint-placeholder-count="4"><span style="{{ k.style }}">{{ k.text }}</span></sc-for>
+</div>
+
+<!-- Waveform từng bè -->
+<sc-for list="{{ rows }}" as="r" hint-placeholder-count="4">
+<div style="{{ r.rowStyle }}">
+<sc-if value="{{ r.showLight }}" hint-placeholder-val="{{ true }}"><svg width="{{ W }}" height="56" style="position:absolute;left:0;top:0;pointer-events:none;"><path d="{{ r.pathD }}" stroke="{{ r.colLight }}" stroke-width="{{ sw }}" stroke-linecap="round" fill="none"></path></svg></sc-if>
+<div style="{{ r.playedStyle }}"><svg width="{{ W }}" height="56" style="position:absolute;left:0;top:0;"><path d="{{ r.pathD }}" stroke="{{ r.colDark }}" stroke-width="{{ sw }}" stroke-linecap="round" fill="none"></path></svg></div>
+</div>
+</sc-for>
+
+<!-- Playhead -->
+<div style="{{ playheadStyle }}"><span style="position:absolute;left:0;top:0;bottom:0;width:2px;background:#145B43;border-radius:1px;box-shadow:0 0 0 1px rgba(250,248,239,0.9);"></span><span style="position:absolute;left:-7px;top:9px;width:16px;height:16px;border-radius:50%;background:#145B43;border:2px solid #FAF8EF;box-sizing:border-box;box-shadow:0 1px 4px rgba(20,91,67,0.5);"></span></div>
+
+</div>
+</div>
+
+<!-- Đếm nhịp -->
+<sc-if value="{{ isCount }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;left:94px;right:0;top:32px;bottom:0;z-index:6;background:rgba(250,248,239,0.82);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;pointer-events:none;"><span style="font-family:'IBM Plex Mono',monospace;font-size:64px;font-weight:600;line-height:1;color:#145B43;">{{ cinNum }}</span><span style="font-size:12.5px;color:#5E6F66;">Chuẩn bị vào bè</span></div>
+</sc-if>
+</div>
+
+
+===== 2. HẰNG SỐ & MÀU BÈ =====
+const DUR = 45, SR = 22050, BPM = 96, BEAT = 60 / BPM, BAR = BEAT * 4;
+const PPS = 14, LEAD = 12; // tỉ lệ cố định: 14 px / giây, không co giãn theo màn hình
+const ZOOMS = [1];
+const ROW_H = 56, ROW_GAP = 6, RULER_H = 32;
+const TRACKS = [
+  { key: 'bau', name: 'Đàn bầu', light: '#9ED394', dark: '#3E8C45', bg: '#E5F3DF' },
+  { key: 'nhi', name: 'Đàn nhị', light: '#9DBFEF', dark: '#2F6DC2', bg: '#E1EBF9' },
+  { key: 'sao', name: 'Sáo trúc', light: '#F4C685', dark: '#CF7F1C', bg: '#FBEED8' },
+  { key: 'trong', name: 'Đàn nguyệt', light: '#E8B7C7', dark: '#B24D6D', bg: '#F8E6EC' },
+  { key: 'you', name: 'Bạn', light: '#E3CC8A', dark: '#8A6A12', bg: '#FBF3DE' },
+];
+const mmss = (t) => { t = Math.max(0, Math.floor(t + 1e-6)); return String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0'); };
+
+===== 3. WAVEFORM + THƯỚC + KÉO/TUA (trong class Component) =====
+  wfPath(i, zoom) {
+    const key = i + '|' + zoom + '|' + (i === 4 ? this.eng.userVer : 0); if (this.wf[key]) return this.wf[key];
+    const data = this.dataOf(i); const W = DUR * PPS; const pitch = 2.8; const n = Math.floor(W / pitch); const per = Math.floor(data.length / n);
+    if (this.maxs[i === 4 ? this.state.part : i] == null) { const src = this.data[i === 4 ? this.state.part : i]; let m = 0; for (let j = 0; j < src.length; j += 5) { const a = Math.abs(src[j]); if (a > m) m = a; } this.maxs[i === 4 ? this.state.part : i] = m || 1; }
+    const mx = this.maxs[i === 4 ? this.state.part : i]; let d = '';
+    for (let c = 0; c < n; c++) {
+      let m = 0; for (let j = c * per; j < (c + 1) * per; j += 5) { const a = Math.abs(data[j]); if (a > m) m = a; }
+      const h = Math.max(1.1, Math.pow(Math.min(1, m / mx), 0.75) * 22); const x = (c * pitch + pitch / 2).toFixed(1);
+      d += 'M' + x + ' ' + (28 - h).toFixed(1) + 'V' + (28 + h).toFixed(1);
+    }
+    this.wf[key] = d; return d;
+  }
+  ticksFor(zoom) {
+    if (this.tickCache[zoom]) return this.tickCache[zoom]; const pps = PPS; const ticks = []; const labels = [];
+    for (let t = 0; t <= DUR; t++) {
+      const major = t % 15 === 0; const minor = !major && t % 5 === 0; const micro = !major && !minor; if (!major && !minor && !micro) continue;
+      const h = major ? 12 : minor ? 8 : 4; ticks.push({ style: 'position:absolute;bottom:0;left:' + (LEAD + t * pps).toFixed(1) + 'px;width:1px;height:' + h + 'px;background:' + (major ? '#7C8C82' : '#B5C0B8') + ';' });
+      if (major) labels.push({ text: mmss(t), style: 'position:absolute;top:5px;left:' + (LEAD + t * pps + (t === 0 ? 5 : 4)).toFixed(1) + 'px;font-family:\'IBM Plex Mono\',monospace;font-size:11px;font-weight:600;color:' + (t === 0 ? '#145B43' : '#5E6F66') + ';' });
+    }
+    return (this.tickCache[zoom] = { ticks, labels });
+  }
+
+  // ---------- Pointer: kéo/chạm để seek ----------
+  xToT(e) { const el = document.getElementById('ens-content'); const r = el.getBoundingClientRect(); return (e.clientX - r.left - LEAD) / PPS; }
+  onDown(e) {
+    const s = this.eng; if (s.rec === 'countin' || s.rec === 'recording') return;
+    s.tap = { x: e.clientX, y: e.clientY, p0: this.curPos(), moved: false }; s.wasPlaying = s.playing;
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch (x) { /* bỏ qua */ }
+  }
+  onMove(e) {
+    const s = this.eng; const g = s.tap; if (!g) return; const dx = e.clientX - g.x;
+    if (!g.moved && Math.abs(dx) < 5) return;
+    if (!g.moved) { g.moved = true; s.drag = true; if (s.playing) { s.pos = this.curPos(); this.stopSources(); s.playing = false; this.sync(); } }
+    s.pos = Math.max(0, Math.min(DUR, g.p0 - dx / PPS)); this.setState({ pos: s.pos });
+  }
+  onUp(e) {
+    const s = this.eng; const g = s.tap; s.tap = null; if (!g) return;
+    if (g.moved) { s.drag = false; if (s.wasPlaying) this.play(); else this.sync(); }
+    else this.seek(this.xToT(e));
+  }
+  onCancel() { const s = this.eng; const g = s.tap; s.tap = null; if (g && g.moved) { s.drag = false; if (s.wasPlaying) this.play(); else this.sync(); } }
+
+
+===== 4. renderVals (dữ liệu bind cho timeline, dùng chung với các phần khác) =====
+  renderVals() {
+    const s = this.state; const e = this.eng; const ready = s.ready && this.data;
+    const zoom = 0; const pps = PPS; const W = DUR * PPS; const vw = this.viewW(); const WC = Math.round(LEAD + W + Math.max(LEAD, vw / 2)); const pos = e.playing ? s.pos : s.pos;
+    const rec = s.rec; const idle = rec === 'idle', isCount = rec === 'countin', isRec = rec === 'recording', isPreview = rec === 'preview';
+    const part = s.part; const hasUser = !!this.user && (isCount || isRec || isPreview);
+    const nRows = hasUser ? 5 : 4; const cardH = RULER_H + 2 + nRows * (ROW_H + ROW_GAP) + 2;
+    const parts = TRACKS.slice(0, 4).map((t, i) => ({ name: t.name, on: part === i,
+      pick: () => { if (isCount || isRec) return; if (isPreview) this.retake(); e.muted = { [i]: true }; this.applyGains(); this.setState({ part: i, muted: { [i]: true } }); },
+      style: 'flex:1 1 0;min-height:44px;border-radius:14px;font-size:13.5px;font-weight:' + (part === i ? 700 : 600) + ';cursor:' + ((isCount || isRec) ? 'not-allowed' : 'pointer') + ';padding:0 4px;' + (part === i ? 'border:2px solid #145B43;background:#145B43;color:#FFFFFF;' : 'border:1px solid #CFDCD3;background:#FFFFFF;color:#123F33;') + ((isCount || isRec) && part !== i ? 'opacity:.5;' : '') }));
+    const rows = [];
+    for (let i = 0; i < nRows; i++) {
+      const t = TRACKS[i]; const mine = i === part; const muted = i === 4 ? false : !!s.muted[i];
+      const played = Math.max(0, Math.min(W, pos * pps));
+      const showLight = i === 4 ? isPreview : true;
+      const top = RULER_H + 2 + i * (ROW_H + ROW_GAP) + ROW_GAP / 2;
+      rows.push({
+        name: t.name, tag: mine && i < 4 ? 'Bè của bạn' : (i === 4 ? (isPreview ? 'Bản thu' : 'Đang thu') : ''), muted,
+        ariaLabel: (muted ? 'Bật tiếng ' : 'Tắt tiếng ') + t.name, isBau: i === 0, isNhi: i === 1, isSao: i === 2, isTrong: i === 3, isYou: i === 4,
+        toggleMute: () => { if (i === 4) return; e.muted = Object.assign({}, e.muted, { [i]: !e.muted[i] }); this.applyGains(); this.setState({ muted: Object.assign({}, e.muted) }); },
+        labelStyle: 'width:100%;height:' + ROW_H + 'px;margin-bottom:' + ROW_GAP + 'px;border:none;border-top:1px solid rgba(250,248,239,0.12);background:transparent;display:flex;align-items:center;gap:8px;padding:0 8px;box-sizing:border-box;cursor:pointer;color:#FFFFFF;text-align:left;' + (muted ? 'opacity:.5;' : '') + (mine && i < 4 ? 'box-shadow:inset 3px 0 0 #C8A63C;' : ''),
+        iconWrap: 'width:28px;height:28px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:' + (muted ? '#B9CEC3' : '#FFFFFF') + ';',
+        nameWrap: 'display:flex;flex-direction:column;gap:1px;min-width:0;',
+        nameStyle: 'font-size:13px;font-weight:600;line-height:1.2;' + (muted ? 'text-decoration:line-through;' : ''),
+        rowStyle: 'position:absolute;left:' + LEAD + 'px;top:' + top + 'px;width:' + W + 'px;height:' + ROW_H + 'px;border-radius:12px;overflow:hidden;background:' + t.bg + ';' + (mine && i < 4 ? 'box-shadow:inset 0 0 0 1.5px #C8A63C;' : '') + (muted ? 'opacity:.55;' : ''),
+        showLight, colLight: t.light, colDark: t.dark,
+        pathD: ready ? this.wfPath(i, zoom) : '',
+        playedStyle: 'position:absolute;left:0;top:0;bottom:0;width:' + played.toFixed(1) + 'px;overflow:hidden;',
+      });
+    }
+    const tk = this.ticksFor(zoom); const px = LEAD + Math.max(0, Math.min(W, pos * pps)); const sl = Math.max(0, Math.min(WC - vw, px - vw / 2));
+    const canTransport = ready && !isCount && !isRec;
+    const timeNow = mmss(pos);
+    const recLenText = mmss(s.recLen); const canSend = isPreview && s.recLen >= 10;
+    const ctrl = (on) => 'min-height:48px;border:1px solid #CFDCD3;background:#FFFFFF;color:' + (on ? '#123F33' : '#93A399') + ';border-radius:14px;padding:0 12px;font-size:13.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px;cursor:' + (on ? 'pointer' : 'not-allowed') + ';' + (on ? '' : 'opacity:.6;');
+    return {
+      accent: this.props.accent ?? '#2F7A62',
+      parts, rows, W, WC, sw: 1.5, cardH,
+      ticks: tk.ticks, tickLabels: tk.labels,
+      contentStyle: 'position:relative;width:' + WC + 'px;height:' + (cardH - 2) + 'px;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;transform:translateX(' + (-sl).toFixed(2) + 'px);will-change:transform;',
+      playheadStyle: 'position:absolute;left:0;top:0;bottom:0;width:2px;z-index:5;pointer-events:none;transform:translateX(' + (px - 1).toFixed(2) + 'px);will-change:transform;',
+      onDown: (ev) => this.onDown(ev), onMove: (ev) => this.onMove(ev), onUp: (ev) => this.onUp(ev), onCancel: () => this.onCancel(),
+      trackSummary: nRows + ' bè · 00:45',
+      zoomLabel: ['Vừa khít', '2×', '4×'][zoom], zoomMinDis: zoom === 0, zoomMaxDis: zoom === ZOOMS.length - 1,
+      zoomBtnOut: ctrl(zoom > 0) + 'width:44px;padding:0;justify-content:center;min-height:44px;', zoomBtnIn: ctrl(zoom < ZOOMS.length - 1) + 'width:44px;padding:0;justify-content:center;min-height:44px;',
+      zoomOut: () => { if (zoom > 0) { const sc = document.getElementById('ens-scroll'); this.setState({ zoom: zoom - 1 }); if (sc) sc.scrollLeft = 0; } },
+      zoomIn: () => { if (zoom < ZOOMS.length - 1) this.setState({ zoom: zoom + 1 }); },
+      hint: isRec ? 'Đang thu: các bè còn lại phát cùng bạn, timeline cố định 00:45.' : isCount ? 'Vào bè khi hết 4 phách đếm nhịp.' : isPreview ? 'Kéo waveform sang trái/phải để tua, chạm để nhảy tới vị trí. Chạm tên bè để bật/tắt tiếng.' : 'Chạm tên bè để bật/tắt tiếng · kéo waveform để tua.',
+      isCount, cinNum: s.cin, isIdle: idle, isRec, isPreview,
+      playing: s.playing, notPlaying: !s.playing, playLabel: s.playing ? 'Tạm dừng' : 'Phát', transportDis: !canTransport,
+      playBtnStyle: 'width:56px;height:56px;flex-shrink:0;border:none;border-radius:50%;background:#145B43;color:#FFFFFF;display:flex;align-items:center;justify-content:center;cursor:' + (canTransport ? 'pointer' : 'not-allowed') + ';' + (canTransport ? '' : 'opacity:.45;'),
+      togglePlay: () => { if (!canTransport) return; if (e.playing) this.pause(); else this.play(); },
+      replay: () => { if (!canTransport) return; e.pos = 0; if (e.playing) { this.startSources(this.now() + 0.05, 0); this.sync({ pos: 0 }); } else this.play(); },
+      resetAll: () => { if (isCount) { this.cancelRec(); return; } if (isRec) return; this.stopSources(); e.playing = false; e.pos = 0; this.sync({ pos: 0 }); },
+      ctrlBtnStyle: ctrl(canTransport), ctrlBtnStyle2: ctrl(!isRec),
+      timeNow,
+      partName: TRACKS[part].name, startRec: () => this.startRec(), stopRec: () => this.stopRec(), cancelRec: () => this.cancelRec(), retake: () => this.retake(),
+      recLenText, canSend, cannotSend: !canSend,
+      previewHint: canSend ? 'Nhấn Phát để nghe bản thu của bạn cùng các bè.' : 'Cần thu ít nhất 10 giây mới gửi được.',
+    };
+  }
+}

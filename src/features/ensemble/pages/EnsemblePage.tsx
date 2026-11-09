@@ -1,22 +1,30 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { EnsembleFrame } from "@/features/ensemble/components/EnsembleFrame";
-import { EnsembleHeader } from "@/features/ensemble/components/EnsembleHeader";
 import { HeadphonePrompt } from "@/features/ensemble/components/HeadphonePrompt";
-import { MyTakeLane } from "@/features/ensemble/components/MyTakeLane";
 import { EnsemblePreparation } from "@/features/ensemble/components/EnsemblePreparation";
 import { usePartsPreview } from "@/features/ensemble/hooks/usePartsPreview";
+import { TakeActions } from "@/features/ensemble/components/TakeActions";
 import { ScoreLanes } from "@/features/ensemble/components/ScoreLanes";
-import { TransportBar } from "@/features/ensemble/components/TransportBar";
+import { EnsembleSessionBar } from "@/features/ensemble/components/EnsembleSessionBar";
+import { useEnsembleLiveTempo } from "@/features/ensemble/hooks/useEnsembleLiveTempo";
 import { useEnsembleAssignment } from "@/features/ensemble/hooks/useEnsembleAssignment";
 import { useEnsemblePractice } from "@/features/ensemble/hooks/useEnsemblePractice";
 import { useListeningSetup } from "@/features/ensemble/hooks/useListeningSetup";
 import { useTakePlayback } from "@/features/ensemble/hooks/useTakePlayback";
 import { useTrackPeaks } from "@/features/ensemble/hooks/useTrackPeaks";
 import { type ListeningMode } from "@/features/ensemble/types/ensembleTypes";
+import { MIC_CONSTRAINTS } from "@/features/ensemble/utils/listeningMode";
 import { formatDate } from "@/features/ensemble/utils/formatClock";
+import { UploadPanel } from "@/features/practice/components/UploadPanel";
+import { cn } from "@/shared/utils/cn";
+import { RecordPanel } from "@/features/practice/components/RecordPanel";
+import { usePitchStream } from "@/features/practice/hooks/usePitchStream";
+import { usePracticeAudio } from "@/features/practice/hooks/usePracticeAudio";
+import { StudentShell } from "@/shared/components/bvc/StudentShell";
 import { ConfirmDialog } from "@/shared/components/bvc/ConfirmDialog";
 
+const TUNER_FMIN_HZ = 65;
+const TUNER_FMAX_HZ = 2000;
 const LEAVE_CONFIRM_MESSAGE = "Rời màn hình sẽ hủy bản thu đang thực hiện. Bạn có muốn rời đi?";
 
 export function EnsemblePage() {
@@ -35,6 +43,29 @@ export function EnsemblePage() {
   }, [navigate, practice]);
 
   const listening = useListeningSetup(Boolean(practice.tracksResult));
+  // Micro + bộ phân tích của trang luyện tập: cấp dữ liệu cho tuner và đo nhịp trực tiếp
+  const isMicWindow = status === "ready" || status === "countIn" || status === "recording";
+  const practiceAudio = usePracticeAudio({
+    micWanted: Boolean(practice.tracksResult) && listening.permission === "granted" && listening.hasMic && isMicWindow,
+    fminHz: TUNER_FMIN_HZ,
+    constraints: MIC_CONSTRAINTS[listening.mode ?? "headphones"],
+  });
+  const pitchStream = usePitchStream({
+    audio: practiceAudio,
+    enabled: (status === "ready" && !practice.take) || status === "recording",
+    computePitch: true,
+    fminHz: TUNER_FMIN_HZ,
+    fmaxHz: TUNER_FMAX_HZ,
+  });
+  const liveTempo = useEnsembleLiveTempo({
+    audio: practiceAudio,
+    pitchStream,
+    status,
+    recordingStartedAt: practice.recordingStartedAt,
+    countBeat: practice.countBeat,
+    targetBpm: practice.tracksResult?.targetBpm ?? 60,
+    micDenied: practiceAudio.micState === "denied",
+  });
   const [isPromptForced, setIsPromptForced] = useState(false);
   const [startAfterChoice, setStartAfterChoice] = useState(false);
   const [isPromptDismissed, setIsPromptDismissed] = useState(false);
@@ -87,27 +118,32 @@ export function EnsemblePage() {
     if (listening.mode) setIsPromptForced(false);
   }
 
-  const [isAccompanied, setIsAccompanied] = useState(true);
   const playback = useTakePlayback(practice.take, {
-    enabled: isAccompanied,
+    enabled: true,
     play: practice.playTracksFrom,
     pause: practice.pauseTracks,
   });
+  const hasTake = Boolean(practice.take) && (status === "preview" || status === "saving");
   const togglePartsPreview = () => {
+    if (hasTake) {
+      stopPartsPreview();
+      playback.togglePlay();
+      return;
+    }
     if (playback.playing) playback.togglePlay();
     partsPreview.toggle();
   };
   const seekParts = (seconds: number) => {
+    if (hasTake) {
+      playback.seek(seconds);
+      return;
+    }
     if (playback.playing) {
       playback.seek(seconds);
       return;
     }
     partsPreview.seek(seconds);
     if (!partsPreview.playing) partsPreview.toggle();
-  };
-  const changeAccompaniment = (enabled: boolean) => {
-    setIsAccompanied(enabled);
-    playback.syncAccompaniment(enabled);
   };
   const downloadTake = () => {
     const current = practice.take;
@@ -118,6 +154,8 @@ export function EnsemblePage() {
     link.click();
   };
 
+  const [inputMode, setInputMode] = useState<"record" | "upload">("record");
+  const fileInput = useRef<HTMLInputElement>(null);
   const isBusy = status === "countIn" || status === "recording" || status === "processing" || status === "saving";
   const hasUnsavedTake = status === "preview";
   const backTarget = assignmentId ? `/assignment/${assignmentId}` : "/assignments";
@@ -127,7 +165,7 @@ export function EnsemblePage() {
     : null;
   const isCounted = practice.tracksResult?.isAssignmentCounted ?? false;
   const quotaNote = !assignmentId
-    ? "Buổi luyện tập tự do: bản thu được phân tích nhưng không tính vào bài tập nào."
+    ? null
     : !isCounted
       ? "Bài tập này không phải bài Hòa tấu (hoặc đã đóng) nên bản thu chỉ lưu làm bài luyện tập."
       : assignment && !assignment.canSubmit
@@ -211,8 +249,7 @@ export function EnsemblePage() {
   const { tracksResult, isLoading, error } = practice;
   if (isLoading || !tracksResult) {
     return (
-      <EnsembleFrame>
-        <EnsembleHeader title="Luyện hòa tấu" deadline={null} onClose={leave} />
+      <StudentShell>
         <div className="flex flex-1 items-center justify-center p-6">
           <p
             className={`text-[14.5px] font-medium ${error ? "text-bvc-error" : "text-bvc-muted"}`}
@@ -222,140 +259,225 @@ export function EnsemblePage() {
           </p>
         </div>
         {leaveDialog}
-      </EnsembleFrame>
+      </StudentShell>
     );
   }
 
-  const subtitle = [`Bè ${tracksResult.myInstrumentName}`, assignment?.className, assignment?.title]
+  const subtitle = [
+    `Bè ${tracksResult.myInstrumentName}`,
+    assignment?.className,
+    assignment?.title,
+    isCounted && assignment ? `Hạn ${formatDate(assignment.deadline)}` : null,
+  ]
     .filter(Boolean)
     .join(" · ");
 
   return (
-    <EnsembleFrame>
-      <EnsembleHeader
-        title={tracksResult.pieceTitle}
-        subtitle={subtitle}
-        deadline={isCounted && assignment ? formatDate(assignment.deadline) : null}
-        onClose={leave}
-      />
-
+    <StudentShell>
       {/* Nghe tổng phổ trước, sau đó chuẩn bị và thu âm. */}
-      <main className="min-h-0 flex-1 overflow-y-auto p-3 sm:p-5">
+      <div className="p-3 sm:p-5">
         <div className="mx-auto flex w-full max-w-[1200px] min-w-0 flex-col gap-5">
-          {/* Tổng phổ */}
-          <div className="min-w-0">
-            <ScoreLanes
-              myInstrumentId={tracksResult.myInstrumentId}
-              isRecording={status === "recording"}
-              recordingPositionSec={practice.elapsedSec}
-              isPlaying={isPreviewingParts || playback.playing}
-              onTogglePlay={togglePartsPreview}
-              onSeek={seekParts}
-              disabled={isBusy}
-              tracks={practice.tracks}
-              settings={practice.mixer.settings}
-              anySolo={practice.mixer.anySolo}
-              trackAnalysers={practice.trackAnalysers}
-              peaksByTrack={peaksByTrack}
-              durationSec={practice.durationSec}
-              recordingStartedAt={practice.recordingStartedAt}
-              previewPositionSec={playback.playing && isAccompanied ? playback.playPos : partsPreview.position}
-              onVolumeChange={practice.mixer.setVolume}
-              onToggleMute={practice.mixer.toggleMute}
-              onToggleSolo={practice.mixer.toggleSolo}
-              onReset={practice.mixer.reset}
-            />
-          </div>
-          {/* Thu âm hoặc chọn file */}
-          <div className="flex min-w-0 flex-col gap-3">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-[17px] font-semibold text-bvc-ink">Bản thu của bạn</h2>
+          <div className="grid min-w-0 items-stretch gap-5 lg:grid-cols-3">
+            <div className="flex min-w-0 flex-col gap-3 lg:col-span-2">
+              {/* Tổng phổ */}
+              <div className="flex min-w-0 flex-col lg:flex-1">
+                <ScoreLanes
+                  title={tracksResult.pieceTitle}
+                  subtitle={subtitle}
+                  myInstrumentId={tracksResult.myInstrumentId}
+                  isRecording={status === "recording"}
+                  recordingPositionSec={practice.elapsedSec}
+                  isPlaying={hasTake ? playback.playing : isPreviewingParts}
+                  onTogglePlay={togglePartsPreview}
+                  onSeek={seekParts}
+                  disabled={isBusy && !hasTake}
+                  tracks={practice.tracks}
+                  settings={practice.mixer.settings}
+                  anySolo={practice.mixer.anySolo}
+                  trackAnalysers={practice.trackAnalysers}
+                  peaksByTrack={peaksByTrack}
+                  durationSec={practice.durationSec}
+                  recordingStartedAt={practice.recordingStartedAt}
+                  previewPositionSec={hasTake ? playback.playPos : partsPreview.position}
+                  take={
+                    hasTake && practice.take
+                      ? {
+                          peaks: practice.take.peaks,
+                          durationSec: practice.take.durationSec,
+                          volume: Math.round(playback.volume * 100),
+                          muted: playback.muted,
+                        }
+                      : null
+                  }
+                  onTakeVolumeChange={(value) => playback.setVolume(value / 100)}
+                  onToggleTakeMute={playback.toggleMute}
+                  recorder={
+                    (status === "ready" || status === "countIn" || status === "recording") && (
+                      <div className="flex min-w-0 flex-col gap-3">
+                        {status === "ready" && (
+                          <div className="flex flex-col gap-2.75 md:flex-row md:items-center md:justify-between md:gap-4">
+                            <div className="flex shrink-0 gap-1 rounded-full border border-bvc-border-strong bg-bvc-surface p-0.75 md:w-85 md:border-0 md:bg-bvc-panel">
+                              {(["record", "upload"] as const).map((value) => (
+                                <button
+                                  key={value}
+                                  type="button"
+                                  aria-pressed={inputMode === value}
+                                  onClick={() => setInputMode(value)}
+                                  className={cn(
+                                    "min-h-10 flex-1 cursor-pointer rounded-full text-sm font-medium",
+                                    inputMode === value ? "bg-bvc-ink text-white" : "text-bvc-muted"
+                                  )}
+                                >
+                                  {value === "record" ? "Ghi âm" : "Tải file lên"}
+                                </button>
+                              ))}
+                            </div>
+                            <p className="shrink-0 text-xs leading-normal text-bvc-muted md:text-right md:text-[12.5px]">
+                              Định dạng MP3, WAV, M4A · tối đa 20 MB · thời lượng từ 00:10 đến 03:00
+                            </p>
+                          </div>
+                        )}
+                        {status === "ready" && inputMode === "upload" ? (
+                          <div className="flex min-h-44 flex-col">
+                            <UploadPanel
+                              file={null}
+                              playing={false}
+                              position={0}
+                              blocked={!practice.tracksResult}
+                              weakNetwork={false}
+                              errorText=""
+                              weakMessage=""
+                              sendDisabled
+                              sendLabel=""
+                              onPick={() => fileInput.current?.click()}
+                              onPickOther={() => fileInput.current?.click()}
+                              onTogglePlay={() => undefined}
+                              onSend={() => undefined}
+                            />
+                          </div>
+                        ) : (
+                          <RecordPanel
+                            rec={status === "countIn" ? "countin" : status === "recording" ? "recording" : "idle"}
+                            elapsed={practice.elapsedSec}
+                            countBeat={practice.countBeat}
+                            takeLen={practice.take?.durationSec ?? 0}
+                            previewPeaks={practice.take?.peaks ?? []}
+                            analyser={practice.micAnalyser}
+                            playing={playback.playing}
+                            playPos={playback.playPos}
+                            blocked={!listening.hasMic || listening.permission !== "granted"}
+                            micDenied={false}
+                            weakNetwork={false}
+                            errorText=""
+                            weakMessage=""
+                            sendDisabled
+                            sendLabel=""
+                            onStart={requestStart}
+                            onStop={() => void practice.stop()}
+                            onTogglePlay={() => {
+                              stopPartsPreview();
+                              playback.togglePlay();
+                            }}
+                            onSeek={playback.seek}
+                            volume={playback.volume}
+                            muted={playback.muted}
+                            rate={playback.rate}
+                            onVolumeChange={playback.setVolume}
+                            onToggleMute={playback.toggleMute}
+                            onRateChange={playback.setRate}
+                            onRerecord={practice.discardTake}
+                            onDownload={downloadTake}
+                            onSend={() => void handleSubmit()}
+                            targetBpm={tracksResult.targetBpm}
+                            pieceLen={practice.durationSec}
+                            hideIdleStatus
+                            idleNote={
+                              practice.isCountInOn
+                                ? `Chạm nút ghi để bắt đầu. Có 4 tiếng đếm nhịp, rồi các bè khác phát cùng bạn · ${tracksResult.targetBpm} BPM.`
+                                : `Chạm nút ghi để vào bè ngay, các bè khác phát cùng bạn · ${tracksResult.targetBpm} BPM.`
+                            }
+                          />
+                        )}
+                        <input
+                          ref={fileInput}
+                          type="file"
+                          accept="audio/wav,audio/mpeg,audio/mp4,audio/x-m4a,.wav,.mp3,.m4a"
+                          className="hidden"
+                          aria-hidden
+                          tabIndex={-1}
+                          onChange={(event) => {
+                            const file = event.target.files?.[0];
+                            event.target.value = "";
+                            if (file) {
+                              stopPartsPreview();
+                              setInputMode("record");
+                              void practice.selectFile(file);
+                            }
+                          }}
+                        />
+                      </div>
+                    )
+                  }
+                  takeActions={
+                    hasTake ? (
+                      <TakeActions
+                        sendDisabled={status === "saving" || submitBlockedReason !== null}
+                        sendLabel={
+                          status === "saving" ? "Đang tải lên..." : !isCounted ? "Gửi phân tích" : "Nộp bản thu"
+                        }
+                        submitBlockedReason={submitBlockedReason}
+                        onDownload={downloadTake}
+                        onDelete={practice.discardTake}
+                        onRerecord={practice.discardTake}
+                        onSend={() => void handleSubmit()}
+                      />
+                    ) : null
+                  }
+                  onVolumeChange={practice.mixer.setVolume}
+                  onToggleMute={practice.mixer.toggleMute}
+                  onToggleSolo={practice.mixer.toggleSolo}
+                  onReset={practice.mixer.reset}
+                />
+              </div>
+              <EnsembleSessionBar
+                status={status}
+                hasMic={listening.hasMic}
+                micPermission={listening.permission}
+                micError={practice.micError}
+                listeningMode={listening.mode}
+                headphoneLabel={listening.headphoneLabel}
+                isCountInOn={practice.isCountInOn}
+                onCountInChange={practice.setIsCountInOn}
+                onChangeListeningMode={() => setIsPromptForced(true)}
+                onRequestMicAccess={() => void listening.requestAccess()}
+                uploadPercent={practice.uploadPercent}
+                onPracticeAgain={practice.reset}
+                onBack={leave}
+                backLabel={assignmentId ? "Về bài tập" : "Về danh sách bài tập"}
+              />
+              {quotaNote && (status === "ready" || status === "preview") && (
+                <p className="px-1 text-[12px] text-bvc-muted">{quotaNote}</p>
+              )}
+            </div>
+            <div className="min-w-0 lg:h-full">
               <EnsemblePreparation
                 sheetId={tracksResult.mySheetMusicId}
                 targetBpm={tracksResult.targetBpm}
                 disabled={isBusy || Boolean(practice.take)}
                 onOpen={stopPartsPreview}
+                audio={practiceAudio}
+                pitchStream={pitchStream}
+                tempo={liveTempo}
+                clickOn={practice.isMetronomeOn}
+                onToggleClick={() => practice.setIsMetronomeOn(!practice.isMetronomeOn)}
               />
             </div>
-            {status === "ready" && (
-              <label className="flex min-h-11 cursor-pointer flex-wrap items-center gap-2 rounded-bvc-lg border border-bvc-border bg-white px-4 py-3 text-sm font-medium text-bvc-ink">
-                Chọn file bản thu
-                <input
-                  type="file"
-                  accept="audio/wav,audio/mpeg,audio/mp4,audio/x-m4a,.wav,.mp3,.m4a"
-                  className="sr-only"
-                  onChange={(event) => {
-                    const file = event.target.files?.[0];
-                    event.target.value = "";
-                    if (file) {
-                      stopPartsPreview();
-                      void practice.selectFile(file);
-                    }
-                  }}
-                />
-              </label>
-            )}
-
-            <TransportBar
-              status={status}
-              countBeat={practice.countBeat}
-              elapsedSec={practice.elapsedSec}
-              durationSec={practice.durationSec}
-              takeDurationSec={practice.take?.durationSec ?? null}
-              targetBpm={tracksResult.targetBpm}
-              recordingStartedAt={practice.recordingStartedAt}
-              myInstrumentName={tracksResult.myInstrumentName}
-              micError={practice.micError}
-              isCountInOn={practice.isCountInOn}
-              onCountInChange={practice.setIsCountInOn}
-              hasMic={listening.hasMic}
-              listeningMode={listening.mode}
-              headphoneLabel={listening.headphoneLabel}
-              micPermission={listening.permission}
-              onChangeListeningMode={() => setIsPromptForced(true)}
-              onRequestMicAccess={() => void listening.requestAccess()}
-              isPreviewingParts={isPreviewingParts}
-              onTogglePartsPreview={togglePartsPreview}
-              onStart={requestStart}
-              onStop={() => void practice.stop()}
-              onSubmit={() => void handleSubmit()}
-              onDiscard={practice.discardTake}
-              onPracticeAgain={practice.reset}
-              onBack={leave}
-              backLabel={assignmentId ? "Về bài tập" : "Về danh sách bài tập"}
-              uploadPercent={practice.uploadPercent}
-              submitBlockedReason={submitBlockedReason}
-              submitLabel={!isCounted ? "Gửi phân tích" : undefined}
-            />
-
-            {quotaNote && (status === "ready" || status === "preview") && (
-              <p className="px-1 text-[12px] text-bvc-muted">{quotaNote}</p>
-            )}
-
-            <MyTakeLane
-              status={status}
-              myInstrumentName={tracksResult.myInstrumentName}
-              micAnalyser={practice.micAnalyser}
-              isCountInOn={practice.isCountInOn}
-              take={practice.take}
-              playback={{
-                ...playback,
-                togglePlay: () => {
-                  stopPartsPreview();
-                  playback.togglePlay();
-                },
-              }}
-              isAccompanied={isAccompanied}
-              onAccompanimentChange={changeAccompaniment}
-              onDownload={downloadTake}
-              onDiscard={practice.discardTake}
-            />
           </div>
         </div>
-      </main>
+      </div>
 
       <HeadphonePrompt isOpen={isPromptOpen} onOpenChange={changePromptOpen} onChoose={chooseMode} />
       {leaveDialog}
-    </EnsembleFrame>
+    </StudentShell>
   );
 }

@@ -26,9 +26,11 @@ function stopStream(stream: MediaStream): void {
 interface UsePracticeAudioOptions {
   micWanted: boolean; // true khi đang ở chế độ "Ghi âm"
   fminHz: number;
+  // Ràng buộc micro; phải là hằng ổn định (đổi tham chiếu sẽ mở lại micro). Mặc định MIC_CONSTRAINTS
+  constraints?: MediaTrackConstraints;
 }
 
-export function usePracticeAudio({ micWanted, fminHz }: UsePracticeAudioOptions) {
+export function usePracticeAudio({ micWanted, fminHz, constraints = MIC_CONSTRAINTS }: UsePracticeAudioOptions) {
   const [ctx] = useState(() => new AudioContext({ latencyHint: "interactive" }));
   const [micState, setMicState] = useState<MicState>("idle");
   const [ready, setReady] = useState(false);
@@ -77,7 +79,7 @@ export function usePracticeAudio({ micWanted, fminHz }: UsePracticeAudioOptions)
 
     const connect = async () => {
       try {
-        stream = await navigator.mediaDevices.getUserMedia({ audio: MIC_CONSTRAINTS });
+        stream = await navigator.mediaDevices.getUserMedia({ audio: constraints });
         await ctx.audioWorklet.addModule(WORKLET_URL);
         if (cancelled) return;
         if (ctx.state === "suspended") void ctx.resume().catch(() => undefined); // không await: có thể treo tới lần chạm đầu
@@ -131,7 +133,7 @@ export function usePracticeAudio({ micWanted, fminHz }: UsePracticeAudioOptions)
       setReady(false);
       setAnalyser(null);
     };
-  }, [ctx, micWanted, fminHz, retryToken]);
+  }, [ctx, micWanted, fminHz, constraints, retryToken]);
 
   const post = useCallback((command: WorkletCommand) => {
     nodeRef.current?.port.postMessage(command);

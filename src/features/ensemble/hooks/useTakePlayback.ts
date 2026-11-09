@@ -72,7 +72,8 @@ export function useTakePlayback(take: EnsembleTake | null, accompaniment: Accomp
       const target = Math.max(0, Math.min(take.durationSec, sec));
       element.currentTime = target;
       setPlayPos(target);
-      if (!element.paused && accompanimentRef.current.enabled) accompanimentRef.current.play(target, element.playbackRate);
+      if (!element.paused && accompanimentRef.current.enabled)
+        accompanimentRef.current.play(target, element.playbackRate);
     },
     [take]
   );
