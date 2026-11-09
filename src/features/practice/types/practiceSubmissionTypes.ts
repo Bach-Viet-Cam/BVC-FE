@@ -22,12 +22,14 @@ export interface PracticeSubmission {
 }
 
 export interface CreatePracticeSubmissionInput {
+  shareAfterVerification?: boolean;
   sheetMusicId: string;
   assignmentId?: string;
   studentUploadId: string;
 }
 
 export interface PracticeSubmitTarget {
+  shareAfterVerification?: boolean;
   sheetMusicId: string;
   assignmentId?: string;
 }

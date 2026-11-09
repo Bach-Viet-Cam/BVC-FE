@@ -39,6 +39,8 @@ interface TransportBarProps {
   micPermission: MicPermission;
   onChangeListeningMode: () => void;
   onRequestMicAccess: () => void;
+  isPreviewingParts: boolean;
+  onTogglePartsPreview: () => void;
   onStart: () => void;
   onStop: () => void;
   onSubmit: () => void;
@@ -84,9 +86,9 @@ export function TransportBar(props: TransportBarProps) {
       className="flex shrink-0 flex-col gap-3 rounded-lg border border-bvc-border bg-gradient-to-b from-white via-white to-bvc-surface/30 p-3.5 shadow-sm md:p-4"
     >
       {/* Hàng 1: Đồng hồ số lớn & Đèn LED phách + Công tắc đếm nhịp */}
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex min-w-0 flex-col">
-          <div className="flex items-baseline gap-1.5">
+          <div className="flex flex-wrap items-baseline gap-1.5">
             <span className="font-bvc-mono text-[30px] font-semibold tracking-tight text-bvc-ink md:text-[34px]">
               {formatClock(shownSec)}
             </span>
@@ -105,7 +107,7 @@ export function TransportBar(props: TransportBarProps) {
         {/* Cụm Đếm 4 nhịp & 4 Đèn LED nhịp phách đặt cùng 1 hàng */}
         <div className="flex flex-col items-end gap-1">
           <span className="text-[10px] font-semibold text-bvc-faint">Nhịp phách</span>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {!hasTake && (
               <>
                 <button
@@ -174,11 +176,11 @@ export function TransportBar(props: TransportBarProps) {
             onClick={props.onStart}
             disabled={props.micPermission === "pending" || !props.hasMic}
             aria-disabled={props.micPermission === "pending" || !props.hasMic}
-            className="flex h-11.5 w-full cursor-pointer items-center justify-center gap-2.5 rounded-full bg-bvc-accent font-semibold text-[14px] text-white shadow-sm transition-all hover:bg-bvc-ink active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex min-h-11 w-full flex-wrap px-3 py-2 cursor-pointer items-center justify-center gap-2.5 rounded-full bg-bvc-accent font-semibold text-[14px] text-white shadow-sm transition-all hover:bg-bvc-ink active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Mic size={18} strokeWidth={2.4} />
             <span>Bắt đầu thu bè {props.myInstrumentName}</span>
-            <span className="rounded bg-white/20 px-1.5 py-0.5 text-[10.5px] font-medium text-white/90">
+            <span className="hidden sm:inline rounded bg-white/20 px-1.5 py-0.5 text-[10.5px] font-medium text-white/90">
               Phím Space
             </span>
           </button>
@@ -194,11 +196,11 @@ export function TransportBar(props: TransportBarProps) {
           <button
             type="button"
             onClick={props.onStop}
-            className="flex h-11.5 w-full cursor-pointer items-center justify-center gap-2.5 rounded-full bg-bvc-error font-semibold text-[14px] text-white shadow-md transition-all hover:bg-red-700 active:scale-[0.99]"
+            className="flex min-h-11 w-full flex-wrap px-3 py-2 cursor-pointer items-center justify-center gap-2.5 rounded-full bg-bvc-error font-semibold text-[14px] text-white shadow-md transition-all hover:bg-red-700 active:scale-[0.99]"
           >
             <Square size={16} fill="currentColor" strokeWidth={0} />
             <span>Dừng thu âm</span>
-            <span className="rounded bg-white/20 px-1.5 py-0.5 text-[10.5px] font-medium text-white/90">
+            <span className="hidden sm:inline rounded bg-white/20 px-1.5 py-0.5 text-[10.5px] font-medium text-white/90">
               Phím Space
             </span>
           </button>

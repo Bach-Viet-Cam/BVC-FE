@@ -1,3 +1,4 @@
+import { FaqManagePage } from "@/features/platform/pages/FaqManagePage";
 import { AudioAnalysisTestPage } from "@/features/practice/pages/AudioAnalysisTestPage";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
@@ -49,9 +50,7 @@ import { HelpCenterPage } from "@/features/platform/pages/HelpCenterPage";
 import { TeacherHomePage } from "@/features/classes/pages/TeacherHomePage";
 import { ClassListPage } from "@/features/classes/pages/ClassListPage";
 import { ClassFormPage } from "@/features/classes/pages/ClassFormPage";
-import { RoadmapPage } from "@/features/classes/pages/RoadmapPage";
 import { ReviewPage } from "@/features/classes/pages/ReviewPage";
-import { StudentProgressPage } from "@/features/classes/pages/StudentProgressPage";
 import { AssignmentFormPage } from "@/features/classes/pages/AssignmentFormPage";
 import { ClassDetailPage } from "@/features/classes/pages/ClassDetailPage";
 import { ImportStudentsPage } from "@/features/classes/pages/ImportStudentsPage";
@@ -108,13 +107,13 @@ export function AppRouter() {
         <Route path="/library" element={<LibraryPage />} />
         <Route path="/library/:songId" element={<SongDetailPage />} />
         <Route path="/library/:songId/sheets/:sheetId" element={<SheetPage />} />
+        <Route path="/help" element={<HelpCenterPage />} />
 
         {/* Mọi người dùng đã đăng nhập */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dev/audio-analysis" element={<AudioAnalysisTestPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
-          <Route path="/help" element={<HelpCenterPage />} />
           <Route element={<AppLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
           </Route>
@@ -166,8 +165,8 @@ export function AppRouter() {
             <Route path="/teacher/attention-students" element={<AttentionStudentsPage />} />
             <Route path="/teacher/today-submissions" element={<TodaySubmissionsPage />} />
             <Route path="/teacher/classes" element={<ClassListPage />} />
-            <Route path="/teacher/roadmap" element={<RoadmapPage />} />
-            <Route path="/teacher/progress" element={<StudentProgressPage />} />
+            <Route path="/teacher/roadmap" element={<Navigate to="/teacher/classes" replace />} />
+            <Route path="/teacher/progress" element={<Navigate to="/teacher/classes" replace />} />
             <Route path="/teacher/assignments" element={<AssignmentListPage />} />
             <Route path="/teacher/challenges" element={<LecturerChallengesPage />} />
             <Route
@@ -214,6 +213,7 @@ export function AppRouter() {
           <Route element={<DesktopLayout />}>
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/admin/users" element={<UserManagePage />} />
+            <Route path="/admin/faqs" element={<FaqManagePage />} />
             <Route path="/admin/config" element={<SystemConfigPage />} />
             <Route path="/admin/instruments" element={<InstrumentConfigPage />} />
             <Route path="/admin/categories" element={<CategoriesAdminPage />} />

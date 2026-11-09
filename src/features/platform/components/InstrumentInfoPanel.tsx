@@ -181,7 +181,7 @@ export function InstrumentInfoPanel({ onSelectTunes }: InstrumentInfoPanelProps)
               <tr className="border-b border-bvc-border bg-bvc-surface/60 text-[11.5px] font-bold text-bvc-muted tracking-wider select-none">
                 <th className="px-5 py-3.5 w-[160px]">
                   <SortHeader
-                    label="Mã nhạc cụ (Slug)"
+                    label="Mã nhạc cụ"
                     isActive={filters.sortBy === "code"}
                     direction={filters.sortDir}
                     onClick={() => toggleSort("code")}
@@ -261,7 +261,7 @@ export function InstrumentInfoPanel({ onSelectTunes }: InstrumentInfoPanelProps)
                       <button
                         type="button"
                         onClick={() => onSelectTunes?.(instrument)}
-                        className="flex h-[32px] cursor-pointer items-center gap-1.5 rounded-[8px] border border-bvc-border bg-bvc-surface/60 px-3 text-[12.5px] font-semibold text-bvc-ink transition-all hover:border-bvc-ink hover:bg-white hover:shadow-2xs"
+                        className="whitespace-nowrap flex h-[32px] cursor-pointer items-center gap-1.5 rounded-[8px] border border-bvc-border bg-bvc-surface/60 px-3 text-[12.5px] font-semibold text-bvc-ink transition-all hover:border-bvc-ink hover:bg-white hover:shadow-2xs"
                       >
                         <SlidersHorizontal size={13} className="text-bvc-muted" />
                         <span>Cấu hình dây</span>

@@ -1,13 +1,15 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ChevronRight, Plus } from "lucide-react";
 import { ClassCard } from "@/features/classes/components/ClassCard";
 import { ClassCreateDialog } from "@/features/classes/components/ClassCreateDialog";
+import { FilterSelect } from "@/features/classes/components/FilterSelect";
 import { ListState } from "@/features/classes/components/ListState";
+import { SearchInput } from "@/features/classes/components/SearchInput";
 import { useClassList } from "@/features/classes/hooks/useClassList";
-import { type ClassSummary } from "@/features/classes/types/classTypes";
-import { formatCurrentWeek } from "@/features/classes/utils/classFormat";
-import { DesktopPageHeader, StatCard } from "@/shared/components/bvc";
+import { type ClassStatus, type ClassSummary } from "@/features/classes/types/classTypes";
+import { CLASS_STATUS_LABELS, formatCurrentWeek } from "@/features/classes/utils/classFormat";
+import { DesktopPageHeader } from "@/shared/components/bvc";
 import { ActionButton } from "@/shared/components/bvc/ActionButton";
 import { PageHeader } from "@/shared/components/bvc/PageHeader";
 import { StatusDot } from "@/shared/components/bvc/StatusDot";
@@ -22,63 +24,72 @@ import {
 } from "@/shared/components/ui/table";
 import { useCreateDialog } from "@/shared/hooks/useCreateDialog";
 import { useIsMobile } from "@/shared/hooks/use-mobile";
-import { cn } from "@/shared/utils/cn";
 
-const ALL_COHORTS = "ALL";
+const ALL = "ALL";
 const EMPTY_MESSAGE = "Bạn chưa có lớp học nào.";
+const NO_MATCH_MESSAGE = "Không tìm thấy lớp phù hợp.";
+const STATUS_OPTIONS = [
+  { value: ALL, label: "Tất cả" },
+  ...(Object.entries(CLASS_STATUS_LABELS) as Array<[ClassStatus, string]>).map(([value, label]) => ({ value, label })),
+];
 
-interface CohortChipsProps {
-  cohorts: string[];
-  activeCohort: string;
-  onSelect: (cohort: string) => void;
-  className?: string;
+interface ClassFilters {
+  searchText: string;
+  cohort: string;
+  status: string;
 }
 
-function CohortChips({ cohorts, activeCohort, onSelect, className }: CohortChipsProps) {
+interface ClassToolbarProps {
+  filters: ClassFilters;
+  cohorts: string[];
+  onChange: (filters: ClassFilters) => void;
+}
+
+function ClassToolbar({ filters, cohorts, onChange }: ClassToolbarProps) {
+  const cohortOptions = [
+    { value: ALL, label: "Tất cả" },
+    ...cohorts.map((cohort) => ({ value: cohort, label: cohort })),
+  ];
   return (
-    <div className={cn("flex gap-2", className)}>
-      {[ALL_COHORTS, ...cohorts].map((cohort) => (
-        <button
-          key={cohort}
-          type="button"
-          onClick={() => onSelect(cohort)}
-          className={
-            activeCohort === cohort
-              ? "shrink-0 cursor-pointer rounded-full bg-bvc-ink px-3 py-1.5 text-[13px] font-semibold text-white"
-              : "shrink-0 cursor-pointer rounded-full border border-bvc-border-strong px-3 py-1.5 text-[13px] text-bvc-muted"
-          }
-        >
-          {cohort === ALL_COHORTS ? "Tất cả" : cohort}
-        </button>
-      ))}
+    <div className="flex shrink-0 flex-wrap items-center gap-[8px]">
+      <div className="flex min-w-0 basis-full md:basis-auto md:grow lg:max-w-[420px]">
+        <SearchInput
+          id="class-search"
+          label="Tìm tên lớp"
+          value={filters.searchText}
+          onChange={(searchText) => onChange({ ...filters, searchText })}
+        />
+      </div>
+      <div className="no-scrollbar flex min-w-0 gap-[7px] overflow-x-auto">
+        <FilterSelect
+          label="Khóa"
+          value={filters.cohort}
+          allValue={ALL}
+          options={cohortOptions}
+          onChange={(cohort) => onChange({ ...filters, cohort })}
+        />
+        <FilterSelect
+          label="Trạng thái"
+          value={filters.status}
+          allValue={ALL}
+          options={STATUS_OPTIONS}
+          onChange={(status) => onChange({ ...filters, status })}
+        />
+      </div>
     </div>
   );
 }
 
 interface ClassListViewProps {
   classes: ClassSummary[];
-  cohorts: string[];
-  activeCohort: string;
-  onSelectCohort: (cohort: string) => void;
-  totalClasses: number;
-  activeClasses: number;
-  totalStudents: number;
+  summary: string;
+  toolbar: React.ReactNode;
+  emptyMessage: string;
   listState: { isLoading: boolean; error: string | null; onRetry: () => void };
   onCreate: () => void;
 }
 
-// Web layout (primary): page header with filters + stats row + table.
-function DesktopClassList({
-  classes,
-  cohorts,
-  activeCohort,
-  onSelectCohort,
-  totalClasses,
-  activeClasses,
-  totalStudents,
-  listState,
-  onCreate,
-}: ClassListViewProps) {
+function DesktopClassList({ classes, summary, toolbar, emptyMessage, listState, onCreate }: ClassListViewProps) {
   const navigate = useNavigate();
 
   return (
@@ -87,62 +98,65 @@ function DesktopClassList({
         breadcrumb="Lớp học"
         title="Danh sách lớp học"
         actions={
-          <>
-            <CohortChips cohorts={cohorts} activeCohort={activeCohort} onSelect={onSelectCohort} />
-            <ActionButton onClick={onCreate}>Tạo lớp mới</ActionButton>
-          </>
+          <ActionButton onClick={onCreate}>
+            <Plus size={16} strokeWidth={2.2} aria-hidden />
+            Tạo lớp mới
+          </ActionButton>
         }
       />
 
-      <div className="flex flex-1 flex-col gap-[18px] overflow-y-auto p-[22px_32px_26px]">
-        <div className="grid grid-cols-4 gap-[12px]">
-          <StatCard label="Tổng lớp" value={String(totalClasses)} />
-          <StatCard label="Đang hoạt động" value={String(activeClasses)} variant="ok" />
-          <StatCard label="Kết thúc" value={String(totalClasses - activeClasses)} variant="surface" />
-          <StatCard label="Sinh viên" value={String(totalStudents)} />
-        </div>
-
+      <div className="flex flex-1 flex-col gap-[14px] overflow-y-auto p-[18px_32px_26px]">
+        {toolbar}
+        <p className="text-[13px] text-bvc-muted">{summary}</p>
         <ListState
           isLoading={listState.isLoading}
           error={listState.error}
           isEmpty={classes.length === 0}
-          emptyMessage={EMPTY_MESSAGE}
+          emptyMessage={emptyMessage}
           onRetry={listState.onRetry}
           skeletonCount={4}
         >
           <Table className="min-w-[760px]">
             <TableHead>
               <TableHeaderRow>
-                {["Tên lớp", "Nhạc cụ", "Khóa", "Sĩ số", "Tuần hiện tại", "Trạng thái", "Hành động"].map((label) => (
+                {["Tên lớp", "Nhạc cụ", "Khóa", "Sĩ số", "Tuần hiện tại", "Trạng thái"].map((label) => (
                   <TableHeaderCell key={label}>{label}</TableHeaderCell>
                 ))}
+                <TableHeaderCell className="w-[1%]">
+                  <span className="sr-only">Mở lớp</span>
+                </TableHeaderCell>
               </TableHeaderRow>
             </TableHead>
             <TableBody>
-              {classes.map((cls) => (
-                <TableRow key={cls.id}>
-                  <TableCell className="max-w-[240px] truncate font-medium">{cls.name}</TableCell>
-                  <TableCell>{cls.instrument.name}</TableCell>
-                  <TableCell className="text-bvc-muted">{cls.cohort}</TableCell>
-                  <TableCell className="font-bvc-mono">{cls.memberCount}</TableCell>
-                  <TableCell className="font-bvc-mono">{formatCurrentWeek(cls.startDate, cls.status)}</TableCell>
-                  <TableCell>
-                    <span className="flex items-center gap-1.5 text-[13px]">
-                      <StatusDot status={cls.status === "ACTIVE" ? "ok" : "muted"} size={7} />
-                      {cls.status === "ACTIVE" ? "Đang học" : "Kết thúc"}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <button
-                      type="button"
-                      onClick={() => navigate(`/teacher/classes/${cls.id}`)}
-                      className="cursor-pointer text-[13px] font-medium text-bvc-accent-text"
-                    >
-                      Xem lớp
-                    </button>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {classes.map((cls) => {
+                const detailPath = `/teacher/classes/${cls.id}`;
+                return (
+                  <TableRow
+                    key={cls.id}
+                    onClick={() => navigate(detailPath)}
+                    className="cursor-pointer hover:bg-bvc-surface"
+                  >
+                    <TableCell className="max-w-[280px] truncate font-medium">
+                      <Link to={detailPath} onClick={(event) => event.stopPropagation()} className="text-bvc-ink">
+                        {cls.name}
+                      </Link>
+                    </TableCell>
+                    <TableCell>{cls.instrument.name}</TableCell>
+                    <TableCell className="text-bvc-muted">{cls.cohort}</TableCell>
+                    <TableCell className="font-bvc-mono">{cls.memberCount}</TableCell>
+                    <TableCell className="font-bvc-mono">{formatCurrentWeek(cls.startDate, cls.status)}</TableCell>
+                    <TableCell>
+                      <span className="flex items-center gap-1.5 text-[13px]">
+                        <StatusDot status={cls.status === "ACTIVE" ? "ok" : "muted"} size={7} />
+                        {CLASS_STATUS_LABELS[cls.status]}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <ChevronRight size={16} className="text-bvc-muted" aria-hidden />
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </ListState>
@@ -151,21 +165,12 @@ function DesktopClassList({
   );
 }
 
-// PWA layout: compact title, horizontally scrolling chips and a card per class.
-function MobileClassList({
-  classes,
-  cohorts,
-  activeCohort,
-  onSelectCohort,
-  activeClasses,
-  listState,
-  onCreate,
-}: ClassListViewProps) {
+function MobileClassList({ classes, summary, toolbar, emptyMessage, listState, onCreate }: ClassListViewProps) {
   return (
     <div className="flex min-w-0 flex-1 flex-col gap-[14px] px-[18px] pb-[24px] pt-[18px]">
       <PageHeader
         title="Lớp học của tôi"
-        description={`${activeClasses} lớp đang hoạt động`}
+        description={summary}
         actions={
           <ActionButton onClick={onCreate}>
             <Plus size={16} strokeWidth={2.2} aria-hidden />
@@ -173,19 +178,12 @@ function MobileClassList({
           </ActionButton>
         }
       />
-
-      <CohortChips
-        cohorts={cohorts}
-        activeCohort={activeCohort}
-        onSelect={onSelectCohort}
-        className="-mx-[18px] overflow-x-auto px-[18px] [scrollbar-width:none]"
-      />
-
+      {toolbar}
       <ListState
         isLoading={listState.isLoading}
         error={listState.error}
         isEmpty={classes.length === 0}
-        emptyMessage={EMPTY_MESSAGE}
+        emptyMessage={emptyMessage}
         onRetry={listState.onRetry}
         skeletonCount={3}
       >
@@ -201,19 +199,29 @@ function MobileClassList({
 
 export function ClassListPage() {
   const isMobile = useIsMobile();
-  const [activeCohort, setActiveCohort] = useState<string>(ALL_COHORTS);
+  const [filters, setFilters] = useState<ClassFilters>({ searchText: "", cohort: ALL, status: ALL });
   const { result, isLoading, error, reload } = useClassList({ status: "ALL" });
   const createDialog = useCreateDialog("class");
 
-  const allClasses = result?.items ?? [];
+  const allClasses = useMemo(() => result?.items ?? [], [result]);
+  const classes = useMemo(() => {
+    const keyword = filters.searchText.trim().toLocaleLowerCase("vi");
+    return allClasses.filter(
+      (cls) =>
+        (filters.cohort === ALL || cls.cohort === filters.cohort) &&
+        (filters.status === ALL || cls.status === filters.status) &&
+        (!keyword || cls.name.toLocaleLowerCase("vi").includes(keyword))
+    );
+  }, [allClasses, filters]);
+  const isFiltered = Boolean(filters.searchText.trim()) || filters.cohort !== ALL || filters.status !== ALL;
+  const totalStudents = allClasses.reduce((sum, cls) => sum + cls.memberCount, 0);
+  const summary = `${result?.pagination.total ?? 0} lớp · ${result?.activeCount ?? 0} đang học · ${totalStudents} sinh viên`;
+
   const viewProps: ClassListViewProps = {
-    classes: activeCohort === ALL_COHORTS ? allClasses : allClasses.filter((cls) => cls.cohort === activeCohort),
-    cohorts: result?.cohorts ?? [],
-    activeCohort,
-    onSelectCohort: setActiveCohort,
-    totalClasses: result?.pagination.total ?? 0,
-    activeClasses: result?.activeCount ?? 0,
-    totalStudents: allClasses.reduce((sum, cls) => sum + cls.memberCount, 0),
+    classes,
+    summary,
+    toolbar: <ClassToolbar filters={filters} cohorts={result?.cohorts ?? []} onChange={setFilters} />,
+    emptyMessage: isFiltered ? NO_MATCH_MESSAGE : EMPTY_MESSAGE,
     listState: { isLoading, error, onRetry: reload },
     onCreate: () => createDialog.open(),
   };

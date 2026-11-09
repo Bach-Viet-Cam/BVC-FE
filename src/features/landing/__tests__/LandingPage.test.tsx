@@ -1,8 +1,13 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import { beforeAll, describe, expect, it, vi } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { LandingPage } from "@/features/landing/pages/LandingPage";
+import { ROLES } from "@/shared/constants/roles";
+import type { UserInfo } from "@/shared/context/AuthContext";
+
+const auth = vi.hoisted(() => ({ user: null as UserInfo | null, isLoading: false }));
+vi.mock("@/shared/context/AuthContext", () => ({ useAuth: () => auth }));
 
 vi.mock("@/features/music-library/hooks/useTrendingSongs", () => ({
   useTrendingSongs: () => ({ songs: [], error: null, isFirstLoad: false }),
@@ -70,6 +75,11 @@ function renderPage() {
 }
 
 describe("LandingPage", () => {
+  beforeEach(() => {
+    auth.user = null;
+    auth.isLoading = false;
+  });
+
   it("shows the hero with links to login and the public library", () => {
     renderPage();
 
@@ -81,6 +91,27 @@ describe("LandingPage", () => {
     expect(screen.getByRole("link", { name: "Xem thư viện bài hát" })).toHaveAttribute("href", "/library");
     const nav = screen.getByRole("navigation", { name: "Điều hướng trang giới thiệu" });
     expect(within(nav).getByRole("link", { name: "Tính năng" })).toHaveAttribute("href", "#features");
+    expect(within(nav).getByRole("link", { name: "Đăng nhập" })).toHaveAttribute("href", "/login");
+  });
+
+  it("shows the signed-in user's name instead of the login button, linking to their home", () => {
+    auth.user = { userId: "u1", username: "Nguyễn Văn A", email: "a@bvc.vn", role: ROLES.STUDENT };
+    renderPage();
+
+    const nav = screen.getByRole("navigation", { name: "Điều hướng trang giới thiệu" });
+    expect(within(nav).getByRole("link", { name: "Nguyễn Văn A" })).toHaveAttribute("href", "/home");
+    expect(screen.queryByRole("link", { name: "Đăng nhập" })).not.toBeInTheDocument();
+    screen
+      .getAllByRole("link", { name: "Bắt đầu luyện tập" })
+      .forEach((link) => expect(link).toHaveAttribute("href", "/home"));
+  });
+
+  it("sends a signed-in lecturer to the lecturer home", () => {
+    auth.user = { userId: "u2", username: "Cô Lan", email: "lan@bvc.vn", role: ROLES.TEACHER };
+    renderPage();
+
+    const nav = screen.getByRole("navigation", { name: "Điều hướng trang giới thiệu" });
+    expect(within(nav).getByRole("link", { name: "Cô Lan" })).toHaveAttribute("href", "/teacher/home");
   });
 
   it("switches the practice step when another tab is chosen", async () => {

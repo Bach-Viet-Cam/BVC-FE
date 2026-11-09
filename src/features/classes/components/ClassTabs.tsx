@@ -1,16 +1,15 @@
 import { cn } from "@/shared/utils/cn";
 
-export type ClassTabKey = "members" | "roadmap" | "assignments" | "progress";
+export type ClassTabKey = "members" | "roadmap" | "progress";
 
 interface ClassTabsProps {
   activeTab: ClassTabKey;
   onChange: (tab: ClassTabKey) => void;
 }
 
-const TABS: Array<{ key: ClassTabKey; label: string }> = [
+const CLASS_TABS: Array<{ key: ClassTabKey; label: string }> = [
   { key: "members", label: "Thành viên" },
   { key: "roadmap", label: "Lộ trình" },
-  { key: "assignments", label: "Bài tập" },
   { key: "progress", label: "Tiến độ" },
 ];
 
@@ -21,7 +20,7 @@ export function ClassTabs({ activeTab, onChange }: ClassTabsProps) {
       role="tablist"
       className="flex shrink-0 justify-center gap-[22px] no-scrollbar overflow-x-auto overflow-y-hidden border-b border-bvc-border bg-white px-[18px] lg:sticky lg:top-0 lg:z-10 lg:justify-start lg:gap-[28px] lg:px-[32px] lg:pt-[8px]"
     >
-      {TABS.map((tab) => {
+      {CLASS_TABS.map((tab) => {
         const isActive = tab.key === activeTab;
         return (
           <button

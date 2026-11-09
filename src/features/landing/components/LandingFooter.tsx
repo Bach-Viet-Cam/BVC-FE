@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import bannerImage from "@/assets/image/Artboard 3.png";
 import { PillLink } from "@/shared/components/bvc/PillLink";
 import { Accent, SectionBadge } from "@/shared/components/bvc/SectionIntro";
+import { useLandingAccount } from "@/features/landing/hooks/useLandingAccount";
+import { cn } from "@/shared/utils/cn";
 
 interface FooterLink {
   label: string;
@@ -10,14 +12,7 @@ interface FooterLink {
   isRoute?: boolean;
 }
 
-const FOOTER_COLUMNS: { title: string; links: FooterLink[] }[] = [
-  {
-    title: "Khám phá",
-    links: [
-      { label: "Thư viện bài hát", href: "/library", isRoute: true },
-      { label: "Đăng nhập", href: "/login", isRoute: true },
-    ],
-  },
+const STATIC_FOOTER_COLUMNS: { title: string; links: FooterLink[] }[] = [
   {
     title: "Tính năng",
     links: [
@@ -38,6 +33,18 @@ const itemVariants = {
 
 // Lời mời bắt đầu và chân trang trên nền ảnh BVC
 export function LandingFooter() {
+  const { isLoading: isAccountLoading, accountLabel, homePath } = useLandingAccount();
+  const footerColumns = [
+    {
+      title: "Khám phá",
+      links: [
+        { label: "Thư viện bài hát", href: "/library", isRoute: true },
+        ...(isAccountLoading ? [] : [{ label: accountLabel, href: homePath, isRoute: true }]),
+      ],
+    },
+    ...STATIC_FOOTER_COLUMNS,
+  ];
+
   return (
     <footer className="relative flex w-full flex-col items-center overflow-hidden">
       <div className="absolute inset-0" aria-hidden>
@@ -64,7 +71,11 @@ export function LandingFooter() {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="flex flex-col items-center gap-4 sm:flex-row"
         >
-          <PillLink to="/login" label="Đăng nhập" />
+          <PillLink
+            to={homePath}
+            label={accountLabel}
+            className={cn("max-w-[300px]", isAccountLoading && "invisible")}
+          />
           <PillLink to="/library" label="Xem thư viện" variant="light" />
         </motion.div>
       </section>
@@ -86,7 +97,7 @@ export function LandingFooter() {
             </p>
           </motion.div>
           <div className="grid gap-10 sm:grid-cols-2 lg:ml-auto lg:gap-16">
-            {FOOTER_COLUMNS.map((column) => (
+            {footerColumns.map((column) => (
               <motion.div key={column.title} variants={itemVariants} className="flex flex-col gap-4">
                 <p className="font-bvc-display text-[20px] font-semibold text-bvc-ink">{column.title}</p>
                 <ul className="flex flex-col gap-3">

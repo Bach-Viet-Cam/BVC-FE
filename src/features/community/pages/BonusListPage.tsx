@@ -51,7 +51,6 @@ export function BonusListPage() {
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <PageTitle>Bài tập bonus</PageTitle>
-              <p className="text-[12.5px] text-bvc-muted sm:text-[13px]">Luyện thêm để nâng cao kỹ năng diễn tấu.</p>
             </div>
           </div>
         </div>

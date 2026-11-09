@@ -1,6 +1,6 @@
 import { useId, useState } from "react";
-import { Maximize2, ZoomIn, ZoomOut } from "lucide-react";
-import { ChartFullscreen } from "@/features/practice/components/ChartFullscreen";
+import { Maximize2, Minimize2, ZoomIn, ZoomOut } from "lucide-react";
+import { ChartFullscreen, useFullscreenChartHeight } from "@/features/practice/components/ChartFullscreen";
 import { useElementWidth } from "@/features/practice/hooks/useElementWidth";
 import type {
   CompareSegment,
@@ -8,6 +8,7 @@ import type {
   SubmissionCompare,
 } from "@/features/practice/types/submissionHistoryTypes";
 import { formatTick, isZoomed, zoomView } from "@/features/practice/utils/chartView";
+import type { ChartView } from "@/features/practice/utils/chartView";
 import { hzToMidiFloat, midiToNoteInfo } from "@/features/practice/utils/noteMath";
 import { toCompareChartPaths, toSegmentBands } from "@/features/practice/utils/submissionCompare";
 
@@ -63,13 +64,15 @@ interface SubmissionCompareChartProps {
 // Biểu đồ cao độ chồng nhau của hai bài nộp trên trục thời gian bản mẫu (không zoom, không phát âm thanh)
 export function SubmissionCompareChart(props: SubmissionCompareChartProps) {
   const [fullscreen, setFullscreen] = useState(false);
+  const [fullscreenView, setFullscreenView] = useState<ChartView | undefined>();
   return <>
-    <ComparePlot {...props} onFullscreen={() => setFullscreen(true)} />
-    {fullscreen && <ChartFullscreen onClose={() => setFullscreen(false)}><ComparePlot {...props} onFullscreen={() => setFullscreen(false)} /></ChartFullscreen>}
+    <ComparePlot {...props} onFullscreen={(view) => { setFullscreenView(view); setFullscreen(true); }} />
+    {fullscreen && <ChartFullscreen onClose={() => setFullscreen(false)}><ComparePlot {...props} fullscreen initialView={fullscreenView} onFullscreen={() => setFullscreen(false)} /></ChartFullscreen>}
   </>;
 }
 
-function ComparePlot({ chart, segments, selectedId, visible, onSelectSegment, onFullscreen }: SubmissionCompareChartProps & { onFullscreen: () => void }) {
+function ComparePlot({ chart, segments, selectedId, visible, onSelectSegment, onFullscreen, fullscreen = false, initialView }: SubmissionCompareChartProps & { onFullscreen: (view?: ChartView) => void; fullscreen?: boolean; initialView?: ChartView }) {
+  const height = useFullscreenChartHeight(fullscreen, HEIGHT);
   const clipId = useId();
   const { ref, width } = useElementWidth<HTMLDivElement>();
 
@@ -77,11 +80,11 @@ function ComparePlot({ chart, segments, selectedId, visible, onSelectSegment, on
   const lowMidi = hzToMidiFloat(chart.minHz) - MIDI_PADDING;
   const highMidi = hzToMidiFloat(chart.maxHz) + MIDI_PADDING;
   const base = { t0: 0, t1: duration, m0: lowMidi, m1: highMidi };
-  const [view, setView] = useState(base);
+  const [view, setView] = useState(initialView ?? base);
   const zoomed = isZoomed(view, base);
   const zoom = (factor: number) => setView(current => zoomView(current, factor, { seconds: (current.t0 + current.t1) / 2, midi: (current.m0 + current.m1) / 2 }, base));
   const plotWidth = Math.max(width - PLOT.left - PLOT.right, 1);
-  const plotHeight = HEIGHT - PLOT.top - PLOT.bottom;
+  const plotHeight = height - PLOT.top - PLOT.bottom;
   const xAt = (seconds: number) => PLOT.left + ((seconds - view.t0) / (view.t1 - view.t0)) * plotWidth;
   const yAtMidi = (midi: number) => PLOT.top + (1 - (midi - view.m0) / (view.m1 - view.m0)) * plotHeight;
   const yAt = (hz: number) => yAtMidi(hzToMidiFloat(hz));
@@ -94,15 +97,15 @@ function ComparePlot({ chart, segments, selectedId, visible, onSelectSegment, on
   const paths = toCompareChartPaths(chart, xAt, yAt);
   const bands = toSegmentBands(segments.filter(segment => segment.endSec >= view.t0 && segment.startSec <= view.t1), xAt);
   const kindById = new Map(segments.map((segment) => [segment.id, segment.kind]));
-  const axisY = HEIGHT - PLOT.bottom;
+  const axisY = height - PLOT.bottom;
 
   return (
     <div ref={ref} className="w-full">
       {width > 0 && (
         <svg
-          viewBox={`0 0 ${width} ${HEIGHT}`}
+          viewBox={`0 0 ${width} ${height}`}
           width={width}
-          height={HEIGHT}
+          height={height}
           role="img"
           aria-label="Biểu đồ cao độ theo thời gian của hai bài nộp và bản mẫu"
           className="block"
@@ -205,8 +208,8 @@ function ComparePlot({ chart, segments, selectedId, visible, onSelectSegment, on
       )}
       <div className="flex justify-end gap-1 pt-1">
         <button type="button" aria-label="Thu nh?" title="Thu nh?" disabled={!zoomed} onClick={() => zoom(1 / 1.6)} className="flex size-9 items-center justify-center rounded-full border border-bvc-border bg-white disabled:opacity-40"><ZoomOut className="size-4" /></button>
-        <button type="button" aria-label="Ph?ng to" title="Ph?ng to" onClick={() => zoom(1.6)} className="flex size-9 items-center justify-center rounded-full border border-bvc-border bg-white"><ZoomIn className="size-4" /></button>
-        <button type="button" aria-label="Xem to?n b?" title="Xem to?n b?" onClick={onFullscreen} className="flex size-9 items-center justify-center rounded-full border border-bvc-border bg-white"><Maximize2 className="size-4" /></button>
+        <button type="button" aria-label="Ph?ng to" title="Ph?ng to" onClick={() => { if (fullscreen) zoom(1.6); else onFullscreen(zoomView(view, 1.6, { seconds: (view.t0 + view.t1) / 2, midi: (view.m0 + view.m1) / 2 }, base)); }} className="flex size-9 items-center justify-center rounded-full border border-bvc-border bg-white"><ZoomIn className="size-4" /></button>
+        <button type="button" aria-label={fullscreen ? "Thu nhỏ biểu đồ" : "Xem toàn bộ"} title={fullscreen ? "Thu nhỏ biểu đồ" : "Xem toàn bộ"} onClick={() => onFullscreen(view)} className="flex size-9 items-center justify-center rounded-full border border-bvc-border bg-white">{fullscreen ? <Minimize2 className="size-4" /> : <Maximize2 className="size-4" />}</button>
       </div>
     </div>
   );

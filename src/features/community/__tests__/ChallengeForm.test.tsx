@@ -33,6 +33,7 @@ function makeClass(id: string, name: string, instrumentId: string, status: "ACTI
     startDate: "2026-01-01",
     endDate: "2026-12-31",
     memberCount: 10,
+    isPrimaryLecturer: true,
   };
 }
 

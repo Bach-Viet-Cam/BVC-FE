@@ -74,7 +74,7 @@ export function ClassCreateDialog({ open, onClose }: ClassCreateDialogProps) {
       open={open}
       onClose={close}
       title="Tạo lớp học"
-      description="Sau khi tạo lớp, bạn thêm sinh viên hoặc nhập danh sách từ file trong trang chi tiết lớp."
+      description="Sau khi tạo lớp, bạn thêm sinh viên hoặc nhập danh sách từ file và quản lý giảng viên cùng dạy trong trang chi tiết lớp."
       isDirty={isDirty}
     >
       {(requestClose) => <ClassCreateContent onCancel={requestClose} onDirtyChange={setIsDirty} />}

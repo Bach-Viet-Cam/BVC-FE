@@ -4,6 +4,8 @@ import { Bookmark, LibraryBig } from "lucide-react";
 import { useAuth } from "@/shared/context/AuthContext";
 import { useViewerRole } from "@/shared/hooks/useViewerRole";
 import { NotificationBell } from "@/shared/components/bvc/NotificationBell";
+import { BottomTabBar } from "@/shared/components/bvc/BottomTabBar";
+import { STUDENT_TABS } from "@/shared/config/navConfig";
 import { UserAvatar } from "@/shared/components/bvc/UserAvatar";
 import logoImage from "@/assets/image/logo.png";
 import { PillLink } from "@/shared/components/bvc/PillLink";
@@ -21,12 +23,23 @@ const NAV_ITEMS = [
   { label: "Thư viện", to: "/library" },
   { label: "Bài tập", to: "/assignments" },
   { label: "Lịch sử", to: "/practice/submissions" },
+  { label: "Trợ giúp", to: "/help" },
 ];
 
 // Giảng viên / quản trị viên chỉ ghé thư viện công khai, các mục sinh viên ở trên sẽ trả 403
 const STAFF_NAV_ITEMS = [{ label: "Thư viện", to: "/library" }];
 
 const ROLE_FALLBACK_NAMES = { student: "Sinh viên", teacher: "Giảng viên", admin: "Quản trị viên", guest: "Khách" };
+
+const FOCUSED_PATHS = [
+  /^\/practice\/sheets\//,
+  /^\/practice\/submissions\/[^/]+/,
+  /^\/assignment\//,
+  /^\/community\/bonus\/[^/]+/,
+  /^\/ensemble\//,
+  /^\/library\/[^/]+\/sheets\//,
+  /^\/library\/upload/,
+];
 
 // Nút biểu tượng dạng kính mờ trên nền header tối
 const iconLinkClass =
@@ -38,8 +51,10 @@ export function StudentShell({ children, className }: StudentShellProps) {
   const location = useLocation();
   const displayName = user?.username ?? ROLE_FALLBACK_NAMES[role];
   const isStaff = role === "teacher" || role === "admin";
+  const isStudent = role === "student";
   const homePath = user ? getRoleHome(user.role) : "/library";
   const navItems = isStaff ? [{ label: "Trang chủ", to: homePath }, ...STAFF_NAV_ITEMS] : NAV_ITEMS;
+  const showBottomNav = isStudent && !FOCUSED_PATHS.some((pattern) => pattern.test(location.pathname));
 
   return (
     <div className="flex min-h-dvh flex-col bg-white font-bvc-sans text-bvc-ink">
@@ -51,7 +66,10 @@ export function StudentShell({ children, className }: StudentShellProps) {
 
           <nav
             aria-label="Điều hướng chính"
-            className="order-last -mx-[18px] mt-2 flex w-[calc(100%+36px)] gap-1.5 overflow-x-auto px-[18px] [scrollbar-width:none] md:order-none md:mx-0 md:mt-0 md:w-auto md:flex-1 md:px-0"
+            className={cn(
+              "order-last -mx-[18px] mt-2 flex w-[calc(100%+36px)] gap-1.5 overflow-x-auto px-[18px] [scrollbar-width:none] md:order-none md:mx-0 md:mt-0 md:flex md:w-auto md:flex-1 md:px-0",
+              isStudent && "hidden"
+            )}
           >
             {navItems.map((item) => (
               <NavLink
@@ -82,7 +100,7 @@ export function StudentShell({ children, className }: StudentShellProps) {
           ) : (
             <div className="flex items-center gap-2">
               <NotificationBell className={iconLinkClass} iconClassName="size-[19px]" />
-              {role === "student" && (
+              {isStudent && (
                 <Link to="/saved" aria-label="Nội dung đã lưu" className={iconLinkClass}>
                   <Bookmark className="size-[19px]" strokeWidth={1.6} />
                 </Link>
@@ -95,7 +113,10 @@ export function StudentShell({ children, className }: StudentShellProps) {
               <Link
                 to="/profile"
                 aria-label={`Hồ sơ ${displayName}`}
-                className="flex size-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition-colors hover:bg-white/20 hover:text-white md:h-11 md:w-auto md:justify-start md:gap-2.5 md:pr-4 md:pl-1"
+                className={cn(
+                  "size-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition-colors hover:bg-white/20 hover:text-white md:flex md:h-11 md:w-auto md:justify-start md:gap-2.5 md:pr-4 md:pl-1",
+                  showBottomNav ? "hidden" : "flex"
+                )}
               >
                 <UserAvatar name={displayName} />
                 <span className="hidden max-w-[160px] truncate text-sm font-medium md:inline">{displayName}</span>
@@ -105,9 +126,18 @@ export function StudentShell({ children, className }: StudentShellProps) {
         </div>
       </header>
 
-      <main key={location.pathname} className={cn("flex flex-1 flex-col motion-safe:animate-page-enter", className)}>
+      <main
+        key={location.pathname}
+        className={cn(
+          "flex flex-1 flex-col motion-safe:animate-page-enter",
+          showBottomNav && "pb-(--bvc-bottom-nav-h)",
+          className
+        )}
+      >
         {children}
       </main>
+
+      {showBottomNav && <BottomTabBar tabs={STUDENT_TABS} displayName={displayName} />}
     </div>
   );
 }

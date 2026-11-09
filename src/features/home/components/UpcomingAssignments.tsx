@@ -28,11 +28,7 @@ export function UpcomingAssignments({ items, isLoading, error }: UpcomingAssignm
           {error}
         </p>
       ) : items.length === 0 ? (
-        <EmptyState
-          title="Không có bài tập cần nộp"
-          description="Bài tập giảng viên giao sẽ hiện ở đây."
-          className="py-8"
-        />
+        <EmptyState title="Không có bài tập cần nộp" className="py-8" />
       ) : (
         <ul className="flex flex-col gap-3">
           {items.map((item) => {

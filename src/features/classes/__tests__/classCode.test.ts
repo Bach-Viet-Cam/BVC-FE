@@ -10,6 +10,9 @@ describe("classCode", () => {
   it("splits subject, slot and half on dots", () => {
     expect(parseClassCode("DNH103.M2.H1")).toEqual({ subject: "DNH103", slot: "2", half: "1" });
     expect(parseClassCode(" dnh103.m2.h2 ")).toEqual({ subject: "DNH103", slot: "2", half: "2" });
+    expect(parseClassCode("DNH103.M3.H1")?.slot).toBe("3");
+    expect(parseClassCode("DNH103.E1.H1")?.slot).toBe("4");
+    expect(parseClassCode("DNH103.e3.H1")?.slot).toBe("6");
     expect(parseClassCode("DNH103.3.4")).toEqual({ subject: "DNH103", slot: "3", half: "4" });
   });
 

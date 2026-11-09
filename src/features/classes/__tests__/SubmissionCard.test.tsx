@@ -1,8 +1,15 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { SubmissionCard } from "@/features/classes/components/SubmissionCard";
 import { type StudentSubmission } from "@/features/classes/types/teacherAssignmentTypes";
+import { verifiedApi } from "@/features/community/api/verifiedApi";
+
+vi.mock("@/features/community/api/verifiedApi", () => ({
+  verifiedApi: {
+    review: vi.fn().mockResolvedValue({ review: null, shareConsent: false, canReview: false, verifiedContentId: null }),
+  },
+}));
 
 const SUBMISSION: StudentSubmission = {
   id: "sub1",
@@ -49,6 +56,33 @@ describe("SubmissionCard", () => {
     );
     expect(screen.getByLabelText("Nhận xét")).toHaveValue("Tốt");
     expect(screen.getByRole("button", { name: "Cập nhật nhận xét" })).toBeInTheDocument();
+  });
+
+  it("opens and cancels verification without submitting the comment", async () => {
+    vi.mocked(verifiedApi.review)
+      .mockResolvedValueOnce({
+        review: null,
+        shareConsent: true,
+        canReview: true,
+        verifiedContentId: null,
+      })
+      .mockResolvedValueOnce({
+        review: null,
+        shareConsent: true,
+        canReview: true,
+        verifiedContentId: null,
+      });
+    const onSaveComment = vi.fn();
+    render(<SubmissionCard submission={SUBMISSION} canComment onSaveComment={onSaveComment} />);
+    await userEvent.type(screen.getByLabelText("Nhận xét"), "Đã nghe");
+    const verify = screen.getByRole("button", { name: "Xác minh bản thu" });
+    await waitFor(() => expect(verify).toBeEnabled());
+    expect(verify.parentElement).toBe(screen.getByRole("button", { name: "Gửi nhận xét" }).parentElement);
+    await userEvent.click(verify);
+    await userEvent.click(await screen.findByRole("button", { name: "Hủy" }));
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    expect(onSaveComment).not.toHaveBeenCalled();
+    expect(screen.getByLabelText("Nhận xét")).toHaveValue("Đã nghe");
   });
 
   it("is read-only when comments are locked", () => {

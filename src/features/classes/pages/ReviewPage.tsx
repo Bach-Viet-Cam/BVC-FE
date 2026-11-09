@@ -197,6 +197,12 @@ export function ReviewPage() {
                   <SubmissionCard
                     key={`${submission.id}:${submission.comment?.updatedAt ?? "new"}`}
                     submission={submission}
+                    studentName={result.student.fullName}
+                    targetName={
+                      detail.assignment?.sheetMusic
+                        ? `${detail.assignment.sheetMusic.pieceTitle} · ${detail.assignment.sheetMusic.name}`
+                        : undefined
+                    }
                     canComment={result.canComment}
                     onSaveComment={handleSaveComment(submission.id)}
                   />

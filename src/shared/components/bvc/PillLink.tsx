@@ -45,7 +45,7 @@ export function PillLink({ to, label, variant = "dark", size = "lg", state, clas
         className
       )}
     >
-      <motion.span layout transition={{ type: "spring", stiffness: 400, damping: 32 }}>
+      <motion.span layout transition={{ type: "spring", stiffness: 400, damping: 32 }} className="min-w-0 truncate">
         {label}
       </motion.span>
       <motion.span

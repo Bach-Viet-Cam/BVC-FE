@@ -39,7 +39,8 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
   const tracksResult = tracksQuery.data;
   const tracks = useMemo(() => tracksResult?.tracks ?? [], [tracksResult]);
   const mixer = useTrackMixer(tracks);
-  const durationSec = tracks.length > 0 ? Math.max(...tracks.map((track) => track.durationSec)) : 0;
+  const durationSec =
+    tracks.length > 0 ? Math.max(...tracks.map((track) => track.durationSec + track.offsetMs / 1000)) : 0;
 
   const [status, setStatus] = useState<PracticeStatus>("ready");
   const [elapsedSec, setElapsedSec] = useState(0);
@@ -57,6 +58,12 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
   const takeRef = useRef<EnsembleTake | null>(null);
   const accompanimentTimersRef = useRef<number[]>([]);
 
+  const suppressOwnRef = useRef(false);
+  const ownTrackIds = useMemo(
+    () =>
+      new Set(tracks.filter((track) => track.instrumentId === tracksResult?.myInstrumentId).map((track) => track.id)),
+    [tracks, tracksResult?.myInstrumentId]
+  );
   const statusRef = useRef<PracticeStatus>("ready");
   const isMetronomeOnRef = useRef(false);
   const settingsRef = useRef<TrackSetting[]>([]);
@@ -93,9 +100,14 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
   const applyVolumes = useCallback(() => {
     settingsRef.current.forEach((setting) => {
       const gain = gainsRef.current.get(setting.trackId);
-      if (gain) gain.gain.value = getEffectiveVolume(setting, anySoloRef.current);
+      if (gain)
+        gain.gain.value = getEffectiveVolume(
+          setting,
+          anySoloRef.current,
+          suppressOwnRef.current && ownTrackIds.has(setting.trackId)
+        );
     });
-  }, []);
+  }, [ownTrackIds]);
 
   useEffect(() => {
     isMetronomeOnRef.current = isMetronomeOn;
@@ -183,6 +195,8 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
     timersRef.current.forEach((timerId) => window.clearInterval(timerId));
     timersRef.current = [];
     pauseTracks();
+    suppressOwnRef.current = false;
+    applyVolumes();
     audiosRef.current.forEach((audio) => {
       audio.currentTime = 0;
     });
@@ -192,7 +206,7 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
     streamRef.current = null;
     setMicAnalyser(null);
     setRecordingStartedAt(null);
-  }, [pauseTracks]);
+  }, [pauseTracks, applyVolumes]);
 
   const cancel = useCallback(() => {
     abortedRef.current = true;
@@ -224,7 +238,11 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
     try {
       const file = new File([current.blob], "ban-thu-hoa-tau.wav", { type: "audio/wav" });
       const { data: upload } = await ensembleApi.uploadRecording(file, setUploadPercent);
-      const { data } = await ensembleApi.createSubmission({ sheetMusicId, assignmentId, studentUploadId: upload.data.fileId });
+      const { data } = await ensembleApi.createSubmission({
+        sheetMusicId,
+        assignmentId,
+        studentUploadId: upload.data.fileId,
+      });
       setSubmission(data.data);
       toast.success("Đã nộp bản thu. Hệ thống đang phân tích.");
       if (assignmentId && data.data.assignmentId === null) {
@@ -278,6 +296,38 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
     changeStatus("ready");
   }, [changeStatus, pauseTracks, replaceTake]);
 
+  const selectFile = useCallback(
+    async (file: File) => {
+      if (statusRef.current !== "ready") return;
+      if (!file.size || file.size > 20 * 1024 * 1024) {
+        setMicError("Chọn file âm thanh không quá 20 MB.");
+        return;
+      }
+      changeStatus("processing");
+      setMicError(null);
+      abortedRef.current = false;
+      try {
+        const wav = await encodeWav(file);
+        const decoded = await new OfflineAudioContext(1, 1, 44100).decodeAudioData(await wav.arrayBuffer());
+        if (abortedRef.current) return;
+        if (!Number.isFinite(decoded.duration) || decoded.duration <= 0 || decoded.duration > 180) throw new Error();
+        replaceTake({
+          blob: wav,
+          url: URL.createObjectURL(wav),
+          durationSec: decoded.duration,
+          peaks: computePeaks(decoded.getChannelData(0), TAKE_PEAK_BUCKETS),
+        });
+        changeStatus("preview");
+      } catch {
+        if (!abortedRef.current) {
+          setMicError("Không đọc được file. Chọn bản thu WAV, MP3 hoặc M4A dài tối đa 3 phút.");
+          changeStatus("ready");
+        }
+      }
+    },
+    [changeStatus, replaceTake]
+  );
+
   const reset = discardTake;
 
   const beginRecording = useCallback(
@@ -289,14 +339,9 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
       };
       recorderRef.current = recorder;
       recorder.start();
-      tracks.forEach((track) => {
-        const audio = audiosRef.current.get(track.id);
-        if (!audio) return;
-        audio.playbackRate = 1;
-        audio.currentTime = 0;
-        if (track.offsetMs > 0) window.setTimeout(() => void audio.play(), track.offsetMs);
-        else void audio.play();
-      });
+      suppressOwnRef.current = true;
+      applyVolumes();
+      playTracksFrom(0, 1);
       const startedAt = Date.now();
       setRecordingStartedAt(startedAt);
       setElapsedSec(0);
@@ -312,7 +357,7 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
       }, beatMs);
       timersRef.current = [clock, metronome];
     },
-    [changeStatus, durationSec, stop, tracks]
+    [applyVolumes, playTracksFrom, changeStatus, durationSec, stop]
   );
 
   const start = useCallback(
@@ -327,6 +372,10 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
         stream = await navigator.mediaDevices.getUserMedia({ audio: MIC_CONSTRAINTS[mode] });
       } catch {
         setMicError(MIC_DENIED_MESSAGE);
+        return;
+      }
+      if (abortedRef.current) {
+        stream.getTracks().forEach((track) => track.stop());
         return;
       }
       streamRef.current = stream;
@@ -378,6 +427,7 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
     uploadPercent,
     submission,
     submit,
+    selectFile,
     discardTake,
     playTracksFrom,
     pauseTracks,
