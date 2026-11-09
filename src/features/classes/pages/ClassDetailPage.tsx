@@ -55,7 +55,13 @@ export function ClassDetailPage() {
         </div>
       ) : (
         <>
-          <ClassInfoPanel classDetail={classDetail} onEndClass={() => setIsEndDialogOpen(true)} />
+          <ClassInfoPanel
+            classDetail={classDetail}
+            onEndClass={() => setIsEndDialogOpen(true)}
+            onLecturersChanged={(update) =>
+              setClassDetail((previous) => previous && { ...previous, coLecturers: update(previous.coLecturers) })
+            }
+          />
           <ClassTabs
             activeTab={activeTab}
             onChange={(tab) => setSearchParams(tab === "members" ? {} : { tab }, { replace: true })}

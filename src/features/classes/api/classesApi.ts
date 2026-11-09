@@ -8,6 +8,7 @@ import {
   type ImportConfirmResult,
   type ImportPreview,
   type Instrument,
+  type Lecturer,
   type Member,
   type MemberListParams,
   type MemberListResult,
@@ -26,6 +27,13 @@ export const classesApi = {
   updateClass: (classId: string, payload: Partial<ClassPayload>) =>
     axiosClient.patch<ApiResponse<ClassDetail>>(`/classes/${classId}`, payload),
   endClass: (classId: string) => axiosClient.post<ApiResponse<ClassDetail>>(`/classes/${classId}/end`),
+
+  lookupLecturers: (email: string) =>
+    axiosClient.get<ApiResponse<Lecturer[]>>("/classes/lecturers/lookup", { params: { email } }),
+  addLecturer: (classId: string, lecturerId: string) =>
+    axiosClient.post<ApiResponse<Lecturer>>(`/classes/${classId}/lecturers`, { lecturerId }),
+  removeLecturer: (classId: string, lecturerId: string) =>
+    axiosClient.delete<ApiResponse<null>>(`/classes/${classId}/lecturers/${lecturerId}`),
 
   listMembers: (classId: string, params: MemberListParams) =>
     axiosClient.get<ApiResponse<MemberListResult>>(`/classes/${classId}/members`, { params }),
