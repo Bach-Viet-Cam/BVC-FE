@@ -5,7 +5,6 @@ import { LandingFooter } from "@/features/landing/components/LandingFooter";
 import { LandingHero } from "@/features/landing/components/LandingHero";
 import { LandingLibraryShowcase } from "@/features/landing/components/LandingLibraryShowcase";
 import { LandingModules } from "@/features/landing/components/LandingModules";
-import { LandingSteps } from "@/features/landing/components/LandingSteps";
 import { usePageMeta } from "@/shared/hooks/usePageMeta";
 
 // Trang giới thiệu công khai. Người dùng bật "giảm chuyển động" trong hệ điều hành thì tắt các hiệu ứng chạy.
@@ -16,7 +15,6 @@ export function LandingPage() {
       <main className="min-h-screen scroll-smooth bg-white text-bvc-ink">
         <LandingHero />
         <LandingFeatures />
-        <LandingSteps />
         <LandingBenefits />
         <LandingModules />
         <LandingLibraryShowcase />

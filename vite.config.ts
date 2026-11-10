@@ -15,7 +15,7 @@ function seoPlugin(): Plugin {
     transformIndexHtml: (html) =>
       base ? html.replaceAll("%SITE_URL%", base) : html.replace(/^.*%SITE_URL%.*\r?\n/gm, ""),
     generateBundle() {
-      const urls = ["/", "/login", "/library", "/help"];
+      const urls = ["/", "/login", "/library", "/help", "/install"];
       const body = urls.map((u) => `  <url><loc>${base}${u}</loc></url>`).join("\n");
       const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`;
       this.emitFile({ type: "asset", fileName: "sitemap.xml", source: sitemap });

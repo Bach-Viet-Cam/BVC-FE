@@ -1,5 +1,4 @@
 import { render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { LandingPage } from "@/features/landing/pages/LandingPage";
@@ -112,15 +111,6 @@ describe("LandingPage", () => {
 
     const nav = screen.getByRole("navigation", { name: "Điều hướng trang giới thiệu" });
     expect(within(nav).getByRole("link", { name: "Cô Lan" })).toHaveAttribute("href", "/teacher/home");
-  });
-
-  it("switches the practice step when another tab is chosen", async () => {
-    renderPage();
-
-    await userEvent.click(screen.getByRole("tab", { name: /Thu âm & nộp/ }));
-
-    expect(screen.getByRole("tab", { name: /Thu âm & nộp/ })).toHaveAttribute("aria-selected", "true");
-    expect(screen.getByRole("heading", { name: "Thu âm và nộp bài" })).toBeInTheDocument();
   });
 
   it("shows real library songs that have sheet music and no audience section", () => {

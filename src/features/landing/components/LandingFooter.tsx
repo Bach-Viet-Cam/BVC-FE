@@ -17,8 +17,8 @@ const STATIC_FOOTER_COLUMNS: { title: string; links: FooterLink[] }[] = [
     title: "Tính năng",
     links: [
       { label: "Tính năng chính", href: "#features" },
-      { label: "Cách luyện", href: "#steps" },
       { label: "Lợi ích", href: "#benefits" },
+      { label: "Thêm vào màn hình", href: "/install", isRoute: true },
     ],
   },
 ];
@@ -92,8 +92,8 @@ export function LandingFooter() {
           <motion.div variants={itemVariants} className="flex max-w-[380px] flex-col gap-3">
             <p className="font-bvc-display text-[24px] font-semibold tracking-[-0.02em] text-bvc-ink">Bách Việt Cầm</p>
             <p className="text-[17px] leading-relaxed text-bvc-ink/80">
-              Nền tảng luyện nhạc cụ dân tộc: thư viện bản nhạc, chấm điểm bản thu bằng AI, hòa tấu và lớp học có lộ
-              trình.
+              Nền tảng luyện nhạc cụ dân tộc: thư viện bản nhạc, nhận xét bản thu với hỗ trợ từ AI, hòa tấu và lớp học
+              có lộ trình.
             </p>
           </motion.div>
           <div className="grid gap-10 sm:grid-cols-2 lg:ml-auto lg:gap-16">

@@ -45,6 +45,7 @@ import { EnsemblePage } from "@/features/ensemble/pages/EnsemblePage";
 import { EnsemblePlaybackPage } from "@/features/ensemble/pages/EnsemblePlaybackPage";
 import { NotificationsPage } from "@/features/platform/pages/NotificationsPage";
 import { HelpCenterPage } from "@/features/platform/pages/HelpCenterPage";
+import { InstallGuidePage } from "@/features/landing/pages/InstallGuidePage";
 
 // Desktop - teacher / classes
 import { TeacherHomePage } from "@/features/classes/pages/TeacherHomePage";
@@ -99,6 +100,7 @@ export function AppRouter() {
         {/* Public */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/landing" element={<Navigate to="/" replace />} />
+        <Route path="/install" element={<InstallGuidePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/403" element={<ForbiddenPage />} />
 
