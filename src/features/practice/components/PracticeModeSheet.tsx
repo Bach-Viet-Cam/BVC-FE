@@ -1,4 +1,4 @@
-import { ChevronRight, Music2, Scissors, X } from "lucide-react";
+import { ChevronRight, Music2, RotateCw, Scissors, X } from "lucide-react";
 import {
   PracticeBottomSheet,
   PracticeSheetClose,
@@ -14,6 +14,8 @@ interface PracticeModeSheetProps {
   pieceTitle: string;
   // Thời lượng bản thu, ví dụ "2 phút 41"; null khi BE không đo được
   durationLabel: string | null;
+  // Chỉ có ở màn Kết quả đoạn: thu lại đúng đoạn vừa luyện (label đã gồm khoảng thời gian)
+  retakeSegment?: { label: string; onSelect: () => void };
 }
 
 // "Luyện tập lại": chọn luyện cả bài hay một đoạn (AI gợi ý đoạn)
@@ -24,6 +26,7 @@ export function PracticeModeSheet({
   onSegment,
   pieceTitle,
   durationLabel,
+  retakeSegment,
 }: PracticeModeSheetProps) {
   return (
     <PracticeBottomSheet open={open} onOpenChange={onOpenChange}>
@@ -46,6 +49,24 @@ export function PracticeModeSheet({
         </header>
 
         <div className="flex flex-col gap-3.5 pt-2">
+          {retakeSegment && (
+            <button
+              type="button"
+              onClick={retakeSegment.onSelect}
+              className="flex cursor-pointer items-center gap-3.5 rounded-2xl border border-bvc-border bg-white p-4 text-left hover:bg-bvc-soft"
+            >
+              <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-bvc-surface text-bvc-ink">
+                <RotateCw className="size-6" strokeWidth={2} aria-hidden />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-semibold text-bvc-ink">{retakeSegment.label}</span>
+                <span className="mt-0.5 block text-xs leading-snug text-bvc-muted">
+                  Thu lại đúng đoạn vừa luyện để cải thiện điểm
+                </span>
+              </span>
+              <ChevronRight className="size-5 shrink-0 text-bvc-faint" strokeWidth={2.5} aria-hidden />
+            </button>
+          )}
           <button
             type="button"
             onClick={onSegment}

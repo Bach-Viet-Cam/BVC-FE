@@ -3,6 +3,10 @@ import type { ChangeEvent } from "react";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ReferenceAudioPlayer } from "@/features/practice/components/ReferenceAudioPlayer";
 import { SheetPanel } from "@/features/practice/components/SheetPanel";
+import { SegmentPickerSheet } from "@/features/practice/components/SegmentPickerSheet";
+import type { PracticeSegment } from "@/features/practice/components/SegmentPickerSheet";
+import { SegmentReferencePlayer } from "@/features/practice/components/SegmentReferencePlayer";
+import { SegmentTimeline } from "@/features/practice/components/SegmentTimeline";
 import { MetronomeView } from "@/features/practice/components/MetronomeView";
 import { PracticeDrawer } from "@/features/practice/components/PracticeDrawer";
 import { PracticeTitleRow } from "@/features/practice/components/PracticeTitleRow";
@@ -21,6 +25,7 @@ import {
   MSG,
   TEMPO_TOLERANCE_PERCENT,
 } from "@/features/practice/constants/practiceConstants";
+import { practiceResultApi } from "@/features/practice/api/practiceResultApi";
 import { usePracticeDemo } from "@/features/practice/context/PracticeDemoContext";
 import { usePracticeAudio } from "@/features/practice/hooks/usePracticeAudio";
 import { useClickTrack } from "@/features/practice/hooks/useClickTrack";
@@ -33,10 +38,18 @@ import { usePracticeTargetBpm } from "@/features/practice/hooks/usePracticeTarge
 import { useInstrumentTunes } from "@/features/practice/hooks/useInstrumentTunes";
 import { useActiveSubmission } from "@/features/practice/hooks/useActiveSubmission";
 import { useFilePreview } from "@/features/practice/hooks/useFilePreview";
+import { useResultPart } from "@/features/practice/hooks/useResultPart";
+import { useSegmentSubmit } from "@/features/practice/hooks/useSegmentSubmit";
 import { readAudioFile } from "@/features/practice/utils/readAudioFile";
 import { midiToNoteInfo, noteAtTime } from "@/features/practice/utils/noteMath";
 import { noteGridBeats } from "@/features/practice/utils/tempoEstimator";
+import { fmtTime } from "@/features/practice/utils/practiceFormat";
 import { buildDemoSession } from "@/features/practice/utils/practiceSession";
+import {
+  buildAttemptProcessingPath,
+  buildSegmentRecordPath,
+  parseSegmentQuery,
+} from "@/features/practice/utils/segmentFormat";
 import { fileErrorMessage, takeToRecordingFile, validateFile } from "@/features/practice/utils/validateRecording";
 import type { RecordingFile, SubmitMode } from "@/features/practice/types/practiceTypes";
 import { BvcDialogPopup } from "@/shared/components/bvc/BvcDialogPopup";
@@ -48,23 +61,38 @@ import { cn } from "@/shared/utils/cn";
 
 type DrawerKind = "tuner" | "metronome";
 
+// Chế độ đoạn: đoạn thu cần dư một chút ở cuối để không cắt mất nốt cuối
+const SEGMENT_TAIL_SEC = 1.5;
+// Không đếm nhịp: RecordPanel mặc định nhắc "4 tiếng đếm nhịp" nên phải thay dòng hướng dẫn
+const IDLE_NOTE_NO_COUNT_IN = "Chạm nút ghi để bắt đầu thu đoạn này ngay, không có tiếng đếm nhịp.";
+
 // Laptop: TunerPage/MetronomePage chuyển về đây kèm state.drawer để mở sẵn ngăn kéo
 function drawerFromState(state: unknown): DrawerKind | null {
   const value = typeof state === "object" && state !== null ? (state as { drawer?: unknown }).drawer : null;
   return value === "tuner" || value === "metronome" ? value : null;
 }
 
+// Màn Ghi âm. Có `of` trong query (cùng start/end/countIn) thì là chế độ đoạn (UC-03): cùng layout, cùng thẻ,
+// chỉ bỏ phần chỉ dành cho nộp cả bài (tải file, bài tập, khoá GBR-49) và gửi lên API luyện đoạn.
 export function RecordPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { sheetId = "" } = useParams();
   const [searchParams] = useSearchParams();
   const assignmentId = searchParams.get("assignmentId") ?? undefined;
+  const ofRaw = searchParams.get("of");
+  const segmentQuery = parseSegmentQuery(searchParams);
+  const segmentMode = segmentQuery !== null;
+  const segmentOf = segmentQuery?.of ?? "";
+  const segStart = segmentQuery?.start ?? 0;
+  const segEnd = segmentQuery?.end ?? 0;
+  const segCountIn = segmentQuery?.countIn ?? false;
   const isMobile = useIsMobile();
   const { demo, blocked: demoBlocked, submit, uploading, uploadWeak } = usePracticeDemo();
   const { context, isLoading: contextLoading } = usePracticeContext(sheetId, assignmentId);
   const { active, refresh: refreshActive } = useActiveSubmission(sheetId);
-  const blocked = demoBlocked || Boolean(active); // GBR-49: chỉ khóa bài đang có bản xử lý
+  // GBR-49: chỉ khóa bài đang có bản xử lý; luyện đoạn không bị khoá
+  const blocked = !segmentMode && (demoBlocked || Boolean(active));
   const [drawer, setDrawer] = useState<DrawerKind | null>(() => drawerFromState(location.state));
 
   const [shareAfterVerification, setShareAfterVerification] = useState(false);
@@ -79,13 +107,40 @@ export function RecordPage() {
   const preview = useFilePreview(pickedFile);
 
   // Tốc độ luyện: BPM bài tập của lớp nếu bản nhạc được giao, ngược lại mặc định 60
-  const { targetBpm } = usePracticeTargetBpm(sheetId, assignmentId);
+  const { targetBpm: practiceBpm } = usePracticeTargetBpm(sheetId, assignmentId);
+  // Chế độ đoạn: bản nộp gốc cho timeline, bản mẫu đoạn, tốc độ bản mẫu; bản nộp không còn phân tích được thì quay về
+  const original = useResultPart(practiceResultApi.getResult, segmentOf, segmentMode, MSG.resultLoadFailed);
+  const originalChart = useResultPart(practiceResultApi.getPitchChart, segmentOf, segmentMode, MSG.pitchUnavailable);
+  const originalData = original.data;
+  const segmentDurationSec = originalChart.data?.durationSec ?? originalData?.recording.durationSec ?? 0;
+  const targetBpm = segmentMode ? Math.round(originalData?.tempo?.teacherBpm ?? practiceBpm) : practiceBpm;
+  const { send: sendSegment, uploading: segmentUploading } = useSegmentSubmit(segmentOf);
+  const [segmentPickerOpen, setSegmentPickerOpen] = useState(false);
+
+  useEffect(() => {
+    if (ofRaw && !segmentQuery) {
+      toast.error(MSG.segmentInvalid);
+      navigate(`/practice/submissions/${encodeURIComponent(ofRaw)}`, { replace: true });
+    }
+  }, [ofRaw, segmentQuery, navigate]);
+
+  useEffect(() => {
+    if (segmentMode && originalData && originalData.submission.status !== "COMPLETED") {
+      toast.error(MSG.segmentInvalid);
+      navigate(`/practice/submissions/${encodeURIComponent(segmentOf)}`, { replace: true });
+    }
+  }, [segmentMode, originalData, segmentOf, navigate]);
   // Dây chuẩn của nhạc cụ thuộc bản nhạc, cho ngăn lên dây (laptop)
   const tunes = useInstrumentTunes(sheetId);
-  const session = useMemo(() => buildDemoSession(demo.noPitch, targetBpm), [demo.noPitch, targetBpm]);
+  const session = useMemo(() => {
+    const base = buildDemoSession(demo.noPitch, targetBpm);
+    if (!segmentMode) return base;
+    return { ...base, pieceLenSec: segEnd - segStart + SEGMENT_TAIL_SEC, countInBeats: segCountIn ? undefined : 0 };
+  }, [demo.noPitch, targetBpm, segmentMode, segStart, segEnd, segCountIn]);
   const audio = usePracticeAudio({ micWanted: mode === "record", fminHz: session.fminHz });
   const micDenied = demo.micDenied || audio.micState === "denied";
-  const timelineOffsetSec = demo.autoStop ? Math.max(0, session.pieceLenSec - DEMO_AUTO_STOP_TAIL_S) : 0;
+  const timelineOffsetSec =
+    demo.autoStop && !segmentMode ? Math.max(0, session.pieceLenSec - DEMO_AUTO_STOP_TAIL_S) : 0;
 
   const recorder = useRecorder({
     audio,
@@ -164,13 +219,14 @@ export function RecordPage() {
 
   // Bản thu mô phỏng: dung lượng suy ra từ thời lượng
   const errorKind = useMemo(() => {
+    if (segmentMode) return ""; // đoạn ngắn nên không áp giới hạn 00:10 - 03:00 của bài nộp
     if (mode === "record") {
       if (rec !== "preview" || !recorder.take) return "";
       if (demo.invalid !== "none") return demo.invalid;
       return validateFile(takeToRecordingFile(recorder.take));
     }
     return file ? validateFile(file) : "";
-  }, [mode, rec, demo.invalid, recorder.take, file]);
+  }, [segmentMode, mode, rec, demo.invalid, recorder.take, file]);
 
   // GBR-51: đóng tab / ứng dụng thì bỏ bản thu đang ghi hoặc đang nghe lại, không hỏi lại
   const resetRecorder = recorder.reset;
@@ -202,7 +258,23 @@ export function RecordPage() {
     setPickedFile(picked);
   }
 
+  async function handleSendSegment() {
+    const take = rec === "preview" ? recorder.take?.file : undefined;
+    if (!take || segmentUploading) return;
+    const attempt = await sendSegment(take, { start: segStart, end: segEnd });
+    if (!attempt) return; // bản thu còn đó để gửi lại
+    recorder.reset(); // GBR-51: bản thu được bỏ khỏi màn ghi âm ngay khi gửi
+    navigate(buildAttemptProcessingPath(segmentOf, attempt.id), { replace: true });
+  }
+
+  function changeSegment(segment: PracticeSegment) {
+    setSegmentPickerOpen(false);
+    recorder.reset();
+    navigate(buildSegmentRecordPath(sheetId, segmentOf, segment), { replace: true });
+  }
+
   async function handleSend() {
+    if (segmentMode) return handleSendSegment();
     if (blocked || uploading || errorKind || !sheetId) return;
     const source = mode === "record" ? (rec === "preview" ? recorder.take?.file : undefined) : pickedFile;
     if (!source) return;
@@ -253,18 +325,22 @@ export function RecordPage() {
   }
 
   const notices: string[] = [];
-  if (demo.expired) notices.push(MSG.expired); // MSG-16
-  if (demo.otherProc || active) notices.push(MSG.busy); // GBR-49
+  if (!segmentMode && demo.expired) notices.push(MSG.expired); // MSG-16
+  if (!segmentMode && (demo.otherProc || active)) notices.push(MSG.busy); // GBR-49
   if (!sheetId) notices.push(MSG.chooseSheet);
 
-  const sendDisabled = blocked || uploading || Boolean(errorKind) || !sheetId;
-  const sendLabel = uploading ? "Đang tải lên..." : "Gửi";
+  const sending = segmentMode ? segmentUploading : uploading;
+  const sendDisabled = blocked || sending || Boolean(errorKind) || !sheetId;
+  const sendLabel = sending ? "Đang tải lên..." : segmentMode ? "Gửi phân tích" : "Gửi";
 
   const assignment = context?.assignment ?? null;
   const referenceAudio = context?.sheet.referenceAudio ?? null;
+  const segmentTeacherUrl = originalData?.audio.teacherUrl ?? null;
   const subtitle = context
     ? [context.sheet.name, context.sheet.instrument.name, context.classRecord?.name].filter(Boolean).join(" · ")
     : undefined;
+
+  if (ofRaw && !segmentQuery) return null; // tham số đoạn sai: đã báo lỗi và đang quay về kết quả
 
   return (
     <StudentShell>
@@ -276,9 +352,21 @@ export function RecordPage() {
           <div className="contents lg:flex lg:min-w-0 lg:flex-col lg:gap-5">
             <PracticeTitleRow
               title={context?.piece.title ?? (contextLoading ? "Đang tải..." : "Luyện tập")}
-              subtitle={subtitle}
-              // Tạm ẩn nút Demo (mô phỏng luồng ghi âm); bật lại bằng rightSlot={<DemoPanel />}
-              // rightSlot={<DemoPanel />}
+              subtitle={segmentMode ? `Đoạn ${fmtTime(segStart)} – ${fmtTime(segEnd)}` : subtitle}
+              rightSlot={
+                segmentMode &&
+                originalData && (
+                  <button
+                    type="button"
+                    disabled={recActive}
+                    onClick={() => setSegmentPickerOpen(true)}
+                    className="min-h-11 shrink-0 cursor-pointer rounded-full border border-bvc-border px-4 text-sm font-medium text-bvc-ink disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    Đổi đoạn
+                  </button>
+                )
+              }
+              // Nút Demo (mô phỏng luồng ghi âm) đang tạm ẩn; muốn bật lại thì thêm <DemoPanel /> vào rightSlot khi không ở chế độ đoạn
             />
             {context && <SheetPanel songId={context.piece.id} sheetId={context.sheet.id} />}
           </div>
@@ -325,8 +413,30 @@ export function RecordPage() {
               )}
             </div>
 
+            {/* Chế độ đoạn: timeline đoạn + nghe mẫu đoạn, đặt đúng chỗ bản thu mẫu của luyện cả bài */}
+            {segmentMode && (segmentDurationSec > 0 || segmentTeacherUrl) && (
+              <div className="mx-3.5 mt-3 flex flex-col gap-3.5 rounded-bvc-xl border border-bvc-border bg-white p-4 md:mx-0 md:mt-0 md:p-5.5">
+                {segmentDurationSec > 0 && (
+                  <SegmentTimeline
+                    durationSec={segmentDurationSec}
+                    start={segStart}
+                    end={segEnd}
+                    issues={originalData?.issues ?? []}
+                  />
+                )}
+                {segmentTeacherUrl && (rec === "idle" || rec === "preview") && (
+                  <SegmentReferencePlayer
+                    key={segmentTeacherUrl}
+                    url={segmentTeacherUrl}
+                    start={segStart}
+                    end={segEnd}
+                  />
+                )}
+              </div>
+            )}
+
             {/* Bản thu mẫu nằm trên thẻ ghi âm; gỡ khỏi màn hình khi đang đếm nhịp/ghi để tiếng mẫu không lọt vào micro */}
-            {referenceAudio && mode === "record" && (rec === "idle" || rec === "preview") && (
+            {!segmentMode && referenceAudio && mode === "record" && (rec === "idle" || rec === "preview") && (
               <div className="mx-3.5 mt-3 md:mx-0 md:mt-0">
                 <ReferenceAudioPlayer
                   key={referenceAudio.url}
@@ -338,31 +448,33 @@ export function RecordPage() {
 
             <div className="contents">
               <div className="mx-3.5 mt-3 flex min-h-0 flex-1 flex-col gap-2.75 pb-5.5 md:mx-0 md:mt-0 md:min-h-98 md:rounded-bvc-xl md:border md:border-bvc-border md:bg-white md:p-5.5 md:pb-5.5">
-                <div className="contents md:flex md:shrink-0 md:items-center md:justify-between md:gap-4">
-                  <div className="flex shrink-0 gap-1 rounded-full border border-bvc-border-strong bg-bvc-surface p-0.75 md:w-85 md:border-0 md:bg-bvc-panel">
-                    {(["record", "upload"] as const).map((value) => (
-                      <button
-                        key={value}
-                        type="button"
-                        aria-pressed={mode === value}
-                        onClick={() => switchMode(value)}
-                        className={cn(
-                          "min-h-10 flex-1 cursor-pointer rounded-full text-sm font-medium md:min-h-10.5",
-                          mode === value ? "bg-bvc-ink text-white" : "text-bvc-muted",
-                          recActive && "opacity-60"
-                        )}
-                      >
-                        {value === "record" ? "Ghi âm" : "Tải file lên"}
-                      </button>
-                    ))}
-                  </div>
+                {!segmentMode && (
+                  <div className="contents md:flex md:shrink-0 md:items-center md:justify-between md:gap-4">
+                    <div className="flex shrink-0 gap-1 rounded-full border border-bvc-border-strong bg-bvc-surface p-0.75 md:w-85 md:border-0 md:bg-bvc-panel">
+                      {(["record", "upload"] as const).map((value) => (
+                        <button
+                          key={value}
+                          type="button"
+                          aria-pressed={mode === value}
+                          onClick={() => switchMode(value)}
+                          className={cn(
+                            "min-h-10 flex-1 cursor-pointer rounded-full text-sm font-medium md:min-h-10.5",
+                            mode === value ? "bg-bvc-ink text-white" : "text-bvc-muted",
+                            recActive && "opacity-60"
+                          )}
+                        >
+                          {value === "record" ? "Ghi âm" : "Tải file lên"}
+                        </button>
+                      ))}
+                    </div>
 
-                  <p className="shrink-0 text-xs leading-normal text-bvc-muted md:text-right md:text-[12.5px]">
-                    Định dạng MP3, WAV, M4A - tối đa 20 MB
-                    <br />
-                    Thời lượng từ 00:10 đến 03:00
-                  </p>
-                </div>
+                    <p className="shrink-0 text-xs leading-normal text-bvc-muted md:text-right md:text-[12.5px]">
+                      Định dạng MP3, WAV, M4A - tối đa 20 MB
+                      <br />
+                      Thời lượng từ 00:10 đến 03:00
+                    </p>
+                  </div>
+                )}
 
                 {notices.map((text) => (
                   <NoticeBanner key={text} message={text} />
@@ -399,6 +511,8 @@ export function RecordPage() {
                     onDownload={handleDownload}
                     onSend={() => void handleSend()}
                     targetBpm={targetBpm}
+                    pieceLen={segmentMode ? session.pieceLenSec : undefined}
+                    idleNote={segmentMode && !segCountIn ? IDLE_NOTE_NO_COUNT_IN : undefined}
                   />
                 ) : (
                   <UploadPanel
@@ -417,7 +531,31 @@ export function RecordPage() {
                     onSend={() => void handleSend()}
                   />
                 )}
-                {assignmentId && <label className="flex min-h-11 items-start gap-3 py-3 text-sm leading-relaxed text-bvc-muted"><input type="checkbox" className="mt-1 size-5 shrink-0 accent-bvc-ink" checked={shareAfterVerification} disabled={uploading} onChange={(event) => setShareAfterVerification(event.target.checked)} /><span>Tôi đồng ý chia sẻ bản thu sau khi giảng viên xác minh, để người học các khóa khác tham khảo tại bài nhạc. Có thể rút đồng ý ở trang kết quả.</span></label>}
+                {segmentMode && recActive && (
+                  // Huỷ khi đếm nhịp / đang thu: bỏ bản thu, không gọi API, kết quả trước giữ nguyên
+                  <button
+                    type="button"
+                    onClick={recorder.reset}
+                    className="flex min-h-11 w-full cursor-pointer items-center justify-center rounded-full border border-bvc-border-strong text-sm font-medium text-bvc-ink"
+                  >
+                    Huỷ
+                  </button>
+                )}
+                {assignmentId && (
+                  <label className="flex min-h-11 items-start gap-3 py-3 text-sm leading-relaxed text-bvc-muted">
+                    <input
+                      type="checkbox"
+                      className="mt-1 size-5 shrink-0 accent-bvc-ink"
+                      checked={shareAfterVerification}
+                      disabled={uploading}
+                      onChange={(event) => setShareAfterVerification(event.target.checked)}
+                    />
+                    <span>
+                      Tôi đồng ý chia sẻ bản thu sau khi giảng viên xác minh, để người học các khóa khác tham khảo tại
+                      bài nhạc. Có thể rút đồng ý ở trang kết quả.
+                    </span>
+                  </label>
+                )}
                 <input
                   ref={fileInput}
                   type="file"
@@ -475,6 +613,18 @@ export function RecordPage() {
           </button>
         </BvcDialogPopup>
       </Dialog>
+
+      {segmentPickerOpen && originalData && (
+        <SegmentPickerSheet
+          open
+          onOpenChange={setSegmentPickerOpen}
+          onBack={() => setSegmentPickerOpen(false)}
+          onStart={changeSegment}
+          durationSec={segmentDurationSec}
+          issues={originalData.issues}
+          chart={originalChart.data}
+        />
+      )}
     </StudentShell>
   );
 }
