@@ -22,8 +22,8 @@ export const assignmentsApi = {
   getOverview: () => axiosClient.get<ApiResponse<AssignmentOverview>>("/assignments/overview"),
   assignToClasses: (payload: AssignPayload) =>
     axiosClient.post<ApiResponse<AssignResult>>("/assignments/assign", payload),
-  listClassSheetMusic: (classId: string) =>
-    axiosClient.get<ApiResponse<ClassSheetMusic[]>>("/assignments/sheet-music", { params: { classId } }),
+  listClassSheetMusic: (target: { classId: string } | { instrumentId: string }) =>
+    axiosClient.get<ApiResponse<ClassSheetMusic[]>>("/assignments/sheet-music", { params: target }),
   getAssignment: (assignmentId: string) =>
     axiosClient.get<ApiResponse<AssignmentDetail>>(`/assignments/${assignmentId}`),
   createAssignment: (payload: CreateAssignmentPayload) =>
