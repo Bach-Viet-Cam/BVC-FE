@@ -1,20 +1,20 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AssignmentList } from "@/features/classes/components/AssignmentList";
 import { assignmentsApi } from "@/features/classes/api/assignmentsApi";
+import { type AssignmentOverview, type OverviewAssignment } from "@/features/classes/types/teacherAssignmentTypes";
 
-vi.mock("@/features/classes/api/assignmentsApi", () => ({ assignmentsApi: { listAssignments: vi.fn() } }));
+vi.mock("@/features/classes/api/assignmentsApi", () => ({
+  assignmentsApi: { getOverview: vi.fn(), assignToClasses: vi.fn(), listClassSheetMusic: vi.fn() },
+}));
 vi.mock("@/features/classes/api/classesApi", () => ({
   classesApi: {
     listClasses: vi.fn().mockResolvedValue({
       data: {
         data: {
-          items: [
-            { id: "c1", name: "TRD301", status: "ACTIVE" },
-            { id: "c9", name: "TRD101", status: "ENDED" },
-          ],
+          items: [{ id: "c1", name: "TRD301", status: "ACTIVE" }],
           pagination: { page: 1, limit: 200, total: 1 },
           activeCount: 1,
           cohorts: [],
@@ -24,22 +24,62 @@ vi.mock("@/features/classes/api/classesApi", () => ({
   },
 }));
 
-const ITEM = {
-  id: "a1",
-  classId: "c1",
-  className: "TRD301",
-  status: "PUBLISHED",
-  version: 2,
-  title: "Độc tấu - Lý ngựa ô",
-  kind: "SOLO",
-  submittedCount: 3,
-  memberCount: 20,
-  updatedAt: "2026-10-16T02:30:00.000Z",
+const SEMESTER = { name: "HK1 2026-2027", startDate: "2026-09-01", endDate: "2027-01-15" };
+
+function assignment(overrides: Partial<OverviewAssignment>): OverviewAssignment {
+  return {
+    id: "a1",
+    classId: "c1",
+    title: "Độc tấu - Lý ngựa ô",
+    kind: "SOLO",
+    status: "PUBLISHED",
+    version: 1,
+    sheetMusicId: "sh1",
+    sheetTitle: "Lý ngựa ô",
+    practiceCount: 5,
+    submittedCount: 3,
+    memberCount: 20,
+    updatedAt: "2026-10-01T00:00:00.000Z",
+    ...overrides,
+  };
+}
+
+const OVERVIEW: AssignmentOverview = {
+  semester: SEMESTER,
+  emptyReason: null,
+  classes: [
+    {
+      id: "c1",
+      name: "TRD301",
+      status: "ACTIVE",
+      memberCount: 20,
+      assignments: [
+        assignment({}),
+        assignment({ id: "a2", title: "Bonus tuần 3", kind: "BONUS", sheetMusicId: null, sheetTitle: null }),
+      ],
+    },
+    {
+      id: "c2",
+      name: "TRD302",
+      status: "ACTIVE",
+      memberCount: 18,
+      assignments: [
+        assignment({
+          id: "a3",
+          classId: "c2",
+          title: "Hòa tấu hò kéo pháo",
+          kind: "ENSEMBLE",
+          sheetMusicId: "sh2",
+          sheetTitle: "Hò kéo pháo",
+        }),
+      ],
+    },
+  ],
 };
 
-function mockItems(items: unknown[]) {
-  vi.mocked(assignmentsApi.listAssignments).mockResolvedValue({
-    data: { data: { items, pagination: { page: 1, limit: 100, total: items.length } }, message: "", success: true },
+function mockOverview(overview: AssignmentOverview) {
+  vi.mocked(assignmentsApi.getOverview).mockResolvedValue({
+    data: { data: overview, message: "", success: true },
   } as never);
 }
 
@@ -51,80 +91,95 @@ const renderList = (props: { canCreate: boolean }, url = "/teacher/assignments")
   );
 
 describe("AssignmentList", () => {
-  beforeEach(() => vi.clearAllMocks());
-
-  it("renders a card with title, kind, class, status and submitted count", async () => {
-    mockItems([ITEM]);
-    renderList({ canCreate: true });
-    const card = (await screen.findByText("Độc tấu - Lý ngựa ô")).closest("a") as HTMLElement;
-    expect(card).toHaveAttribute("href", "/teacher/assignments/a1");
-    expect(within(card).getByText("Độc tấu")).toBeInTheDocument();
-    expect(within(card).getByText("Đã đăng")).toBeInTheDocument();
-    expect(within(card).getByText("3/20 đã nộp")).toBeInTheDocument();
-    expect(within(card).getByText("TRD301")).toBeInTheDocument();
-    await userEvent.click(screen.getByRole("button", { name: /Tạo bài tập/ }));
-    const dialog = await screen.findByRole("dialog");
-    expect(within(dialog).getByRole("heading", { name: "Tạo bài tập" })).toBeInTheDocument();
+  beforeEach(() => {
+    vi.clearAllMocks();
+    Element.prototype.scrollIntoView = vi.fn();
   });
 
-  it("shows the empty message when the lecturer has no assignment", async () => {
-    mockItems([]);
+  it("shows the semester chip, both tabs with counts and collapsed classes", async () => {
+    mockOverview(OVERVIEW);
     renderList({ canCreate: true });
-    expect(await screen.findByText("Bạn chưa có bài tập nào.")).toBeInTheDocument();
+    expect(await screen.findByText("Học kỳ: HK1 2026-2027 (01/09 – 15/01)")).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /Theo lớp\s*2/ })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tab", { name: /Theo bài tập chung\s*2/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /TRD301/ })).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByText("Độc tấu - Lý ngựa ô")).not.toBeInTheDocument();
   });
 
-  it("shows the no-match message when filters are active", async () => {
-    mockItems([]);
+  it("opens a class to show its assignments", async () => {
+    mockOverview(OVERVIEW);
     renderList({ canCreate: true });
-    await screen.findByText("Bạn chưa có bài tập nào.");
-    await userEvent.selectOptions(screen.getByLabelText("Loại"), "BONUS");
-    expect(await screen.findByText("Không tìm thấy bài tập phù hợp.")).toBeInTheDocument();
-    expect(assignmentsApi.listAssignments).toHaveBeenLastCalledWith(expect.objectContaining({ kind: "BONUS" }));
+    await userEvent.click(await screen.findByRole("button", { name: /TRD301/ }));
+    const row = screen.getByText("Độc tấu - Lý ngựa ô").closest("a") as HTMLElement;
+    expect(row).toHaveAttribute("href", "/teacher/assignments/a1");
+    expect(screen.getByText("Bonus tuần 3")).toBeInTheDocument();
   });
 
-  it("is scoped to the class in the URL and can hide the create button", async () => {
-    mockItems([ITEM]);
-    renderList({ canCreate: false }, "/teacher/assignments?class=c1");
-    await screen.findByText("Độc tấu - Lý ngựa ô");
-    expect(assignmentsApi.listAssignments).toHaveBeenCalledWith(expect.objectContaining({ classId: "c1" }));
-    expect(await screen.findByLabelText("Lớp")).toHaveValue("c1");
-    expect(screen.getByRole("link", { name: /Mở trang lớp/ })).toHaveAttribute("href", "/teacher/classes/c1");
+  it("groups assignments by sheet in the second tab and leaves out those without a sheet", async () => {
+    mockOverview(OVERVIEW);
+    renderList({ canCreate: true });
+    await userEvent.click(await screen.findByRole("tab", { name: /Theo bài tập chung/ }));
+    expect(screen.getByText("Bài tập theo sheet nhạc")).toBeInTheDocument();
+    expect(screen.getByText("Hò kéo pháo")).toBeInTheDocument();
+    expect(screen.queryByText("Bonus tuần 3")).not.toBeInTheDocument();
+  });
+
+  it("opens the classes that match the search and hides the others", async () => {
+    mockOverview(OVERVIEW);
+    renderList({ canCreate: true });
+    await userEvent.type(await screen.findByRole("searchbox", { name: "Tìm bài tập" }), "ngua");
+    expect(await screen.findByText("Độc tấu - Lý ngựa ô")).toBeInTheDocument();
+    expect(screen.queryByText("Bonus tuần 3")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /TRD302/ })).not.toBeInTheDocument();
+  });
+
+  it("says when nothing matches the search", async () => {
+    mockOverview(OVERVIEW);
+    renderList({ canCreate: true });
+    await userEvent.type(await screen.findByRole("searchbox", { name: "Tìm bài tập" }), "zzz");
+    expect(await screen.findByText("Không có bài tập nào khớp “zzz”.")).toBeInTheDocument();
+  });
+
+  it("opens and scrolls to the class given in the URL", async () => {
+    mockOverview(OVERVIEW);
+    renderList({ canCreate: true }, "/teacher/assignments?class=c2");
+    expect(await screen.findByText("Hòa tấu hò kéo pháo")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /TRD302/ })).toHaveAttribute("aria-expanded", "true");
+    await waitFor(() => expect(Element.prototype.scrollIntoView).toHaveBeenCalled());
+  });
+
+  it.each([
+    ["NO_SEMESTER_CONFIGURED", "Chưa có học kỳ nào được cấu hình."],
+    ["NO_CURRENT_SEMESTER", "không nằm trong học kỳ nào đã cấu hình"],
+    ["NO_CLASSES_IN_SEMESTER", "Bạn chưa có lớp nào trong học kỳ HK1 2026-2027."],
+  ] as const)("explains %s and blocks assigning", async (emptyReason, message) => {
+    mockOverview({ semester: emptyReason === "NO_CLASSES_IN_SEMESTER" ? SEMESTER : null, emptyReason, classes: [] });
+    renderList({ canCreate: true });
+    expect(await screen.findByRole("status")).toHaveTextContent(message);
+    expect(screen.queryByRole("tablist")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Gán bài tập cho lớp" })).toBeDisabled();
+  });
+
+  it("hides the action buttons when the lecturer cannot create", async () => {
+    mockOverview(OVERVIEW);
+    renderList({ canCreate: false });
+    await screen.findByRole("tab", { name: /Theo lớp/ });
+    expect(screen.queryByRole("button", { name: "Gán bài tập cho lớp" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Tạo bài tập/ })).not.toBeInTheDocument();
-    expect(screen.getByText("Lớp chưa có bài Hòa tấu.")).toBeInTheDocument();
   });
 
-  it("switches to the class view when a class is picked and back when cleared", async () => {
-    mockItems([ITEM]);
+  it("opens the create dialog and the assign dialog from the toolbar", async () => {
+    mockOverview(OVERVIEW);
     renderList({ canCreate: true });
-    await screen.findByText("Độc tấu - Lý ngựa ô");
-    expect(screen.queryByRole("heading", { name: "Bài tập khác" })).not.toBeInTheDocument();
-    await userEvent.selectOptions(await screen.findByLabelText("Lớp"), "c1");
-    expect(await screen.findByRole("heading", { name: "Bài tập khác" })).toBeInTheDocument();
-    expect(assignmentsApi.listAssignments).toHaveBeenLastCalledWith(expect.objectContaining({ classId: "c1" }));
-    await userEvent.selectOptions(screen.getByLabelText("Lớp"), "ALL");
-    expect(screen.queryByRole("heading", { name: "Bài tập khác" })).not.toBeInTheDocument();
+    await userEvent.click(await screen.findByRole("button", { name: /Tạo bài tập/ }));
+    const createDialog = await screen.findByRole("dialog");
+    expect(within(createDialog).getByRole("heading", { name: "Tạo bài tập" })).toBeInTheDocument();
   });
 
-  it("does not offer to create into the empty slots of an ended class", async () => {
-    mockItems([]);
-    renderList({ canCreate: true }, "/teacher/assignments?class=c9");
-    expect(await screen.findByText("Lớp chưa có bài Hòa tấu.")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /Tạo bài Hòa tấu/ })).not.toBeInTheDocument();
-  });
-
-  it("shows the ensemble and solo slots above the other assignments for a class", async () => {
-    mockItems([ITEM, { ...ITEM, id: "a2", title: "Bonus tuần 3", kind: "BONUS" }]);
-    renderList({ canCreate: true }, "/teacher/assignments?class=c1");
-    await screen.findByText("Độc tấu - Lý ngựa ô");
-    expect(screen.queryByLabelText("Loại")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /Tạo bài Độc tấu/ })).not.toBeInTheDocument();
-    const heading = screen.getByRole("heading", { name: "Bài tập khác" });
-    expect(heading.compareDocumentPosition(screen.getByText("Bonus tuần 3"))).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
-    expect(heading.compareDocumentPosition(screen.getByText("Độc tấu - Lý ngựa ô"))).toBe(
-      Node.DOCUMENT_POSITION_PRECEDING
-    );
-    await userEvent.click(await screen.findByRole("button", { name: /Tạo bài Hòa tấu/ }));
-    const dialog = await screen.findByRole("dialog");
-    expect(await within(dialog).findByLabelText(/Loại/)).toHaveValue("ENSEMBLE");
+  it("opens the assign dialog", async () => {
+    mockOverview(OVERVIEW);
+    renderList({ canCreate: true });
+    await userEvent.click(await screen.findByRole("button", { name: "Gán bài tập cho lớp" }));
+    expect(await screen.findByRole("heading", { name: "Gán bài tập cho lớp" })).toBeInTheDocument();
   });
 });

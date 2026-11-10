@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -43,6 +43,14 @@ function toFormValues(classDetail: ClassDetail | null, defaultSemesterName: stri
   };
 }
 
+export interface ClassFormPrefill {
+  // Changes whenever a different source class is picked.
+  key: string;
+  name: string;
+  description: string | null;
+  coLecturers: Lecturer[];
+}
+
 interface ClassFormProps {
   // null = tạo lớp mới
   classDetail: ClassDetail | null;
@@ -50,9 +58,19 @@ interface ClassFormProps {
   semesters: Semester[];
   defaultSemesterName: string | null;
   isSaving: boolean;
+  // Blocks submit without showing the saving label (e.g. while a copy source is loading).
+  submitDisabled?: boolean;
   onCancel: () => void;
   onSubmit: (payload: Partial<ClassPayload>) => Promise<ApiFieldError[] | null>;
   onDirtyChange?: (isDirty: boolean) => void;
+  // Create flow only: values copied from another class.
+  prefill?: ClassFormPrefill | null;
+  // Rendered right before the start/end date block.
+  copySection?: ReactNode;
+  // Reports the instrument derived from the class code.
+  onInstrumentChange?: (instrumentId: string) => void;
+  // Called before onSubmit; false stops the submit.
+  beforeSubmit?: () => boolean;
 }
 
 // Form lớp học dùng cho modal tạo lớp và trang sửa lớp
@@ -62,9 +80,14 @@ export function ClassForm({
   semesters,
   defaultSemesterName,
   isSaving,
+  submitDisabled = false,
   onCancel,
   onSubmit,
   onDirtyChange,
+  prefill = null,
+  copySection,
+  onInstrumentChange,
+  beforeSubmit,
 }: ClassFormProps) {
   const isCreate = classDetail === null;
   // GBR-36: subject (instrument) and semester are locked once the class has started.
@@ -76,6 +99,7 @@ export function ClassForm({
     setError,
     setValue,
     getValues,
+    reset,
     formState: { errors, isSubmitted, isDirty },
   } = useForm<ClassFormValues>({
     resolver: zodResolver(isCreate ? createClassFormSchema : classFormSchema),
@@ -115,12 +139,55 @@ export function ClassForm({
   const targetKey = semesterTarget ? `${semesterTarget.kind}:${targetCohort}` : null;
   const lastAppliedTarget = useRef<string | null>(null);
 
+  // Create flow: applying or removing a copied class. Declared before the effects below so they see the reset.
+  const appliedPrefillKey = useRef<string | null>(null);
+  const prefillKey = prefill?.key ?? null;
+  // Co-lecturers are plain state: adjust them while rendering when the prefill changes.
+  const [seenPrefillKey, setSeenPrefillKey] = useState<string | null>(null);
+  if (isCreate && prefillKey !== seenPrefillKey) {
+    setSeenPrefillKey(prefillKey);
+    setCoLecturers(prefill?.coLecturers ?? []);
+    setCoLecturerError(undefined);
+  }
+  useEffect(() => {
+    if (!isCreate || prefillKey === appliedPrefillKey.current) return;
+    appliedPrefillKey.current = prefillKey;
+    if (prefill) {
+      // The instrument and semester effects only re-run when their inputs change, so derive both from the
+      // copied code here instead of relying on them.
+      const code = parseClassCode(prefill.name);
+      const instrument = code ? findInstrumentBySubject(instruments, code.subject) : null;
+      const half = toSemesterHalf(code?.half);
+      const target = half ? resolveSemesterForHalf(semesters, half) : null;
+      reset(
+        {
+          name: prefill.name,
+          instrumentId: instrument?.id ?? "",
+          cohort: target?.kind === "found" ? target.semester.name : (defaultSemesterName ?? ""),
+          description: prefill.description ?? "",
+        },
+        { keepDefaultValues: true }
+      );
+      // A non-empty copied description never equals "", so the generated one will not replace it.
+      lastAutoDescription.current = "";
+    } else {
+      reset(toFormValues(null, defaultSemesterName), { keepDefaultValues: true });
+      lastAutoDescription.current = "";
+    }
+    lastAppliedTarget.current = null;
+  }, [isCreate, prefillKey, prefill, defaultSemesterName, instruments, semesters, reset]);
+
   useEffect(() => {
     const previous = lastAppliedTarget.current;
     lastAppliedTarget.current = targetKey;
     if (targetKey === null || targetKey === previous) return;
     setValue("cohort", targetCohort, { shouldDirty: true, shouldValidate: isSubmitted });
   }, [targetKey, targetCohort, isSubmitted, setValue]);
+
+  const matchedInstrumentId = matchedInstrument?.id ?? "";
+  useEffect(() => {
+    onInstrumentChange?.(matchedInstrumentId);
+  }, [matchedInstrumentId, onInstrumentChange]);
 
   useEffect(() => {
     if (!isCreate) return;
@@ -169,6 +236,7 @@ export function ClassForm({
       ...(isLocked ? {} : { instrumentId: values.instrumentId, cohort: values.cohort }),
       ...(isCreate ? { coLecturerIds: coLecturers.map((lecturer) => lecturer.id) } : {}),
     };
+    if (beforeSubmit && !beforeSubmit()) return;
     setCoLecturerError(undefined);
     const fieldErrors = await onSubmit(payload);
     if (!fieldErrors) return;
@@ -320,6 +388,8 @@ export function ClassForm({
           </FormField>
         )}
 
+        {copySection}
+
         <div className="grid gap-[14px] sm:grid-cols-2">
           <FormField htmlFor="class-start-date" label="Ngày bắt đầu" hint="Theo học kỳ đã chọn">
             <input
@@ -345,7 +415,7 @@ export function ClassForm({
         <ActionButton variant="secondary" onClick={onCancel} disabled={isSaving}>
           Hủy
         </ActionButton>
-        <ActionButton type="submit" disabled={isSaving}>
+        <ActionButton type="submit" disabled={isSaving || submitDisabled}>
           {isSaving ? "Đang lưu…" : isCreate ? "Tạo lớp" : "Lưu"}
         </ActionButton>
       </FormFooter>

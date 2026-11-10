@@ -1,6 +1,7 @@
 import { axiosClient } from "@/shared/api/axiosClient";
 import { type ApiResponse } from "@/shared/types/commonTypes";
 import {
+  type ClassCopySource,
   type ClassDetail,
   type ClassListParams,
   type ClassListResult,
@@ -24,6 +25,7 @@ export const classesApi = {
   listClasses: (params: ClassListParams) => axiosClient.get<ApiResponse<ClassListResult>>("/classes", { params }),
   getClass: (classId: string) => axiosClient.get<ApiResponse<ClassDetail>>(`/classes/${classId}`),
   createClass: (payload: ClassPayload) => axiosClient.post<ApiResponse<ClassDetail>>("/classes", payload),
+  getCopySource: (classId: string) => axiosClient.get<ApiResponse<ClassCopySource>>(`/classes/${classId}/copy-source`),
   updateClass: (classId: string, payload: Partial<ClassPayload>) =>
     axiosClient.patch<ApiResponse<ClassDetail>>(`/classes/${classId}`, payload),
   endClass: (classId: string) => axiosClient.post<ApiResponse<ClassDetail>>(`/classes/${classId}/end`),
