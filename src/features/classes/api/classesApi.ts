@@ -3,6 +3,8 @@ import { type ApiResponse } from "@/shared/types/commonTypes";
 import {
   type ClassCopySource,
   type ClassDetail,
+  type ClassFileImportPreview,
+  type ClassFileImportResult,
   type ClassListParams,
   type ClassListResult,
   type ClassPayload,
@@ -17,6 +19,14 @@ import {
   type SemesterList,
   type StudentPayload,
 } from "@/features/classes/types/classTypes";
+
+function buildFileForm(file: File) {
+  const formData = new FormData();
+  formData.append("file", file);
+  return formData;
+}
+
+const MULTIPART = { headers: { "Content-Type": "multipart/form-data" } };
 
 export const classesApi = {
   listInstruments: () => axiosClient.get<ApiResponse<Instrument[]>>("/instruments", { params: { active: "true" } }),
@@ -54,6 +64,14 @@ export const classesApi = {
       headers: { "Content-Type": "multipart/form-data" },
     });
   },
+  previewClassFileImport: (file: File) =>
+    axiosClient.post<ApiResponse<ClassFileImportPreview>>(
+      "/classes/file-imports/preview",
+      buildFileForm(file),
+      MULTIPART
+    ),
+  confirmClassFileImport: (file: File) =>
+    axiosClient.post<ApiResponse<ClassFileImportResult>>("/classes/file-imports", buildFileForm(file), MULTIPART),
   confirmImport: (classId: string, logId: string) =>
     axiosClient.post<ApiResponse<ImportConfirmResult>>(`/classes/${classId}/imports/${logId}/confirm`),
   cancelImport: (classId: string, logId: string) =>

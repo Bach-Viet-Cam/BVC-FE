@@ -112,6 +112,14 @@ describe("ClassListPage", () => {
     expect(navigate).not.toHaveBeenCalledWith("/teacher/classes/new");
   });
 
+  it("opens the file import dialog from the Nhập file SV button", async () => {
+    mockClasses([CLASS_FA26]);
+    renderPage();
+    await userEvent.click(await screen.findByRole("button", { name: "Nhập file SV" }));
+    const dialog = await screen.findByRole("dialog");
+    expect(within(dialog).getByRole("heading", { name: "Nhập file SV" })).toBeInTheDocument();
+  });
+
   it("shows the load error with a retry that refetches", async () => {
     vi.mocked(classesApi.listClasses).mockRejectedValueOnce(new Error("boom"));
     renderPage();
