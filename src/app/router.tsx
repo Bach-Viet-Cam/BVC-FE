@@ -9,7 +9,6 @@ import { TunerPage } from "@/features/practice/pages/TunerPage";
 import { MetronomePage } from "@/features/practice/pages/MetronomePage";
 import { ProcessingPage } from "@/features/practice/pages/ProcessingPage";
 import { ResultsPage } from "@/features/practice/pages/ResultsPage";
-import { SegmentPracticePage } from "@/features/practice/pages/SegmentPracticePage";
 import { SubmissionHistoryPage } from "@/features/practice/pages/SubmissionHistoryPage";
 import { SubmissionComparePage } from "@/features/practice/pages/SubmissionComparePage";
 
@@ -45,6 +44,7 @@ import { EnsemblePage } from "@/features/ensemble/pages/EnsemblePage";
 import { EnsemblePlaybackPage } from "@/features/ensemble/pages/EnsemblePlaybackPage";
 import { NotificationsPage } from "@/features/platform/pages/NotificationsPage";
 import { HelpCenterPage } from "@/features/platform/pages/HelpCenterPage";
+import { InstallGuidePage } from "@/features/landing/pages/InstallGuidePage";
 
 // Desktop - teacher / classes
 import { TeacherHomePage } from "@/features/classes/pages/TeacherHomePage";
@@ -99,6 +99,7 @@ export function AppRouter() {
         {/* Public */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/landing" element={<Navigate to="/" replace />} />
+        <Route path="/install" element={<InstallGuidePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/403" element={<ForbiddenPage />} />
 
@@ -137,7 +138,6 @@ export function AppRouter() {
             <Route path="/practice/sheets/:sheetId/metronome" element={<MetronomePage />} />
             <Route path="/practice/submissions/:submissionId/processing" element={<ProcessingPage />} />
             {/* UC-03 - luyện lại một đoạn; đặt trước :submissionId để không bị nhầm với trang kết quả */}
-            <Route path="/practice/submissions/:submissionId/segment" element={<SegmentPracticePage />} />
             <Route path="/practice/submissions/:submissionId" element={<ResultsPage />} />
             {/* SCR-01, SCR-02 - lịch sử và so sánh bài nộp (mockup) */}
             <Route path="/practice/submissions" element={<SubmissionHistoryPage />} />

@@ -25,6 +25,8 @@ import { cn } from "@/shared/utils/cn";
 const LEFT = 64;
 const RIGHT = 10;
 const CHART_HEIGHT = 380;
+// Bề ngang tối thiểu của biểu đồ; khung hẹp hơn thì cuộn ngang
+const MIN_CHART_WIDTH = 640;
 // Khung cao độ: hàng nhãn vùng lỗi ở trên, đường cao độ bên dưới để nhãn không đè lên đường
 const ZONE_TOP = 4;
 const CHIP_ROWS = [6, 25];
@@ -253,10 +255,14 @@ export function PitchContourCard({ chart, loading, error }: PitchContourCardProp
 function PitchContourChart({ chart, mode, onFullscreen, fullscreen = false, initialView }: { chart: PitchChart; mode: SeriesMode; onFullscreen: (view?: ChartView) => void; fullscreen?: boolean; initialView?: ChartView }) {
   const height = useFullscreenChartHeight(fullscreen, CHART_HEIGHT);
   const { ref, width } = useElementWidth<HTMLDivElement>();
+  // Khung hẹp hơn MIN_CHART_WIDTH thì giữ nguyên tỉ lệ biểu đồ và cho cuộn ngang thay vì co lại
+  const chartWidth = Math.max(width, MIN_CHART_WIDTH);
   return (
-    <div className="overflow-hidden rounded-xl border border-bvc-border bg-bvc-soft p-2.5 pt-3">
-      <div ref={ref} className="relative" style={{ height: height + 60 }}>
-        {width > LEFT + RIGHT && <PitchContourPlot chart={chart} width={width} mode={mode} onFullscreen={onFullscreen} fullscreen={fullscreen} initialView={initialView} height={height} />}
+    <div className="rounded-xl border border-bvc-border bg-bvc-soft p-2.5 pt-3">
+      <div ref={ref} className="overflow-x-auto overscroll-x-contain">
+        <div className="relative" style={{ width: chartWidth, height: height + 60 }}>
+          {width > 0 && <PitchContourPlot chart={chart} width={chartWidth} viewportWidth={width} mode={mode} onFullscreen={onFullscreen} fullscreen={fullscreen} initialView={initialView} height={height} />}
+        </div>
       </div>
     </div>
   );
@@ -281,7 +287,7 @@ function prepareChart(chart: PitchChart): PreparedChart {
   return { shown, base, bounds };
 }
 
-function PitchContourPlot({ chart, width, mode, onFullscreen, fullscreen, initialView, height }: { chart: PitchChart; width: number; mode: SeriesMode; onFullscreen: (view?: ChartView) => void; fullscreen: boolean; initialView?: ChartView; height: number }) {
+function PitchContourPlot({ chart, width, viewportWidth, mode, onFullscreen, fullscreen, initialView, height }: { chart: PitchChart; width: number; viewportWidth: number; mode: SeriesMode; onFullscreen: (view?: ChartView) => void; fullscreen: boolean; initialView?: ChartView; height: number }) {
   const pitchBottom = height - (CHART_HEIGHT - PITCH_BOTTOM);
   const tickTop = height - (CHART_HEIGHT - TICK_TOP);
   const tickLabelY = height - (CHART_HEIGHT - TICK_LABEL_Y);
@@ -386,7 +392,7 @@ function PitchContourPlot({ chart, width, mode, onFullscreen, fullscreen, initia
         onPointerMove={handlePointerMove}
         onPointerUp={endDrag}
         onPointerCancel={endDrag}
-        style={{ touchAction: zoomed ? "none" : "pan-y" }}
+        style={{ touchAction: zoomed ? "none" : "pan-x pan-y" }}
         width={width}
         height={height}
         viewBox={`0 0 ${width} ${height}`}
@@ -518,7 +524,8 @@ function PitchContourPlot({ chart, width, mode, onFullscreen, fullscreen, initia
         )}
       </svg>
 
-      <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+      {/* Hàng nút giữ nguyên trong khung nhìn khi cuộn ngang biểu đồ */}
+      <div className="sticky left-0 flex flex-wrap items-center justify-between gap-2 pt-1" style={{ width: viewportWidth }}>
         <p className="text-[11px] text-bvc-faint">
           Ctrl + cuộn chuột (hoặc nút bên phải) để phóng to theo thời gian và cao độ; khi đã phóng, kéo để di chuyển.
         </p>

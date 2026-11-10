@@ -4,10 +4,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Menu, Music2, X } from "lucide-react";
 import bannerImage from "@/assets/image/Artboard 3.png";
 import logoImage from "@/assets/image/logo.png";
+import { InstallAppButton } from "@/features/landing/components/InstallAppButton";
 import { PillLink } from "@/shared/components/bvc/PillLink";
 import { useLandingAccount } from "@/features/landing/hooks/useLandingAccount";
 import { cn } from "@/shared/utils/cn";
 import { LANDING_INSTRUMENTS, LANDING_NAV } from "@/features/landing/constants/landingContent";
+
+const DESKTOP_NAV_LINK = "text-[15px] font-medium text-white/80 transition-colors hover:text-white";
+const MOBILE_NAV_LINK = "font-bvc-display text-2xl font-semibold text-bvc-ink";
 
 // Phần đầu trang: thanh điều hướng, tiêu đề, nút bắt đầu và dải tên nhạc cụ chạy ngang trên nền ảnh BVC
 export function LandingHero() {
@@ -55,12 +59,15 @@ export function LandingHero() {
           <ul className="hidden items-center gap-8 lg:flex">
             {LANDING_NAV.map((item) => (
               <li key={item.href}>
-                <a
-                  href={item.href}
-                  className="text-[15px] font-medium text-white/80 transition-colors hover:text-white"
-                >
-                  {item.label}
-                </a>
+                {item.isRoute ? (
+                  <Link to={item.href} className={DESKTOP_NAV_LINK}>
+                    {item.label}
+                  </Link>
+                ) : (
+                  <a href={item.href} className={DESKTOP_NAV_LINK}>
+                    {item.label}
+                  </a>
+                )}
               </li>
             ))}
           </ul>
@@ -116,13 +123,15 @@ export function LandingHero() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.08 * index, ease: "easeOut" }}
                   >
-                    <a
-                      href={item.href}
-                      onClick={() => setIsMenuOpen(false)}
-                      className="font-bvc-display text-2xl font-semibold text-bvc-ink"
-                    >
-                      {item.label}
-                    </a>
+                    {item.isRoute ? (
+                      <Link to={item.href} className={MOBILE_NAV_LINK}>
+                        {item.label}
+                      </Link>
+                    ) : (
+                      <a href={item.href} onClick={() => setIsMenuOpen(false)} className={MOBILE_NAV_LINK}>
+                        {item.label}
+                      </a>
+                    )}
                   </motion.li>
                 ))}
               </ul>
@@ -172,10 +181,13 @@ export function LandingHero() {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 1, duration: 0.8, ease: "easeOut" }}
-            className="mt-9 flex flex-col items-center gap-3 sm:flex-row lg:mt-12"
+            className="mt-9 flex flex-col items-center gap-3 lg:mt-12"
           >
-            <PillLink to={homePath} label="Bắt đầu luyện tập" variant="light" />
-            <PillLink to="/library" label="Xem thư viện bài hát" variant="glass" />
+            <div className="flex flex-col items-center gap-3 sm:flex-row">
+              <PillLink to={homePath} label="Bắt đầu luyện tập" variant="light" />
+              <PillLink to="/library" label="Xem thư viện bài hát" variant="glass" />
+            </div>
+            <InstallAppButton />
           </motion.div>
 
           <motion.div

@@ -1,3 +1,9 @@
+import {
+  type AssignmentContentPayload,
+  type AssignmentKind,
+  type AssignmentSheetMusic,
+} from "@/features/classes/types/teacherAssignmentTypes";
+
 export type ClassStatus = "ACTIVE" | "ENDED";
 export type ClassStatusFilter = ClassStatus | "ALL";
 export type AccountStatus = "PENDING" | "ACTIVE" | "LOCKED";
@@ -65,6 +71,42 @@ export interface ClassPayload {
   instrumentId: string;
   description: string | null;
   coLecturerIds?: string[];
+  sourceClassId?: string;
+  assignments?: CopyAssignmentPayload[];
+}
+
+export type CopyAssignmentStatus = "DRAFT" | "PUBLISHED";
+
+export interface CopyAssignmentPayload extends AssignmentContentPayload {
+  status: CopyAssignmentStatus;
+}
+
+export interface ClassCopySource {
+  id: string;
+  name: string;
+  cohort: string;
+  description: string | null;
+  instrument: { id: string; name: string };
+  coLecturers: Lecturer[];
+  assignments: Array<{
+    id: string;
+    title: string;
+    kind: AssignmentKind;
+    description: string | null;
+    sheetMusic: AssignmentSheetMusic | null;
+    requiredBpm: number | null;
+    status: "DRAFT" | "PUBLISHED" | "CLOSED";
+  }>;
+}
+
+// One row in the copy-assignments list
+export interface CopyAssignmentRow {
+  key: string;
+  checked: boolean;
+  content: AssignmentContentPayload;
+  sheetMusic: AssignmentSheetMusic | null;
+  status: CopyAssignmentStatus;
+  error: string | null;
 }
 
 // Configured by System Admin; a class runs exactly from startDate to endDate of its semester.

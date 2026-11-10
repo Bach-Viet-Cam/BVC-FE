@@ -32,7 +32,7 @@ export const practiceSubmissionApi = {
       timeout: 15_000,
     }),
   retry: (id: string) =>
-    axiosClient.post<ApiResponse<PracticeSubmission>>(`/practice/submissions/${encodeURIComponent(id)}/retry`, null, {
+    axiosClient.post<ApiResponse<PracticeSubmission>>(`/practice/submissions/${encodeURIComponent(id)}/retry`, {}, {
       timeout: 30_000,
     }),
 };

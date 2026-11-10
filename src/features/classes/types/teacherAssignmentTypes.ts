@@ -119,3 +119,57 @@ export interface CreateAssignmentPayload extends AssignmentContentPayload {
 }
 
 export type AssignmentAction = "publish" | "close" | "reopen";
+
+export type OverviewEmptyReason = "NO_SEMESTER_CONFIGURED" | "NO_CURRENT_SEMESTER" | "NO_CLASSES_IN_SEMESTER";
+export type AssignSkipReason =
+  | "NOT_CLASS_LECTURER"
+  | "NOT_CURRENT_SEMESTER"
+  | "CLASS_NOT_ACTIVE"
+  | "SHEET_UNAVAILABLE"
+  | "ALREADY_ASSIGNED"
+  | "KIND_SLOT_TAKEN";
+
+export interface OverviewSemester {
+  name: string;
+  startDate: string;
+  endDate: string;
+}
+
+export interface OverviewAssignment {
+  id: string;
+  classId: string;
+  title: string;
+  kind: AssignmentKind;
+  status: AssignmentStatus;
+  version: number;
+  sheetMusicId: string | null;
+  sheetTitle: string | null;
+  practiceCount: number;
+  submittedCount: number;
+  memberCount: number;
+  updatedAt: string;
+}
+
+export interface OverviewClass {
+  id: string;
+  name: string;
+  status: ClassStatus;
+  memberCount: number;
+  assignments: OverviewAssignment[];
+}
+
+export interface AssignmentOverview {
+  semester: OverviewSemester | null;
+  emptyReason: OverviewEmptyReason | null;
+  classes: OverviewClass[];
+}
+
+export interface AssignPayload {
+  assignmentIds: string[];
+  classIds: string[];
+}
+
+export interface AssignResult {
+  created: AssignmentBase[];
+  skipped: { assignmentId: string; classId: string; reason: AssignSkipReason }[];
+}
