@@ -155,7 +155,7 @@ export function LandingHero() {
             transition={{ delay: 0.4, duration: 0.8, ease: "easeOut" }}
             className="mb-6 flex items-center gap-2 rounded-full border border-white/40 bg-white/10 px-4 py-1.5 text-center text-[14px] font-medium text-white backdrop-blur-sm sm:text-[15px]"
           >
-            Nền tảng luyện nhạc cụ dân tộc cho sinh viên
+            Nền tảng luyện nhạc cụ dân tộc cho sinh viên Đại Học FPT
           </motion.p>
 
           <motion.h1

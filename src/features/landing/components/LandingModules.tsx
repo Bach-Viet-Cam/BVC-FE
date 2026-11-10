@@ -1,6 +1,5 @@
 import { Fragment } from "react";
 import { motion } from "framer-motion";
-import { LogIn } from "lucide-react";
 import logoImage from "@/assets/image/logo.png";
 import { Accent, SectionBadge, SectionHeading } from "@/shared/components/bvc/SectionIntro";
 import {
@@ -169,20 +168,6 @@ export function LandingModules() {
             </ul>
           </div>
         </div>
-
-        <motion.p
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="mx-auto mt-12 flex w-fit items-center gap-3 rounded-full border border-bvc-accent/15 bg-white px-5 py-2.5 text-[14px] shadow-[0_4px_24px_rgba(47,122,98,0.05)] md:mt-20 md:text-[15px]"
-        >
-          <LogIn className="size-5 text-bvc-accent" aria-hidden />
-          <span>
-            <span className="font-semibold text-bvc-accent">Đăng nhập nhanh bằng Google.</span>{" "}
-            <span className="text-bvc-ink/50">Thư viện xem được cả khi chưa đăng nhập.</span>
-          </span>
-        </motion.p>
       </div>
     </section>
   );

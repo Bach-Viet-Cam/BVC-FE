@@ -1,5 +1,5 @@
-import { ChevronDown, ChevronLeft, ChevronRight, Search, X } from "lucide-react";
-import { useSearchParams } from "react-router-dom";
+import { ChevronDown, ChevronLeft, ChevronRight, Download, Search, X } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
 import { faqApi } from "@/features/platform/api/faqApi";
 import { instrumentApi } from "@/features/platform/api/instrumentApi";
 import { FAQ_TOPICS } from "@/features/platform/types/faqTypes";
@@ -8,12 +8,16 @@ import { EmptyState } from "@/shared/components/bvc/EmptyState";
 import { PageHero } from "@/shared/components/bvc/PageHero";
 import { RoleShell } from "@/shared/components/bvc/RoleShell";
 import { INPUT_CLASSES } from "@/shared/components/bvc/fieldStyles";
+import { FEEDBACK_FORM_URL } from "@/shared/constants/contact";
 import { useAsyncData } from "@/shared/hooks/useAsyncData";
 import { useDebouncedValue } from "@/shared/hooks/useDebouncedValue";
 import { usePageMeta } from "@/shared/hooks/usePageMeta";
 
 export function HelpCenterPage() {
-  usePageMeta({ title: "Câu hỏi thường gặp", description: "Giải đáp các câu hỏi thường gặp khi luyện tập, nộp bài và sử dụng nền tảng Bách Việt Cầm." });
+  usePageMeta({
+    title: "Câu hỏi thường gặp",
+    description: "Giải đáp các câu hỏi thường gặp khi luyện tập, nộp bài và sử dụng nền tảng Bách Việt Cầm.",
+  });
   const [searchParams, setSearchParams] = useSearchParams();
   const q = searchParams.get("q") ?? "";
   const topic = searchParams.get("topic") ?? "";
@@ -112,6 +116,13 @@ export function HelpCenterPage() {
                 ))}
               </select>
             </label>
+            <Link
+              to="/install"
+              className="flex min-h-11 items-center gap-2.5 rounded-[11px] border border-bvc-border-strong bg-white px-3 py-2.5 text-sm leading-snug font-semibold text-bvc-ink transition-colors hover:bg-bvc-surface hover:text-bvc-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bvc-ink sm:order-last sm:col-span-2 lg:order-none lg:col-span-1"
+            >
+              <Download size={17} className="shrink-0 text-bvc-accent" aria-hidden />
+              Hướng dẫn thêm vào màn hình chính
+            </Link>
             <label className="flex min-w-0 flex-col gap-2 text-sm font-semibold text-bvc-ink">
               Nhạc cụ
               <select
@@ -243,6 +254,17 @@ export function HelpCenterPage() {
           )}
         </section>
       </div>
+      <p className="border-t border-bvc-border pt-6 text-sm text-bvc-muted">
+        Chưa tìm thấy câu trả lời?{" "}
+        <a
+          href={FEEDBACK_FORM_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-semibold text-bvc-ink underline underline-offset-4"
+        >
+          Gửi góp ý cho chúng tôi
+        </a>
+      </p>
     </RoleShell>
   );
 }

@@ -1,11 +1,26 @@
 import { Link } from "react-router-dom";
-import { Bell, Bookmark, ChevronRight, CircleHelp, LogOut, Mail, type LucideIcon } from "lucide-react";
+import {
+  Bell,
+  Bookmark,
+  ChevronRight,
+  CircleHelp,
+  ExternalLink,
+  LogOut,
+  Mail,
+  MessageSquareText,
+  type LucideIcon,
+} from "lucide-react";
 import { RoleShell } from "@/shared/components/bvc/RoleShell";
 import { UserAvatar } from "@/shared/components/bvc/UserAvatar";
+import { FEEDBACK_FORM_URL } from "@/shared/constants/contact";
 import { ROLES, ROLE_LABELS } from "@/shared/constants/roles";
 import { useAuth } from "@/shared/context/AuthContext";
 
 const ROLE_LABEL_BY_NUMBER: Record<number, string> = ROLE_LABELS;
+const ROW_CLASS =
+  "group flex items-center gap-3 border-b border-bvc-border px-5 py-3.5 text-bvc-ink transition-colors last:border-b-0 hover:bg-bvc-soft hover:text-bvc-ink";
+const ROW_ICON_CLASS =
+  "flex size-10 shrink-0 items-center justify-center rounded-[13px] bg-bvc-soft text-bvc-accent transition-colors group-hover:bg-white";
 
 interface AccountLink {
   label: string;
@@ -50,12 +65,8 @@ export function ProfilePage() {
 
       <nav aria-label="Tài khoản" className="overflow-hidden rounded-bvc-xl border border-bvc-border bg-white">
         {accountLinksFor(user.role).map((item) => (
-          <Link
-            key={item.to}
-            to={item.to}
-            className="group flex items-center gap-3 border-b border-bvc-border px-5 py-3.5 text-bvc-ink transition-colors last:border-b-0 hover:bg-bvc-soft hover:text-bvc-ink"
-          >
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-[13px] bg-bvc-soft text-bvc-accent transition-colors group-hover:bg-white">
+          <Link key={item.to} to={item.to} className={ROW_CLASS}>
+            <span className={ROW_ICON_CLASS}>
               <item.icon className="size-[18px]" strokeWidth={1.8} />
             </span>
             <span className="min-w-0 flex-1 truncate text-[14.5px] font-medium">{item.label}</span>
@@ -65,6 +76,13 @@ export function ProfilePage() {
             />
           </Link>
         ))}
+        <a href={FEEDBACK_FORM_URL} target="_blank" rel="noopener noreferrer" className={ROW_CLASS}>
+          <span className={ROW_ICON_CLASS}>
+            <MessageSquareText className="size-[18px]" strokeWidth={1.8} />
+          </span>
+          <span className="min-w-0 flex-1 truncate text-[14.5px] font-medium">Gửi góp ý</span>
+          <ExternalLink aria-hidden className="size-[17px] shrink-0 text-bvc-faint" />
+        </a>
       </nav>
 
       <button

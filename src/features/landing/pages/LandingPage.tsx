@@ -1,9 +1,7 @@
 import { MotionConfig } from "framer-motion";
-import { LandingBenefits } from "@/features/landing/components/LandingBenefits";
 import { LandingFeatures } from "@/features/landing/components/LandingFeatures";
 import { LandingFooter } from "@/features/landing/components/LandingFooter";
 import { LandingHero } from "@/features/landing/components/LandingHero";
-import { LandingLibraryShowcase } from "@/features/landing/components/LandingLibraryShowcase";
 import { LandingModules } from "@/features/landing/components/LandingModules";
 import { usePageMeta } from "@/shared/hooks/usePageMeta";
 
@@ -15,9 +13,7 @@ export function LandingPage() {
       <main className="min-h-screen scroll-smooth bg-white text-bvc-ink">
         <LandingHero />
         <LandingFeatures />
-        <LandingBenefits />
         <LandingModules />
-        <LandingLibraryShowcase />
         <LandingFooter />
       </main>
     </MotionConfig>
