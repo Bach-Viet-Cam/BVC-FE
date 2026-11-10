@@ -56,4 +56,13 @@ describe("StudentShell bottom tab bar", () => {
     const nav = within(screen.getByRole("navigation", { name: "Điều hướng chính" }));
     expect(nav.getAllByRole("link").map((link) => link.textContent)).toEqual(["Thư viện", "Trợ giúp"]);
   });
+
+  it("offers guests a login icon on mobile that returns them to the current page", () => {
+    auth.user = null;
+    renderAt("/help");
+    const links = screen.getAllByRole("link", { name: "Đăng nhập" });
+    expect(links).toHaveLength(2);
+    links.forEach((link) => expect(link).toHaveAttribute("href", "/login"));
+    expect(links[0]).toHaveClass("md:hidden");
+  });
 });
