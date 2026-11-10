@@ -3,7 +3,11 @@ import { useSegmentAttempts } from "@/features/practice/hooks/useSegmentAttempts
 import type { SegmentSummary } from "@/features/practice/types/practiceSegmentTypes";
 import { fmtTime } from "@/features/practice/utils/practiceFormat";
 import { formatAttemptTime } from "@/features/practice/utils/resultFormat";
-import { buildSegmentPath, formatScoreDelta } from "@/features/practice/utils/segmentFormat";
+import {
+  buildAttemptProcessingPath,
+  buildAttemptResultPath,
+  formatScoreDelta,
+} from "@/features/practice/utils/segmentFormat";
 
 interface SegmentAttemptsCardProps {
   submissionId: string;
@@ -38,7 +42,9 @@ export function SegmentAttemptsCard({ submissionId }: SegmentAttemptsCardProps) 
               type="button"
               onClick={() =>
                 navigate(
-                  `${buildSegmentPath(submissionId, { start: item.startSec, end: item.endSec, countIn: false })}&attemptId=${encodeURIComponent(item.id)}`
+                  item.status === "PROCESSING"
+                    ? buildAttemptProcessingPath(submissionId, item.id)
+                    : buildAttemptResultPath(submissionId, item.id)
                 )
               }
               className="flex min-h-12 w-full cursor-pointer items-center justify-between gap-3 py-2.5 text-left"

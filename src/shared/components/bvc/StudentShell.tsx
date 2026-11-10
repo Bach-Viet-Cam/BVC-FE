@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { Bookmark, LibraryBig } from "lucide-react";
+import { Bookmark, LibraryBig, LogIn } from "lucide-react";
 import { useAuth } from "@/shared/context/AuthContext";
 import { useViewerRole } from "@/shared/hooks/useViewerRole";
 import { NotificationBell } from "@/shared/components/bvc/NotificationBell";
@@ -57,12 +57,14 @@ export function StudentShell({ children, className }: StudentShellProps) {
   const displayName = user?.username ?? ROLE_FALLBACK_NAMES[role];
   const isStaff = role === "teacher" || role === "admin";
   const isStudent = role === "student";
+  const isGuest = role === "guest";
   const homePath = user ? getRoleHome(user.role) : "/library";
   const navItems = isStaff
     ? [{ label: "Trang chủ", to: homePath }, ...STAFF_NAV_ITEMS]
-    : role === "guest"
+    : isGuest
       ? GUEST_NAV_ITEMS
       : NAV_ITEMS;
+  const loginState = { from: `${location.pathname}${location.search}` };
   const showBottomNav = isStudent && !FOCUSED_PATHS.some((pattern) => pattern.test(location.pathname));
 
   return (
@@ -76,7 +78,10 @@ export function StudentShell({ children, className }: StudentShellProps) {
           <nav
             aria-label="Điều hướng chính"
             className={cn(
-              "order-last -mx-[18px] mt-2 flex w-[calc(100%+36px)] gap-1.5 overflow-x-auto px-[18px] [scrollbar-width:none] md:order-none md:mx-0 md:mt-0 md:flex md:w-auto md:flex-1 md:px-0",
+              "flex gap-1.5 overflow-x-auto [scrollbar-width:none] md:flex md:w-auto md:flex-1",
+              isGuest
+                ? "gap-1 md:gap-1.5"
+                : "order-last -mx-[18px] mt-2 w-[calc(100%+36px)] px-[18px] md:order-none md:mx-0 md:mt-0 md:px-0",
               isStudent && "hidden"
             )}
           >
@@ -86,7 +91,8 @@ export function StudentShell({ children, className }: StudentShellProps) {
                 to={item.to}
                 className={({ isActive }) =>
                   cn(
-                    "flex min-h-10 shrink-0 items-center rounded-full px-4 text-sm whitespace-nowrap transition-colors md:text-[14.5px]",
+                    "flex min-h-10 shrink-0 items-center rounded-full text-sm whitespace-nowrap transition-colors md:px-4 md:text-[14.5px]",
+                    isGuest ? "px-3" : "px-4",
                     isActive
                       ? "bg-white font-semibold text-bvc-ink hover:text-bvc-ink"
                       : "font-medium text-white/75 hover:bg-white/10 hover:text-white"
@@ -98,14 +104,25 @@ export function StudentShell({ children, className }: StudentShellProps) {
             ))}
           </nav>
 
-          {role === "guest" ? (
-            <PillLink
-              to="/login"
-              state={{ from: `${location.pathname}${location.search}` }}
-              label="Đăng nhập"
-              variant="light"
-              size="md"
-            />
+          {isGuest ? (
+            <>
+              <Link
+                to="/login"
+                state={loginState}
+                aria-label="Đăng nhập"
+                className={cn(iconLinkClass, "shrink-0 md:hidden")}
+              >
+                <LogIn className="size-[19px]" strokeWidth={2} aria-hidden />
+              </Link>
+              <PillLink
+                to="/login"
+                state={loginState}
+                label="Đăng nhập"
+                variant="light"
+                size="md"
+                className="hidden md:inline-flex"
+              />
+            </>
           ) : (
             <div className="flex items-center gap-2">
               <NotificationBell className={iconLinkClass} iconClassName="size-[19px]" />

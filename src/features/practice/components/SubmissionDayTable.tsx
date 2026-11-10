@@ -1,3 +1,4 @@
+import { SubmissionCard } from "@/features/practice/components/SubmissionCard";
 import { SubmissionRow } from "@/features/practice/components/SubmissionRow";
 import type { SubmissionDayGroup, SubmissionHistoryItem } from "@/features/practice/types/submissionHistoryTypes";
 import type { SelectionBlock } from "@/features/practice/utils/submissionHistory";
@@ -26,9 +27,26 @@ export function SubmissionDayTable({
   onToggle,
 }: SubmissionDayTableProps) {
   return (
-    <section className="flex shrink-0 flex-col gap-2">
+    <section className="flex min-w-0 shrink-0 flex-col gap-2">
       <h2 className="text-[13px] font-semibold text-bvc-muted">{group.label}</h2>
-      <div className={TABLE_STYLES.frame}>
+      <ul className="overflow-hidden rounded-bvc-xl border border-bvc-border bg-white md:hidden" aria-label={`Bài nộp ${group.label}`}>
+        {group.items.map((item) => {
+          const block = selectionBlock(item);
+          return (
+            <SubmissionCard
+              key={item.id}
+              item={item}
+              isSelecting={isSelecting}
+              isSelected={selectedIds.includes(item.id)}
+              isSelectable={block === null}
+              isDifferentSheet={block === "DIFFERENT_SHEET"}
+              onOpen={onOpen}
+              onToggle={onToggle}
+            />
+          );
+        })}
+      </ul>
+      <div className={cn(TABLE_STYLES.frame, "hidden md:block")}>
         <table className={cn(TABLE_STYLES.table, "min-w-[640px] table-fixed")}>
           <caption className="sr-only">Bài nộp {group.label}</caption>
           <colgroup>

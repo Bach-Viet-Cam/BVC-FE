@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { submissionCompareApi } from "@/features/practice/api/submissionCompareApi";
 import type { CompareSegment } from "@/features/practice/types/submissionHistoryTypes";
 import { useResultPart } from "@/features/practice/hooks/useResultPart";
-import { buildSegmentPath } from "@/features/practice/utils/segmentFormat";
+import { buildSegmentRecordPath } from "@/features/practice/utils/segmentFormat";
 
 const LOAD_ERROR = "Tải kết quả so sánh thất bại. Vui lòng thử lại.";
 
@@ -27,7 +27,11 @@ export function useSubmissionCompare() {
   function practiceSegment(segment: CompareSegment) {
     if (!part.data) return;
     navigate(
-      buildSegmentPath(part.data.newer.submissionId, { start: segment.startSec, end: segment.endSec, countIn: false })
+      buildSegmentRecordPath(part.data.sheetMusic.id, part.data.newer.submissionId, {
+        start: segment.startSec,
+        end: segment.endSec,
+        countIn: false,
+      })
     );
   }
 
