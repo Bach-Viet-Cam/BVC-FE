@@ -17,6 +17,7 @@ const TEACHER = "#c3cfc7";
 const OLDER = "#93a399";
 
 const HEIGHT = 300;
+const MIN_CHART_WIDTH = 560;
 const PLOT = { left: 34, right: 8, top: 26, bottom: 30 };
 const TIME_TICKS = 5;
 const MAX_NOTE_LINES = 6;
@@ -74,7 +75,9 @@ export function SubmissionCompareChart(props: SubmissionCompareChartProps) {
 function ComparePlot({ chart, segments, selectedId, visible, onSelectSegment, onFullscreen, fullscreen = false, initialView }: SubmissionCompareChartProps & { onFullscreen: (view?: ChartView) => void; fullscreen?: boolean; initialView?: ChartView }) {
   const height = useFullscreenChartHeight(fullscreen, HEIGHT);
   const clipId = useId();
-  const { ref, width } = useElementWidth<HTMLDivElement>();
+  const { ref, width: viewportWidth } = useElementWidth<HTMLDivElement>();
+  // Khung hẹp hơn MIN_CHART_WIDTH thì giữ nguyên tỉ lệ biểu đồ và cho cuộn ngang thay vì co lại
+  const width = viewportWidth > 0 ? Math.max(viewportWidth, MIN_CHART_WIDTH) : 0;
 
   const duration = Math.max(chart.durationSec, 0.1);
   const lowMidi = hzToMidiFloat(chart.minHz) - MIDI_PADDING;
@@ -100,7 +103,8 @@ function ComparePlot({ chart, segments, selectedId, visible, onSelectSegment, on
   const axisY = height - PLOT.bottom;
 
   return (
-    <div ref={ref} className="w-full">
+    <div className="w-full">
+      <div ref={ref} className="overflow-x-auto overscroll-x-contain">
       {width > 0 && (
         <svg
           viewBox={`0 0 ${width} ${height}`}
@@ -206,6 +210,7 @@ function ComparePlot({ chart, segments, selectedId, visible, onSelectSegment, on
           })}
         </svg>
       )}
+      </div>
       <div className="flex justify-end gap-1 pt-1">
         <button type="button" aria-label="Thu nh?" title="Thu nh?" disabled={!zoomed} onClick={() => zoom(1 / 1.6)} className="flex size-9 items-center justify-center rounded-full border border-bvc-border bg-white disabled:opacity-40"><ZoomOut className="size-4" /></button>
         <button type="button" aria-label="Ph?ng to" title="Ph?ng to" onClick={() => { if (fullscreen) zoom(1.6); else onFullscreen(zoomView(view, 1.6, { seconds: (view.t0 + view.t1) / 2, midi: (view.m0 + view.m1) / 2 }, base)); }} className="flex size-9 items-center justify-center rounded-full border border-bvc-border bg-white"><ZoomIn className="size-4" /></button>
