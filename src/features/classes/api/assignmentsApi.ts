@@ -2,6 +2,9 @@ import { axiosClient } from "@/shared/api/axiosClient";
 import { type ApiResponse } from "@/shared/types/commonTypes";
 import {
   type AssignmentAction,
+  type AssignmentOverview,
+  type AssignPayload,
+  type AssignResult,
   type AssignmentBase,
   type AssignmentContentPayload,
   type AssignmentDetail,
@@ -16,6 +19,9 @@ import {
 export const assignmentsApi = {
   listAssignments: (params: AssignmentListParams) =>
     axiosClient.get<ApiResponse<AssignmentListResult>>("/assignments", { params }),
+  getOverview: () => axiosClient.get<ApiResponse<AssignmentOverview>>("/assignments/overview"),
+  assignToClasses: (payload: AssignPayload) =>
+    axiosClient.post<ApiResponse<AssignResult>>("/assignments/assign", payload),
   listClassSheetMusic: (classId: string) =>
     axiosClient.get<ApiResponse<ClassSheetMusic[]>>("/assignments/sheet-music", { params: { classId } }),
   getAssignment: (assignmentId: string) =>

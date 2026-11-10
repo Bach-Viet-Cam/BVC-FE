@@ -7,7 +7,7 @@ export function AssignmentListPage() {
   return (
     <TeacherScreen>
       <PageTitle className="shrink-0 px-[18px] pt-[16px] lg:border-b lg:border-bvc-border-strong lg:px-[32px] lg:pb-[18px] lg:pt-[26px]">
-        Bài tập
+        Danh sách bài tập
       </PageTitle>
       <AssignmentList canCreate />
     </TeacherScreen>
