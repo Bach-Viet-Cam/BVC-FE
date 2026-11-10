@@ -32,16 +32,16 @@ function FilterDropdown({ label, isActive, children }: FilterDropdownProps) {
     <Popover>
       <PopoverTrigger
         className={cn(
-          "flex min-h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-full border pr-2.5 pl-3 text-[13.5px]",
+          "flex min-h-9 max-w-full min-w-0 cursor-pointer items-center gap-1.5 rounded-full border pr-2.5 pl-3 text-[13.5px]",
           isActive
             ? "border-bvc-accent bg-bvc-accent-tint font-semibold text-bvc-accent-text"
             : "border-bvc-border-strong bg-white text-bvc-ink"
         )}
       >
-        {label}
+        <span className="min-w-0 truncate">{label}</span>
         <ChevronDown className="size-3.5 shrink-0" strokeWidth={2} aria-hidden />
       </PopoverTrigger>
-      <PopoverContent className="w-64 p-2">{children}</PopoverContent>
+      <PopoverContent className="w-64 max-w-[calc(100vw-2rem)] p-2">{children}</PopoverContent>
     </Popover>
   );
 }
@@ -103,7 +103,8 @@ export function SubmissionFilterBar({
   }
 
   return (
-    <div className="flex shrink-0 flex-wrap items-center gap-2">
+    // contents: các chip xếp thẳng vào hàng flex-wrap của trang, không tạo khung shrink-0 rộng bằng tổng các chip
+    <div className="contents">
       <FilterDropdown label={pieceLabel} isActive={filter.pieceIds.length > 0}>
         {pieceOptions.map((option) => (
           <OptionRow

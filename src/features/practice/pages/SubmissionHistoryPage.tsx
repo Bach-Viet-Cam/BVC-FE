@@ -40,7 +40,7 @@ export function SubmissionHistoryPage() {
 
   return (
     <StudentShell>
-      <div className="mx-auto flex w-full max-w-[1200px] flex-1 flex-col gap-3.5 px-[18px] pt-5 pb-6 md:gap-4 md:px-14 md:pt-8">
+      <div className="mx-auto flex w-full min-w-0 max-w-[1200px] flex-1 flex-col gap-3.5 px-[18px] pt-5 pb-6 md:gap-4 md:px-14 md:pt-8">
         <SubmissionPageTitle
           title="Bài nộp"
           subtitle={`Tất cả bài hát · ${totalCount} bài nộp`}
@@ -59,7 +59,7 @@ export function SubmissionHistoryPage() {
 
         <p className="shrink-0 text-[12.5px] text-bvc-muted">{isFirstLoad ? "Đang tải bài nộp..." : summary}</p>
 
-        <div className="flex shrink-0 flex-wrap items-center gap-2">
+        <div className="flex min-w-0 shrink-0 flex-wrap items-center gap-2">
           <SubmissionFilterBar
             filter={filter}
             pieceOptions={pieceOptions}
