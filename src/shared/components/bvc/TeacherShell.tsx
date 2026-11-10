@@ -20,7 +20,6 @@ import {
 import { ROLES } from "@/shared/constants/roles";
 import { UserAvatar } from "@/shared/components/bvc/UserAvatar";
 import { cn } from "@/shared/utils/cn";
-import { getRoleHome } from "@/shared/utils/roleHome";
 
 interface TeacherShellProps {
   children: ReactNode;
@@ -212,7 +211,6 @@ export function TeacherShell({ children, className, navItems, roleLabel }: Teach
   const flatItems = flattenNav(effectiveNavItems);
   const displayName = user?.username ?? effectiveRoleLabel;
   const navLabel = `Điều hướng ${effectiveRoleLabel.toLowerCase()}`;
-  const homePath = user?.role ? getRoleHome(user.role) : "/teacher/home";
   const showBottomNav =
     user?.role === ROLES.TEACHER && !FOCUSED_PATHS.some((pattern) => pattern.test(location.pathname));
   const panelProps = {
@@ -272,7 +270,7 @@ export function TeacherShell({ children, className, navItems, roleLabel }: Teach
               </Dialog.Popup>
             </Dialog.Portal>
           </Dialog.Root>
-          <Link to={homePath} className="mr-auto shrink-0 transition-opacity hover:opacity-85">
+          <Link to="/" className="mr-auto shrink-0 transition-opacity hover:opacity-85">
             <img src={logoImage} alt="Bách Việt Cầm" className="h-9 w-auto sm:h-10" />
           </Link>
           <NotificationBell className={bellClass} iconClassName="size-[18px]" />

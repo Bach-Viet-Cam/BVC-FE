@@ -16,6 +16,9 @@ describe("InstallGuidePage", () => {
     await userEvent.click(screen.getByRole("tab", { name: "iPhone, iPad" }));
     expect(within(screen.getByRole("list", { name: /iPhone/ })).getAllByRole("listitem")).toHaveLength(6);
 
+    await userEvent.click(screen.getByRole("tab", { name: "Android" }));
+    expect(within(screen.getByRole("list", { name: /Android/ })).getAllByRole("listitem")).toHaveLength(4);
+
     await userEvent.click(screen.getByRole("tab", { name: "Microsoft Edge" }));
     const steps = within(screen.getByRole("list", { name: /Microsoft Edge/ })).getAllByRole("listitem");
     expect(steps).toHaveLength(4);
@@ -44,5 +47,8 @@ describe("detectInstallPlatform", () => {
     expect(detectInstallPlatform("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Safari/605.1.15", 5)).toBe("ios");
     expect(detectInstallPlatform("Mozilla/5.0 (Windows NT 10.0) Chrome/130.0 Safari/537.36 Edg/130.0", 0)).toBe("edge");
     expect(detectInstallPlatform("Mozilla/5.0 (Windows NT 10.0) Chrome/130.0 Safari/537.36", 0)).toBe("chrome");
+    expect(
+      detectInstallPlatform("Mozilla/5.0 (Linux; Android 14; SM-S918B) Chrome/130.0 Mobile Safari/537.36", 5)
+    ).toBe("android");
   });
 });

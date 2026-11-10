@@ -4,6 +4,10 @@ import ios3 from "@/assets/image/guideline/ios/3.jpg";
 import ios4 from "@/assets/image/guideline/ios/4.jpg";
 import ios5 from "@/assets/image/guideline/ios/5.jpg";
 import ios6 from "@/assets/image/guideline/ios/6.jpg";
+import and1 from "@/assets/image/guideline/android/and1.jpg";
+import and2 from "@/assets/image/guideline/android/and2.png";
+import and3 from "@/assets/image/guideline/android/and3.png";
+import and4 from "@/assets/image/guideline/android/and4.jpg";
 import chrome1 from "@/assets/image/guideline/web/chrome1.jpg";
 import chrome2 from "@/assets/image/guideline/web/chrome2.jpg";
 import chrome3 from "@/assets/image/guideline/web/chrome3.jpg";
@@ -14,7 +18,7 @@ import edge2 from "@/assets/image/guideline/web/edge2.jpg";
 import edge5 from "@/assets/image/guideline/web/edge5.jpg";
 import resultWeb from "@/assets/image/guideline/web/resultweb.jpg";
 
-export type InstallPlatform = "ios" | "chrome" | "edge";
+export type InstallPlatform = "ios" | "android" | "chrome" | "edge";
 
 export interface InstallStep {
   text: string;
@@ -67,6 +71,28 @@ export const INSTALL_GUIDES: Record<InstallPlatform, InstallGuide> = {
       },
     ],
   },
+  android: {
+    label: "Android",
+    layout: "phone",
+    steps: [
+      {
+        text: "Mở bachvietcam.io.vn bằng Chrome, nhấn nút ba chấm ở góc trên bên phải.",
+        image: and1,
+        alt: "Nút ba chấm trên thanh địa chỉ của Chrome trên Android",
+      },
+      {
+        text: "Chọn “Thêm vào Màn hình chính”.",
+        image: and2,
+        alt: "Mục Thêm vào Màn hình chính trong menu của Chrome",
+      },
+      { text: "Nhấn “Cài đặt”.", image: and3, alt: "Hộp thoại Cài đặt ứng dụng với nút Cài đặt" },
+      {
+        text: "Biểu tượng Bách Việt Cầm xuất hiện trên màn hình chính. Nhấn vào để mở ứng dụng.",
+        image: and4,
+        alt: "Biểu tượng Bách Việt Cầm trên màn hình chính của điện thoại Android",
+      },
+    ],
+  },
   chrome: {
     label: "Google Chrome",
     layout: "desktop",
@@ -115,10 +141,11 @@ export const INSTALL_GUIDES: Record<InstallPlatform, InstallGuide> = {
   },
 };
 
-export const INSTALL_PLATFORMS: InstallPlatform[] = ["ios", "chrome", "edge"];
+export const INSTALL_PLATFORMS: InstallPlatform[] = ["ios", "android", "chrome", "edge"];
 
 export function detectInstallPlatform(userAgent: string, maxTouchPoints: number): InstallPlatform {
   if (/iPhone|iPad|iPod/.test(userAgent) || (/Macintosh/.test(userAgent) && maxTouchPoints > 1)) return "ios";
+  if (/Android/.test(userAgent)) return "android";
   if (/Edg\//.test(userAgent)) return "edge";
   return "chrome";
 }
