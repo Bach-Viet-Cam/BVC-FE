@@ -2,6 +2,7 @@ import type {
   CoverTone,
   EditableVisibility,
   LibrarySort,
+  PieceOwnership,
   Visibility,
 } from "@/features/music-library/types/musicLibraryTypes";
 
@@ -19,6 +20,11 @@ export const VISIBILITY_LABELS: Record<Visibility, string> = {
   PUBLIC: "Công khai",
   HIDDEN: "Đã ẩn",
   ADMIN_HIDDEN: "Admin đã ẩn",
+};
+
+export const OWNERSHIP_LABELS: Record<PieceOwnership, string> = {
+  OWNED: "Bài của tôi",
+  CONTRIBUTED: "Bài của người khác",
 };
 
 export const EDITABLE_VISIBILITY_OPTIONS: { value: EditableVisibility; label: string }[] = [
@@ -60,6 +66,10 @@ export const LIBRARY_MESSAGES = {
   noResult: "Không tìm thấy bài hát nào",
   noVisibleSheet: "Bài hát chưa có bản nhạc công khai nào. Sinh viên sẽ thấy bài nhưng chưa mở được bản nhạc.",
   hiddenByAdmin: "Admin đã ẩn nội dung này. Bạn không tự bật lại được.",
+  lockedByOwner: "Chủ bài đang ẩn bài này nên bạn không thao tác được.",
+  lockedByAdmin: "Admin đang ẩn bài này nên bạn không thao tác được.",
+  ownerOnlyVisibility: "Chỉ chủ bài mới đổi được hiển thị",
+  notOwner: "Chỉ chủ bài mới sửa được thông tin bài hát. Bạn vẫn thêm và quản lý được bản nhạc của mình.",
   guestSaveTitle: "Đăng nhập để lưu",
   guestSaveBody:
     "Bạn cần đăng nhập để lưu bài hát và bản nhạc vào danh sách của mình. Sau khi đăng nhập, hệ thống đưa bạn về đúng trang này.",

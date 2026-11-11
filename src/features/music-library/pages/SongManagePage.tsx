@@ -17,18 +17,24 @@ import {
   KEYWORD_MAX_LENGTH,
   LIBRARY_MESSAGES,
   MANAGE_PAGE_SIZE,
+  OWNERSHIP_LABELS,
   VISIBILITY_LABELS,
 } from "@/features/music-library/constants/musicLibraryConstants";
 import { INITIAL_MANAGED_QUERY, useManagedSongs } from "@/features/music-library/hooks/useManagedSongs";
 import { useMusicCategories } from "@/features/music-library/hooks/useMusicCategories";
 import { useVisibilityConfirm } from "@/features/music-library/hooks/useVisibilityConfirm";
 import type { LecturerPiece } from "@/features/music-library/types/lecturerTypes";
-import type { Visibility } from "@/features/music-library/types/musicLibraryTypes";
+import type { PieceOwnership, Visibility } from "@/features/music-library/types/musicLibraryTypes";
 
 // Object.keys trả string[]; key của VISIBILITY_LABELS chính là Visibility
 const VISIBILITY_OPTIONS = (Object.keys(VISIBILITY_LABELS) as Visibility[]).map((value) => ({
   value,
   label: VISIBILITY_LABELS[value],
+}));
+
+const OWNERSHIP_OPTIONS = (Object.keys(OWNERSHIP_LABELS) as PieceOwnership[]).map((value) => ({
+  value,
+  label: OWNERSHIP_LABELS[value],
 }));
 
 const COLUMN_HEADERS = ["", "Tiêu đề", "Nhạc cụ", "Bản nhạc", "Hiển thị", "Cập nhật", ""];
@@ -41,7 +47,9 @@ export function SongManagePage() {
   const debouncedSearch = useDebouncedCallback((value: string) => songs.updateQuery({ keyword: value.trim() }));
 
   const { query, result } = songs;
-  const hasFilters = Boolean(query.keyword || query.genreId || query.instrumentId || query.levelId || query.visibility);
+  const hasFilters = Boolean(
+    query.keyword || query.genreId || query.instrumentId || query.levelId || query.visibility || query.ownership
+  );
 
   // R-03: công khai bài chưa có bản nhạc công khai thì hỏi lại trước
   const requestVisibility = (song: LecturerPiece, nextVisible: boolean) =>
@@ -107,6 +115,12 @@ export function SongManagePage() {
             options={VISIBILITY_OPTIONS}
             // Option lấy từ VISIBILITY_LABELS nên giá trị luôn là Visibility hoặc rỗng
             onChange={(value) => songs.updateQuery({ visibility: value as Visibility | "" })}
+          />
+          <FilterPill
+            label="Chủ bài"
+            value={query.ownership}
+            options={OWNERSHIP_OPTIONS}
+            onChange={(value) => songs.updateQuery({ ownership: value as PieceOwnership | "" })}
           />
         </div>
       </div>

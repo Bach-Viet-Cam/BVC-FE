@@ -2,6 +2,7 @@ import type { PaginatedResponse } from "@/shared/types/commonTypes";
 
 export type Visibility = "PUBLIC" | "HIDDEN" | "ADMIN_HIDDEN";
 export type EditableVisibility = Exclude<Visibility, "ADMIN_HIDDEN">;
+export type PieceOwnership = "OWNED" | "CONTRIBUTED";
 
 export type CoverTone = "ink" | "accent" | "tint" | "muted" | "bar" | "gold";
 
@@ -130,6 +131,7 @@ export interface ManagedSongQuery {
   instrumentId: string;
   levelId: string;
   visibility: Visibility | "";
+  ownership: PieceOwnership | "";
   page: number;
 }
 

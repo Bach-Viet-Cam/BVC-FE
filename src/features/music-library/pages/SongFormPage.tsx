@@ -7,8 +7,10 @@ import { ActionButton } from "@/shared/components/bvc/ActionButton";
 import { LeaveConfirmDialog } from "@/shared/components/bvc/LeaveConfirmDialog";
 import { useLeaveGuard } from "@/shared/hooks/useLeaveGuard";
 import { SongForm } from "@/features/music-library/components/SongForm";
+import { LIBRARY_MESSAGES } from "@/features/music-library/constants/musicLibraryConstants";
 import { useMusicCategories } from "@/features/music-library/hooks/useMusicCategories";
 import { useSongEditor } from "@/features/music-library/hooks/useSongEditor";
+import { pieceLockMessage } from "@/features/music-library/utils/pieceAccess";
 
 const FORM_ID = "song-form";
 const LIST_PATH = "/songs";
@@ -27,7 +29,8 @@ export function SongFormPage() {
   const leave = () => guard(() => navigate(LIST_PATH));
 
   const loadError = editor.loadError ?? categoriesError;
-  const isReady = !editor.isLoading && !isCategoriesLoading && !loadError;
+  const isNotOwner = editor.song?.canEdit === false;
+  const isReady = !editor.isLoading && !isCategoriesLoading && !loadError && !isNotOwner;
 
   return (
     <TeacherShell>
@@ -59,6 +62,20 @@ export function SongFormPage() {
       {loadError ? (
         <div className="px-[18px] py-8 md:px-8">
           <EmptyState title="Không mở được bài hát" description={loadError} />
+        </div>
+      ) : isNotOwner && editor.song ? (
+        <div className="px-[18px] py-8 md:px-8">
+          <EmptyState
+            title="Bạn không phải chủ bài này"
+            description={
+              editor.song.canManageSheets ? LIBRARY_MESSAGES.notOwner : pieceLockMessage(editor.song.moderation)
+            }
+            actions={
+              editor.song.canManageSheets ? (
+                <ActionButton onClick={() => navigate(`/songs/${songId}/sheets`)}>Đến trang bản nhạc</ActionButton>
+              ) : undefined
+            }
+          />
         </div>
       ) : !isReady ? (
         <div aria-hidden className="grid animate-pulse gap-6 px-[18px] py-7 md:px-8 lg:grid-cols-[280px_1fr_1fr]">
