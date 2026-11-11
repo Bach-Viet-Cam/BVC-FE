@@ -4,8 +4,7 @@ import { usePwaInstall } from "@/shared/hooks/usePwaInstall";
 
 // Chrome/Edge mở hộp thoại cài đặt ngay; Safari không hỗ trợ nên dẫn sang trang hướng dẫn
 export function InstallAppButton() {
-  const { canPrompt, isInstalled, promptInstall } = usePwaInstall();
-  if (isInstalled) return null;
+  const { canPrompt, promptInstall } = usePwaInstall();
 
   return (
     <PillLink

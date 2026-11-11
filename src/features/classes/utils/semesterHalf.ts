@@ -3,8 +3,9 @@ import { todayInVietnam } from "@/features/classes/utils/classFormat";
 
 export type SemesterHalf = 1 | 2;
 
-// Admin configures each half as its own semester entry: "FA26-H1", "FA26-H2", "SP27-H1", ...
-const HALF_NAME_PATTERN = /^(.+)-H([12])$/i;
+// Admin configures each half as its own semester entry: "FA26-H1", "Fall2026_H2", "SP27-H1", ...
+// Both "-" and "_" are accepted before the half suffix.
+const HALF_NAME_PATTERN = /^(.+)[-_]H([12])$/i;
 
 export function halfOfSemesterName(name: string): SemesterHalf | null {
   const match = HALF_NAME_PATTERN.exec(name.trim());

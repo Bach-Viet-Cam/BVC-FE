@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ChevronRight, Plus } from "lucide-react";
+import { ChevronRight, Plus, Upload } from "lucide-react";
 import { ClassCard } from "@/features/classes/components/ClassCard";
 import { ClassCreateDialog } from "@/features/classes/components/ClassCreateDialog";
+import { ClassFileImportDialog } from "@/features/classes/components/ClassFileImportDialog";
 import { FilterSelect } from "@/features/classes/components/FilterSelect";
 import { ListState } from "@/features/classes/components/ListState";
 import { SearchInput } from "@/features/classes/components/SearchInput";
@@ -87,9 +88,18 @@ interface ClassListViewProps {
   emptyMessage: string;
   listState: { isLoading: boolean; error: string | null; onRetry: () => void };
   onCreate: () => void;
+  onImport: () => void;
 }
 
-function DesktopClassList({ classes, summary, toolbar, emptyMessage, listState, onCreate }: ClassListViewProps) {
+function DesktopClassList({
+  classes,
+  summary,
+  toolbar,
+  emptyMessage,
+  listState,
+  onCreate,
+  onImport,
+}: ClassListViewProps) {
   const navigate = useNavigate();
 
   return (
@@ -98,10 +108,16 @@ function DesktopClassList({ classes, summary, toolbar, emptyMessage, listState, 
         breadcrumb="Lớp học"
         title="Danh sách lớp học"
         actions={
-          <ActionButton onClick={onCreate}>
-            <Plus size={16} strokeWidth={2.2} aria-hidden />
-            Tạo lớp mới
-          </ActionButton>
+          <div className="flex items-center gap-[10px]">
+            <ActionButton variant="secondary" onClick={onImport}>
+              <Upload size={16} strokeWidth={2.2} aria-hidden />
+              Nhập file SV
+            </ActionButton>
+            <ActionButton onClick={onCreate}>
+              <Plus size={16} strokeWidth={2.2} aria-hidden />
+              Tạo lớp mới
+            </ActionButton>
+          </div>
         }
       />
 
@@ -165,17 +181,31 @@ function DesktopClassList({ classes, summary, toolbar, emptyMessage, listState, 
   );
 }
 
-function MobileClassList({ classes, summary, toolbar, emptyMessage, listState, onCreate }: ClassListViewProps) {
+function MobileClassList({
+  classes,
+  summary,
+  toolbar,
+  emptyMessage,
+  listState,
+  onCreate,
+  onImport,
+}: ClassListViewProps) {
   return (
     <div className="flex min-w-0 flex-1 flex-col gap-[14px] px-[18px] pb-[24px] pt-[18px]">
       <PageHeader
         title="Lớp học của tôi"
         description={summary}
         actions={
-          <ActionButton onClick={onCreate}>
-            <Plus size={16} strokeWidth={2.2} aria-hidden />
-            Tạo mới
-          </ActionButton>
+          <div className="flex items-center gap-[8px]">
+            <ActionButton variant="secondary" onClick={onImport}>
+              <Upload size={16} strokeWidth={2.2} aria-hidden />
+              Nhập file SV
+            </ActionButton>
+            <ActionButton onClick={onCreate}>
+              <Plus size={16} strokeWidth={2.2} aria-hidden />
+              Tạo mới
+            </ActionButton>
+          </div>
         }
       />
       {toolbar}
@@ -202,6 +232,7 @@ export function ClassListPage() {
   const [filters, setFilters] = useState<ClassFilters>({ searchText: "", cohort: ALL, status: ALL });
   const { result, isLoading, error, reload } = useClassList({ status: "ALL" });
   const createDialog = useCreateDialog("class");
+  const importDialog = useCreateDialog("class-file-import");
 
   const allClasses = useMemo(() => result?.items ?? [], [result]);
   const classes = useMemo(() => {
@@ -224,12 +255,14 @@ export function ClassListPage() {
     emptyMessage: isFiltered ? NO_MATCH_MESSAGE : EMPTY_MESSAGE,
     listState: { isLoading, error, onRetry: reload },
     onCreate: () => createDialog.open(),
+    onImport: () => importDialog.open(),
   };
 
   return (
     <>
       {isMobile ? <MobileClassList {...viewProps} /> : <DesktopClassList {...viewProps} />}
       <ClassCreateDialog open={createDialog.isOpen} onClose={createDialog.close} />
+      <ClassFileImportDialog open={importDialog.isOpen} onClose={importDialog.close} onImported={reload} />
     </>
   );
 }

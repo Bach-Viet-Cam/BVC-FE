@@ -1,29 +1,34 @@
-import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { Mail, MapPin, MessageSquareText, Phone, type LucideIcon } from "lucide-react";
 import bannerImage from "@/assets/image/Artboard 3.png";
 import { PillLink } from "@/shared/components/bvc/PillLink";
 import { Accent, SectionBadge } from "@/shared/components/bvc/SectionIntro";
 import { useLandingAccount } from "@/features/landing/hooks/useLandingAccount";
+import {
+  CONTACT_ADDRESS,
+  CONTACT_EMAIL,
+  CONTACT_PHONE,
+  CONTACT_PHONE_DISPLAY,
+  FEEDBACK_FORM_URL,
+} from "@/shared/constants/contact";
 import { cn } from "@/shared/utils/cn";
 
-interface FooterLink {
-  label: string;
-  href: string;
-  isRoute?: boolean;
+interface ContactItem {
+  caption: string;
+  value: string;
+  icon: LucideIcon;
+  href?: string;
+  isExternal?: boolean;
 }
 
-const STATIC_FOOTER_COLUMNS: { title: string; links: FooterLink[] }[] = [
-  {
-    title: "Tính năng",
-    links: [
-      { label: "Tính năng chính", href: "#features" },
-      { label: "Lợi ích", href: "#benefits" },
-      { label: "Thêm vào màn hình", href: "/install", isRoute: true },
-    ],
-  },
+const CONTACT_ITEMS: ContactItem[] = [
+  { caption: "Email", value: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}`, icon: Mail },
+  { caption: "Điện thoại", value: CONTACT_PHONE_DISPLAY, href: `tel:${CONTACT_PHONE}`, icon: Phone },
+  { caption: "Địa chỉ", value: CONTACT_ADDRESS, icon: MapPin },
+  { caption: "Góp ý", value: "Gửi góp ý", href: FEEDBACK_FORM_URL, isExternal: true, icon: MessageSquareText },
 ];
 
-const LINK_CLASS = "text-[17px] text-bvc-ink/80 transition-colors hover:text-bvc-ink";
+const VALUE_CLASS = "text-[17px] font-medium [overflow-wrap:anywhere] text-bvc-ink";
 
 const containerVariants = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } } };
 const itemVariants = {
@@ -34,17 +39,6 @@ const itemVariants = {
 // Lời mời bắt đầu và chân trang trên nền ảnh BVC
 export function LandingFooter() {
   const { isLoading: isAccountLoading, accountLabel, homePath } = useLandingAccount();
-  const footerColumns = [
-    {
-      title: "Khám phá",
-      links: [
-        { label: "Thư viện bài hát", href: "/library", isRoute: true },
-        ...(isAccountLoading ? [] : [{ label: accountLabel, href: homePath, isRoute: true }]),
-      ],
-    },
-    ...STATIC_FOOTER_COLUMNS,
-  ];
-
   return (
     <footer className="relative flex w-full flex-col items-center overflow-hidden">
       <div className="absolute inset-0" aria-hidden>
@@ -81,44 +75,46 @@ export function LandingFooter() {
       </section>
 
       <div className="relative z-10 flex w-full max-w-[1248px] flex-col px-6 pt-20 pb-8">
-        <motion.nav
-          aria-label="Liên kết chân trang"
+        <motion.address
+          aria-labelledby="footer-contact-heading"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
           variants={containerVariants}
-          className="flex flex-col gap-12 rounded-[28px] border border-white/60 bg-white/55 p-8 backdrop-blur-xl md:p-10 lg:flex-row lg:gap-24"
+          className="flex flex-col gap-8 rounded-[28px] border border-white/60 bg-white/55 p-8 not-italic backdrop-blur-xl md:p-10"
         >
-          <motion.div variants={itemVariants} className="flex max-w-[380px] flex-col gap-3">
-            <p className="font-bvc-display text-[24px] font-semibold tracking-[-0.02em] text-bvc-ink">Bách Việt Cầm</p>
-            <p className="text-[17px] leading-relaxed text-bvc-ink/80">
-              Nền tảng luyện nhạc cụ dân tộc: thư viện bản nhạc, nhận xét bản thu với hỗ trợ từ AI, hòa tấu và lớp học
-              có lộ trình.
-            </p>
-          </motion.div>
-          <div className="grid gap-10 sm:grid-cols-2 lg:ml-auto lg:gap-16">
-            {footerColumns.map((column) => (
-              <motion.div key={column.title} variants={itemVariants} className="flex flex-col gap-4">
-                <p className="font-bvc-display text-[20px] font-semibold text-bvc-ink">{column.title}</p>
-                <ul className="flex flex-col gap-3">
-                  {column.links.map((link) => (
-                    <li key={link.label}>
-                      {link.isRoute ? (
-                        <Link to={link.href} className={LINK_CLASS}>
-                          {link.label}
-                        </Link>
-                      ) : (
-                        <a href={link.href} className={LINK_CLASS}>
-                          {link.label}
-                        </a>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
+          <motion.p
+            id="footer-contact-heading"
+            variants={itemVariants}
+            className="font-bvc-display text-[24px] font-semibold tracking-[-0.02em] text-bvc-ink"
+          >
+            Liên hệ
+          </motion.p>
+          <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-[repeat(4,auto)] lg:justify-between lg:gap-10">
+            {CONTACT_ITEMS.map((item) => (
+              <motion.li key={item.caption} variants={itemVariants} className="flex min-w-0 items-start gap-3">
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-[13px] bg-white/80 text-bvc-accent">
+                  <item.icon className="size-[18px]" strokeWidth={1.9} aria-hidden />
+                </span>
+                <span className="flex min-w-0 flex-col gap-0.5">
+                  <span className="text-[13.5px] text-bvc-ink/60">{item.caption}</span>
+                  {item.href ? (
+                    <a
+                      href={item.href}
+                      target={item.isExternal ? "_blank" : undefined}
+                      rel={item.isExternal ? "noopener noreferrer" : undefined}
+                      className={cn(VALUE_CLASS, "underline-offset-4 hover:text-bvc-accent hover:underline")}
+                    >
+                      {item.value}
+                    </a>
+                  ) : (
+                    <span className={VALUE_CLASS}>{item.value}</span>
+                  )}
+                </span>
+              </motion.li>
             ))}
-          </div>
-        </motion.nav>
+          </ul>
+        </motion.address>
 
         {/* <div className="overflow-hidden pt-10 select-none" aria-hidden>
           <motion.p

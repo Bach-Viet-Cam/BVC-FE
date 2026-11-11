@@ -75,7 +75,7 @@ export function CoverPicker({ title, tone, currentUrl, file, isRemoved, error, o
         </p>
       ) : (
         <span className="text-xs leading-snug text-bvc-muted">
-          JPG, PNG hoặc WebP, ảnh vuông. Giới hạn dung lượng theo cấu hình hệ thống. Không có ảnh thì dùng ảnh mặc định.
+          JPG, PNG hoặc WebP
         </span>
       )}
     </div>

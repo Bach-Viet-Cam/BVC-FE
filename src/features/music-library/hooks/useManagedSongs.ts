@@ -15,6 +15,7 @@ export const INITIAL_MANAGED_QUERY: ManagedSongQuery = {
   instrumentId: "",
   levelId: "",
   visibility: "",
+  ownership: "",
   page: 1,
 };
 
@@ -25,6 +26,7 @@ function toApiQuery(query: ManagedSongQuery): LecturerPieceQuery {
     instrumentId: query.instrumentId || undefined,
     levelId: query.levelId || undefined,
     visibility: query.visibility || "ALL",
+    ownership: query.ownership || "ALL",
     page: query.page,
     pageSize: MANAGE_PAGE_SIZE,
   };

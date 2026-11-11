@@ -182,6 +182,30 @@ export interface ImportConfirmResult {
   skippedCount: number;
 }
 
+export interface ClassFileImportPreview {
+  fileName: string;
+  classInfo: {
+    name: string;
+    subjectCode: string;
+    cohort: string;
+    instrument: { id: string; name: string } | null;
+    startDate: string | null;
+    endDate: string | null;
+  };
+  blockingErrors: string[];
+  totalRows: number;
+  validRows: number;
+  errorRows: number;
+  rows: ImportRow[];
+}
+
+export interface ClassFileImportResult {
+  classId: string;
+  className: string;
+  importedCount: number;
+  skippedCount: number;
+}
+
 export interface ApiFieldError {
   field: string;
   code?: string;

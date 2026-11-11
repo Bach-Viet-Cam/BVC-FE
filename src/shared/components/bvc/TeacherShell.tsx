@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Dialog } from "@base-ui/react/dialog";
-import { ChevronDown, LogOut, Menu, X } from "lucide-react";
+import { ChevronDown, LogOut, Menu, MessageSquareText, X } from "lucide-react";
 import logoImage from "@/assets/image/logo.png";
 import { BottomTabBar } from "@/shared/components/bvc/BottomTabBar";
 import { NotificationBell } from "@/shared/components/bvc/NotificationBell";
@@ -17,10 +17,10 @@ import {
   type NavGroup,
   type NavItem,
 } from "@/shared/config/navConfig";
+import { FEEDBACK_FORM_URL } from "@/shared/constants/contact";
 import { ROLES } from "@/shared/constants/roles";
 import { UserAvatar } from "@/shared/components/bvc/UserAvatar";
 import { cn } from "@/shared/utils/cn";
-import { getRoleHome } from "@/shared/utils/roleHome";
 
 interface TeacherShellProps {
   children: ReactNode;
@@ -189,6 +189,18 @@ function NavPanel({ entries, allItems, pathname, navLabel, displayName, roleLabe
             </span>
           </span>
         </Link>
+        <a
+          href={FEEDBACK_FORM_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group flex min-h-11 items-center justify-center gap-2 rounded-full text-[13px] font-medium text-white/60 transition-all duration-150 hover:bg-white/10 hover:text-white short:min-h-9"
+        >
+          <MessageSquareText
+            className="size-4 text-white/45 transition-colors group-hover:text-white"
+            strokeWidth={1.9}
+          />
+          <span>Gửi góp ý</span>
+        </a>
         <button
           type="button"
           onClick={onLogout}
@@ -212,7 +224,6 @@ export function TeacherShell({ children, className, navItems, roleLabel }: Teach
   const flatItems = flattenNav(effectiveNavItems);
   const displayName = user?.username ?? effectiveRoleLabel;
   const navLabel = `Điều hướng ${effectiveRoleLabel.toLowerCase()}`;
-  const homePath = user?.role ? getRoleHome(user.role) : "/teacher/home";
   const showBottomNav =
     user?.role === ROLES.TEACHER && !FOCUSED_PATHS.some((pattern) => pattern.test(location.pathname));
   const panelProps = {
@@ -272,7 +283,7 @@ export function TeacherShell({ children, className, navItems, roleLabel }: Teach
               </Dialog.Popup>
             </Dialog.Portal>
           </Dialog.Root>
-          <Link to={homePath} className="mr-auto shrink-0 transition-opacity hover:opacity-85">
+          <Link to="/" className="mr-auto shrink-0 transition-opacity hover:opacity-85">
             <img src={logoImage} alt="Bách Việt Cầm" className="h-9 w-auto sm:h-10" />
           </Link>
           <NotificationBell className={bellClass} iconClassName="size-[18px]" />

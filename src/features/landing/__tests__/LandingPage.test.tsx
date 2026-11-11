@@ -8,46 +8,6 @@ import type { UserInfo } from "@/shared/context/AuthContext";
 const auth = vi.hoisted(() => ({ user: null as UserInfo | null, isLoading: false }));
 vi.mock("@/shared/context/AuthContext", () => ({ useAuth: () => auth }));
 
-vi.mock("@/features/music-library/hooks/useTrendingSongs", () => ({
-  useTrendingSongs: () => ({ songs: [], error: null, isFirstLoad: false }),
-}));
-vi.mock("@/features/music-library/hooks/useLibrarySongs", () => ({
-  useLibrarySongs: () => ({
-    result: {
-      data: [
-        {
-          id: "p1",
-          title: "Lý chiều chiều",
-          composer: "Dân gian",
-          description: "",
-          genre: { id: "g", name: "Dân ca Trung Bộ" },
-          instruments: [],
-          instrumentCount: 2,
-          coverTone: "accent",
-          visibility: "PUBLIC",
-          createdAt: "",
-          updatedAt: "",
-          isSaved: false,
-        },
-        {
-          id: "p2",
-          title: "Chưa có bản nhạc",
-          composer: "",
-          description: "",
-          genre: { id: "g", name: "Dân ca Nam Bộ" },
-          instruments: [],
-          instrumentCount: 0,
-          coverTone: "bar",
-          visibility: "PUBLIC",
-          createdAt: "",
-          updatedAt: "",
-          isSaved: false,
-        },
-      ],
-    },
-  }),
-}));
-
 // jsdom không có IntersectionObserver / matchMedia mà hiệu ứng cuộn của framer-motion cần
 beforeAll(() => {
   class IntersectionObserverStub {
@@ -83,13 +43,14 @@ describe("LandingPage", () => {
     renderPage();
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Luyện đàn dân tộc với phản hồi");
-    // Hero và phần 4 bước đều có nút này
     screen
       .getAllByRole("link", { name: "Bắt đầu luyện tập" })
       .forEach((link) => expect(link).toHaveAttribute("href", "/login"));
     expect(screen.getByRole("link", { name: "Xem thư viện bài hát" })).toHaveAttribute("href", "/library");
     const nav = screen.getByRole("navigation", { name: "Điều hướng trang giới thiệu" });
     expect(within(nav).getByRole("link", { name: "Tính năng" })).toHaveAttribute("href", "#features");
+    expect(within(nav).getByRole("link", { name: "Thư viện" })).toHaveAttribute("href", "/library");
+    expect(within(nav).getByRole("link", { name: "Câu hỏi thường gặp" })).toHaveAttribute("href", "/help");
     expect(within(nav).getByRole("link", { name: "Đăng nhập" })).toHaveAttribute("href", "/login");
   });
 
@@ -113,12 +74,20 @@ describe("LandingPage", () => {
     expect(within(nav).getByRole("link", { name: "Cô Lan" })).toHaveAttribute("href", "/teacher/home");
   });
 
-  it("shows real library songs that have sheet music and no audience section", () => {
+  it("lists the contact email, phone and feedback form in the footer", () => {
     renderPage();
 
-    const library = screen.getByRole("region", { name: /thư viện/i });
-    expect(within(library).getByRole("link", { name: /Lý chiều chiều/ })).toHaveAttribute("href", "/library/p1");
-    expect(within(library).queryByText("Chưa có bản nhạc")).not.toBeInTheDocument();
-    expect(screen.queryByText("Dành cho ai")).not.toBeInTheDocument();
+    const footer = within(screen.getByRole("contentinfo"));
+    expect(footer.getByRole("link", { name: "bachvietcam.work@gmail.com" })).toHaveAttribute(
+      "href",
+      "mailto:bachvietcam.work@gmail.com"
+    );
+    expect(footer.getByRole("link", { name: "0868 112 005" })).toHaveAttribute("href", "tel:0868112005");
+    expect(footer.getByText("Đại Học FPT Hà Nội")).toBeInTheDocument();
+    expect(footer.queryByRole("link", { name: "Thư viện bài hát" })).not.toBeInTheDocument();
+    const feedback = footer.getByRole("link", { name: "Gửi góp ý" });
+    expect(feedback).toHaveAttribute("href", "https://forms.gle/HboKU3YcHNUYRwVq9");
+    expect(feedback).toHaveAttribute("target", "_blank");
+    expect(screen.queryByRole("region", { name: /thư viện/i })).not.toBeInTheDocument();
   });
 });

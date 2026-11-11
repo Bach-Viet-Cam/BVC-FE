@@ -36,7 +36,7 @@ function defaultValuesOf(song?: LecturerPiece): SongFormValues {
     description: song?.description ?? "",
     genreId: song?.genre.id ?? "",
     // Bài mới mặc định ẩn
-    visibility: song?.visibility ?? "HIDDEN",
+    visibility: song?.visibility ?? "PUBLIC",
     coverFile: null,
     removeCover: false,
   };

@@ -6,10 +6,6 @@ import { InstallAppButton } from "@/features/landing/components/InstallAppButton
 import { listenForPwaInstall } from "@/shared/utils/pwaInstall";
 
 beforeAll(() => {
-  vi.stubGlobal(
-    "matchMedia",
-    vi.fn(() => ({ matches: false }))
-  );
   listenForPwaInstall();
 });
 
@@ -27,7 +23,7 @@ describe("InstallAppButton", () => {
     expect(screen.getByRole("link", { name: "Thêm vào màn hình chính" })).toHaveAttribute("href", "/install");
   });
 
-  it("opens the browser install dialog, then hides once the app is installed", async () => {
+  it("opens the browser install dialog and stays visible after installing", async () => {
     renderButton();
     const prompt = vi.fn().mockResolvedValue(undefined);
     const event = Object.assign(new Event("beforeinstallprompt"), {
@@ -44,6 +40,6 @@ describe("InstallAppButton", () => {
     act(() => {
       window.dispatchEvent(new Event("appinstalled"));
     });
-    expect(screen.queryByText("Thêm vào màn hình chính")).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Thêm vào màn hình chính" })).toHaveAttribute("href", "/install");
   });
 });

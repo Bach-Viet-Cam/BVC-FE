@@ -14,6 +14,7 @@ import { useMusicCategories } from "@/features/music-library/hooks/useMusicCateg
 import { useSongSheets } from "@/features/music-library/hooks/useSongSheets";
 import { useVisibilityConfirm } from "@/features/music-library/hooks/useVisibilityConfirm";
 import type { LecturerSheetMusic } from "@/features/music-library/types/lecturerTypes";
+import { pieceLockMessage } from "@/features/music-library/utils/pieceAccess";
 import { sheetViewerHref } from "@/features/music-library/utils/sheetUtils";
 import type { SheetFormValues } from "@/features/music-library/utils/validateSheet";
 
@@ -43,6 +44,7 @@ export function SheetManagePage() {
   };
 
   const { song, sheets, groups } = data;
+  const isLocked = song?.canManageSheets === false;
   const pendingSheet = visibility.pending?.item;
   // Trang xem của thư viện chỉ mở được nội dung đang công khai
   const isSongViewable = song?.effectiveVisibility === "PUBLIC";
@@ -53,7 +55,7 @@ export function SheetManagePage() {
     <TeacherShell className="lg:overflow-hidden">
       <div className="flex min-w-0 flex-1 flex-col lg:overflow-y-auto">
         <TeacherPageHeader
-          onBack={() => navigate(song && !song.canEdit ? `/library/${song.id}` : "/songs")}
+          onBack={() => navigate("/songs")}
           title={song ? `Bản nhạc - ${song.title}` : "Bản nhạc"}
           subtitle={song ? `${sheets.length} bản · ${groups.length} nhạc cụ · mỗi nhạc cụ 1 bản chính` : undefined}
           actions={
@@ -63,7 +65,7 @@ export function SheetManagePage() {
                   Xem như sinh viên
                 </Link>
               )}
-              <ActionButton onClick={() => setPanel({ mode: "create" })} disabled={!song}>
+              <ActionButton onClick={() => setPanel({ mode: "create" })} disabled={!song || isLocked}>
                 <Plus className="size-[18px]" aria-hidden />
                 Thêm bản nhạc
               </ActionButton>
@@ -84,6 +86,12 @@ export function SheetManagePage() {
                 <span key={index} className="h-44 rounded-bvc-xl bg-bvc-surface" />
               ))}
             </div>
+          ) : isLocked && song ? (
+            <EmptyState
+              title="Bài hát đang bị ẩn"
+              description={pieceLockMessage(song.moderation)}
+              actions={<ActionButton onClick={() => navigate("/songs")}>Về thư viện của tôi</ActionButton>}
+            />
           ) : groups.length === 0 ? (
             <EmptyState
               title="Bài hát chưa có bản nhạc"
@@ -110,7 +118,7 @@ export function SheetManagePage() {
         </div>
       </div>
 
-      {panel && song && (
+      {panel && song && !isLocked && (
         <SheetFormDialog
           key={panel.mode === "edit" ? panel.sheet.id : `new-${panel.instrumentId ?? ""}`}
           song={song}

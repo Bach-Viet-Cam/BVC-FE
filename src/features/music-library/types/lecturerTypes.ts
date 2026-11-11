@@ -1,5 +1,10 @@
 import type { PaginatedData } from "@/shared/types/commonTypes";
-import type { CategoryRef, EditableVisibility, Visibility } from "@/features/music-library/types/musicLibraryTypes";
+import type {
+  CategoryRef,
+  EditableVisibility,
+  PieceOwnership,
+  Visibility,
+} from "@/features/music-library/types/musicLibraryTypes";
 
 export type Moderation = "NORMAL" | "ADMIN_HIDDEN";
 export type SheetKind = "MAIN" | "LEVEL";
@@ -40,7 +45,9 @@ export interface LecturerPiece {
   canChangeVisibility: boolean;
   // Chỉ chủ bài sửa thông tin bài hát; giảng viên khác vẫn thêm được bản nhạc
   canEdit: boolean;
+  canManageSheets: boolean;
   sheetMusicCount: number;
+  mySheetMusicCount: number;
   publicSheetMusicCount: number;
   createdAt: string;
   updatedAt: string;
@@ -62,6 +69,7 @@ export interface LecturerPieceQuery {
   levelId?: string;
   instrumentId?: string;
   visibility?: Visibility | "ALL";
+  ownership?: PieceOwnership | "ALL";
   page: number;
   pageSize: number;
 }
@@ -119,7 +127,7 @@ export interface SheetInstrumentOption extends CategoryRef {
 }
 
 export interface LecturerSheetMusicList {
-  piece: Pick<LecturerPiece, "id" | "title" | "coverUrl">;
+  piece: Pick<LecturerPiece, "id" | "title" | "coverUrl" | "canManageSheets">;
   total: number;
   groups: LecturerSheetGroup[];
   instrumentOptions: SheetInstrumentOption[];

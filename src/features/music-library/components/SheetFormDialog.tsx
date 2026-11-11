@@ -97,7 +97,7 @@ export function SheetFormDialog({
       instrumentId: initialInstrumentId,
       levelId: editing?.level.id ?? "",
       isMain: editing?.isMain ?? mainRuleFor(initialInstrumentId, sheets).canBeMain,
-      visibility: editing?.visibility ?? "HIDDEN",
+      visibility: editing?.visibility ?? "PUBLIC",
       sheetFile: null,
       referenceRecording: null,
       tutorialVideo: null,

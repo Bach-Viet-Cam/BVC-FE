@@ -5,11 +5,10 @@ interface BeforeInstallPromptEvent extends Event {
 
 export interface PwaInstallState {
   canPrompt: boolean;
-  isInstalled: boolean;
 }
 
 let deferredPrompt: BeforeInstallPromptEvent | null = null;
-let state: PwaInstallState = { canPrompt: false, isInstalled: false };
+let state: PwaInstallState = { canPrompt: false };
 const listeners = new Set<() => void>();
 
 function setState(next: Partial<PwaInstallState>) {
@@ -21,13 +20,8 @@ function isInstallPromptEvent(event: Event): event is BeforeInstallPromptEvent {
   return "prompt" in event && typeof event.prompt === "function";
 }
 
-function isStandalone() {
-  return window.matchMedia?.("(display-mode: standalone)").matches || Reflect.get(navigator, "standalone") === true;
-}
-
 // Chrome/Edge bắn beforeinstallprompt rất sớm nên phải bắt từ lúc khởi động, trước khi trang nào được render
 export function listenForPwaInstall() {
-  setState({ isInstalled: isStandalone() });
   window.addEventListener("beforeinstallprompt", (event) => {
     if (!isInstallPromptEvent(event)) return;
     event.preventDefault();
@@ -36,7 +30,7 @@ export function listenForPwaInstall() {
   });
   window.addEventListener("appinstalled", () => {
     deferredPrompt = null;
-    setState({ canPrompt: false, isInstalled: true });
+    setState({ canPrompt: false });
   });
 }
 

@@ -71,7 +71,7 @@ export function StudentShell({ children, className }: StudentShellProps) {
     <div className="flex min-h-dvh flex-col bg-white font-bvc-sans text-bvc-ink">
       <header className="shrink-0 bg-bvc-ink text-white">
         <div className="mx-auto flex w-full max-w-[1440px] flex-wrap items-center gap-2.5 px-[18px] pt-[max(env(safe-area-inset-top),18px)] pb-3 md:h-[72px] md:flex-nowrap md:gap-8 md:px-14 md:py-0">
-          <Link to={homePath} className="mr-auto shrink-0 transition-opacity hover:opacity-85 md:mr-0">
+          <Link to="/" className="mr-auto shrink-0 transition-opacity hover:opacity-85 md:mr-0">
             <img src={logoImage} alt="Bách Việt Cầm" className="h-10 w-auto md:h-11" />
           </Link>
 

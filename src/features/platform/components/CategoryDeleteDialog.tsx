@@ -6,9 +6,18 @@ interface CategoryDeleteDialogProps {
   target: { id: string; name: string } | null;
   onClose: () => void;
   onConfirm: (id: string) => Promise<boolean>;
+  description?: string;
 }
 
-export function CategoryDeleteDialog({ target, onClose, onConfirm }: CategoryDeleteDialogProps) {
+const DEFAULT_DESCRIPTION =
+  "Chỉ có thể xóa khi danh mục không còn danh mục con trực thuộc và không gắn với bài nhạc nào. Thao tác này không thể hoàn tác.";
+
+export function CategoryDeleteDialog({
+  target,
+  onClose,
+  onConfirm,
+  description = DEFAULT_DESCRIPTION,
+}: CategoryDeleteDialogProps) {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const confirm = async () => {
@@ -31,8 +40,7 @@ export function CategoryDeleteDialog({ target, onClose, onConfirm }: CategoryDel
               Xóa danh mục “{target?.name}”?
             </DialogTitle>
             <DialogDescription className="mt-1.5 text-[13px] leading-relaxed text-bvc-muted">
-              Chỉ có thể xóa khi danh mục không còn danh mục con trực thuộc và không gắn với bài nhạc nào. Thao tác này
-              không thể hoàn tác.
+              {description}
             </DialogDescription>
           </div>
         </div>

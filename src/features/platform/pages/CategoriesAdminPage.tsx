@@ -1,88 +1,67 @@
-import { useMemo, useState } from "react";
-import {
-  ChevronDown,
-  ChevronRight,
-  Folder,
-  FolderPlus,
-  FolderTree,
-  Pencil,
-  Plus,
-  RotateCw,
-  Search,
-  Trash2,
-  X,
-} from "lucide-react";
+import { useEffect, useState } from "react";
+import { Pencil, Plus, Power, RotateCw, Search, Trash2, X } from "lucide-react";
 import { DesktopPageHeader } from "@/shared/components/bvc";
+import { CatalogCategoryFormDialog } from "@/features/platform/components/CatalogCategoryFormDialog";
 import { CategoryDeleteDialog } from "@/features/platform/components/CategoryDeleteDialog";
-import { CategoryFormDialog } from "@/features/platform/components/CategoryFormDialog";
-import { PageStatus } from "@/features/platform/components/PageStatus";
-import { useContentCategories } from "@/features/platform/hooks/useContentCategories";
-import { type CategoryFormTarget } from "@/features/platform/types/categoryTypes";
+import { CATALOG_CATEGORY_PAGE_SIZE, useCatalogCategories } from "@/features/platform/hooks/useCatalogCategories";
+import {
+  CATALOG_CATEGORY_TYPE_LABELS,
+  type CatalogCategoryItem,
+  type CatalogCategoryStatusFilter,
+  type CatalogCategoryType,
+} from "@/features/platform/types/catalogCategoryTypes";
+import { Pagination } from "@/shared/components/bvc/Pagination";
+import { SegmentedTabs } from "@/shared/components/bvc/SegmentedTabs";
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
 import { ActionTooltip } from "@/shared/components/ui/tooltip";
 
+const TYPE_TABS = (["GENRE", "LEVEL"] as const).map((value) => ({ value, label: CATALOG_CATEGORY_TYPE_LABELS[value] }));
+
+const STATUS_FILTERS: CatalogCategoryStatusFilter[] = ["all", "active", "inactive"];
+
+const STATUS_LABELS: Record<CatalogCategoryStatusFilter, string> = {
+  all: "Tất cả trạng thái",
+  active: "Đang hoạt động",
+  inactive: "Ngừng hoạt động",
+};
+
+const USAGE_UNITS: Record<CatalogCategoryType, string> = { GENRE: "bài hát", LEVEL: "bản nhạc" };
+
+function isStatusFilter(value: unknown): value is CatalogCategoryStatusFilter {
+  return value === "all" || value === "active" || value === "inactive";
+}
+
 export function CategoriesAdminPage() {
-  const { items, error, isLoading, reload, saveCategory, removeCategory } = useContentCategories();
+  const { filters, updateFilters, items, total, error, isLoading, reload, saveCategory, toggleActive, removeCategory } =
+    useCatalogCategories();
+  const [searchText, setSearchText] = useState("");
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [formTarget, setFormTarget] = useState<CatalogCategoryItem | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<CatalogCategoryItem | null>(null);
+  const typeLabel = CATALOG_CATEGORY_TYPE_LABELS[filters.type];
+  const totalPages = Math.max(1, Math.ceil(total / CATALOG_CATEGORY_PAGE_SIZE));
+  const hasActiveFilters = Boolean(filters.q || filters.status !== "all");
 
-  const [categorySearch, setCategorySearch] = useState("");
-  const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
+  useEffect(() => {
+    const nextQuery = searchText.trim();
+    if (nextQuery === filters.q) return;
+    const timer = window.setTimeout(() => updateFilters({ q: nextQuery }), 300);
+    return () => window.clearTimeout(timer);
+  }, [searchText, filters.q, updateFilters]);
 
-  const [isCategoryFormOpen, setIsCategoryFormOpen] = useState(false);
-  const [categoryTarget, setCategoryTarget] = useState<CategoryFormTarget | null>(null);
-  const [defaultParentId, setDefaultParentId] = useState("");
-  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
-
-  const toggleExpand = (id: string) => {
-    setExpandedIds((prev) => ({
-      ...prev,
-      [id]: prev[id] === undefined ? false : !prev[id],
-    }));
+  const openForm = (category: CatalogCategoryItem | null) => {
+    setFormTarget(category);
+    setIsFormOpen(true);
   };
 
-  const expandAll = () => {
-    const next: Record<string, boolean> = {};
-    items.forEach((cat) => {
-      next[cat.id] = true;
-    });
-    setExpandedIds(next);
+  const changeType = (type: CatalogCategoryType) => {
+    setSearchText("");
+    updateFilters({ type, q: "", status: "all" });
   };
 
-  const collapseAll = () => {
-    const next: Record<string, boolean> = {};
-    items.forEach((cat) => {
-      next[cat.id] = false;
-    });
-    setExpandedIds(next);
-  };
-
-  const isExpanded = (id: string) => {
-    return expandedIds[id] ?? true; // Default expanded
-  };
-
-  const filteredCategories = useMemo(() => {
-    const q = categorySearch.trim().toLowerCase();
-    if (!q) return items;
-
-    return items
-      .map((cat) => {
-        const matchesParent = cat.name.toLowerCase().includes(q);
-        const matchingChildren = cat.children.filter((child) => child.name.toLowerCase().includes(q));
-
-        if (matchesParent) return cat;
-        if (matchingChildren.length > 0) {
-          return {
-            ...cat,
-            children: matchingChildren,
-          };
-        }
-        return null;
-      })
-      .filter((cat): cat is NonNullable<typeof cat> => cat !== null);
-  }, [items, categorySearch]);
-
-  const openCategoryForm = (target: CategoryFormTarget | null, parentId = "") => {
-    setCategoryTarget(target);
-    setDefaultParentId(parentId);
-    setIsCategoryFormOpen(true);
+  const resetFilters = () => {
+    setSearchText("");
+    updateFilters({ q: "", status: "all" });
   };
 
   return (
@@ -95,249 +74,227 @@ export function CategoriesAdminPage() {
             <ActionTooltip content="Làm mới dữ liệu">
               <button
                 type="button"
-                onClick={() => {
-                  void reload();
-                }}
+                onClick={reload}
                 disabled={isLoading}
+                aria-label="Làm mới dữ liệu"
                 className="flex size-[42px] cursor-pointer items-center justify-center rounded-[12px] border border-bvc-border bg-white text-bvc-muted transition-colors hover:border-bvc-border-strong hover:text-bvc-ink disabled:opacity-50"
               >
                 <RotateCw size={16} className={isLoading ? "animate-spin text-bvc-ink" : ""} />
               </button>
             </ActionTooltip>
-
-            <ActionTooltip content="Tạo một danh mục gốc mới">
-              <button
-                type="button"
-                onClick={() => openCategoryForm(null)}
-                className="flex min-h-[42px] cursor-pointer items-center gap-2 rounded-[12px] bg-bvc-ink px-4 text-[13.5px] font-medium text-white transition-colors hover:bg-black"
-              >
-                <FolderPlus size={16} />
-                <span>Thêm danh mục gốc</span>
-              </button>
-            </ActionTooltip>
+            <button
+              type="button"
+              onClick={() => openForm(null)}
+              className="flex min-h-[42px] cursor-pointer items-center gap-2 rounded-[12px] bg-bvc-ink px-4 text-[13.5px] font-medium text-white transition-colors hover:bg-black"
+            >
+              <Plus size={16} />
+              <span>Thêm {typeLabel.toLowerCase()}</span>
+            </button>
           </div>
         }
       />
 
       <div className="flex min-w-0 flex-1 flex-col gap-4 p-6 md:px-8">
-        <div className="flex flex-col overflow-hidden rounded-bvc-xl border border-bvc-border bg-white">
-          <div className="flex flex-col gap-3 border-b border-bvc-border p-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="flex size-[32px] items-center justify-center rounded-[8px] bg-bvc-surface text-bvc-ink">
-                <FolderTree size={16} />
-              </div>
-              <div>
-                <h2 className="text-[15px] font-semibold tracking-[-0.02em] text-bvc-ink">Cây danh mục nội dung</h2>
-              </div>
-            </div>
+        <SegmentedTabs label="Loại danh mục" tabs={TYPE_TABS} value={filters.type} onChange={changeType} />
 
-            <div className="flex items-center gap-2">
-              <div className="relative flex items-center">
-                <Search size={14} className="pointer-events-none absolute left-3 text-bvc-muted" />
-                <input
-                  type="search"
-                  value={categorySearch}
-                  onChange={(e) => setCategorySearch(e.target.value)}
-                  placeholder="Tìm danh mục..."
-                  className="h-[36px] w-[180px] rounded-[10px] border border-bvc-border-strong bg-white pl-8 pr-7 text-[13px] text-bvc-ink placeholder:text-bvc-faint transition-colors focus:border-bvc-ink focus:outline-none"
-                />
-                {categorySearch && (
-                  <ActionTooltip content="Xóa tìm kiếm">
-                    <button
-                      type="button"
-                      onClick={() => setCategorySearch("")}
-                      className="absolute right-2 cursor-pointer text-bvc-muted hover:text-bvc-ink"
-                    >
-                      <X size={13} />
-                    </button>
-                  </ActionTooltip>
-                )}
-              </div>
-
-              <div className="flex items-center rounded-[9px] border border-bvc-border bg-bvc-surface/60 p-0.5">
-                <ActionTooltip content="Mở rộng tất cả các nhánh danh mục">
-                  <button
-                    type="button"
-                    onClick={expandAll}
-                    className="cursor-pointer rounded-[7px] px-2 py-1 text-[11.5px] font-medium text-bvc-muted transition-colors hover:text-bvc-ink"
-                  >
-                    Mở rộng
-                  </button>
-                </ActionTooltip>
-                <ActionTooltip content="Thu gọn tất cả các nhánh danh mục">
-                  <button
-                    type="button"
-                    onClick={collapseAll}
-                    className="cursor-pointer rounded-[7px] px-2 py-1 text-[11.5px] font-medium text-bvc-muted transition-colors hover:text-bvc-ink"
-                  >
-                    Thu gọn
-                  </button>
-                </ActionTooltip>
-              </div>
-            </div>
+        <div className="flex flex-wrap items-center gap-2.5 rounded-[14px] border border-bvc-border bg-white p-3">
+          <div className="relative flex flex-1 items-center sm:max-w-[280px]">
+            <Search size={15} className="pointer-events-none absolute left-3 text-bvc-muted" />
+            <input
+              type="search"
+              aria-label={`Tìm ${typeLabel.toLowerCase()}`}
+              value={searchText}
+              onChange={(event) => setSearchText(event.target.value)}
+              placeholder={`Tìm ${typeLabel.toLowerCase()}...`}
+              maxLength={100}
+              className="h-[38px] w-full rounded-[10px] border border-bvc-border-strong bg-white pr-8 pl-8.5 text-[13px] text-bvc-ink transition-all placeholder:text-bvc-faint focus:border-bvc-ink focus:outline-none"
+            />
           </div>
 
-          <div className="p-4">
-            <PageStatus isLoading={isLoading} error={error} onRetry={reload}>
-              {filteredCategories.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <div className="flex size-[44px] items-center justify-center rounded-[12px] bg-bvc-surface text-bvc-muted">
-                    <Folder size={20} />
-                  </div>
-                  <p className="mt-3 text-[14px] font-semibold text-bvc-ink">
-                    {categorySearch ? "Không tìm thấy danh mục phù hợp" : "Chưa có danh mục nội dung"}
-                  </p>
-                  <p className="mt-1 text-[12.5px] text-bvc-muted">
-                    {categorySearch
-                      ? `Không có kết quả cho từ khóa “${categorySearch}”. Hãy thử tìm từ khóa khác.`
-                      : "Bấm “Thêm danh mục gốc” phía trên để thiết lập cây thư mục ban đầu."}
-                  </p>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-3">
-                  {filteredCategories.map((category) => {
-                    const expanded = isExpanded(category.id);
-                    return (
-                      <div
-                        key={category.id}
-                        className="group rounded-[14px] border border-bvc-border bg-white transition-colors hover:border-bvc-border-strong"
+          <Select
+            value={filters.status}
+            onValueChange={(value) => updateFilters({ status: isStatusFilter(value) ? value : "all" })}
+          >
+            <SelectTrigger
+              aria-label="Lọc trạng thái danh mục"
+              className="h-[38px] min-w-[155px] rounded-[10px] border-bvc-border-strong bg-white px-3 text-[13px] font-medium text-bvc-ink shadow-2xs hover:border-bvc-ink"
+            >
+              <SelectValue>{(value) => (isStatusFilter(value) ? STATUS_LABELS[value] : STATUS_LABELS.all)}</SelectValue>
+            </SelectTrigger>
+            <SelectPopup positionerClassName="z-50">
+              {STATUS_FILTERS.map((status) => (
+                <SelectItem key={status} value={status}>
+                  {STATUS_LABELS[status]}
+                </SelectItem>
+              ))}
+            </SelectPopup>
+          </Select>
+
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={resetFilters}
+              className="flex h-[38px] cursor-pointer items-center gap-1.5 rounded-[10px] border border-bvc-border bg-bvc-surface/80 px-2.5 text-[12.5px] font-medium text-bvc-muted transition-colors hover:bg-bvc-border hover:text-bvc-ink"
+            >
+              <X size={13} />
+              <span>Xóa lọc</span>
+            </button>
+          )}
+        </div>
+
+        <div className="flex flex-col overflow-hidden rounded-[18px] border border-bvc-border bg-white">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[860px] border-collapse text-left text-[13px]">
+              <thead>
+                <tr className="border-b border-bvc-border bg-bvc-surface/60 text-[11.5px] font-bold tracking-wider text-bvc-muted uppercase select-none">
+                  <th className="w-[220px] px-5 py-3.5">Tên</th>
+                  <th className="px-5 py-3.5">Mô tả</th>
+                  <th className="w-[100px] px-5 py-3.5">Thứ tự</th>
+                  <th className="w-[130px] px-5 py-3.5">Đang dùng</th>
+                  <th className="w-[160px] px-5 py-3.5">Trạng thái</th>
+                  <th className="w-[200px] px-5 py-3.5 text-right">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-bvc-border">
+                {isLoading && (
+                  <tr>
+                    <td colSpan={6} className="px-5 py-10 text-center text-bvc-muted">
+                      <span className="inline-flex items-center gap-2">
+                        <RotateCw size={15} className="animate-spin text-bvc-ink" />
+                        Đang tải danh mục...
+                      </span>
+                    </td>
+                  </tr>
+                )}
+
+                {error && !isLoading && (
+                  <tr>
+                    <td colSpan={6} className="px-5 py-8 text-center text-bvc-error">
+                      <p className="font-semibold">{error}</p>
+                      <button
+                        type="button"
+                        onClick={reload}
+                        className="mt-2 inline-flex cursor-pointer items-center gap-1.5 rounded-[8px] bg-bvc-surface px-3 py-1.5 text-[12px] font-semibold text-bvc-ink hover:bg-bvc-border"
                       >
-                        <div className="flex items-center justify-between gap-3 p-3">
-                          <div className="flex min-w-0 items-center gap-2.5">
-                            <ActionTooltip content={expanded ? "Thu gọn danh mục" : "Mở rộng danh mục"}>
-                              <button
-                                type="button"
-                                onClick={() => toggleExpand(category.id)}
-                                aria-label={expanded ? "Thu gọn danh mục" : "Mở rộng danh mục"}
-                                className="flex size-[28px] cursor-pointer items-center justify-center rounded-[7px] text-bvc-muted transition-colors hover:bg-bvc-surface hover:text-bvc-ink"
-                              >
-                                {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                              </button>
-                            </ActionTooltip>
+                        <RotateCw size={13} />
+                        Thử lại
+                      </button>
+                    </td>
+                  </tr>
+                )}
 
-                            <Folder size={17} className="shrink-0 text-bvc-ink" />
+                {!isLoading && !error && items.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="px-5 py-12 text-center">
+                      <p className="text-[14px] font-bold text-bvc-ink">
+                        {hasActiveFilters ? "Không tìm thấy danh mục phù hợp" : `Chưa có ${typeLabel.toLowerCase()}`}
+                      </p>
+                      {hasActiveFilters && (
+                        <p className="mt-1 text-[12.5px] text-bvc-muted">
+                          Thử từ khóa khác hoặc bỏ chọn bộ lọc trạng thái.
+                        </p>
+                      )}
+                    </td>
+                  </tr>
+                )}
 
-                            <span className="truncate text-[14px] font-semibold text-bvc-ink">{category.name}</span>
-
-                            <span className="font-mono text-[11.5px] font-medium text-bvc-muted bg-bvc-surface border border-bvc-border px-2 py-0.5 rounded-[6px]">
-                              {category.pieceCount} bài
+                {!isLoading &&
+                  !error &&
+                  items.map((category) => {
+                    const isActive = category.status === "ACTIVE";
+                    const isInUse = category.usageCount > 0;
+                    return (
+                      <tr key={category.id} className="transition-colors hover:bg-bvc-surface/40">
+                        <td className="px-5 py-3.5 text-[13.5px] font-bold text-bvc-ink">{category.name}</td>
+                        <td className="px-5 py-3.5 text-bvc-muted">{category.description || "-"}</td>
+                        <td className="px-5 py-3.5 font-mono text-bvc-ink">{category.displayOrder}</td>
+                        <td className="px-5 py-3.5 text-bvc-ink">
+                          {category.usageCount} {USAGE_UNITS[category.type]}
+                        </td>
+                        <td className="px-5 py-3.5">
+                          <span className="inline-flex items-center gap-2">
+                            <span
+                              className={`size-[7px] shrink-0 rounded-full ${isActive ? "bg-bvc-ok" : "bg-bvc-bar-strong"}`}
+                            />
+                            <span className={isActive ? "font-semibold text-bvc-ink" : "text-bvc-muted"}>
+                              {isActive ? "Đang hoạt động" : "Ngừng hoạt động"}
                             </span>
-
-                            {category.children.length > 0 && (
-                              <span className="hidden font-mono text-[11px] text-bvc-faint sm:inline">
-                                {category.children.length} nhánh con
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="flex items-center gap-1">
-                            <ActionTooltip content={`Thêm nhánh con cho ${category.name}`}>
+                          </span>
+                        </td>
+                        <td className="px-5 py-3.5">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => openForm(category)}
+                              aria-label={`Sửa ${category.name}`}
+                              className="flex h-[32px] cursor-pointer items-center gap-1.5 rounded-[8px] border border-bvc-border bg-white px-2.5 text-[12.5px] font-semibold text-bvc-ink transition-colors hover:border-bvc-ink hover:bg-bvc-surface"
+                            >
+                              <Pencil size={13} />
+                              <span>Sửa</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => void toggleActive(category)}
+                              aria-label={`${isActive ? "Ngừng hoạt động" : "Bật lại"} ${category.name}`}
+                              className={`flex h-[32px] cursor-pointer items-center gap-1 rounded-[8px] border border-bvc-border px-2.5 text-[12.5px] font-semibold transition-colors hover:bg-white ${
+                                isActive
+                                  ? "bg-bvc-surface/60 text-bvc-muted hover:border-bvc-error hover:text-bvc-error"
+                                  : "bg-bvc-surface text-bvc-ok hover:border-bvc-ok hover:text-bvc-ok"
+                              }`}
+                            >
+                              <Power size={13} />
+                              <span>{isActive ? "Ngừng" : "Bật"}</span>
+                            </button>
+                            <ActionTooltip
+                              content={
+                                isInUse
+                                  ? `Đang được ${category.usageCount} ${USAGE_UNITS[category.type]} sử dụng. Hãy ngừng hoạt động thay vì xóa.`
+                                  : `Xóa ${category.name}`
+                              }
+                            >
                               <button
                                 type="button"
-                                onClick={() => openCategoryForm(null, category.id)}
-                                className="flex h-[30px] cursor-pointer items-center gap-1 rounded-[8px] border border-bvc-border bg-bvc-surface/60 px-2 text-[12px] font-medium text-bvc-ink transition-colors hover:border-bvc-border-strong hover:bg-white"
-                              >
-                                <Plus size={13} />
-                                <span className="hidden sm:inline">Thêm nhánh</span>
-                              </button>
-                            </ActionTooltip>
-
-                            <ActionTooltip content={`Đổi tên ${category.name}`}>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  openCategoryForm({ id: category.id, name: category.name, parentId: null })
-                                }
-                                className="flex size-[30px] cursor-pointer items-center justify-center rounded-[8px] text-bvc-muted transition-colors hover:bg-bvc-surface hover:text-bvc-ink"
-                              >
-                                <Pencil size={14} />
-                              </button>
-                            </ActionTooltip>
-
-                            <ActionTooltip content={`Xóa ${category.name}`}>
-                              <button
-                                type="button"
-                                onClick={() => setDeleteTarget({ id: category.id, name: category.name })}
-                                className="flex size-[30px] cursor-pointer items-center justify-center rounded-[8px] text-bvc-muted transition-colors hover:bg-bvc-surface hover:text-bvc-error"
+                                disabled={isInUse}
+                                onClick={() => setDeleteTarget(category)}
+                                aria-label={`Xóa ${category.name}`}
+                                className="flex size-[32px] cursor-pointer items-center justify-center rounded-[8px] text-bvc-muted transition-colors hover:bg-bvc-surface hover:text-bvc-error disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-bvc-muted"
                               >
                                 <Trash2 size={14} />
                               </button>
                             </ActionTooltip>
                           </div>
-                        </div>
-
-                        {expanded && category.children.length > 0 && (
-                          <div className="border-t border-bvc-line bg-bvc-surface/20 px-3 py-2">
-                            <div className="ml-4 flex flex-col gap-1 border-l-2 border-bvc-border pl-3">
-                              {category.children.map((child) => (
-                                <div
-                                  key={child.id}
-                                  className="flex min-h-[36px] items-center justify-between rounded-[8px] px-2.5 py-1 text-[13px] transition-colors hover:bg-white"
-                                >
-                                  <div className="flex min-w-0 items-center gap-2">
-                                    <span className="size-[5px] shrink-0 rounded-full bg-bvc-muted" />
-                                    <span className="truncate font-medium text-bvc-ink">{child.name}</span>
-                                    <span className="font-mono text-[11px] text-bvc-muted">
-                                      ({child.pieceCount} bài)
-                                    </span>
-                                  </div>
-
-                                  <div className="flex items-center gap-1">
-                                    <ActionTooltip content={`Sửa ${child.name}`}>
-                                      <button
-                                        type="button"
-                                        onClick={() =>
-                                          openCategoryForm({
-                                            id: child.id,
-                                            name: child.name,
-                                            parentId: category.id,
-                                          })
-                                        }
-                                        className="flex size-[28px] cursor-pointer items-center justify-center rounded-[6px] text-bvc-muted transition-colors hover:bg-bvc-surface hover:text-bvc-ink"
-                                      >
-                                        <Pencil size={13} />
-                                      </button>
-                                    </ActionTooltip>
-                                    <ActionTooltip content={`Xóa ${child.name}`}>
-                                      <button
-                                        type="button"
-                                        onClick={() => setDeleteTarget({ id: child.id, name: child.name })}
-                                        className="flex size-[28px] cursor-pointer items-center justify-center rounded-[6px] text-bvc-muted transition-colors hover:bg-bvc-surface hover:text-bvc-error"
-                                      >
-                                        <Trash2 size={13} />
-                                      </button>
-                                    </ActionTooltip>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {expanded && category.children.length === 0 && (
-                          <div className="border-t border-bvc-line bg-bvc-surface/10 px-4 py-2 text-[12px] text-bvc-muted">
-                            Chưa có nhánh con trực thuộc.
-                          </div>
-                        )}
-                      </div>
+                        </td>
+                      </tr>
                     );
                   })}
-                </div>
-              )}
-            </PageStatus>
+              </tbody>
+            </table>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-bvc-border bg-bvc-surface/30 px-5 py-3 text-[12px] text-bvc-muted">
+            <span>
+              Tổng cộng <strong className="font-mono text-bvc-ink">{total}</strong> {typeLabel.toLowerCase()}
+            </span>
+            {totalPages > 1 && (
+              <Pagination page={filters.page} totalPages={totalPages} onChange={(page) => updateFilters({ page })} />
+            )}
           </div>
         </div>
       </div>
 
-      <CategoryFormDialog
-        isOpen={isCategoryFormOpen}
-        target={categoryTarget}
-        defaultParentId={defaultParentId}
-        parentOptions={items}
-        onOpenChange={setIsCategoryFormOpen}
-        onSubmit={(values) => saveCategory(categoryTarget, values)}
+      <CatalogCategoryFormDialog
+        isOpen={isFormOpen}
+        type={filters.type}
+        category={formTarget}
+        onOpenChange={setIsFormOpen}
+        onSubmit={(values) => saveCategory(formTarget, values)}
       />
-      <CategoryDeleteDialog target={deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={removeCategory} />
+      <CategoryDeleteDialog
+        target={deleteTarget}
+        description="Chỉ xóa được danh mục chưa có bài hát hoặc bản nhạc nào sử dụng. Thao tác này không thể hoàn tác."
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={removeCategory}
+      />
     </div>
   );
 }

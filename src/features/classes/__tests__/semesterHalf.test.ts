@@ -16,6 +16,10 @@ describe("halfOfSemesterName", () => {
     expect(halfOfSemesterName("FA26-H1")).toBe(1);
     expect(halfOfSemesterName("sp27-h2")).toBe(2);
     expect(halfOfSemesterName("FA26")).toBeNull();
+    expect(halfOfSemesterName("FA26-H1")).toBe(1);
+    expect(halfOfSemesterName("Fall2026_H2")).toBe(2);
+    expect(halfOfSemesterName("Spring2027_h1")).toBe(1);
+    expect(halfOfSemesterName("Fall2026H2")).toBeNull();
   });
 });
 
