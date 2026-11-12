@@ -74,7 +74,7 @@ export interface EnsembleAssignmentInfo {
   deadline: string;
   canSubmit: boolean;
   usedSubmissions: number;
-  maxSubmissions: number;
+  maxSubmissions: number | null;
 }
 
 export type ListeningMode = "headphones" | "speaker";

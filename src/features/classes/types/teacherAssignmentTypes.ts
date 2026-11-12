@@ -42,6 +42,7 @@ export interface AssignmentSheetMusic {
 }
 
 export interface AssignmentBase {
+  maxSubmissions?: number | null;
   id: string;
   classId: string;
   className: string;
@@ -106,6 +107,7 @@ export interface ClassSheetMusic {
 }
 
 export interface AssignmentContentPayload {
+  maxSubmissions?: number | null;
   title: string;
   description: string | null;
   kind: AssignmentKind;

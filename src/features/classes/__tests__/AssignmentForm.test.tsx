@@ -90,6 +90,7 @@ describe("AssignmentForm", () => {
         kind: "SOLO",
         sheetMusicId: null,
         requiredBpm: null,
+        maxSubmissions: null,
       },
       false
     );
@@ -170,5 +171,16 @@ describe("AssignmentForm", () => {
     await fillRequired();
     await userEvent.click(screen.getByRole("button", { name: "Lưu nháp" }));
     expect(onSubmit).toHaveBeenLastCalledWith(expect.objectContaining({ classId: "c2", sheetMusicId: null }), false);
+  });
+  it("sends an explicit limit and clears it back to unlimited", async () => {
+    const onSubmit = renderForm();
+    await fillRequired();
+    const limit = screen.getByLabelText(/Giới hạn lượt nộp/);
+    await userEvent.type(limit, "5");
+    await userEvent.click(screen.getByRole("button", { name: "Lưu nháp" }));
+    expect(onSubmit).toHaveBeenLastCalledWith(expect.objectContaining({ maxSubmissions: 5 }), false);
+    await userEvent.clear(limit);
+    await userEvent.click(screen.getByRole("button", { name: "Lưu nháp" }));
+    expect(onSubmit).toHaveBeenLastCalledWith(expect.objectContaining({ maxSubmissions: null }), false);
   });
 });

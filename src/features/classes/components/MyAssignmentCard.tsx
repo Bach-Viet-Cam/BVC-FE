@@ -61,7 +61,8 @@ export function MyAssignmentCard({ assignment, now }: MyAssignmentCardProps) {
 
       <div className="mt-auto flex items-center justify-between gap-3 pt-4 text-[13px]">
         <span className="text-bvc-muted tabular-nums">
-          Chuẩn {assignment.minAccuracy}% · Lượt {assignment.usedSubmissions}/{assignment.maxSubmissions}
+          Chuẩn {assignment.minAccuracy}% · Lượt {assignment.usedSubmissions}
+          {assignment.maxSubmissions === null ? " · Không giới hạn" : `/${assignment.maxSubmissions}`}
           {assignment.bonusPoints ? ` · +${assignment.bonusPoints} điểm` : ""}
         </span>
         <span

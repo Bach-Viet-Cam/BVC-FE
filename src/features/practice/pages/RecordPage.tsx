@@ -593,7 +593,7 @@ export function RecordPage() {
           onClose={() => setDrawer(null)}
         >
           {drawer === "tuner" ? (
-            <TunerView audio={audio} tunes={tunes} />
+            <TunerView audio={audio} tunes={tunes} micDenied={micDenied} />
           ) : (
             // key: tốc độ mục tiêu tải xong sau khi mở thì metronome bắt đầu lại từ tốc độ đó
             <MetronomeView key={targetBpm} targetBpm={targetBpm} />

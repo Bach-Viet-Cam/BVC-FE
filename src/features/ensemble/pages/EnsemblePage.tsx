@@ -171,7 +171,9 @@ export function EnsemblePage() {
       : assignment && !assignment.canSubmit
         ? "Bài tập đã hết lượt nộp — bản thu sẽ chỉ lưu làm bài luyện tập."
         : assignment
-          ? `Đã dùng ${assignment.usedSubmissions}/${assignment.maxSubmissions} lượt nộp.`
+          ? assignment.maxSubmissions === null
+            ? `Đã nộp ${assignment.usedSubmissions} lượt · Không giới hạn.`
+            : `Đã dùng ${assignment.usedSubmissions}/${assignment.maxSubmissions} lượt nộp.`
           : null;
 
   useEffect(() => {
@@ -302,11 +304,11 @@ export function EnsemblePage() {
                   take={
                     hasTake && practice.take
                       ? {
-                        peaks: practice.take.peaks,
-                        durationSec: practice.take.durationSec,
-                        volume: Math.round(playback.volume * 100),
-                        muted: playback.muted,
-                      }
+                          peaks: practice.take.peaks,
+                          durationSec: practice.take.durationSec,
+                          volume: Math.round(playback.volume * 100),
+                          muted: playback.muted,
+                        }
                       : null
                   }
                   onTakeVolumeChange={(value) => playback.setVolume(value / 100)}

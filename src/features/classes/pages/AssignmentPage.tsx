@@ -1,3 +1,4 @@
+import { visibleAssignmentAttempts } from "@/features/classes/utils/visibleAssignmentAttempts";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   Activity,
@@ -85,7 +86,14 @@ function AssignmentRequirementsCard({ assignment }: { assignment: AssignmentDeta
         {assignment.pieceTitle && <InfoRow label="Bản nhạc" value={assignment.pieceTitle} />}
         {assignment.targetBpm !== null && <InfoRow label="Tốc độ BPM" value={`${assignment.targetBpm} BPM`} />}
         <InfoRow label="Accuracy tối thiểu" value={`${assignment.minAccuracy}%`} highlight />
-        <InfoRow label="Lượt nộp tối đa" value={`${assignment.usedSubmissions} / ${assignment.maxSubmissions}`} />
+        <InfoRow
+          label="Lượt nộp tối đa"
+          value={
+            assignment.maxSubmissions === null
+              ? `${assignment.usedSubmissions} lượt · Không giới hạn`
+              : `${assignment.usedSubmissions} / ${assignment.maxSubmissions}`
+          }
+        />
       </div>
 
       <div className="mt-3.5 rounded-xl border border-bvc-border bg-bvc-surface/40 p-3">
@@ -153,7 +161,8 @@ function AttemptTimeline({ assignment }: { assignment: AssignmentDetail }) {
     <div className="rounded-2xl border border-bvc-border bg-white p-4 shadow-2xs md:p-5">
       <div className="flex items-center justify-between">
         <p className="text-[11px] font-semibold text-bvc-muted">
-          Tiến trình nộp bài ({assignment.usedSubmissions}/{max} lượt)
+          Tiến trình nộp bài ({assignment.usedSubmissions}
+          {max === null ? " lượt · Không giới hạn" : `/${max} lượt`})
         </p>
         <span className="text-[11.5px] font-medium text-bvc-muted">
           {assignment.canSubmit ? "Có thể nộp thêm" : "Đã khóa nộp"}
@@ -161,37 +170,38 @@ function AttemptTimeline({ assignment }: { assignment: AssignmentDetail }) {
       </div>
 
       <div className="mt-3.5 grid grid-cols-3 gap-2 sm:gap-3">
-        {Array.from({ length: max }).map((_, idx) => {
-          const attemptNumber = idx + 1;
-          const sub = submissions.find((s) => s.attemptNumber === attemptNumber);
-          const isCurrentOrPast = idx < assignment.usedSubmissions;
+        {visibleAssignmentAttempts(Math.max(0, ...submissions.map((sub) => sub.attemptNumber)), max).map(
+          (attemptNumber) => {
+            const sub = submissions.find((s) => s.attemptNumber === attemptNumber);
+            const isCurrentOrPast = attemptNumber <= assignment.usedSubmissions;
 
-          return (
-            <div
-              key={attemptNumber}
-              className={cn(
-                "flex flex-col items-center justify-center rounded-xl border p-2.5 text-center transition-all",
-                sub
-                  ? "border-bvc-accent/60 bg-bvc-accent-tint/30 text-bvc-ink"
-                  : isCurrentOrPast
-                    ? "border-bvc-border bg-bvc-surface text-bvc-ink"
-                    : "border-dashed border-bvc-border/90 bg-white text-bvc-muted"
-              )}
-            >
-              <div className="flex items-center gap-1">
-                {sub ? (
-                  <CheckCircle2 size={13} className="text-bvc-ok" />
-                ) : (
-                  <span className="font-bvc-mono text-[11px] font-semibold text-bvc-faint">#{attemptNumber}</span>
+            return (
+              <div
+                key={attemptNumber}
+                className={cn(
+                  "flex flex-col items-center justify-center rounded-xl border p-2.5 text-center transition-all",
+                  sub
+                    ? "border-bvc-accent/60 bg-bvc-accent-tint/30 text-bvc-ink"
+                    : isCurrentOrPast
+                      ? "border-bvc-border bg-bvc-surface text-bvc-ink"
+                      : "border-dashed border-bvc-border/90 bg-white text-bvc-muted"
                 )}
-                <span className="text-[11.5px] font-semibold">Lượt {attemptNumber}</span>
+              >
+                <div className="flex items-center gap-1">
+                  {sub ? (
+                    <CheckCircle2 size={13} className="text-bvc-ok" />
+                  ) : (
+                    <span className="font-bvc-mono text-[11px] font-semibold text-bvc-faint">#{attemptNumber}</span>
+                  )}
+                  <span className="text-[11.5px] font-semibold">Lượt {attemptNumber}</span>
+                </div>
+                <span className="font-bvc-mono text-[12px] font-semibold text-bvc-ink mt-0.5">
+                  {sub && sub.accuracy !== null ? `${Math.round(sub.accuracy)}%` : sub ? "Đã nộp" : "Chưa nộp"}
+                </span>
               </div>
-              <span className="font-bvc-mono text-[12px] font-semibold text-bvc-ink mt-0.5">
-                {sub && sub.accuracy !== null ? `${Math.round(sub.accuracy)}%` : sub ? "Đã nộp" : "Chưa nộp"}
-              </span>
-            </div>
-          );
-        })}
+            );
+          }
+        )}
       </div>
     </div>
   );
