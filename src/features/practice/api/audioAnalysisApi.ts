@@ -1,10 +1,22 @@
 import { axiosClient } from "@/shared/api/axiosClient";
 import type { ApiResponse } from "@/shared/types/commonTypes";
-import type { AudioEvaluation, AudioEvaluationInput, AudioUploadResult } from "../types/audioAnalysisTypes";
+import type {
+  AudioEvaluation,
+  AudioEvaluationInput,
+  AudioUploadResult,
+  AudioUploadSource,
+} from "../types/audioAnalysisTypes";
 
 export const audioAnalysisApi = {
-  upload: (file: File, signal: AbortSignal, onProgress: (percent: number) => void) => {
+  // source: "file" → server cắt cả hai đầu theo cao độ; "recording" (ghi âm trực tiếp) → chỉ cắt cuối
+  upload: (
+    file: File,
+    signal: AbortSignal,
+    onProgress: (percent: number) => void,
+    source: AudioUploadSource = "file"
+  ) => {
     const body = new FormData();
+    body.append("source", source);
     body.append("file", file);
     return axiosClient.post<ApiResponse<AudioUploadResult>>("/audio-uploads", body, {
       headers: { "Content-Type": undefined },

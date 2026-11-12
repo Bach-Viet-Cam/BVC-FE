@@ -4,6 +4,7 @@ import { audioAnalysisApi } from "@/features/practice/api/audioAnalysisApi";
 import { practiceSubmissionApi } from "@/features/practice/api/practiceSubmissionApi";
 import { MSG } from "@/features/practice/constants/practiceConstants";
 import type { DemoFlags } from "@/features/practice/types/practiceTypes";
+import type { AudioUploadSource } from "@/features/practice/types/audioAnalysisTypes";
 import type { PracticeSubmission, PracticeSubmitTarget } from "@/features/practice/types/practiceSubmissionTypes";
 import { isSlowUpload, isWeakConnection } from "@/features/practice/utils/networkQuality";
 import { toast } from "@/shared/components/ui/toast";
@@ -33,7 +34,7 @@ interface PracticeDemoValue {
   toggleDemoFlag: (key: keyof DemoFlags) => void;
   resetDemo: () => void;
   blocked: boolean;
-  submit: (file: File, target: PracticeSubmitTarget) => Promise<PracticeSubmission | null>;
+  submit: (file: File, target: PracticeSubmitTarget, source?: AudioUploadSource) => Promise<PracticeSubmission | null>;
   uploading: boolean;
   uploadWeak: boolean;
   lastSubmitted: SubmittedFile | null;
@@ -69,36 +70,48 @@ export function PracticeDemoProvider() {
   }, [uploading]);
 
   // Tải file lên rồi tạo Submission "Đang xử lý" (UC-01 steps 10-11, MSG-18)
-  const submit = useCallback(async (file: File, target: PracticeSubmitTarget): Promise<PracticeSubmission | null> => {
-    if (uploadingRef.current) return null;
-    uploadingRef.current = true;
-    progress.current = { startedAt: Date.now(), percent: 0, totalBytes: file.size };
-    setUploading(true);
-    setUploadWeak(isWeakConnection());
-    try {
-      const controller = new AbortController();
-      const uploaded = await audioAnalysisApi.upload(file, controller.signal, (percent) => {
-        progress.current.percent = percent;
-      });
-      const response = await practiceSubmissionApi.create({
-        ...target,
-        studentUploadId: uploaded.data.data.fileId,
-      });
-      const submission = response.data.data;
-      setLastSubmitted({ submissionId: submission.id, file });
-      setBannerVisible(false);
-      toast.success(MSG.sent); // MSG-18
-      return submission;
-    } catch (reason) {
-      // 409 (GBR-49) trả về đúng thông báo "Bản nộp trước đang được xử lý..."
-      toast.error(getApiErrorMessage(reason, MSG.submitFailed));
-      return null;
-    } finally {
-      uploadingRef.current = false;
-      setUploading(false);
-      setUploadWeak(false);
-    }
-  }, []);
+  const submit = useCallback(
+    async (
+      file: File,
+      target: PracticeSubmitTarget,
+      source: AudioUploadSource = "file"
+    ): Promise<PracticeSubmission | null> => {
+      if (uploadingRef.current) return null;
+      uploadingRef.current = true;
+      progress.current = { startedAt: Date.now(), percent: 0, totalBytes: file.size };
+      setUploading(true);
+      setUploadWeak(isWeakConnection());
+      try {
+        const controller = new AbortController();
+        const uploaded = await audioAnalysisApi.upload(
+          file,
+          controller.signal,
+          (percent) => {
+            progress.current.percent = percent;
+          },
+          source
+        );
+        const response = await practiceSubmissionApi.create({
+          ...target,
+          studentUploadId: uploaded.data.data.fileId,
+        });
+        const submission = response.data.data;
+        setLastSubmitted({ submissionId: submission.id, file });
+        setBannerVisible(false);
+        toast.success(MSG.sent); // MSG-18
+        return submission;
+      } catch (reason) {
+        // 409 (GBR-49) trả về đúng thông báo "Bản nộp trước đang được xử lý..."
+        toast.error(getApiErrorMessage(reason, MSG.submitFailed));
+        return null;
+      } finally {
+        uploadingRef.current = false;
+        setUploading(false);
+        setUploadWeak(false);
+      }
+    },
+    []
+  );
 
   const setDemoFlag = useCallback<PracticeDemoValue["setDemoFlag"]>((key, value) => {
     setDemo((flags) => ({ ...flags, [key]: value }));

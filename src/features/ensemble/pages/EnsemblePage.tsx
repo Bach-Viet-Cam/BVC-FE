@@ -302,11 +302,11 @@ export function EnsemblePage() {
                   take={
                     hasTake && practice.take
                       ? {
-                        peaks: practice.take.peaks,
-                        durationSec: practice.take.durationSec,
-                        volume: Math.round(playback.volume * 100),
-                        muted: playback.muted,
-                      }
+                          peaks: practice.take.peaks,
+                          durationSec: practice.take.durationSec,
+                          volume: Math.round(playback.volume * 100),
+                          muted: playback.muted,
+                        }
                       : null
                   }
                   onTakeVolumeChange={(value) => playback.setVolume(value / 100)}

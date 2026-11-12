@@ -278,7 +278,11 @@ export function RecordPage() {
     if (blocked || uploading || errorKind || !sheetId) return;
     const source = mode === "record" ? (rec === "preview" ? recorder.take?.file : undefined) : pickedFile;
     if (!source) return;
-    const submission = await submit(source, { sheetMusicId: sheetId, assignmentId, shareAfterVerification });
+    const submission = await submit(
+      source,
+      { sheetMusicId: sheetId, assignmentId, shareAfterVerification },
+      mode === "record" ? "recording" : "file"
+    );
     if (!submission) {
       refreshActive();
       return;
@@ -353,19 +357,6 @@ export function RecordPage() {
             <PracticeTitleRow
               title={context?.piece.title ?? (contextLoading ? "Đang tải..." : "Luyện tập")}
               subtitle={segmentMode ? `Đoạn ${fmtTime(segStart)} – ${fmtTime(segEnd)}` : subtitle}
-              rightSlot={
-                segmentMode &&
-                originalData && (
-                  <button
-                    type="button"
-                    disabled={recActive}
-                    onClick={() => setSegmentPickerOpen(true)}
-                    className="min-h-11 shrink-0 cursor-pointer rounded-full border border-bvc-border px-4 text-sm font-medium text-bvc-ink disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    Đổi đoạn
-                  </button>
-                )
-              }
               // Nút Demo (mô phỏng luồng ghi âm) đang tạm ẩn; muốn bật lại thì thêm <DemoPanel /> vào rightSlot khi không ở chế độ đoạn
             />
             {context && <SheetPanel songId={context.piece.id} sheetId={context.sheet.id} />}
@@ -513,6 +504,19 @@ export function RecordPage() {
                     targetBpm={targetBpm}
                     pieceLen={segmentMode ? session.pieceLenSec : undefined}
                     idleNote={segmentMode && !segCountIn ? IDLE_NOTE_NO_COUNT_IN : undefined}
+                    headerAction={
+                      segmentMode &&
+                      originalData && (
+                        <button
+                          type="button"
+                          disabled={recActive}
+                          onClick={() => setSegmentPickerOpen(true)}
+                          className="min-h-11 shrink-0 cursor-pointer rounded-full border border-bvc-border px-4 text-sm font-medium text-bvc-ink disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          Đổi đoạn
+                        </button>
+                      )
+                    }
                   />
                 ) : (
                   <UploadPanel
