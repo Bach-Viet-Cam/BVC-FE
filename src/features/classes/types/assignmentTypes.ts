@@ -13,7 +13,7 @@ export interface AssignmentListItem {
   deadline: string;
   status: StudentAssignmentStatus;
   usedSubmissions: number;
-  maxSubmissions: number;
+  maxSubmissions: number | null;
   minAccuracy: number;
   bonusPoints: number | null;
 }

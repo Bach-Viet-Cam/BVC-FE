@@ -19,6 +19,7 @@ export function toCopyRows(source: ClassCopySource): CopyAssignmentRow[] {
       kind: a.kind,
       sheetMusicId: a.sheetMusic?.id ?? null,
       requiredBpm: a.requiredBpm,
+      maxSubmissions: a.maxSubmissions ?? null,
     },
     sheetMusic: a.sheetMusic,
     status: a.status === "CLOSED" ? "PUBLISHED" : a.status,

@@ -54,3 +54,9 @@ describe("groupAssignments", () => {
     expect(groups.overdue.map((entry) => entry.id)).toEqual(["moi", "cu"]);
   });
 });
+
+it("unlimited assignments remain actionable after three submissions", () => {
+  expect(getAssignmentBucket(item({ maxSubmissions: null, usedSubmissions: 4, status: "SUBMITTED" }), now)).toBe(
+    "todo"
+  );
+});

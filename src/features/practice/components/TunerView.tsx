@@ -2,7 +2,6 @@ import { Check, Square, Volume2 } from "lucide-react";
 import { CentsMeter } from "@/features/practice/components/CentsMeter";
 import { NoticeBanner } from "@/features/practice/components/NoticeBanner";
 import { MSG, REFERENCE_TONE, TUNER_TOLERANCE_CENTS } from "@/features/practice/constants/practiceConstants";
-import { usePracticeDemo } from "@/features/practice/context/PracticeDemoContext";
 import type { PracticeAudio } from "@/features/practice/hooks/usePracticeAudio";
 import type { useInstrumentTunes } from "@/features/practice/hooks/useInstrumentTunes";
 import { useReferenceTone } from "@/features/practice/hooks/useReferenceTone";
@@ -15,13 +14,13 @@ import { cn } from "@/shared/utils/cn";
 // Cha phải là cột flex để phần thân cuộn được còn chân luôn ở dưới.
 interface TunerViewProps {
   audio: PracticeAudio;
+  micDenied?: boolean;
   // Dây chuẩn của nhạc cụ thuộc bản nhạc (GET /practice/sheets/:id/tunes)
   tunes: ReturnType<typeof useInstrumentTunes>;
 }
 
-export function TunerView({ audio, tunes }: TunerViewProps) {
-  const { demo } = usePracticeDemo();
-  const micDenied = demo.micDenied || audio.micState === "denied";
+export function TunerView({ audio, tunes, micDenied: denied = false }: TunerViewProps) {
+  const micDenied = denied || audio.micState === "denied";
   const { strings } = tunes;
   const { selected, tuned, live, cents, hz, note, tunedCount, currentString, pickString } = useTuner({
     audio,

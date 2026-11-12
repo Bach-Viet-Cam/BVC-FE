@@ -95,6 +95,7 @@ export interface ClassCopySource {
     description: string | null;
     sheetMusic: AssignmentSheetMusic | null;
     requiredBpm: number | null;
+    maxSubmissions?: number | null;
     status: "DRAFT" | "PUBLISHED" | "CLOSED";
   }>;
 }
