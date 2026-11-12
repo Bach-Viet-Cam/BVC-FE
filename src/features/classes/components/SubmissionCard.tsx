@@ -1,3 +1,4 @@
+import { AiFeedbackRating } from "@/features/platform/components/AiFeedbackRating";
 import { SubmissionVerification } from "@/features/community/components/SubmissionVerification";
 import { AuthenticatedAudio } from "@/shared/components/bvc/AuthenticatedAudio";
 import { useForm, useWatch } from "react-hook-form";
@@ -133,6 +134,9 @@ export function SubmissionCard({
         </div>
         {!canComment && <span className="text-[12px] text-bvc-muted">{COMMENT_LOCKED_MESSAGE}</span>}
       </form>
+      {submission.status === "COMPLETED" && (
+        <AiFeedbackRating key={`rating-${submission.id}`} submissionId={submission.id} showFeedback />
+      )}
     </article>
   );
 }

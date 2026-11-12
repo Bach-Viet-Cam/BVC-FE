@@ -1,3 +1,4 @@
+import { AiFeedbackRating } from "@/features/platform/components/AiFeedbackRating";
 import { SubmissionSharing } from "@/features/community/components/SubmissionVerification";
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
@@ -185,6 +186,17 @@ export function ResultsPage() {
         )}
       </div>
 
+      {data && isCompleted && !segmentMode && data.aiFeedback && !data.aiFeedback.isFallback && (
+        <div className="mx-auto w-full max-w-[1200px] px-4 py-6 md:px-14">
+          <AiFeedbackRating
+            key={submissionId}
+            submissionId={submissionId}
+            presentation="dialog"
+            expectedFeedback={data.aiFeedback.text}
+            onReloadFeedback={result.reload}
+          />
+        </div>
+      )}
       {data && isCompleted && (
         <>
           <footer className="sticky bottom-0 z-10 mt-auto shrink-0 border-t border-bvc-border bg-white/95 px-4 py-4 backdrop-blur-md">
