@@ -35,6 +35,8 @@ interface AssignAssignmentsDialogProps {
   emptyReason: OverviewEmptyReason | null;
   semester: OverviewSemester | null;
   onAssigned: (created: AssignmentBase[]) => void;
+  // Source group keys (assignmentGroupKey) checked when the dialog opens.
+  initialSelectedKeys?: string[];
 }
 
 type KindFilter = "ALL" | AssignmentKind;
@@ -74,8 +76,9 @@ function AssignContent({
   emptyReason,
   semester,
   onAssigned,
+  initialSelectedKeys,
 }: Omit<AssignAssignmentsDialogProps, "open">) {
-  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(() => new Set(initialSelectedKeys));
   const [selectedClassIds, setSelectedClassIds] = useState<Set<string>>(new Set());
   const [query, setQuery] = useState("");
   const [kind, setKind] = useState<KindFilter>("ALL");

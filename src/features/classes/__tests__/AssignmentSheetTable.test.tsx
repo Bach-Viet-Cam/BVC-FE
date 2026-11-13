@@ -29,7 +29,7 @@ const GROUPS: SheetGroup[] = [
     assignments: [assignment("a1", "Độc tấu A", "c1"), assignment("a2", "Độc tấu B", "c2")],
     classNames: ["TRD301", "TRD302"],
     kinds: ["SOLO", "ENSEMBLE"],
-    submittedCount: 10,
+    practicedStudents: 10,
     memberCount: 40,
     practiceCount: 8,
   },
@@ -39,7 +39,7 @@ const GROUPS: SheetGroup[] = [
     assignments: [{ ...assignment("a3", "Bonus", "c1"), sheetMusicId: "sh2", sheetTitle: "Hò kéo pháo" }],
     classNames: ["TRD301"],
     kinds: ["BONUS"],
-    submittedCount: 1,
+    practicedStudents: 1,
     memberCount: 20,
     practiceCount: 0,
   },
@@ -53,13 +53,16 @@ const renderTable = (groups: SheetGroup[]) =>
   );
 
 describe("AssignmentSheetTable", () => {
-  it("renders one row per sheet linking to its first assignment", () => {
+  it("renders one row per sheet linking to its sheet-mode detail", () => {
     renderTable(GROUPS);
     expect(screen.getByText("Bài tập theo sheet nhạc")).toBeInTheDocument();
     expect(screen.getByText("2 sheet nhạc · 3 bài tập")).toBeInTheDocument();
     const row = screen.getByText("Lý ngựa ô").closest("a") as HTMLElement;
-    expect(row).toHaveAttribute("href", "/teacher/assignments/a1");
-    expect(screen.getByText("Hò kéo pháo").closest("a")).toHaveAttribute("href", "/teacher/assignments/a3");
+    expect(row).toHaveAttribute("href", "/teacher/assignments?tab=sheet&sheet=sh1");
+    expect(screen.getByText("Hò kéo pháo").closest("a")).toHaveAttribute(
+      "href",
+      "/teacher/assignments?tab=sheet&sheet=sh2"
+    );
   });
 
   it("shows kinds, class chips, usage count, progress and practice count", () => {

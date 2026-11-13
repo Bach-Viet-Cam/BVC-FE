@@ -16,7 +16,7 @@ interface AssignmentCreateDialogProps {
   onClose: () => void;
   presetClassId?: string;
   presetKind?: string;
-  // Lưu bản nháp lúc thoát: ở lại trang hiện tại, danh sách tải lại
+  // Gọi sau mỗi lần tạo thành công (kể cả lưu nháp lúc thoát) để danh sách tải lại
   onSaved?: () => void;
 }
 
@@ -54,8 +54,9 @@ function AssignmentCreateContent({
     const result = await saveAssignment(payload, publish);
     if ("assignment" in result) {
       toast.success(result.message);
-      if (isLeavingRef.current) onSaved?.();
-      else navigate(`/teacher/assignments/${result.assignment.id}`);
+      // The list stays mounted behind the detail drawer, so it reloads on both paths.
+      onSaved?.();
+      if (!isLeavingRef.current) navigate(`/teacher/assignments/${result.assignment.id}`);
       return null;
     }
     if (result.error.fieldErrors.length === 0) toast.error(result.error.message);

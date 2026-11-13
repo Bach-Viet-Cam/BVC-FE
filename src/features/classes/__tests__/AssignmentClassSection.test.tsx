@@ -66,6 +66,18 @@ describe("AssignmentClassSection", () => {
     expect(screen.queryByText("Tuần")).not.toBeInTheDocument();
   });
 
+  it("keeps the ?class= deep link in the row links", () => {
+    render(
+      <MemoryRouter initialEntries={["/teacher/assignments?class=c1&create=assignment"]}>
+        <AssignmentClassSection cls={CLASS} open onToggle={vi.fn()} highlightIds={new Set()} />
+      </MemoryRouter>
+    );
+    expect(screen.getByText("Độc tấu - Lý ngựa ô").closest("a")).toHaveAttribute(
+      "href",
+      "/teacher/assignments/a1?class=c1"
+    );
+  });
+
   it("links each row to the detail page with progress, practice count and status", () => {
     renderSection();
     const row = screen.getByText("Độc tấu - Lý ngựa ô").closest("a") as HTMLElement;

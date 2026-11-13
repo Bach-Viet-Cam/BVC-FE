@@ -1,7 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Plus } from "lucide-react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { AssignAssignmentsDialog } from "@/features/classes/components/AssignAssignmentsDialog";
+import {
+  AssignmentDetailDrawer,
+  type AssignmentDrawerTarget,
+} from "@/features/classes/components/AssignmentDetailDrawer";
 import { AssignmentClassSection } from "@/features/classes/components/AssignmentClassSection";
 import { AssignmentCreateDialog } from "@/features/classes/components/AssignmentCreateDialog";
 import { AssignmentSheetTable } from "@/features/classes/components/AssignmentSheetTable";
@@ -14,7 +18,11 @@ import {
   formatDayMonth,
   groupBySheet,
 } from "@/features/classes/utils/assignmentOverviewFormat";
-import { ASSIGNMENT_CLASS_PARAM } from "@/features/classes/utils/teacherAssignmentFormat";
+import {
+  ASSIGNMENT_CLASS_PARAM,
+  ASSIGNMENT_SHEET_PARAM,
+  ASSIGNMENT_TAB_PARAM,
+} from "@/features/classes/utils/teacherAssignmentFormat";
 import { ActionButton } from "@/shared/components/bvc/ActionButton";
 import { PillTabs } from "@/shared/components/bvc/PillTabs";
 import { SearchField } from "@/shared/components/bvc/SearchField";
@@ -28,22 +36,27 @@ interface AssignmentListProps {
 type ViewTab = "class" | "sheet";
 
 export function AssignmentList({ canCreate }: AssignmentListProps) {
-  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { assignmentId } = useParams<{ assignmentId: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   const deepLinkClassId = searchParams.get(ASSIGNMENT_CLASS_PARAM);
+  const detailSheetId = searchParams.get(ASSIGNMENT_SHEET_PARAM);
+  // The list tab lives in the URL so it survives opening and closing the detail drawer.
+  const tab: ViewTab = searchParams.get(ASSIGNMENT_TAB_PARAM) === "sheet" || detailSheetId ? "sheet" : "class";
   const [searchText, setSearchText] = useState("");
-  const [tab, setTab] = useState<ViewTab>("class");
   const [openClassIds, setOpenClassIds] = useState<Set<string>>(
     () => new Set(deepLinkClassId ? [deepLinkClassId] : [])
   );
   const [highlightIds, setHighlightIds] = useState<Set<string>>(new Set());
   const [isAssignOpen, setIsAssignOpen] = useState(false);
+  const [assignPreselect, setAssignPreselect] = useState<string[]>([]);
   const query = useDebouncedValue(searchText.trim());
   const { overview, isLoading, error, reload } = useAssignmentOverview();
   const createDialog = useCreateDialog("assignment", ["classId", "kind"] as const);
   const hasScrolled = useRef(false);
 
   const classes = useMemo(() => filterOverviewClasses(overview?.classes ?? [], query), [overview, query]);
-  const sheetGroups = useMemo(() => groupBySheet(classes), [classes]);
+  const sheetGroups = useMemo(() => groupBySheet(classes, overview?.sheetStats ?? []), [classes, overview]);
   const emptyReason = overview?.emptyReason ?? null;
 
   useEffect(() => {
@@ -52,6 +65,40 @@ export function AssignmentList({ canCreate }: AssignmentListProps) {
     hasScrolled.current = true;
     document.getElementById(`class-${deepLinkClassId}`)?.scrollIntoView({ block: "start" });
   }, [overview, deepLinkClassId]);
+
+  let drawerTarget: AssignmentDrawerTarget | null = null;
+  if (assignmentId) drawerTarget = { mode: "class", assignmentId };
+  else if (detailSheetId) drawerTarget = { mode: "sheet", sheetMusicId: detailSheetId };
+
+  const setTab = (next: ViewTab) =>
+    setSearchParams(
+      (previous) => {
+        const params = new URLSearchParams(previous);
+        if (next === "sheet") params.set(ASSIGNMENT_TAB_PARAM, "sheet");
+        else params.delete(ASSIGNMENT_TAB_PARAM);
+        return params;
+      },
+      { replace: true }
+    );
+
+  // Back to the list, keeping ?class= and the active tab.
+  const closeDrawer = () => {
+    const params = new URLSearchParams(searchParams);
+    params.delete(ASSIGNMENT_SHEET_PARAM);
+    if (tab === "sheet") params.set(ASSIGNMENT_TAB_PARAM, "sheet");
+    const search = params.toString();
+    navigate({ pathname: "/teacher/assignments", search: search ? `?${search}` : "" }, { replace: true });
+  };
+
+  const openAssign = (preselectedKeys: string[] = []) => {
+    setAssignPreselect(preselectedKeys);
+    setIsAssignOpen(true);
+  };
+
+  const assignFromDrawer = (groupKeys: string[]) => {
+    closeDrawer();
+    openAssign(groupKeys);
+  };
 
   const toggleClass = (classId: string) =>
     setOpenClassIds((current) => {
@@ -93,7 +140,7 @@ export function AssignmentList({ canCreate }: AssignmentListProps) {
               variant="secondary"
               disabled={Boolean(assignDisabledReason)}
               title={assignDisabledReason}
-              onClick={() => setIsAssignOpen(true)}
+              onClick={() => openAssign()}
             >
               Gán bài tập cho lớp
             </ActionButton>
@@ -154,9 +201,16 @@ export function AssignmentList({ canCreate }: AssignmentListProps) {
             emptyReason={emptyReason}
             semester={overview?.semester ?? null}
             onAssigned={handleAssigned}
+            initialSelectedKeys={assignPreselect}
           />
         </>
       )}
+      <AssignmentDetailDrawer
+        target={drawerTarget}
+        onClose={closeDrawer}
+        onChanged={reload}
+        onAssign={assignFromDrawer}
+      />
     </div>
   );
 }

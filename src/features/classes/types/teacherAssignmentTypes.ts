@@ -70,8 +70,47 @@ export interface AssignmentStudent {
   bestAccuracy: number | null;
 }
 
+export interface MediaFileInfo {
+  url: string | null;
+  originalName: string;
+  mimeType: string;
+  sizeBytes: number;
+  durationSec: number | null;
+  pageCount: number | null;
+}
+
+export interface AssignmentMedia {
+  sheet: MediaFileInfo | null;
+  referenceAudio: MediaFileInfo | null;
+  tutorialVideo: MediaFileInfo | null;
+}
+
+export interface DailyPracticeCount {
+  date: string;
+  count: number;
+}
+
+export interface PracticeStats {
+  totalPractices: number;
+  practicedStudents: number;
+  memberCount: number;
+  averagePerStudent: number;
+  last7Days: DailyPracticeCount[];
+}
+
+export interface ClassPractice {
+  classId: string;
+  className: string;
+  practicedStudents: number;
+  memberCount: number;
+}
+
 export interface AssignmentDetail extends AssignmentBase {
   students: AssignmentStudent[];
+  practiceStats: PracticeStats;
+  minAccuracy: number;
+  createdBy: { id: string; fullName: string } | null;
+  media: AssignmentMedia | null;
 }
 
 export interface SubmissionComment {
@@ -160,10 +199,36 @@ export interface OverviewClass {
   assignments: OverviewAssignment[];
 }
 
+export interface SheetStat {
+  sheetMusicId: string;
+  practicedStudents: number;
+  memberCount: number;
+  practiceCount: number;
+}
+
 export interface AssignmentOverview {
   semester: OverviewSemester | null;
   emptyReason: OverviewEmptyReason | null;
   classes: OverviewClass[];
+  sheetStats: SheetStat[];
+}
+
+export interface SheetGroupAssignment extends OverviewAssignment {
+  className: string;
+  maxSubmissions: number | null;
+  effectiveBpm: number | null;
+  minAccuracy: number;
+  publishedAt: string | null;
+  createdBy: { id: string; fullName: string } | null;
+}
+
+export interface SheetGroupDetail {
+  semester: OverviewSemester;
+  sheetMusic: AssignmentSheetMusic;
+  media: AssignmentMedia;
+  assignments: SheetGroupAssignment[];
+  practiceStats: PracticeStats;
+  byClass: ClassPractice[];
 }
 
 export interface AssignPayload {
