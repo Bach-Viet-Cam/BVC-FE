@@ -8,6 +8,14 @@ import {
 // Không dùng "classId": modal tạo bài tập dùng tên này và xóa nó khi đóng
 export const ASSIGNMENT_CLASS_PARAM = "class";
 
+// List tab ("?tab=sheet", default "Theo lớp") and the sheet-mode drawer ("?sheet=<sheetMusicId>").
+export const ASSIGNMENT_TAB_PARAM = "tab";
+export const ASSIGNMENT_SHEET_PARAM = "sheet";
+
+export function sheetGroupPath(sheetMusicId: string): string {
+  return `/teacher/assignments?${ASSIGNMENT_TAB_PARAM}=sheet&${ASSIGNMENT_SHEET_PARAM}=${encodeURIComponent(sheetMusicId)}`;
+}
+
 export function classAssignmentsPath(classId: string): string {
   return `/teacher/assignments?${ASSIGNMENT_CLASS_PARAM}=${encodeURIComponent(classId)}`;
 }

@@ -7,15 +7,12 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { practiceResultApi } from "@/features/practice/api/practiceResultApi";
 import { practiceSegmentApi } from "@/features/practice/api/practiceSegmentApi";
 import { AiFeedbackCard } from "@/features/practice/components/AiFeedbackCard";
-import { ClassRankCard } from "@/features/practice/components/ClassRankCard";
 import { PitchContourCard } from "@/features/practice/components/PitchContourCard";
 import { PracticeModeSheet } from "@/features/practice/components/PracticeModeSheet";
 import { PracticeTitleRow } from "@/features/practice/components/PracticeTitleRow";
-import { ResultAudioPlayers } from "@/features/practice/components/ResultAudioPlayers";
 import { ResultBanner } from "@/features/practice/components/ResultBanner";
-import { ProgressHistoryCard } from "@/features/practice/components/ProgressHistoryCard";
+import { ResultCardsGrid } from "@/features/practice/components/ResultCardsGrid";
 import { ResultOverviewCard } from "@/features/practice/components/ResultOverviewCard";
-import { SegmentAttemptsCard } from "@/features/practice/components/SegmentAttemptsCard";
 import { SegmentPickerSheet } from "@/features/practice/components/SegmentPickerSheet";
 import { ComparisonLines } from "@/features/practice/components/SegmentResultCard";
 import { MSG } from "@/features/practice/constants/practiceConstants";
@@ -146,43 +143,15 @@ export function ResultsPage() {
             <SubmissionSharing key={submissionId} submissionId={submissionId} showAudio={false} />
           </div>
         )}
-        {data && isCompleted && !segmentMode && data.scores && (
-          // Dưới lg: một cột (điểm, AI, biểu đồ, vị trí, tiến trình). Từ lg: điểm bên trái, AI bên phải;
-          // biểu đồ cao độ trải hết bề ngang ở hàng 2; nghe lại GV + sinh viên ngay dưới biểu đồ; vị trí + tiến trình ở hàng dưới
-          <div className="flex flex-col gap-3.5 px-3.5 pt-3.5 pb-4 md:px-0 md:pt-6 lg:grid lg:grid-cols-12 lg:content-start lg:gap-5">
-            <div
-              className={`*:h-full lg:row-start-1 ${data.aiFeedback ? "lg:col-span-5 lg:col-start-1" : "lg:col-span-12"}`}
-            >
-              <ResultOverviewCard scores={data.scores} />
-            </div>
-            {data.aiFeedback && (
-              <div className="*:h-full lg:col-span-7 lg:col-start-6 lg:row-start-1">
-                <AiFeedbackCard feedback={data.aiFeedback} warnings={data.qualityWarnings} />
-              </div>
-            )}
-            <div className="lg:col-span-12 lg:row-start-2">
-              <PitchContourCard chart={chart.data} loading={chart.loading} error={chart.error} />
-            </div>
-            <div className="lg:col-span-12 lg:row-start-3">
-              <ResultAudioPlayers submissionId={submissionId} teacherUrl={data.audio.teacherUrl} />
-            </div>
-            {/* Chỉ bài nộp thuộc bài tập của lớp mới có vị trí trong lớp; BE trả null khi lớp quá ít bạn để ẩn danh */}
-            {classRank.data && (
-              <div className="*:h-full lg:col-span-6 lg:col-start-1 lg:row-start-4">
-                <ClassRankCard rank={classRank.data} />
-              </div>
-            )}
-            {history.data && history.data.attempts.length > 0 && (
-              <div
-                className={`*:h-full lg:col-span-6 lg:row-start-4 ${classRank.data ? "lg:col-start-7" : "lg:col-start-1"}`}
-              >
-                <ProgressHistoryCard history={history.data} />
-              </div>
-            )}
-            <div className="empty:hidden lg:col-span-12 lg:row-start-5">
-              <SegmentAttemptsCard submissionId={submissionId} />
-            </div>
-          </div>
+        {data && isCompleted && !segmentMode && (
+          <ResultCardsGrid
+            submissionId={submissionId}
+            data={data}
+            chart={chart}
+            history={history}
+            classRank={classRank}
+            showSegments
+          />
         )}
       </div>
 

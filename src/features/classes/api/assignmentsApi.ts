@@ -11,6 +11,7 @@ import {
   type AssignmentListParams,
   type AssignmentListResult,
   type ClassSheetMusic,
+  type SheetGroupDetail,
   type CreateAssignmentPayload,
   type StudentSubmissions,
   type SubmissionComment,
@@ -26,6 +27,8 @@ export const assignmentsApi = {
     axiosClient.get<ApiResponse<ClassSheetMusic[]>>("/assignments/sheet-music", { params: target }),
   getAssignment: (assignmentId: string) =>
     axiosClient.get<ApiResponse<AssignmentDetail>>(`/assignments/${assignmentId}`),
+  getSheetGroup: (sheetMusicId: string) =>
+    axiosClient.get<ApiResponse<SheetGroupDetail>>(`/assignments/sheet-groups/${sheetMusicId}`),
   createAssignment: (payload: CreateAssignmentPayload) =>
     axiosClient.post<ApiResponse<AssignmentBase>>("/assignments", payload),
   updateAssignment: (assignmentId: string, payload: AssignmentContentPayload) =>

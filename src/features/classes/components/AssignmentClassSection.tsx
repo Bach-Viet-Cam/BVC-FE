@@ -1,8 +1,8 @@
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { type OverviewAssignment, type OverviewClass } from "@/features/classes/types/teacherAssignmentTypes";
 import { OVERVIEW_STATUS_LABELS, summarizeClass } from "@/features/classes/utils/assignmentOverviewFormat";
-import { ASSIGNMENT_KIND_LABELS } from "@/features/classes/utils/teacherAssignmentFormat";
+import { ASSIGNMENT_CLASS_PARAM, ASSIGNMENT_KIND_LABELS } from "@/features/classes/utils/teacherAssignmentFormat";
 import { cn } from "@/shared/utils/cn";
 
 interface AssignmentClassSectionProps {
@@ -75,9 +75,15 @@ export function AssignmentClassSection({ cls, open, onToggle, highlightIds }: As
 function AssignmentRow({ assignment, isNew }: { assignment: OverviewAssignment; isNew: boolean }) {
   const isClosed = assignment.status === "CLOSED";
   const percent = assignment.memberCount ? Math.round((assignment.submittedCount / assignment.memberCount) * 100) : 0;
+  // Keep ?class= so closing the detail drawer returns to the same class deep link.
+  const [searchParams] = useSearchParams();
+  const classId = searchParams.get(ASSIGNMENT_CLASS_PARAM);
   return (
     <Link
-      to={`/teacher/assignments/${assignment.id}`}
+      to={{
+        pathname: `/teacher/assignments/${assignment.id}`,
+        search: classId ? `?${ASSIGNMENT_CLASS_PARAM}=${encodeURIComponent(classId)}` : "",
+      }}
       className={cn(
         "grid items-center gap-x-[14px] gap-y-[8px] border-b border-bvc-line px-[16px] py-[12px] text-[14px] text-bvc-ink max-lg:grid-cols-2 lg:min-h-[64px] lg:px-[24px] lg:py-[10px]",
         COLUMNS,

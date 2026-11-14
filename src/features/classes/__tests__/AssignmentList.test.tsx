@@ -47,6 +47,7 @@ function assignment(overrides: Partial<OverviewAssignment>): OverviewAssignment 
 const OVERVIEW: AssignmentOverview = {
   semester: SEMESTER,
   emptyReason: null,
+  sheetStats: [],
   classes: [
     {
       id: "c1",
@@ -124,6 +125,24 @@ describe("AssignmentList", () => {
     expect(screen.queryByText("Bonus tuần 3")).not.toBeInTheDocument();
   });
 
+  it("opens on the sheet tab from ?tab=sheet and links rows to the sheet-mode detail", async () => {
+    mockOverview(OVERVIEW);
+    renderList({ canCreate: true }, "/teacher/assignments?tab=sheet");
+    expect(await screen.findByRole("tab", { name: /Theo bài tập chung/ })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByText("Hò kéo pháo").closest("a")).toHaveAttribute(
+      "href",
+      "/teacher/assignments?tab=sheet&sheet=sh2"
+    );
+  });
+
+  it("keeps the selected tab when switching back to Theo lớp", async () => {
+    mockOverview(OVERVIEW);
+    renderList({ canCreate: true }, "/teacher/assignments?tab=sheet");
+    await userEvent.click(await screen.findByRole("tab", { name: /Theo lớp/ }));
+    expect(screen.getByRole("tab", { name: /Theo lớp/ })).toHaveAttribute("aria-selected", "true");
+    expect(screen.queryByText("Bài tập theo sheet nhạc")).not.toBeInTheDocument();
+  });
+
   it("opens the classes that match the search and hides the others", async () => {
     mockOverview(OVERVIEW);
     renderList({ canCreate: true });
@@ -153,7 +172,12 @@ describe("AssignmentList", () => {
     ["NO_CURRENT_SEMESTER", "không nằm trong học kỳ nào đã cấu hình"],
     ["NO_CLASSES_IN_SEMESTER", "Bạn chưa có lớp nào trong học kỳ HK1 2026-2027."],
   ] as const)("explains %s and blocks assigning", async (emptyReason, message) => {
-    mockOverview({ semester: emptyReason === "NO_CLASSES_IN_SEMESTER" ? SEMESTER : null, emptyReason, classes: [] });
+    mockOverview({
+      semester: emptyReason === "NO_CLASSES_IN_SEMESTER" ? SEMESTER : null,
+      emptyReason,
+      classes: [],
+      sheetStats: [],
+    });
     renderList({ canCreate: true });
     expect(await screen.findByRole("status")).toHaveTextContent(message);
     expect(screen.queryByRole("tablist")).not.toBeInTheDocument();

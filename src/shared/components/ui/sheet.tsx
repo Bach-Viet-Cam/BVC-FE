@@ -8,16 +8,27 @@ export const SheetTrigger = BaseDialog.Trigger;
 
 interface SheetPopupProps extends React.ComponentProps<typeof BaseDialog.Popup> {
   side?: "left" | "right";
+  backdropClassName?: string;
+  // Off when the content renders its own close control.
+  showCloseButton?: boolean;
 }
 
-export function SheetPopup({ side = "right", className, children, ...props }: SheetPopupProps) {
+export function SheetPopup({
+  side = "right",
+  backdropClassName,
+  showCloseButton = true,
+  className,
+  children,
+  ...props
+}: SheetPopupProps) {
   return (
     <BaseDialog.Portal>
       <BaseDialog.Backdrop
         className={cn(
           "fixed inset-0 z-50 bg-inverse-surface/40 backdrop-blur-sm",
           "transition-opacity duration-200",
-          "data-starting-style:opacity-0 data-ending-style:opacity-0"
+          "data-starting-style:opacity-0 data-ending-style:opacity-0",
+          backdropClassName
         )}
       />
       <BaseDialog.Popup
@@ -34,12 +45,14 @@ export function SheetPopup({ side = "right", className, children, ...props }: Sh
         )}
       >
         {children}
-        <BaseDialog.Close
-          aria-label="Đóng"
-          className="absolute top-4 right-4 rounded-md p-1 text-on-surface-variant transition-colors hover:bg-primary/5 hover:text-primary"
-        >
-          <XIcon className="size-4" />
-        </BaseDialog.Close>
+        {showCloseButton && (
+          <BaseDialog.Close
+            aria-label="Đóng"
+            className="absolute top-4 right-4 rounded-md p-1 text-on-surface-variant transition-colors hover:bg-primary/5 hover:text-primary"
+          >
+            <XIcon className="size-4" />
+          </BaseDialog.Close>
+        )}
       </BaseDialog.Popup>
     </BaseDialog.Portal>
   );

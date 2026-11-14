@@ -99,6 +99,14 @@ describe("AssignAssignmentsDialog", () => {
     expect(screen.getByText("Sẽ tạo 1 lượt gán mới.")).toBeInTheDocument();
   });
 
+  it("checks the groups given in initialSelectedKeys", () => {
+    renderDialog({ initialSelectedKeys: ["độc tấu - lý ngựa ô|SOLO|sh1"] });
+    const sources = within(screen.getByRole("group", { name: "Bài tập" }));
+    expect(sources.getByText("Độc tấu - Lý ngựa ô").closest("button")).toHaveAttribute("aria-pressed", "true");
+    expect(sources.getByText("Bonus tháng 10").closest("button")).toHaveAttribute("aria-pressed", "false");
+    expect(sources.getByText("1 / 3 đã chọn")).toBeInTheDocument();
+  });
+
   it("lists only active classes as targets", () => {
     renderDialog();
     expect(classRow(/TRD301/)).toBeInTheDocument();

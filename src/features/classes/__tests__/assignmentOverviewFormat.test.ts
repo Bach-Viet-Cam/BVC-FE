@@ -7,7 +7,7 @@ import {
   groupBySheet,
   summarizeClass,
 } from "@/features/classes/utils/assignmentOverviewFormat";
-import { type OverviewAssignment, type OverviewClass } from "@/features/classes/types/teacherAssignmentTypes";
+import { type OverviewAssignment, type OverviewClass, type SheetStat } from "@/features/classes/types/teacherAssignmentTypes";
 
 function assignment(overrides: Partial<OverviewAssignment> = {}): OverviewAssignment {
   return {
@@ -58,30 +58,37 @@ describe("filterOverviewClasses", () => {
 });
 
 describe("groupBySheet", () => {
-  it("merges clones of one sheet, sums counts and skips assignments without a sheet", () => {
+  it("takes counts from sheetStats", () => {
     const classes = [
       overviewClass("c1", "TRD301", [
         assignment({ id: "a1" }),
         assignment({ id: "a9", sheetMusicId: null, sheetTitle: null, title: "Không sheet" }),
+        assignment({ id: "a3", kind: "ENSEMBLE" }),
       ]),
       overviewClass("c2", "TRD302", [assignment({ id: "a2", classId: "c2", kind: "ENSEMBLE", practiceCount: 2 })]),
     ];
-    const groups = groupBySheet(classes);
+    const stats: SheetStat[] = [{ sheetMusicId: "sh1", practicedStudents: 3, memberCount: 40, practiceCount: 12 }];
+    const groups = groupBySheet(classes, stats);
     expect(groups).toHaveLength(1);
     expect(groups[0]).toMatchObject({
       sheetMusicId: "sh1",
       sheetTitle: "Lý ngựa ô",
       classNames: ["TRD301", "TRD302"],
       kinds: ["SOLO", "ENSEMBLE"],
-      submittedCount: 6,
+      practicedStudents: 3,
       memberCount: 40,
-      practiceCount: 7,
+      practiceCount: 12,
     });
-    expect(groups[0].assignments.map((item) => item.id)).toEqual(["a1", "a2"]);
+    expect(groups[0].assignments.map((item) => item.id)).toEqual(["a1", "a3", "a2"]);
+  });
+
+  it("defaults to zero without a stat", () => {
+    const groups = groupBySheet([overviewClass("c1", "TRD301", [assignment()])], []);
+    expect(groups[0]).toMatchObject({ practicedStudents: 0, memberCount: 0, practiceCount: 0 });
   });
 
   it("returns no group when no assignment has a sheet", () => {
-    expect(groupBySheet([overviewClass("c1", "TRD301", [assignment({ sheetMusicId: null })])])).toEqual([]);
+    expect(groupBySheet([overviewClass("c1", "TRD301", [assignment({ sheetMusicId: null })])], [])).toEqual([]);
   });
 });
 
