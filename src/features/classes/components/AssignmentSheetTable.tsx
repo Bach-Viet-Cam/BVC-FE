@@ -1,7 +1,7 @@
 import { ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { type SheetGroup } from "@/features/classes/utils/assignmentOverviewFormat";
-import { ASSIGNMENT_KIND_LABELS } from "@/features/classes/utils/teacherAssignmentFormat";
+import { ASSIGNMENT_KIND_LABELS, sheetGroupPath } from "@/features/classes/utils/teacherAssignmentFormat";
 import { cn } from "@/shared/utils/cn";
 
 interface AssignmentSheetTableProps {
@@ -54,10 +54,10 @@ export function AssignmentSheetTable({ groups }: AssignmentSheetTableProps) {
 }
 
 function SheetRow({ group }: { group: SheetGroup }) {
-  const percent = group.memberCount ? Math.round((group.submittedCount / group.memberCount) * 100) : 0;
+  const percent = group.memberCount ? Math.round((group.practicedStudents / group.memberCount) * 100) : 0;
   return (
     <Link
-      to={`/teacher/assignments/${group.assignments[0].id}`}
+      to={sheetGroupPath(group.sheetMusicId)}
       className={cn(
         "grid items-center gap-x-[14px] gap-y-[10px] border-b border-bvc-line px-[16px] py-[12px] text-[14px] text-bvc-ink max-lg:grid-cols-1 lg:px-[24px]",
         COLUMNS
@@ -91,7 +91,7 @@ function SheetRow({ group }: { group: SheetGroup }) {
         ))}
       </span>
       <span className="flex flex-col gap-[5px]">
-        <span className="font-bvc-mono text-[13px]">{`${group.submittedCount} / ${group.memberCount} SV`}</span>
+        <span className="font-bvc-mono text-[13px]">{`${group.practicedStudents} / ${group.memberCount} SV`}</span>
         <span className="block h-[6px] rounded-[3px] bg-bvc-surface">
           <span className="block h-[6px] rounded-[3px] bg-bvc-accent" style={{ width: `${percent}%` }} />
         </span>

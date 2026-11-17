@@ -5,6 +5,7 @@ import {
   type OverviewClass,
   type OverviewEmptyReason,
   type OverviewSemester,
+  type SheetStat,
 } from "@/features/classes/types/teacherAssignmentTypes";
 import { matchesKeyword } from "@/shared/utils/searchUtils";
 
@@ -14,7 +15,7 @@ export interface SheetGroup {
   assignments: OverviewAssignment[];
   classNames: string[];
   kinds: AssignmentKind[];
-  submittedCount: number;
+  practicedStudents: number;
   memberCount: number;
   practiceCount: number;
 }
@@ -43,8 +44,9 @@ export function filterOverviewClasses(classes: OverviewClass[], query: string): 
   });
 }
 
-export function groupBySheet(classes: OverviewClass[]): SheetGroup[] {
+export function groupBySheet(classes: OverviewClass[], sheetStats: SheetStat[]): SheetGroup[] {
   const groups = new Map<string, SheetGroup>();
+  const statBySheet = new Map(sheetStats.map((stat) => [stat.sheetMusicId, stat]));
   for (const item of classes) {
     for (const assignment of item.assignments) {
       if (!assignment.sheetMusicId) continue;
@@ -54,16 +56,13 @@ export function groupBySheet(classes: OverviewClass[]): SheetGroup[] {
         assignments: [],
         classNames: [],
         kinds: [],
-        submittedCount: 0,
-        memberCount: 0,
-        practiceCount: 0,
+        practicedStudents: statBySheet.get(assignment.sheetMusicId)?.practicedStudents ?? 0,
+        memberCount: statBySheet.get(assignment.sheetMusicId)?.memberCount ?? 0,
+        practiceCount: statBySheet.get(assignment.sheetMusicId)?.practiceCount ?? 0,
       };
       group.assignments.push(assignment);
       if (!group.classNames.includes(item.name)) group.classNames.push(item.name);
       if (!group.kinds.includes(assignment.kind)) group.kinds.push(assignment.kind);
-      group.submittedCount += assignment.submittedCount;
-      group.memberCount += assignment.memberCount;
-      group.practiceCount += assignment.practiceCount;
       groups.set(assignment.sheetMusicId, group);
     }
   }
