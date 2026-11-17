@@ -19,7 +19,7 @@ export function useSegmentSubmit(submissionId: string) {
     if (uploading) return null;
     setUploading(true);
     try {
-      const uploaded = await audioAnalysisApi.upload(file, new AbortController().signal, () => undefined);
+      const uploaded = await audioAnalysisApi.upload(file, new AbortController().signal, () => undefined, "recording");
       const created = await practiceSegmentApi.create(submissionId, {
         startSec: range.start,
         endSec: range.end,

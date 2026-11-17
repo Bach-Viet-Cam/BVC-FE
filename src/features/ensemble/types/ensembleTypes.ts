@@ -1,3 +1,5 @@
+import type { AudioUploadSource } from "@/features/practice/types/audioAnalysisTypes";
+
 export interface EnsembleTrack {
   id: string;
   instrumentId: string;
@@ -60,6 +62,8 @@ export interface EnsembleTake {
   url: string;
   peaks: number[];
   durationSec: number;
+  // Ghi âm trực tiếp chỉ được server cắt cuối, file chọn từ máy được cắt cả hai đầu
+  source: AudioUploadSource;
 }
 
 export interface SeatPosition {

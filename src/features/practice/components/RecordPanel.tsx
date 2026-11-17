@@ -48,6 +48,8 @@ interface RecordPanelProps {
   idleExtra?: ReactNode;
   // Ẩn dòng trạng thái "Sẵn sàng ghi âm" lúc chờ ghi
   hideIdleStatus?: boolean;
+  // Nút đặt ở góc trên bên phải của panel (vd. "Đổi đoạn" khi luyện đoạn)
+  headerAction?: ReactNode;
 }
 
 export function RecordPanel({
@@ -83,11 +85,13 @@ export function RecordPanel({
   pieceLen = PRACTICE_DEFAULTS.pieceLen,
   idleExtra,
   hideIdleStatus,
+  headerAction,
   idleNote = "Chạm nút ghi để bắt đầu. Có 4 tiếng đếm nhịp trước khi ghi, phần đếm không được ghi lại.",
 }: RecordPanelProps) {
   if (rec === "preview") {
     return (
       <div className="mt-auto flex flex-col gap-3 md:mx-auto md:my-auto md:w-full md:min-w-0 md:max-w-[760px] xl:max-w-[920px]">
+        {headerAction && <div className="flex justify-end">{headerAction}</div>}
         <div className="flex flex-wrap items-center gap-3">
           <PlaybackBar
             peaks={previewPeaks}
@@ -154,6 +158,7 @@ export function RecordPanel({
 
   return (
     <div className="mt-auto flex flex-col gap-3 md:mx-auto md:my-auto md:w-full md:min-w-0 md:max-w-[760px] xl:max-w-[920px]">
+      {headerAction && <div className="flex justify-end">{headerAction}</div>}
       {micDenied && <NoticeBanner message="Cần cho phép truy cập micro để dùng tính năng này." />}
 
       <div className="flex items-center gap-3.5">

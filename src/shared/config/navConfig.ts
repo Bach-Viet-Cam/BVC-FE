@@ -89,6 +89,7 @@ const ADMIN_NAV: NavEntry[] = [
   { label: "Cấu hình nhạc cụ", to: "/admin/instruments", icon: Music2, activePrefixes: ["/admin/roadmaps"] },
   { label: "Phân loại nội dung", to: "/admin/categories", icon: FolderTree },
   { label: "Giám sát hệ thống", to: "/admin/monitoring", icon: Activity },
+  { label: "Đánh giá phản hồi AI", to: "/admin/ai-ratings", icon: Activity },
   { label: "Quản lý FAQ", to: "/admin/faqs", icon: BookOpen },
   { label: "Quản lý thông báo", to: "/admin/notifications", icon: Megaphone },
   { label: "Nội dung đã xác minh", to: "/community/verified", icon: BadgeCheck },

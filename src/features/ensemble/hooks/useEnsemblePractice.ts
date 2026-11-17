@@ -248,7 +248,7 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
     setUploadPercent(0);
     try {
       const file = new File([current.blob], "ban-thu-hoa-tau.wav", { type: "audio/wav" });
-      const { data: upload } = await ensembleApi.uploadRecording(file, setUploadPercent);
+      const { data: upload } = await ensembleApi.uploadRecording(file, setUploadPercent, current.source);
       const { data } = await ensembleApi.createSubmission({
         sheetMusicId,
         assignmentId,
@@ -288,6 +288,7 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
         url: URL.createObjectURL(wav),
         peaks: computePeaks(decoded.getChannelData(0), TAKE_PEAK_BUCKETS),
         durationSec: decoded.duration,
+        source: "recording",
       });
       changeStatus("preview");
     } catch {
@@ -327,6 +328,7 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
           url: URL.createObjectURL(wav),
           durationSec: decoded.duration,
           peaks: computePeaks(decoded.getChannelData(0), TAKE_PEAK_BUCKETS),
+          source: "file",
         });
         changeStatus("preview");
       } catch {

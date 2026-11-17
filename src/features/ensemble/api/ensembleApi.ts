@@ -6,6 +6,7 @@ import {
   type EnsembleSubmission,
   type EnsembleTracksResult,
 } from "@/features/ensemble/types/ensembleTypes";
+import type { AudioUploadSource } from "@/features/practice/types/audioAnalysisTypes";
 
 export const ensembleApi = {
   getTracks: (pieceId: string, assignmentId?: string) =>
@@ -14,8 +15,9 @@ export const ensembleApi = {
     }),
   getAssignment: (assignmentId: string) =>
     axiosClient.get<ApiResponse<EnsembleAssignmentInfo>>(`/assignments/${assignmentId}`),
-  uploadRecording: (file: File, onProgress: (percent: number) => void) => {
+  uploadRecording: (file: File, onProgress: (percent: number) => void, source: AudioUploadSource) => {
     const body = new FormData();
+    body.append("source", source);
     body.append("file", file);
     return axiosClient.post<ApiResponse<{ fileId: string; url: string }>>("/audio-uploads", body, {
       headers: { "Content-Type": undefined },
@@ -36,9 +38,13 @@ export const ensembleApi = {
       timeout: 15_000,
     }),
   retrySubmission: (id: string) =>
-    axiosClient.post<ApiResponse<EnsembleSubmission>>(`/practice/submissions/${encodeURIComponent(id)}/retry`, {}, {
-      timeout: 30_000,
-    }),
+    axiosClient.post<ApiResponse<EnsembleSubmission>>(
+      `/practice/submissions/${encodeURIComponent(id)}/retry`,
+      {},
+      {
+        timeout: 30_000,
+      }
+    ),
   getSession: (sessionId: string) =>
     axiosClient.get<ApiResponse<EnsembleSessionDetail>>(`/ensemble-sessions/${sessionId}`),
 };
