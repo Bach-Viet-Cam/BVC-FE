@@ -90,7 +90,7 @@ export function RecordPanel({
 }: RecordPanelProps) {
   if (rec === "preview") {
     return (
-      <div className="mt-auto flex flex-col gap-3 md:mx-auto md:my-auto md:w-full md:min-w-0 md:max-w-[760px] xl:max-w-[920px]">
+      <div className="flex flex-col gap-3 md:mx-auto md:my-auto md:w-full md:min-w-0 md:max-w-[760px] xl:max-w-[920px]">
         {headerAction && <div className="flex justify-end">{headerAction}</div>}
         <div className="flex flex-wrap items-center gap-3">
           <PlaybackBar
@@ -157,7 +157,7 @@ export function RecordPanel({
   }
 
   return (
-    <div className="mt-auto flex flex-col gap-3 md:mx-auto md:my-auto md:w-full md:min-w-0 md:max-w-[760px] xl:max-w-[920px]">
+    <div className="flex flex-col gap-3 md:mx-auto md:my-auto md:w-full md:min-w-0 md:max-w-[760px] xl:max-w-[920px]">
       {headerAction && <div className="flex justify-end">{headerAction}</div>}
       {micDenied && <NoticeBanner message="Cần cho phép truy cập micro để dùng tính năng này." />}
 
