@@ -41,7 +41,6 @@ function renderPanel(overrides: Partial<React.ComponentProps<typeof ImportStuden
     fileError: null,
     preview: null,
     onSelectFile: vi.fn(),
-    onDownloadTemplate: vi.fn(),
     onCancel: vi.fn(),
     onConfirm: vi.fn(),
     ...overrides,
@@ -59,15 +58,16 @@ describe("ImportStudentsPanel", () => {
 
   it("passes the chosen file up and shows a server file error with 'Đổi file'", async () => {
     const props = renderPanel();
-    const file = new File(["a"], "ds.csv", { type: "text/csv" });
+    const file = new File(["a"], "Students_DNH103_DNH103.E1.H2.xlsx");
     await userEvent.upload(screen.getByTestId("import-file-input"), file);
     expect(props.onSelectFile).toHaveBeenCalledWith(file);
 
     renderPanel({
-      fileName: "ds.pdf",
-      fileError: "Định dạng file không được hỗ trợ. Vui lòng chọn file có định dạng .xlsx, .csv.",
+      fileName: "Students_DNH103_DNH103.E2.H2.xlsx",
+      fileError:
+        "File dành cho lớp DNH103.E2.H2, không khớp với lớp hiện tại DNH103.E1.H2. Vui lòng chọn đúng file của lớp.",
     });
-    expect(screen.getByRole("alert")).toHaveTextContent("Định dạng file không được hỗ trợ");
+    expect(screen.getByRole("alert")).toHaveTextContent("không khớp với lớp hiện tại");
     expect(screen.getByRole("button", { name: "Đổi file" })).toBeEnabled();
   });
 

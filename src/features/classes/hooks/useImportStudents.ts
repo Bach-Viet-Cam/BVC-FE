@@ -4,15 +4,15 @@ import { type ImportPreview } from "@/features/classes/types/classTypes";
 import { parseApiError } from "@/features/classes/utils/mapApiErrors";
 
 const MAX_FILE_BYTES = 2 * 1024 * 1024;
-const ALLOWED_EXTENSIONS = ["xlsx", "csv"];
-export const UNSUPPORTED_FILE_MESSAGE =
-  "Định dạng file không được hỗ trợ. Vui lòng chọn file có định dạng .xlsx, .csv.";
+const ALLOWED_EXTENSIONS = ["xlsx"];
+export const UNSUPPORTED_FILE_MESSAGE = "Chỉ hỗ trợ file .xlsx.";
 export const FILE_TOO_LARGE_MESSAGE = "File vượt quá dung lượng tối đa 2 MB.";
 export const NO_VALID_ROW_MESSAGE = "Không thể nhập danh sách vì không có dòng hợp lệ.";
 
 export type ImportPhase = "select" | "uploading" | "preview" | "confirming";
 
-// Quick client-side checks; the server repeats every check (format, size, columns, rows).
+// Quick client-side checks; the server repeats every check and also verifies that the
+// class code in Students_[Mã môn]_[Mã lớp].xlsx matches this class.
 export function checkImportFile(file: File): string | null {
   const extension = file.name.includes(".") ? file.name.split(".").pop()?.toLowerCase() : "";
   if (!extension || !ALLOWED_EXTENSIONS.includes(extension)) return UNSUPPORTED_FILE_MESSAGE;
@@ -75,20 +75,5 @@ export function useImportStudents(classId: string) {
     }
   }, [classId, preview]);
 
-  const downloadTemplate = useCallback(async (): Promise<string | null> => {
-    try {
-      const { data } = await classesApi.downloadImportTemplate();
-      const url = URL.createObjectURL(data);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "mau-danh-sach-sinh-vien.xlsx";
-      link.click();
-      URL.revokeObjectURL(url);
-      return null;
-    } catch {
-      return "Tải file mẫu thất bại. Vui lòng thử lại.";
-    }
-  }, []);
-
-  return { phase, fileName, fileError, preview, selectFile, confirm, cancel: cancelOpenPreview, downloadTemplate };
+  return { phase, fileName, fileError, preview, selectFile, confirm, cancel: cancelOpenPreview };
 }
