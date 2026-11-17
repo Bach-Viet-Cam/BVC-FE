@@ -6,7 +6,7 @@ import { type ImportPhase, NO_VALID_ROW_MESSAGE } from "@/features/classes/hooks
 import { type ImportPreview } from "@/features/classes/types/classTypes";
 import { cn } from "@/shared/utils/cn";
 
-const REQUIRED_COLUMNS_TEXT = "cột Mã sinh viên, Họ tên, Email";
+const FILE_HINT = "File Students_[Mã môn]_[Mã lớp].xlsx, sheet Students, tối đa 2 MB và 200 dòng.";
 
 interface ImportStudentsPanelProps {
   phase: ImportPhase;
@@ -14,7 +14,6 @@ interface ImportStudentsPanelProps {
   fileError: string | null;
   preview: ImportPreview | null;
   onSelectFile: (file: File) => void;
-  onDownloadTemplate: () => void;
   onCancel: () => void;
   onConfirm: () => void;
 }
@@ -35,7 +34,7 @@ function Step({ label, isReached, isCurrent }: StepProps) {
 }
 
 export function ImportStudentsPanel(props: ImportStudentsPanelProps) {
-  const { phase, fileName, fileError, preview, onSelectFile, onDownloadTemplate, onCancel, onConfirm } = props;
+  const { phase, fileName, fileError, preview, onSelectFile, onCancel, onConfirm } = props;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const hasPreview = preview !== null && (phase === "preview" || phase === "confirming");
   const validRows = hasPreview ? preview.validRows : 0;
@@ -51,7 +50,7 @@ export function ImportStudentsPanel(props: ImportStudentsPanelProps) {
     <>
       <div className="flex grow flex-col gap-[14px] px-[18px] pb-[16px] pt-[4px] lg:px-[32px] lg:pb-[24px] lg:pt-[22px]">
         <div className="flex gap-[10px] lg:max-w-[720px]">
-          <Step label="1 · Tải file mẫu & tải lên" isReached isCurrent={!hasPreview} />
+          <Step label="1 · Tải file lên" isReached isCurrent={!hasPreview} />
           <Step label="2 · Kiểm tra & xác nhận" isReached={hasPreview} isCurrent={hasPreview} />
         </div>
 
@@ -59,15 +58,10 @@ export function ImportStudentsPanel(props: ImportStudentsPanelProps) {
           <span className="flex flex-col gap-[2px]">
             <span className="break-all text-[14px] font-medium">{fileName ?? "Chưa chọn file"}</span>
             <span className="text-[12px] text-bvc-muted">
-              {hasPreview
-                ? `${preview.totalRows} dòng · ${REQUIRED_COLUMNS_TEXT}`
-                : `File cần có ${REQUIRED_COLUMNS_TEXT}`}
+              {hasPreview ? `${preview.totalRows} dòng` : "Mã lớp trong tên file phải trùng với tên lớp này."}
             </span>
           </span>
           <div className="flex flex-wrap gap-[8px]">
-            <ActionButton variant="secondary" onClick={onDownloadTemplate}>
-              Tải file mẫu .xlsx
-            </ActionButton>
             <ActionButton
               variant={fileName ? "secondary" : "primary"}
               onClick={() => fileInputRef.current?.click()}
@@ -78,7 +72,7 @@ export function ImportStudentsPanel(props: ImportStudentsPanelProps) {
             <input
               ref={fileInputRef}
               type="file"
-              accept=".xlsx,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv"
+              accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
               onChange={handleFileChange}
               className="hidden"
               data-testid="import-file-input"
@@ -124,7 +118,7 @@ export function ImportStudentsPanel(props: ImportStudentsPanelProps) {
         )}
 
         <span className="text-[12px] leading-[1.5] text-bvc-muted">
-          .xlsx hoặc .csv, tối đa 2 MB và 200 dòng. SV chưa có tài khoản được tạo ở trạng thái Chờ kích hoạt.
+          {FILE_HINT} SV chưa có tài khoản được tạo ở trạng thái Chờ kích hoạt.
         </span>
       </div>
       <FormFooter>

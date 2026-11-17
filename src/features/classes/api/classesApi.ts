@@ -56,7 +56,6 @@ export const classesApi = {
   removeMember: (classId: string, studentId: string) =>
     axiosClient.delete<ApiResponse<null>>(`/classes/${classId}/members/${studentId}`),
 
-  downloadImportTemplate: () => axiosClient.get<Blob>("/classes/import-template", { responseType: "blob" }),
   previewImport: (classId: string, file: File) => {
     const formData = new FormData();
     formData.append("file", file);
