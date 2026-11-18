@@ -45,20 +45,6 @@ export function AssignmentContentFields<V extends ContentValues>({
 
   return (
     <>
-      <FormField
-        htmlFor={`${idPrefix}-title`}
-        label="Tiêu đề"
-        required
-        hint={`${title.length} / ${ASSIGNMENT_TITLE_MAX}`}
-        error={errors.title?.message}
-      >
-        <input
-          id={`${idPrefix}-title`}
-          {...register("title")}
-          aria-invalid={Boolean(errors.title)}
-          className={INPUT_CLASSES}
-        />
-      </FormField>
       <FormField htmlFor={`${idPrefix}-kind`} label="Loại bài" required error={errors.kind?.message}>
         <select
           id={`${idPrefix}-kind`}
@@ -73,6 +59,20 @@ export function AssignmentContentFields<V extends ContentValues>({
             </option>
           ))}
         </select>
+      </FormField>
+      <FormField
+        htmlFor={`${idPrefix}-title`}
+        label="Tiêu đề"
+        required
+        hint={`${title.length} / ${ASSIGNMENT_TITLE_MAX}`}
+        error={errors.title?.message}
+      >
+        <input
+          id={`${idPrefix}-title`}
+          {...register("title")}
+          aria-invalid={Boolean(errors.title)}
+          className={INPUT_CLASSES}
+        />
       </FormField>
       <FormField
         htmlFor={`${idPrefix}-description`}

@@ -1,4 +1,4 @@
-import { useImperativeHandle, type Ref } from "react";
+import { useEffect, useImperativeHandle, useRef, type Ref } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ActionButton } from "@/shared/components/bvc/ActionButton";
@@ -12,6 +12,7 @@ import {
   type AssignmentContentPayload,
   type AssignmentSheetMusic,
 } from "@/features/classes/types/teacherAssignmentTypes";
+import { ASSIGNMENT_KIND_LABELS } from "@/features/classes/utils/teacherAssignmentFormat";
 import { applyFieldErrors } from "@/features/classes/utils/mapApiErrors";
 import {
   assignmentFormSchema,
@@ -69,11 +70,21 @@ export function AssignmentForm({
     formState: { errors, isDirty },
   } = useForm<AssignmentFormValues>({ resolver: zodResolver(assignmentFormSchema), defaultValues: initialValues });
   const classId = useWatch({ control, name: "classId" });
+  const kind = useWatch({ control, name: "kind" });
   const sheetMusicId = useWatch({ control, name: "sheetMusicId" });
   const title = useWatch({ control, name: "title" }) ?? "";
   const description = useWatch({ control, name: "description" }) ?? "";
   const { sheets } = useClassSheetMusic({ classId });
   const className = classes.find((item) => item.id === classId)?.name ?? "";
+
+  // Chọn loại bài thì tự điền tiêu đề theo nhãn, nhưng không đè tên người dùng đã gõ.
+  const autoFilledKind = useRef<string>("");
+  useEffect(() => {
+    if (kind && !title.trim() && autoFilledKind.current !== kind) {
+      setValue("title", ASSIGNMENT_KIND_LABELS[kind]);
+      autoFilledKind.current = kind;
+    }
+  }, [kind, title, setValue]);
 
   useReportDirty(isDirty, onDirtyChange);
 

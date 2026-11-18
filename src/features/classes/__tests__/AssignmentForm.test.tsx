@@ -59,6 +59,17 @@ describe("AssignmentForm", () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
+  it("fills the title from kind without overwriting a typed title", async () => {
+    renderForm();
+    await userEvent.selectOptions(screen.getByLabelText(/Loại bài/), "SOLO");
+    expect(screen.getByLabelText(/Tiêu đề/)).toHaveValue("Độc tấu");
+
+    await userEvent.clear(screen.getByLabelText(/Tiêu đề/));
+    await userEvent.type(screen.getByLabelText(/Tiêu đề/), "Bài của tôi");
+    await userEvent.selectOptions(screen.getByLabelText(/Loại bài/), "ENSEMBLE");
+    expect(screen.getByLabelText(/Tiêu đề/)).toHaveValue("Bài của tôi");
+  });
+
   it.each(["0", "301", "1.5"])("rejects BPM %s with MSG-03", async (bpm) => {
     const onSubmit = renderForm();
     await fillRequired();
