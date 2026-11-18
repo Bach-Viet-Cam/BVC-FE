@@ -17,6 +17,7 @@ const SECRET = "sk-test-SECRET-1234567890";
 const item = (overrides: Partial<LlmKeyItem>): LlmKeyItem => ({
   id: "k1",
   name: "Key chính",
+  provider: "gemini",
   status: "active",
   cooldownUntil: null,
   lastUsedAt: null,
@@ -86,11 +87,26 @@ describe("LlmKeyManagePage", () => {
     expect(keyInput).toHaveAttribute("type", "password");
     expect(keyInput).toHaveAttribute("autocomplete", "off");
     await user.type(screen.getByLabelText(/Tên/), "Key mới");
+    await user.selectOptions(screen.getByLabelText(/Nhà cung cấp/), "openrouter");
     await user.type(keyInput, SECRET);
     await user.click(screen.getByRole("button", { name: "Lưu API key" }));
-    await waitFor(() => expect(llmKeyApi.create).toHaveBeenCalledWith({ name: "Key mới", key: SECRET }));
+    await waitFor(() =>
+      expect(llmKeyApi.create).toHaveBeenCalledWith({ name: "Key mới", key: SECRET, provider: "openrouter" })
+    );
     await waitFor(() => expect(llmKeyApi.list).toHaveBeenCalledTimes(2));
     expect(screen.queryByText(SECRET)).not.toBeInTheDocument();
+  });
+
+  it("shows the provider in the list and locks it when editing", async () => {
+    const user = userEvent.setup();
+    vi.mocked(llmKeyApi.list).mockResolvedValue([item({ provider: "openrouter" })]);
+    renderPage();
+    const row = (await screen.findByText("Key chính")).closest("tr")!;
+    expect(within(row).getByText("OpenRouter")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Sửa Key chính" }));
+    const provider = screen.getByLabelText(/Nhà cung cấp/);
+    expect(provider).toBeDisabled();
+    expect(provider).toHaveValue("openrouter");
   });
 
   it("opens edit with an empty password field and omits key from PATCH when blank", async () => {
@@ -108,8 +124,20 @@ describe("LlmKeyManagePage", () => {
     await waitFor(() => expect(llmKeyApi.update).toHaveBeenCalledTimes(1));
     const [id, body] = vi.mocked(llmKeyApi.update).mock.calls[0];
     expect(id).toBe("k1");
-    expect(body).toEqual({ name: "Key đổi tên", status: "active" });
+    expect(body).toEqual({ name: "Key đổi tên" });
     expect(body).not.toHaveProperty("key");
+    expect(body).not.toHaveProperty("status");
+  });
+
+  it("sends status only when the switch was toggled", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByText("Key chính");
+    await user.click(screen.getByRole("button", { name: "Sửa Key chính" }));
+    await user.click(screen.getByRole("switch"));
+    await user.click(screen.getByRole("button", { name: "Lưu API key" }));
+    await waitFor(() => expect(llmKeyApi.update).toHaveBeenCalledTimes(1));
+    expect(vi.mocked(llmKeyApi.update).mock.calls[0][1]).toEqual({ name: "Key chính", status: "disabled" });
   });
 
   it("sends the new key when replacing it, and the dialog reopens empty", async () => {
