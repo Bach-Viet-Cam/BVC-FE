@@ -3,7 +3,7 @@ import { Pencil, Plus, Trash2 } from "lucide-react";
 import { LlmKeyDeleteDialog } from "@/features/platform/components/LlmKeyDeleteDialog";
 import { LlmKeyFormDialog } from "@/features/platform/components/LlmKeyFormDialog";
 import { useLlmKeys } from "@/features/platform/hooks/useLlmKeys";
-import { type LlmKeyItem } from "@/features/platform/types/llmKeyTypes";
+import { LLM_PROVIDER_LABELS, type LlmKeyItem } from "@/features/platform/types/llmKeyTypes";
 import { ActionButton } from "@/shared/components/bvc/ActionButton";
 import { DesktopPageHeader } from "@/shared/components/bvc/DesktopPageHeader";
 import { EmptyState } from "@/shared/components/bvc/EmptyState";
@@ -38,7 +38,7 @@ export function LlmKeyManagePage() {
       />
       <div className="mx-auto flex w-full max-w-[1360px] min-w-0 flex-col gap-6 px-[18px] py-6 md:px-8">
         <p className="max-w-[75ch] text-sm leading-relaxed text-bvc-muted">
-          Hệ thống xoay vòng các key đang dùng khi gọi mô hình AI. Giá trị key không bao giờ hiển thị lại sau khi lưu.
+          Hệ thống xoay vòng các key đang dùng của từng nhà cung cấp khi gọi mô hình AI, và tự chuyển sang nhà cung cấp khác khi nhà cung cấp hiện tại gặp lỗi máy chủ (5xx). Giá trị key không bao giờ hiển thị lại sau khi lưu.
         </p>
         {loading && items.length === 0 ? (
           <p role="status" className="py-12 text-center text-sm text-bvc-muted">
@@ -58,7 +58,7 @@ export function LlmKeyManagePage() {
               <caption className="sr-only">Danh sách API key LLM và trạng thái sử dụng</caption>
               <thead className="border-b border-bvc-border-strong bg-bvc-surface">
                 <tr>
-                  {["Tên", "Trạng thái", "Lần dùng cuối", "Lỗi cuối", "Thành công / Lỗi", "Thao tác"].map((label) => (
+                  {["Tên", "Nhà cung cấp", "Trạng thái", "Lần dùng cuối", "Lỗi cuối", "Thành công / Lỗi", "Thao tác"].map((label) => (
                     <th key={label} scope="col" className="px-4 py-3.5 text-xs font-semibold text-bvc-muted">
                       {label}
                     </th>
@@ -69,6 +69,7 @@ export function LlmKeyManagePage() {
                 {items.map((item) => (
                   <tr key={item.id} className="hover:bg-bvc-surface/30">
                     <td className="px-4 py-4 font-semibold break-words text-bvc-ink">{item.name}</td>
+                    <td className="px-4 py-4 text-bvc-ink">{LLM_PROVIDER_LABELS[item.provider] ?? item.provider}</td>
                     <td className="px-4 py-4 text-bvc-ink">{statusLabel(item)}</td>
                     <td className="px-4 py-4 text-bvc-muted">{formatDate(item.lastUsedAt)}</td>
                     <td className="px-4 py-4 text-bvc-muted">{item.lastErrorCode ?? "—"}</td>

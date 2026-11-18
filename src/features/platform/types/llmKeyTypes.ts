@@ -1,9 +1,17 @@
+export type LlmProvider = "gemini" | "openrouter";
+
+export const LLM_PROVIDER_LABELS: Record<LlmProvider, string> = {
+  gemini: "Google Gemini",
+  openrouter: "OpenRouter",
+};
+
 export type LlmKeyStatus = "active" | "disabled" | "invalid";
 
 // Không có trường chứa giá trị key: BE không bao giờ trả key về.
 export interface LlmKeyItem {
   id: string;
   name: string;
+  provider: LlmProvider;
   status: LlmKeyStatus;
   cooldownUntil: string | null;
   lastUsedAt: string | null;
@@ -16,6 +24,7 @@ export interface LlmKeyItem {
 export interface LlmKeyCreateInput {
   name: string;
   key: string;
+  provider: LlmProvider;
 }
 
 export interface LlmKeyUpdateInput {

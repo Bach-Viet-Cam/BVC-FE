@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { type LlmKeyItem, type LlmKeyUpdateInput } from "@/features/platform/types/llmKeyTypes";
+import {
+  LLM_PROVIDER_LABELS,
+  type LlmKeyCreateInput,
+  type LlmKeyItem,
+  type LlmKeyUpdateInput,
+  type LlmProvider,
+} from "@/features/platform/types/llmKeyTypes";
 import { validateLlmKey, type LlmKeyFormValues } from "@/features/platform/utils/validateLlmKey";
 import { ActionButton } from "@/shared/components/bvc/ActionButton";
 import { FormDialog } from "@/shared/components/bvc/FormDialog";
@@ -9,13 +15,14 @@ import { FormBody, FormFooter } from "@/shared/components/bvc/FormLayout";
 import { INPUT_CLASSES } from "@/shared/components/bvc/fieldStyles";
 import { Switch } from "@/shared/components/ui/switch";
 import { useReportDirty } from "@/shared/hooks/useReportDirty";
+import { cn } from "@/shared/utils/cn";
 
 interface LlmKeyFormProps {
   target: LlmKeyItem | null;
   // Trả về null khi lưu xong, hoặc thông báo lỗi (vd. 409 trùng tên/key)
   onSubmit: (
     target: LlmKeyItem | null,
-    body: { name: string; key: string; enabled: boolean }
+    body: { name: string; key: string; provider: LlmProvider; enabled: boolean }
   ) => Promise<string | null>;
   onCancel: () => void;
   onSaved: () => void;
@@ -31,9 +38,9 @@ function LlmKeyForm({ target, onSubmit, onCancel, onSaved, onDirtyChange }: LlmK
     handleSubmit,
     setValue,
     formState: { errors, isDirty, isSubmitting },
-  } = useForm<LlmKeyFormValues>({
+  } = useForm<LlmKeyFormValues & { provider: LlmProvider }>({
     // Ô key luôn rỗng khi mở form, kể cả khi sửa
-    defaultValues: { name: target?.name ?? "", key: "" },
+    defaultValues: { name: target?.name ?? "", key: "", provider: target?.provider ?? "gemini" },
     resolver: (values) => {
       const fieldErrors = validateLlmKey(values, mode);
       return {
@@ -46,9 +53,9 @@ function LlmKeyForm({ target, onSubmit, onCancel, onSaved, onDirtyChange }: LlmK
   });
   useReportDirty(isDirty || enabled !== (target ? target.status === "active" : true), onDirtyChange);
 
-  const submit = async (values: LlmKeyFormValues) => {
+  const submit = async (values: LlmKeyFormValues & { provider: LlmProvider }) => {
     setSaveError(null);
-    const message = await onSubmit(target, { name: values.name.trim(), key: values.key.trim(), enabled });
+    const message = await onSubmit(target, { name: values.name.trim(), key: values.key.trim(), provider: values.provider, enabled });
     // Xóa key khỏi state form dù thành công hay thất bại
     setValue("key", "");
     if (message) setSaveError(message);
@@ -67,6 +74,25 @@ function LlmKeyForm({ target, onSubmit, onCancel, onSaved, onDirtyChange }: LlmK
             className={INPUT_CLASSES}
             {...register("name")}
           />
+        </FormField>
+        <FormField
+          label="Nhà cung cấp"
+          htmlFor="llm-key-provider"
+          required={!target}
+          hint={target ? "Không thể đổi nhà cung cấp của key đã lưu" : "Key chỉ được dùng cho nhà cung cấp này"}
+        >
+          <select
+            id="llm-key-provider"
+            disabled={Boolean(target)}
+            className={cn(INPUT_CLASSES, "cursor-pointer")}
+            {...register("provider")}
+          >
+            {(Object.keys(LLM_PROVIDER_LABELS) as LlmProvider[]).map((provider) => (
+              <option key={provider} value={provider}>
+                {LLM_PROVIDER_LABELS[provider]}
+              </option>
+            ))}
+          </select>
         </FormField>
         <FormField
           label="Khóa API"
@@ -116,7 +142,7 @@ interface LlmKeyFormDialogProps {
   isOpen: boolean;
   target: LlmKeyItem | null;
   onOpenChange: (isOpen: boolean) => void;
-  onCreate: (body: { name: string; key: string }) => Promise<string | null>;
+  onCreate: (body: LlmKeyCreateInput) => Promise<string | null>;
   onUpdate: (id: string, body: LlmKeyUpdateInput) => Promise<string | null>;
 }
 
@@ -126,9 +152,11 @@ export function LlmKeyFormDialog({ isOpen, target, onOpenChange, onCreate, onUpd
     setIsDirty(false);
     onOpenChange(false);
   };
-  const submit: LlmKeyFormProps["onSubmit"] = (item, { name, key, enabled }) => {
-    if (!item) return onCreate({ name, key });
-    const body: LlmKeyUpdateInput = { name, status: enabled ? "active" : "disabled" };
+  const submit: LlmKeyFormProps["onSubmit"] = (item, { name, key, provider, enabled }) => {
+    if (!item) return onCreate({ name, key, provider });
+    const body: LlmKeyUpdateInput = { name };
+    // Chỉ gửi status khi người dùng đổi công tắc, để đổi tên không làm mất trạng thái "invalid".
+    if (enabled !== (item.status === "active")) body.status = enabled ? "active" : "disabled";
     if (key) body.key = key; // để trống = giữ key cũ, không gửi trường key
     return onUpdate(item.id, body);
   };
