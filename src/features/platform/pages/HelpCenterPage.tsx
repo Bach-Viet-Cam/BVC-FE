@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronLeft, ChevronRight, Download, Search, X } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, Download, MessageSquareText, Search, X } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { faqApi } from "@/features/platform/api/faqApi";
 import { instrumentApi } from "@/features/platform/api/instrumentApi";
@@ -58,7 +58,20 @@ export function HelpCenterPage() {
 
   return (
     <RoleShell title="Câu hỏi thường gặp" hideHeader contentClassName="max-w-[1200px] gap-7 md:gap-8">
-      <PageHero title="Câu hỏi thường gặp">
+      <PageHero
+        title="Câu hỏi thường gặp"
+        actions={
+          <a
+            href={FEEDBACK_FORM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/40 bg-white/10 px-4 text-[13px] font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20 hover:text-white"
+          >
+            <MessageSquareText size={16} aria-hidden />
+            Gửi góp ý
+          </a>
+        }
+      >
         <label className="flex max-w-[640px] flex-col gap-2">
           <span className="text-sm font-medium text-white">Bạn muốn tìm hiểu điều gì?</span>
           <span className="relative block">
@@ -254,17 +267,6 @@ export function HelpCenterPage() {
           )}
         </section>
       </div>
-      <p className="border-t border-bvc-border pt-6 text-sm text-bvc-muted">
-        Chưa tìm thấy câu trả lời?{" "}
-        <a
-          href={FEEDBACK_FORM_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-semibold text-bvc-ink underline underline-offset-4"
-        >
-          Gửi góp ý cho chúng tôi
-        </a>
-      </p>
     </RoleShell>
   );
 }

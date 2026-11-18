@@ -195,7 +195,7 @@ export function UserManagePage() {
                   onChange={(event) => setSearchText(event.target.value)}
                   placeholder="Tên, email hoặc mã SV..."
                   maxLength={100}
-                  className="h-[38px] w-full rounded-[10px] border border-bvc-border-strong bg-white pl-8.5 pr-8 text-[13px] text-bvc-ink placeholder:text-bvc-faint transition-all focus:border-bvc-ink focus:outline-none"
+                  className="h-[38px] w-full rounded-[10px] border border-bvc-border-strong bg-white pl-8.5 pr-8 text-[13px] text-bvc-ink placeholder:text-bvc-faint transition-all focus:border-bvc-ink focus:outline-none [&::-webkit-search-cancel-button]:hidden"
                 />
                 {searchText && (
                   <button
