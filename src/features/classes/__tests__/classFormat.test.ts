@@ -43,11 +43,11 @@ describe("classFormat", () => {
 });
 
 describe("checkImportFile", () => {
-  it("accepts .xlsx/.csv up to 2 MB and rejects other files", () => {
+  it("accepts .xlsx up to 2 MB and rejects other files", () => {
     expect(checkImportFile(new File(["a"], "ds.XLSX"))).toBeNull();
-    expect(checkImportFile(new File(["a"], "ds.csv"))).toBeNull();
-    expect(checkImportFile(new File(["a"], "ds.pdf"))).toMatch(/Định dạng file không được hỗ trợ/);
-    const big = new File([new Uint8Array(2 * 1024 * 1024 + 1)], "big.csv");
+    expect(checkImportFile(new File(["a"], "ds.csv"))).toBe("Chỉ hỗ trợ file .xlsx.");
+    expect(checkImportFile(new File(["a"], "ds.pdf"))).toBe("Chỉ hỗ trợ file .xlsx.");
+    const big = new File([new Uint8Array(2 * 1024 * 1024 + 1)], "big.xlsx");
     expect(checkImportFile(big)).toBe("File vượt quá dung lượng tối đa 2 MB.");
   });
 });

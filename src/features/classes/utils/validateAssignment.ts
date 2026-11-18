@@ -27,6 +27,13 @@ export const assignmentFormSchema = z.object({
   kind: z.string().min(1, "Loại bài không được để trống."),
   description: z.string().trim().max(DESCRIPTION_MAX, `Mô tả không được vượt quá ${DESCRIPTION_MAX} ký tự.`),
   sheetMusicId: z.string(),
+  maxSubmissions: z
+    .string()
+    .optional()
+    .refine(
+      (value) => !value?.trim() || (/^\d+$/.test(value.trim()) && Number(value) >= 1 && Number(value) <= 2147483647),
+      "Số lượt nộp phải là số nguyên dương."
+    ),
   requiredBpm: z.string().refine(isValidBpm, BPM_RANGE_MESSAGE),
 });
 
@@ -42,6 +49,7 @@ export const EMPTY_ASSIGNMENT_FORM: AssignmentFormValues = {
   description: "",
   sheetMusicId: "",
   requiredBpm: "",
+  maxSubmissions: "",
 };
 
 export function toAssignmentFormValues(assignment: AssignmentBase): AssignmentFormValues {
@@ -51,12 +59,14 @@ export function toAssignmentFormValues(assignment: AssignmentBase): AssignmentFo
     kind: assignment.kind,
     description: assignment.description ?? "",
     sheetMusicId: assignment.sheetMusic?.id ?? "",
+    maxSubmissions: assignment.maxSubmissions == null ? "" : String(assignment.maxSubmissions),
     requiredBpm: assignment.requiredBpm === null ? "" : String(assignment.requiredBpm),
   };
 }
 
 export function toAssignmentContent(values: AssignmentFormValues): AssignmentContentPayload {
   return {
+    maxSubmissions: values.maxSubmissions?.trim() ? Number(values.maxSubmissions) : null,
     title: values.title.trim(),
     description: values.description.trim() || null,
     kind: values.kind as AssignmentContentPayload["kind"],

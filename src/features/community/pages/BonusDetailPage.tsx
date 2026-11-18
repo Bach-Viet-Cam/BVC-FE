@@ -150,7 +150,14 @@ export function BonusDetailPage() {
                 <InfoRow label="Accuracy tối thiểu" value={`${assignment.minAccuracy}%`} />
                 <InfoRow label="Hạn nộp" value={formatFullDeadline(assignment.deadline)} />
                 {assignment.targetBpm !== null && <InfoRow label="BPM yêu cầu" value={`${assignment.targetBpm} BPM`} />}
-                <InfoRow label="Lượt nộp" value={`${assignment.usedSubmissions} / ${assignment.maxSubmissions}`} />
+                <InfoRow
+                  label="Lượt nộp"
+                  value={
+                    assignment.maxSubmissions === null
+                      ? `${assignment.usedSubmissions} lượt · Không giới hạn`
+                      : `${assignment.usedSubmissions} / ${assignment.maxSubmissions}`
+                  }
+                />
               </div>
 
               <div className="mt-5 hidden lg:block">

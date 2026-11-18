@@ -1,4 +1,5 @@
 import { Search, SlidersHorizontal } from "lucide-react";
+import { MyStatsSection } from "@/features/practice/components/MyStatsSection";
 import { SubmissionPageTitle } from "@/features/practice/components/SubmissionPageTitle";
 import { SubmissionFilterBar } from "@/features/practice/components/SubmissionFilterBar";
 import { SubmissionFilterSheet } from "@/features/practice/components/SubmissionFilterSheet";
@@ -56,6 +57,8 @@ export function SubmissionHistoryPage() {
             ) : undefined
           }
         />
+
+        {!isSelecting && <MyStatsSection />}
 
         <p className="shrink-0 text-[12.5px] text-bvc-muted">{isFirstLoad ? "Đang tải bài nộp..." : summary}</p>
 

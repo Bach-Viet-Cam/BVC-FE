@@ -12,6 +12,9 @@ export type AudioEvaluationStatus =
 
 export type AudioJobCode = "quality_check" | "audio_analysis" | "comparison" | "feedback";
 
+// Nguồn bài upload: chọn file có sẵn hay ghi âm trực tiếp (quyết định cách server cắt đầu/cuối)
+export type AudioUploadSource = "file" | "recording";
+
 export interface AudioUploadResult {
   fileId: string;
   url: string;

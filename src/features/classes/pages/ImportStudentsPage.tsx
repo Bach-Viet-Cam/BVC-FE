@@ -29,11 +29,6 @@ export function ImportStudentsPage() {
     navigate(backPath);
   };
 
-  const downloadTemplate = async () => {
-    const downloadError = await importer.downloadTemplate();
-    if (downloadError) toast.error(downloadError);
-  };
-
   return (
     <TeacherScreen>
       <TeacherPageHeader
@@ -57,7 +52,6 @@ export function ImportStudentsPage() {
             fileError={importer.fileError}
             preview={importer.preview}
             onSelectFile={importer.selectFile}
-            onDownloadTemplate={downloadTemplate}
             onCancel={leave}
             onConfirm={confirmImport}
           />

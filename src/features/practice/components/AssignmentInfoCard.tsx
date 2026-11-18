@@ -28,7 +28,13 @@ function buildRows(context: PracticeContext): InfoRow[] {
     assignment ? { label: "Bài tập", value: assignment.title } : null,
     assignment ? { label: "Hạn nộp", value: formatDate(assignment.deadline) } : null,
     assignment
-      ? { label: "Lượt nộp còn lại", value: `${assignment.remainingSubmissions}/${assignment.maxSubmissions}` }
+      ? {
+          label: "Lượt nộp còn lại",
+          value:
+            assignment.maxSubmissions === null
+              ? "Không giới hạn"
+              : `${assignment.remainingSubmissions}/${assignment.maxSubmissions}`,
+        }
       : null,
     assignment?.targetBpm ? { label: "Tốc độ yêu cầu", value: `${assignment.targetBpm} BPM` } : null,
   ];

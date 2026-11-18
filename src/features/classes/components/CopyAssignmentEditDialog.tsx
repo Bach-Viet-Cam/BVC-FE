@@ -39,6 +39,7 @@ function EditContent({ row, instrumentId, onCancel, onApply }: EditContentProps)
   } = useForm<CopyEditValues>({
     resolver: zodResolver(copyEditSchema),
     defaultValues: {
+      maxSubmissions: row.content.maxSubmissions == null ? "" : String(row.content.maxSubmissions),
       title: row.content.title,
       kind: row.content.kind,
       description: row.content.description ?? "",

@@ -25,7 +25,7 @@ export function SheetPanel({ songId, sheetId }: SheetPanelProps) {
     <section
       aria-label="Bản nhạc"
       className={cn(
-        "mx-3.5 mt-2.5 flex min-h-0 flex-col gap-3 rounded-bvc-xl border border-bvc-border bg-bvc-panel p-3 md:mx-0 md:mt-0 lg:sticky lg:top-4 lg:h-[calc(100vh-2rem)] lg:max-h-screen lg:p-4",
+        "mx-3.5 flex min-h-0 flex-col gap-3 rounded-bvc-xl border border-bvc-border bg-bvc-panel p-3 md:mx-0 lg:sticky lg:top-4 lg:h-[calc(100vh-2rem)] lg:max-h-screen lg:p-4",
         open && "h-[75vh]"
       )}
     >

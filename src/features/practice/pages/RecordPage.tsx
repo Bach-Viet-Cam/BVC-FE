@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ReferenceAudioPlayer } from "@/features/practice/components/ReferenceAudioPlayer";
 import { SheetPanel } from "@/features/practice/components/SheetPanel";
@@ -97,6 +98,8 @@ export function RecordPage() {
 
   const [shareAfterVerification, setShareAfterVerification] = useState(false);
   const [mode, setMode] = useState<SubmitMode>("record");
+  // Điện thoại: mặc định chỉ hiện phần cốt lõi (ghi âm + gửi); nhịp, lên dây, bản thu mẫu nằm sau "Xem nâng cao"
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const [tempoOpen, setTempoOpen] = useState(true);
   const [tunerOpen, setTunerOpen] = useState(true);
   const [clickOn, setClickOn] = useState(false);
@@ -162,6 +165,7 @@ export function RecordPage() {
     gridOrigin: recorder.recordStartTime,
   });
 
+  const showAdvanced = !isMobile || advancedOpen;
   const tunerShown = mode === "record" && session.hasPitch;
   const live = rec === "recording" && !micDenied;
 
@@ -278,7 +282,11 @@ export function RecordPage() {
     if (blocked || uploading || errorKind || !sheetId) return;
     const source = mode === "record" ? (rec === "preview" ? recorder.take?.file : undefined) : pickedFile;
     if (!source) return;
-    const submission = await submit(source, { sheetMusicId: sheetId, assignmentId, shareAfterVerification });
+    const submission = await submit(
+      source,
+      { sheetMusicId: sheetId, assignmentId, shareAfterVerification },
+      mode === "record" ? "recording" : "file"
+    );
     if (!submission) {
       refreshActive();
       return;
@@ -345,7 +353,7 @@ export function RecordPage() {
   return (
     <StudentShell>
       <ResultBanner className="fixed inset-x-3.5 top-3 md:inset-x-auto md:top-24 md:right-8 md:w-96" />
-      <div className="mx-auto flex w-full max-w-[428px] flex-1 flex-col md:max-w-none md:gap-5 md:px-14 md:pt-6 md:pb-7">
+      <div className="mx-auto flex w-full max-w-[428px] flex-1 flex-col max-md:gap-3 md:max-w-none md:gap-5 md:px-14 md:pt-6 md:pb-7">
         {/* Điện thoại: `contents` giữ nguyên bố cục cũ; từ md thành cột của bản laptop.
             Từ lg: cột trái là tiêu đề + thẻ Bài tập; cột phải là tempo + tuner ở trên, khu ghi âm ở dưới */}
         <div className="contents md:flex md:flex-col md:gap-5 lg:grid lg:min-h-0 lg:flex-1 lg:grid-cols-[2fr_3fr] lg:items-start">
@@ -353,19 +361,6 @@ export function RecordPage() {
             <PracticeTitleRow
               title={context?.piece.title ?? (contextLoading ? "Đang tải..." : "Luyện tập")}
               subtitle={segmentMode ? `Đoạn ${fmtTime(segStart)} – ${fmtTime(segEnd)}` : subtitle}
-              rightSlot={
-                segmentMode &&
-                originalData && (
-                  <button
-                    type="button"
-                    disabled={recActive}
-                    onClick={() => setSegmentPickerOpen(true)}
-                    className="min-h-11 shrink-0 cursor-pointer rounded-full border border-bvc-border px-4 text-sm font-medium text-bvc-ink disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    Đổi đoạn
-                  </button>
-                )
-              }
               // Nút Demo (mô phỏng luồng ghi âm) đang tạm ẩn; muốn bật lại thì thêm <DemoPanel /> vào rightSlot khi không ở chế độ đoạn
             />
             {context && <SheetPanel songId={context.piece.id} sheetId={context.sheet.id} />}
@@ -373,8 +368,37 @@ export function RecordPage() {
 
           <div className="contents md:flex md:min-h-0 md:flex-1 md:flex-col md:gap-5">
             <div className={cn("contents md:grid md:gap-5", tunerShown ? "md:grid-cols-[2fr_1fr]" : "md:grid-cols-1")}>
-              <div className="mx-3.5 md:mx-0">
-                {mode === "record" && (
+              {tunerShown && (
+                <div className="mx-3.5 md:order-2 md:mx-0">
+                  <TunerCard
+                    open={tunerOpen}
+                    onToggle={() => setTunerOpen((value) => !value)}
+                    live={tuner.live}
+                    cents={tuner.cents}
+                    detectedNote={tuner.detectedNote}
+                    detectedHz={tuner.detectedHz}
+                    expectedNote={expectedNote}
+                    canOpenDetail={canOpenDetail}
+                    onOpenTuner={() => openDetail("tuner")}
+                    micDenied={micDenied}
+                  />
+                </div>
+              )}
+
+              {isMobile && mode === "record" && (
+                <button
+                  type="button"
+                  aria-expanded={advancedOpen}
+                  onClick={() => setAdvancedOpen((value) => !value)}
+                  className="mx-3.5 flex min-h-10 cursor-pointer items-center justify-center gap-1.5 rounded-full border border-bvc-border text-sm font-medium text-bvc-muted"
+                >
+                  {advancedOpen ? "Ẩn nâng cao" : "Xem nâng cao"}
+                  {advancedOpen ? <ChevronUp className="size-4" aria-hidden /> : <ChevronDown className="size-4" aria-hidden />}
+                </button>
+              )}
+
+              {mode === "record" && showAdvanced && (
+                <div className="mx-3.5 md:order-1 md:mx-0">
                   <TempoCard
                     open={tempoOpen}
                     onToggle={() => setTempoOpen((value) => !value)}
@@ -392,30 +416,13 @@ export function RecordPage() {
                     onOpenMetronome={() => openDetail("metronome")}
                     micDenied={micDenied}
                   />
-                )}
-              </div>
-
-              {tunerShown && (
-                <div className="mx-3.5 mt-2.5 md:mx-0 md:mt-0">
-                  <TunerCard
-                    open={tunerOpen}
-                    onToggle={() => setTunerOpen((value) => !value)}
-                    live={tuner.live}
-                    cents={tuner.cents}
-                    detectedNote={tuner.detectedNote}
-                    detectedHz={tuner.detectedHz}
-                    expectedNote={expectedNote}
-                    canOpenDetail={canOpenDetail}
-                    onOpenTuner={() => openDetail("tuner")}
-                    micDenied={micDenied}
-                  />
                 </div>
               )}
             </div>
 
             {/* Chế độ đoạn: timeline đoạn + nghe mẫu đoạn, đặt đúng chỗ bản thu mẫu của luyện cả bài */}
             {segmentMode && (segmentDurationSec > 0 || segmentTeacherUrl) && (
-              <div className="mx-3.5 mt-3 flex flex-col gap-3.5 rounded-bvc-xl border border-bvc-border bg-white p-4 md:mx-0 md:mt-0 md:p-5.5">
+              <div className="mx-3.5 flex flex-col gap-3.5 rounded-bvc-xl border border-bvc-border bg-white p-4 md:mx-0 md:p-5.5">
                 {segmentDurationSec > 0 && (
                   <SegmentTimeline
                     durationSec={segmentDurationSec}
@@ -436,8 +443,8 @@ export function RecordPage() {
             )}
 
             {/* Bản thu mẫu nằm trên thẻ ghi âm; gỡ khỏi màn hình khi đang đếm nhịp/ghi để tiếng mẫu không lọt vào micro */}
-            {!segmentMode && referenceAudio && mode === "record" && (rec === "idle" || rec === "preview") && (
-              <div className="mx-3.5 mt-3 md:mx-0 md:mt-0">
+            {!segmentMode && showAdvanced && referenceAudio && mode === "record" && (rec === "idle" || rec === "preview") && (
+              <div className="mx-3.5 md:mx-0">
                 <ReferenceAudioPlayer
                   key={referenceAudio.url}
                   url={referenceAudio.url}
@@ -447,7 +454,7 @@ export function RecordPage() {
             )}
 
             <div className="contents">
-              <div className="mx-3.5 mt-3 flex min-h-0 flex-1 flex-col gap-2.75 pb-5.5 md:mx-0 md:mt-0 md:min-h-98 md:rounded-bvc-xl md:border md:border-bvc-border md:bg-white md:p-5.5 md:pb-5.5">
+              <div className="mx-3.5 flex min-h-0 flex-1 flex-col gap-2.75 pb-5.5 md:mx-0 md:min-h-98 md:rounded-bvc-xl md:border md:border-bvc-border md:bg-white md:p-5.5 md:pb-5.5">
                 {!segmentMode && (
                   <div className="contents md:flex md:shrink-0 md:items-center md:justify-between md:gap-4">
                     <div className="flex shrink-0 gap-1 rounded-full border border-bvc-border-strong bg-bvc-surface p-0.75 md:w-85 md:border-0 md:bg-bvc-panel">
@@ -468,7 +475,12 @@ export function RecordPage() {
                       ))}
                     </div>
 
-                    <p className="shrink-0 text-xs leading-normal text-bvc-muted md:text-right md:text-[12.5px]">
+                    <p
+                      className={cn(
+                        "shrink-0 text-xs leading-normal text-bvc-muted md:text-right md:text-[12.5px]",
+                        !showAdvanced && "hidden"
+                      )}
+                    >
                       Định dạng MP3, WAV, M4A - tối đa 20 MB
                       <br />
                       Thời lượng từ 00:10 đến 03:00
@@ -513,6 +525,19 @@ export function RecordPage() {
                     targetBpm={targetBpm}
                     pieceLen={segmentMode ? session.pieceLenSec : undefined}
                     idleNote={segmentMode && !segCountIn ? IDLE_NOTE_NO_COUNT_IN : undefined}
+                    headerAction={
+                      segmentMode &&
+                      originalData && (
+                        <button
+                          type="button"
+                          disabled={recActive}
+                          onClick={() => setSegmentPickerOpen(true)}
+                          className="min-h-11 shrink-0 cursor-pointer rounded-full border border-bvc-border px-4 text-sm font-medium text-bvc-ink disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          Đổi đoạn
+                        </button>
+                      )
+                    }
                   />
                 ) : (
                   <UploadPanel
@@ -593,7 +618,7 @@ export function RecordPage() {
           onClose={() => setDrawer(null)}
         >
           {drawer === "tuner" ? (
-            <TunerView audio={audio} tunes={tunes} />
+            <TunerView audio={audio} tunes={tunes} micDenied={micDenied} />
           ) : (
             // key: tốc độ mục tiêu tải xong sau khi mở thì metronome bắt đầu lại từ tốc độ đó
             <MetronomeView key={targetBpm} targetBpm={targetBpm} />
