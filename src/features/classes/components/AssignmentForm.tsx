@@ -80,8 +80,9 @@ export function AssignmentForm({
   // Chọn loại bài thì tự điền tiêu đề theo nhãn, nhưng không đè tên người dùng đã gõ.
   const autoFilledKind = useRef<string>("");
   useEffect(() => {
-    if (kind && !title.trim() && autoFilledKind.current !== kind) {
-      setValue("title", ASSIGNMENT_KIND_LABELS[kind]);
+    const label = Object.entries(ASSIGNMENT_KIND_LABELS).find(([key]) => key === kind)?.[1];
+    if (kind && label && !title.trim() && autoFilledKind.current !== kind) {
+      setValue("title", label);
       autoFilledKind.current = kind;
     }
   }, [kind, title, setValue]);
