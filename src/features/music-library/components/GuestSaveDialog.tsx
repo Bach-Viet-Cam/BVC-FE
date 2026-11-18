@@ -1,8 +1,10 @@
+import { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Dialog, DialogClose, DialogDescription, DialogTitle } from "@/shared/components/ui/dialog";
 import { BvcDialogPopup } from "@/shared/components/bvc/BvcDialogPopup";
 import { actionButtonClass } from "@/shared/components/bvc/actionButtonStyles";
 import { LIBRARY_MESSAGES } from "@/features/music-library/constants/musicLibraryConstants";
+import { buildReturnTo, saveReturnTo } from "@/shared/utils/returnTo";
 
 interface GuestSaveDialogProps {
   open: boolean;
@@ -22,6 +24,11 @@ export function GuestSaveDialog({
   redirectTo,
 }: GuestSaveDialogProps) {
   const location = useLocation();
+  const from = redirectTo ?? buildReturnTo(location);
+
+  useEffect(() => {
+    if (open) saveReturnTo(from);
+  }, [open, from]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -33,7 +40,7 @@ export function GuestSaveDialog({
         <div className="mt-2 flex flex-col gap-2">
           <Link
             to="/login"
-            state={{ from: redirectTo ?? `${location.pathname}${location.search}` }}
+            state={{ from }}
             className={actionButtonClass("primary", "lg", "w-full hover:text-white")}
           >
             <span className="flex size-6 items-center justify-center rounded-full bg-white text-[13px] font-semibold text-bvc-ink">

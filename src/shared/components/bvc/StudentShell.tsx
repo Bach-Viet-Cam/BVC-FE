@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { Bookmark, LibraryBig, LogIn } from "lucide-react";
 import { useAuth } from "@/shared/context/AuthContext";
@@ -10,6 +10,7 @@ import { UserAvatar } from "@/shared/components/bvc/UserAvatar";
 import logoImage from "@/assets/image/logo.png";
 import { PillLink } from "@/shared/components/bvc/PillLink";
 import { getRoleHome } from "@/shared/utils/roleHome";
+import { buildReturnTo, saveReturnTo } from "@/shared/utils/returnTo";
 import { cn } from "@/shared/utils/cn";
 
 interface StudentShellProps {
@@ -64,8 +65,12 @@ export function StudentShell({ children, className }: StudentShellProps) {
     : isGuest
       ? GUEST_NAV_ITEMS
       : NAV_ITEMS;
-  const loginState = { from: `${location.pathname}${location.search}` };
+  const loginState = { from: buildReturnTo(location) };
   const showBottomNav = isStudent && !FOCUSED_PATHS.some((pattern) => pattern.test(location.pathname));
+
+  useEffect(() => {
+    if (isGuest) saveReturnTo(loginState.from);
+  }, [isGuest, loginState.from]);
 
   return (
     <div className="flex min-h-dvh flex-col bg-white font-bvc-sans text-bvc-ink">
