@@ -9,6 +9,7 @@ import { EnsembleSessionBar } from "@/features/ensemble/components/EnsembleSessi
 import { useEnsembleLiveTempo } from "@/features/ensemble/hooks/useEnsembleLiveTempo";
 import { useEnsembleAssignment } from "@/features/ensemble/hooks/useEnsembleAssignment";
 import { useEnsemblePractice } from "@/features/ensemble/hooks/useEnsemblePractice";
+import { LatencyAdjust } from "@/features/ensemble/components/LatencyAdjust";
 import { useListeningSetup } from "@/features/ensemble/hooks/useListeningSetup";
 import { useTakePlayback } from "@/features/ensemble/hooks/useTakePlayback";
 import { useTrackPeaks } from "@/features/ensemble/hooks/useTrackPeaks";
@@ -457,6 +458,13 @@ export function EnsemblePage() {
                 onBack={leave}
                 backLabel={assignmentId ? "Về bài tập" : "Về danh sách bài tập"}
               />
+              {status === "preview" && practice.take?.rawBlob && (
+                <LatencyAdjust
+                  key={practice.latencyMs}
+                  latencyMs={practice.latencyMs}
+                  onCommit={(ms) => void practice.adjustLatency(ms)}
+                />
+              )}
               {quotaNote && (status === "ready" || status === "preview") && (
                 <p className="px-1 text-[12px] text-bvc-muted">{quotaNote}</p>
               )}

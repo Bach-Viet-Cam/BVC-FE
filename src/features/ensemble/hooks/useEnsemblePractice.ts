@@ -12,7 +12,15 @@ import {
 import { computePeaks } from "@/features/ensemble/utils/audioPeaks";
 import { MIC_CONSTRAINTS } from "@/features/ensemble/utils/listeningMode";
 import { getEffectiveVolume } from "@/features/ensemble/utils/mixerMath";
-import { encodeWav } from "@/features/ensemble/utils/wavEncoder";
+import {
+  clampLatencyMs,
+  estimateLatencyMs,
+  latencyStorageKey,
+  readStoredLatencyMs,
+  writeStoredLatencyMs,
+} from "@/features/ensemble/utils/latencyComp";
+import { encodeWav, trimWav } from "@/features/ensemble/utils/wavEncoder";
+import { outputLatencyOf } from "@/features/practice/utils/clickScheduler";
 import { toast } from "@/shared/components/ui/toast";
 import { useAsyncData } from "@/shared/hooks/useAsyncData";
 import { playClick } from "@/shared/utils/clickSound";
@@ -27,6 +35,20 @@ const COUNT_IN_BEATS = 4;
 const COUNT_IN_LEAD_S = 0.15; // khoảng đệm trước phách đếm đầu tiên
 const COUNT_IN_TICK_MS = 30;
 const EMPTY_ANALYSERS: ReadonlyMap<string, AnalyserNode> = new Map();
+
+/** Cắt `latencyMs` đầu của WAV gốc rồi dựng take (kèm đỉnh sóng để vẽ). */
+async function buildTake(raw: Blob, latencyMs: number): Promise<EnsembleTake> {
+  const wav = await trimWav(raw, latencyMs / 1000);
+  const decoded = await new OfflineAudioContext(1, 1, 44100).decodeAudioData(await wav.arrayBuffer());
+  return {
+    blob: wav,
+    url: URL.createObjectURL(wav),
+    peaks: computePeaks(decoded.getChannelData(0), TAKE_PEAK_BUCKETS),
+    durationSec: decoded.duration,
+    rawBlob: raw,
+    latencyMs,
+  };
+}
 
 export function useEnsemblePractice(pieceId: string, assignmentId: string | undefined) {
   const tracksQuery = useAsyncData<EnsembleTracksResult>(
@@ -76,6 +98,12 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
   const timersRef = useRef<number[]>([]);
   const countInNodesRef = useRef<OscillatorNode[]>([]);
   const abortedRef = useRef(false);
+  const latencyKeyRef = useRef<string | null>(null);
+  const storedLatencyRef = useRef<number | null>(null);
+  const playCallPerfRef = useRef(0);
+  const recorderStartPerfRef = useRef<number | null>(null);
+  const inputLatencySecRef = useRef(0);
+  const [latencyMs, setLatencyMs] = useState(0);
 
   const changeStatus = useCallback((next: PracticeStatus) => {
     statusRef.current = next;
@@ -281,14 +309,18 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
     chunksRef.current = [];
     releaseRecording();
     try {
-      const wav = await encodeWav(recording);
-      const decoded = await new OfflineAudioContext(1, 1, 44100).decodeAudioData(await wav.arrayBuffer());
-      replaceTake({
-        blob: wav,
-        url: URL.createObjectURL(wav),
-        peaks: computePeaks(decoded.getChannelData(0), TAKE_PEAK_BUCKETS),
-        durationSec: decoded.duration,
-      });
+      const raw = await encodeWav(recording);
+      // Bù độ trễ: giá trị đã lưu (hiệu chỉnh/chỉnh tay) thắng ước lượng tự động
+      const recorderLateMs =
+        recorderStartPerfRef.current === null ? 0 : Math.max(0, recorderStartPerfRef.current - playCallPerfRef.current);
+      const estimated = estimateLatencyMs(
+        contextRef.current ? outputLatencyOf(contextRef.current) : 0,
+        inputLatencySecRef.current,
+        recorderLateMs
+      );
+      const comp = storedLatencyRef.current ?? estimated;
+      setLatencyMs(comp);
+      replaceTake(await buildTake(raw, comp));
       changeStatus("preview");
     } catch {
       toast.error("Không thể xử lý bản thu. Vui lòng thu lại.");
@@ -341,6 +373,26 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
 
   const reset = discardTake;
 
+  /** Chỉnh tay độ trễ (ms): cắt lại từ bản thu gốc và nhớ giá trị cho các lần thu sau. */
+  const adjustLatency = useCallback(
+    async (nextMs: number) => {
+      const current = takeRef.current;
+      const comp = clampLatencyMs(nextMs);
+      setLatencyMs(comp);
+      storedLatencyRef.current = comp;
+      if (latencyKeyRef.current) writeStoredLatencyMs(latencyKeyRef.current, comp);
+      if (!current?.rawBlob || statusRef.current !== "preview") return;
+      try {
+        const next = await buildTake(current.rawBlob, comp);
+        if (takeRef.current === current && statusRef.current === "preview") replaceTake(next);
+        else URL.revokeObjectURL(next.url);
+      } catch {
+        toast.error("Không thể chỉnh độ trễ bản thu. Vui lòng thử lại.");
+      }
+    },
+    [replaceTake]
+  );
+
   const beginRecording = useCallback(
     (stream: MediaStream, beatMs: number) => {
       const recorder = new MediaRecorder(stream);
@@ -349,9 +401,14 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
         if (event.data.size > 0) chunksRef.current.push(event.data);
       };
       recorderRef.current = recorder;
+      recorderStartPerfRef.current = null;
+      recorder.onstart = () => {
+        recorderStartPerfRef.current = performance.now();
+      };
       recorder.start();
       suppressOwnRef.current = true;
       applyVolumes();
+      playCallPerfRef.current = performance.now();
       playTracksFrom(0, 1);
       const startedAt = Date.now();
       setRecordingStartedAt(startedAt);
@@ -390,6 +447,13 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
         return;
       }
       streamRef.current = stream;
+      // `latency` có trong spec Media Capture nhưng chưa có trong kiểu DOM của TypeScript
+      const micSettings: (MediaTrackSettings & { latency?: number }) | undefined = stream
+        .getAudioTracks()[0]
+        ?.getSettings();
+      inputLatencySecRef.current = micSettings?.latency ?? 0;
+      latencyKeyRef.current = latencyStorageKey(micSettings?.deviceId, mode);
+      storedLatencyRef.current = readStoredLatencyMs(latencyKeyRef.current);
       if (import.meta.env.DEV) {
         (window as unknown as { __ensembleMicSettings?: MediaTrackSettings }).__ensembleMicSettings = stream
           .getAudioTracks()[0]
@@ -447,6 +511,8 @@ export function useEnsemblePractice(pieceId: string, assignmentId: string | unde
     trackAnalysers,
     isCountInOn,
     setIsCountInOn,
+    latencyMs,
+    adjustLatency,
     isMetronomeOn,
     setIsMetronomeOn,
     micError,

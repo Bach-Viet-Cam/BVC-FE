@@ -55,8 +55,9 @@ export function useTakePlayback(take: EnsembleTake | null, accompaniment: Accomp
     const element = playerRef.current;
     if (!element) return;
     if (element.paused) {
-      void element.play();
+      // Hai lệnh play() liền nhau trong cùng một tick để giảm lệch giữa bản thu và các bè
       if (accompanimentRef.current.enabled) accompanimentRef.current.play(element.currentTime, element.playbackRate);
+      void element.play();
       setPlaying(true);
     } else {
       element.pause();

@@ -60,6 +60,10 @@ export interface EnsembleTake {
   url: string;
   peaks: number[];
   durationSec: number;
+  /** WAV chưa cắt độ trễ; chỉ có với bản thu từ micro, dùng để cắt lại khi chỉnh bù độ trễ. */
+  rawBlob?: Blob;
+  /** Độ trễ (ms) đã cắt khỏi đầu bản thu. */
+  latencyMs?: number;
 }
 
 export interface SeatPosition {

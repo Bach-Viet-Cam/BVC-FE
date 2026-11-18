@@ -43,6 +43,7 @@ vi.mock("@/features/ensemble/api/ensembleApi", () => ({
 }));
 vi.mock("@/features/ensemble/utils/wavEncoder", () => ({
   encodeWav: async () => new Blob(["wav"], { type: "audio/wav" }),
+  trimWav: async (wav: Blob) => wav,
 }));
 
 const gains: { gain: { value: number } }[] = [];
