@@ -1,4 +1,5 @@
 import { FaqManagePage } from "@/features/platform/pages/FaqManagePage";
+import { LlmKeyManagePage } from "@/features/platform/pages/LlmKeyManagePage";
 import { AudioAnalysisTestPage } from "@/features/practice/pages/AudioAnalysisTestPage";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
@@ -213,6 +214,7 @@ export function AppRouter() {
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/admin/users" element={<UserManagePage />} />
             <Route path="/admin/faqs" element={<FaqManagePage />} />
+            <Route path="/admin/llm-keys" element={<LlmKeyManagePage />} />
             <Route path="/admin/config" element={<SystemConfigPage />} />
             <Route path="/admin/instruments" element={<InstrumentConfigPage />} />
             <Route path="/admin/categories" element={<CategoriesAdminPage />} />
