@@ -1,3 +1,5 @@
+import type { AudioUploadSource } from "@/features/practice/types/audioAnalysisTypes";
+
 export interface EnsembleTrack {
   id: string;
   instrumentId: string;
@@ -64,6 +66,8 @@ export interface EnsembleTake {
   rawBlob?: Blob;
   /** Độ trễ (ms) đã cắt khỏi đầu bản thu. */
   latencyMs?: number;
+  // Ghi âm trực tiếp chỉ được server cắt cuối, file chọn từ máy được cắt cả hai đầu
+  source: AudioUploadSource;
 }
 
 export interface SeatPosition {
@@ -78,7 +82,7 @@ export interface EnsembleAssignmentInfo {
   deadline: string;
   canSubmit: boolean;
   usedSubmissions: number;
-  maxSubmissions: number;
+  maxSubmissions: number | null;
 }
 
 export type ListeningMode = "headphones" | "speaker";

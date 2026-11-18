@@ -44,6 +44,7 @@ describe("toCopyRows", () => {
           description: "mô tả",
           sheetMusic: null,
           requiredBpm: 90,
+          maxSubmissions: null,
           status: "CLOSED",
         },
         {
@@ -67,6 +68,7 @@ describe("toCopyRows", () => {
       kind: "SOLO",
       sheetMusicId: null,
       requiredBpm: 90,
+      maxSubmissions: null,
     });
   });
 });

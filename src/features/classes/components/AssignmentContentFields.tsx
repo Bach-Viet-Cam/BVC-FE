@@ -127,6 +127,21 @@ export function AssignmentContentFields<V extends ContentValues>({
           className={cn(INPUT_CLASSES, "font-bvc-mono")}
         />
       </FormField>
+      <FormField
+        htmlFor={`${idPrefix}-max-submissions`}
+        label="Giới hạn lượt nộp"
+        hint="Bỏ trống để không giới hạn"
+        error={errors.maxSubmissions?.message}
+      >
+        <input
+          id={`${idPrefix}-max-submissions`}
+          inputMode="numeric"
+          {...register("maxSubmissions")}
+          placeholder="Không giới hạn"
+          aria-invalid={Boolean(errors.maxSubmissions)}
+          className={INPUT_CLASSES}
+        />
+      </FormField>
     </>
   );
 }

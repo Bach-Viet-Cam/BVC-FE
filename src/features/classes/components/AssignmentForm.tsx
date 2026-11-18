@@ -21,7 +21,15 @@ import {
 import { type DraftFormHandle } from "@/shared/hooks/useLeaveGuard";
 import { useReportDirty } from "@/shared/hooks/useReportDirty";
 
-const FORM_FIELDS = ["classId", "title", "kind", "description", "sheetMusicId", "requiredBpm"] as const;
+const FORM_FIELDS = [
+  "classId",
+  "title",
+  "kind",
+  "description",
+  "sheetMusicId",
+  "requiredBpm",
+  "maxSubmissions",
+] as const;
 
 interface AssignmentFormProps {
   mode: "create" | "edit";

@@ -6,9 +6,9 @@ export interface PracticeContextAssignment {
   title: string;
   description: string;
   deadline: string;
-  maxSubmissions: number;
+  maxSubmissions: number | null;
   usedSubmissions: number;
-  remainingSubmissions: number;
+  remainingSubmissions: number | null;
   targetBpm: number | null;
   state: PracticeAssignmentState;
   countsTowardAssignment: boolean;

@@ -23,6 +23,7 @@ function song(overrides: Partial<LecturerPiece> = {}): LecturerPiece {
     canEdit: true,
     canManageSheets: true,
     sheetMusicCount: 3,
+    publicSheetMusicCount: 3,
     mySheetMusicCount: 3,
     createdAt: "2026-11-01T00:00:00.000Z",
     updatedAt: "2026-11-10T00:00:00.000Z",

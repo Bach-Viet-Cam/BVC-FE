@@ -49,6 +49,17 @@ export interface PracticeResult {
   issues: ResultIssue[];
   qualityWarnings: QualityWarning[];
   audio: { teacherUrl: string | null; studentUrl: string | null };
+  // Chỉ có khi giảng viên của lớp mở bài nộp
+  lecturerReview?: LecturerReview;
+}
+
+export interface LecturerReview {
+  comment: { content: string; updatedAt: string } | null;
+  canComment: boolean;
+  student: { id: string; fullName: string; studentCode: string | null };
+  classId: string;
+  // Đếm mọi lần nộp của bài (kể cả lần lỗi), khớp với trang thống kê
+  attemptNo: number;
 }
 
 export interface ResultAttempt {

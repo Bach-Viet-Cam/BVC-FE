@@ -8,7 +8,7 @@ export function getAssignmentBucket(item: AssignmentListItem, now: Date): Assign
   if (item.status === "OVERDUE") return "overdue";
   if (item.status === "PASSED") return "submitted";
   const isOpen = new Date(item.deadline).getTime() >= now.getTime();
-  const hasAttemptsLeft = item.usedSubmissions < item.maxSubmissions;
+  const hasAttemptsLeft = item.maxSubmissions === null || item.usedSubmissions < item.maxSubmissions;
   return isOpen && hasAttemptsLeft ? "todo" : "submitted";
 }
 

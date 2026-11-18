@@ -1,4 +1,6 @@
+import { AiRatingHistoryPage } from "@/features/platform/pages/AiRatingHistoryPage";
 import { FaqManagePage } from "@/features/platform/pages/FaqManagePage";
+import { LlmKeyManagePage } from "@/features/platform/pages/LlmKeyManagePage";
 import { AudioAnalysisTestPage } from "@/features/practice/pages/AudioAnalysisTestPage";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
@@ -54,8 +56,8 @@ import { ReviewPage } from "@/features/classes/pages/ReviewPage";
 import { AssignmentFormPage } from "@/features/classes/pages/AssignmentFormPage";
 import { ClassDetailPage } from "@/features/classes/pages/ClassDetailPage";
 import { ImportStudentsPage } from "@/features/classes/pages/ImportStudentsPage";
-import { TeacherAssignmentDetailPage } from "@/features/classes/pages/TeacherAssignmentDetailPage";
-import { StudentHistoryPage } from "@/features/classes/pages/StudentHistoryPage";
+import { StudentStatsPage } from "@/features/classes/pages/StudentStatsPage";
+import { TeacherSubmissionResultPage } from "@/features/classes/pages/TeacherSubmissionResultPage";
 import { AttentionStudentsPage } from "@/features/classes/pages/AttentionStudentsPage";
 import { TodaySubmissionsPage } from "@/features/classes/pages/TodaySubmissionsPage";
 import { StudentSubmissionsPage } from "@/features/classes/pages/StudentSubmissionsPage";
@@ -184,13 +186,17 @@ export function AppRouter() {
               element={<CreateRedirect to="/teacher/classes/:classId" name="member" />}
             />
             <Route path="/teacher/classes/:classId/import" element={<ImportStudentsPage />} />
-            <Route path="/teacher/classes/:classId/students/:studentId" element={<StudentHistoryPage />} />
+            <Route path="/teacher/classes/:classId/students/:studentId" element={<StudentStatsPage />} />
+            <Route
+              path="/teacher/classes/:classId/students/:studentId/submissions/:submissionId"
+              element={<TeacherSubmissionResultPage />}
+            />
             <Route
               path="/teacher/assignments/new"
               element={<CreateRedirect to="/teacher/assignments" name="assignment" />}
             />
             <Route path="/teacher/assignments/:assignmentId/edit" element={<AssignmentFormPage />} />
-            <Route path="/teacher/assignments/:assignmentId" element={<TeacherAssignmentDetailPage />} />
+            <Route path="/teacher/assignments/:assignmentId" element={<AssignmentListPage />} />
             <Route path="/teacher/assignments/:assignmentId/students/:studentId" element={<StudentSubmissionsPage />} />
             <Route path="/teacher/review" element={<ReviewPage />} />
             <Route path="/teacher/student-review" element={<StudentReviewPage />} />
@@ -212,7 +218,9 @@ export function AppRouter() {
           <Route element={<DesktopLayout />}>
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/admin/users" element={<UserManagePage />} />
+            <Route path="/admin/ai-ratings" element={<AiRatingHistoryPage />} />
             <Route path="/admin/faqs" element={<FaqManagePage />} />
+            <Route path="/admin/llm-keys" element={<LlmKeyManagePage />} />
             <Route path="/admin/config" element={<SystemConfigPage />} />
             <Route path="/admin/instruments" element={<InstrumentConfigPage />} />
             <Route path="/admin/categories" element={<CategoriesAdminPage />} />

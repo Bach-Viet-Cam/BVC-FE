@@ -27,7 +27,8 @@ export function NextAssignmentCard({ assignment, now }: NextAssignmentCardProps)
         </h2>
         <p className="mt-2 text-[14px] text-bvc-ink/80 tabular-nums">
           {assignment.className} · {formatDeadlineLine(assignment.deadline, true, now)} · Chuẩn {assignment.minAccuracy}
-          % · Lượt {assignment.usedSubmissions}/{assignment.maxSubmissions}
+          % · Lượt {assignment.usedSubmissions}
+          {assignment.maxSubmissions === null ? " · Không giới hạn" : `/${assignment.maxSubmissions}`}
         </p>
       </div>
       <Link
