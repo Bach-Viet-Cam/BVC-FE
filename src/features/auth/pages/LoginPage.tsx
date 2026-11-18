@@ -1,5 +1,5 @@
 import { GoogleLogin } from "@react-oauth/google";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import bannerImage from "@/assets/image/Artboard 3.png";
@@ -9,7 +9,7 @@ import { useGoogleButtonWidth } from "@/features/auth/hooks/useGoogleButtonWidth
 import { useLogin } from "@/features/auth/hooks/useLogin";
 import { Eyebrow } from "@/shared/components/bvc/SectionIntro";
 import { useAuth } from "@/shared/context/AuthContext";
-import { getRoleHome } from "@/shared/utils/roleHome";
+import { resolveReturnTarget } from "@/shared/utils/returnTo";
 import { usePageMeta } from "@/shared/hooks/usePageMeta";
 
 export function LoginPage() {
@@ -17,10 +17,12 @@ export function LoginPage() {
   const { login, isLoading, error, setError, isCreateAccountOpen, confirmCreateAccount, cancelCreateAccount } =
     useLogin();
   const { user, isLoading: isAuthLoading } = useAuth();
+  const location = useLocation();
   const { containerRef, width: googleButtonWidth } = useGoogleButtonWidth();
 
   if (isAuthLoading) return <p className="p-6 text-center text-bvc-muted">Đang kiểm tra phiên đăng nhập...</p>;
-  if (user) return <Navigate to={getRoleHome(user.role)} replace />;
+  // Đã đăng nhập (session restore / mở lại /login) thì vẫn về đúng trang khách đang xem
+  if (user) return <Navigate to={resolveReturnTarget(location.state, user.role)} replace />;
 
   return (
     <div className="relative isolate flex min-h-dvh flex-col overflow-hidden bg-bvc-ink text-white">

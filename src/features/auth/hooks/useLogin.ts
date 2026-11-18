@@ -3,22 +3,8 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { authApi } from "@/features/auth/api/authApi";
 import { useAuth } from "@/shared/context/AuthContext";
-import { getRoleHome } from "@/shared/utils/roleHome";
+import { resolveReturnTarget } from "@/shared/utils/returnTo";
 import { getApiErrorMessage } from "@/shared/utils/getApiErrorMessage";
-
-// Trang gửi người dùng tới /login (vd. khách bấm Lưu ở thư viện) truyền state.from để quay lại đúng chỗ
-function redirectTarget(state: unknown) {
-  if (
-    state &&
-    typeof state === "object" &&
-    "from" in state &&
-    typeof state.from === "string" &&
-    state.from.startsWith("/")
-  ) {
-    return state.from;
-  }
-  return null;
-}
 
 // BE trả data.reason khi email Google chưa có tài khoản nào trong hệ thống
 function isAccountNotProvisioned(error: unknown) {
@@ -45,7 +31,7 @@ export function useLogin() {
       setPendingCredential(null);
       localStorage.setItem("accessToken", data.data.accessToken);
       setUser(data.data.user);
-      navigate(redirectTarget(location.state) ?? getRoleHome(data.data.user.role), { replace: true });
+      navigate(resolveReturnTarget(location.state, data.data.user.role), { replace: true });
     } catch (err: unknown) {
       if (!createIfMissing && isAccountNotProvisioned(err)) {
         setPendingCredential(credential);

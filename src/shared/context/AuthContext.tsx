@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { authApi } from "@/features/auth/api/authApi";
 import { clearAsyncDataCache } from "@/shared/hooks/useAsyncData";
+import { clearReturnTo } from "@/shared/utils/returnTo";
 
 export type UserInfo = {
   userId: string;
@@ -51,6 +52,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       for (const key of Object.keys(sessionStorage)) {
         if (key.startsWith('audio-evaluation:')) sessionStorage.removeItem(key);
       }
+      // Địa chỉ khách đang xem không được sống qua lần đăng nhập của người khác
+      clearReturnTo();
     }
     // Dữ liệu cache (vd. cờ "đã lưu") thuộc về người xem trước, đổi người là bỏ
     clearAsyncDataCache();
