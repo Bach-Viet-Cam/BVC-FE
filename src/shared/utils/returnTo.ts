@@ -87,7 +87,13 @@ export function saveReturnTo(path: string): void {
 // state.from là trang liền trước; sessionStorage chỉ là dự phòng. Cả hai phải qua cùng một bộ lọc.
 export function resolveReturnTarget(state: unknown, role: number): string {
   const candidates = [fromState(state), readStored()];
-  const target = candidates.find((candidate) => isSafePath(candidate) && isAllowedForRole(candidate, role));
+  let target: string | undefined;
+  for (const candidate of candidates) {
+    if (isSafePath(candidate) && isAllowedForRole(candidate, role)) {
+      target = candidate;
+      break;
+    }
+  }
   clearReturnTo();
   return target ?? getRoleHome(role);
 }
