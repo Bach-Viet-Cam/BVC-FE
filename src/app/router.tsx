@@ -66,6 +66,7 @@ import { StudentSubmissionsPage } from "@/features/classes/pages/StudentSubmissi
 import { SongManagePage } from "@/features/music-library/pages/SongManagePage";
 import { SongFormPage } from "@/features/music-library/pages/SongFormPage";
 import { SheetManagePage } from "@/features/music-library/pages/SheetManagePage";
+import { SheetRecordPage } from "@/features/music-library/pages/SheetRecordPage";
 
 // Desktop - platform
 import { AdminPage } from "@/features/platform/pages/AdminPage";
@@ -207,6 +208,7 @@ export function AppRouter() {
           <Route path="/songs/new" element={<CreateRedirect to="/songs" name="song" />} />
           <Route path="/songs/:songId/edit" element={<SongFormPage />} />
           <Route path="/songs/:songId/sheets" element={<SheetManagePage />} />
+          <Route path="/songs/:songId/sheets/record" element={<SheetRecordPage />} />
 
           {/* Community - desktop */}
           {/* Bonus tạo bằng form bài tập chung (chọn loại Bonus) */}

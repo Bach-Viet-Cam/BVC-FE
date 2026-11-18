@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AudioLines, FileText, Video } from "lucide-react";
+import { FileText, Video } from "lucide-react";
 import { ActionButton } from "@/shared/components/bvc/ActionButton";
 import { ChoiceCards } from "@/shared/components/bvc/ChoiceCards";
 import { cn } from "@/shared/utils/cn";
@@ -9,6 +10,7 @@ import { FileField } from "@/shared/components/bvc/FileField";
 import { FormDialog } from "@/shared/components/bvc/FormDialog";
 import { FormField } from "@/shared/components/bvc/FormField";
 import { FormBody, FormFooter } from "@/shared/components/bvc/FormLayout";
+import { ReferenceRecordingField } from "@/features/music-library/components/ReferenceRecordingField";
 import { fieldClass } from "@/shared/components/bvc/fieldStyles";
 import type { SelectOption } from "@/shared/types/commonTypes";
 import {
@@ -21,6 +23,7 @@ import type { CategoryRef } from "@/features/music-library/types/musicLibraryTyp
 import { withCurrentOptions } from "@/features/music-library/utils/categoryOptions";
 import type { FormFailure } from "@/features/music-library/utils/formFailure";
 import { formatDuration, formatFileSize } from "@/features/music-library/utils/mediaUtils";
+import { saveSheetDraft } from "@/features/music-library/utils/sheetDraftStore";
 import { createSheetSchema, type SheetFormValues } from "@/features/music-library/utils/validateSheet";
 
 interface SheetFormDialogProps {
@@ -28,6 +31,10 @@ interface SheetFormDialogProps {
   sheets: LecturerSheetMusic[];
   editing?: LecturerSheetMusic;
   presetInstrumentId?: string;
+  // Bản thu mang về từ trang ghi âm trực tiếp; null khi mở form bình thường
+  initialRecording?: File | null;
+  // Các ô đã gõ trước khi sang trang thu âm; giữ lại để không mất tiến trình
+  initialDraft?: SheetFormValues | null;
   // Mọi nhạc cụ đang hoạt động + nhạc cụ bài đã dùng; nhạc cụ của bài suy ra từ các bản nhạc
   instrumentOptions: CategoryRef[];
   levelOptions: SelectOption[];
@@ -61,11 +68,14 @@ export function SheetFormDialog({
   sheets,
   editing,
   presetInstrumentId,
+  initialRecording,
+  initialDraft,
   instrumentOptions: availableInstruments,
   levelOptions,
   onCancel,
   onSubmit,
 }: SheetFormDialogProps) {
+  const navigate = useNavigate();
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const schema = useMemo(
@@ -92,15 +102,15 @@ export function SheetFormDialog({
   } = useForm<SheetFormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      name: editing?.name ?? "",
-      description: editing?.description ?? "",
-      instrumentId: initialInstrumentId,
-      levelId: editing?.level.id ?? "",
-      isMain: editing?.isMain ?? mainRuleFor(initialInstrumentId, sheets).canBeMain,
-      visibility: editing?.visibility ?? "PUBLIC",
-      sheetFile: null,
-      referenceRecording: null,
-      tutorialVideo: null,
+      name: initialDraft?.name ?? editing?.name ?? "",
+      description: initialDraft?.description ?? editing?.description ?? "",
+      instrumentId: initialDraft?.instrumentId ?? initialInstrumentId,
+      levelId: initialDraft?.levelId ?? editing?.level.id ?? "",
+      isMain: initialDraft?.isMain ?? editing?.isMain ?? mainRuleFor(initialInstrumentId, sheets).canBeMain,
+      visibility: initialDraft?.visibility ?? editing?.visibility ?? "PUBLIC",
+      sheetFile: initialDraft?.sheetFile ?? null,
+      referenceRecording: initialRecording ?? null,
+      tutorialVideo: initialDraft?.tutorialVideo ?? null,
     },
   });
 
@@ -124,6 +134,14 @@ export function SheetFormDialog({
       setValue("name", "", { shouldDirty: true });
     }
   }, [isNameLocked, mainName, setValue, getValues]);
+
+  // Trở về từ trang thu âm: dùng ngay file WAV vừa ghi được làm bản thu mẫu
+  useEffect(() => {
+    if (initialRecording instanceof File) {
+      setValue("referenceRecording", initialRecording, { shouldValidate: true, shouldDirty: true });
+    }
+  }, [initialRecording, setValue]);
+
   const kindHint = rule.canBeMain
     ? `${instrumentName} chưa có bản chính, có thể tạo bản theo độ khó trước.`
     : `${instrumentName} đã có bản chính nên chỉ thêm được bản theo độ khó.`;
@@ -267,18 +285,20 @@ export function SheetFormDialog({
             <FormField
               label="Bản thu mẫu"
               required={isMain && visibility === "PUBLIC"}
-              hint="Bắt buộc với bản chính khi công khai, tùy chọn với bản theo độ khó · MP3, WAV, M4A"
+              hint="Bắt buộc với bản chính khi công khai, tùy chọn với bản theo độ khó"
               error={errors.referenceRecording?.message}
             >
-              <FileField
-                ariaLabel="Chọn bản thu mẫu"
+              <ReferenceRecordingField
                 accept={FILE_RULES.recording.accept}
-                icon={<AudioLines className="size-4" strokeWidth={1.8} />}
-                emptyLabel="Chọn file MP3, WAV, M4A"
-                currentName={recordingFile?.name ?? existingFiles?.audio?.name}
-                currentMeta={recordingDuration !== undefined ? formatDuration(recordingDuration) : undefined}
+                fileName={recordingFile?.name ?? existingFiles?.audio?.name}
+                fileMeta={recordingDuration !== undefined ? formatDuration(recordingDuration) : undefined}
                 hasError={Boolean(errors.referenceRecording)}
-                onSelect={(file) => setValue("referenceRecording", file, { shouldValidate: true, shouldDirty: true })}
+                canRecord={!editing}
+                onPick={(file) => setValue("referenceRecording", file, { shouldValidate: true, shouldDirty: true })}
+                onRecord={() => {
+                  saveSheetDraft(getValues());
+                  navigate(`/songs/${song.id}/sheets/record?instrumentId=${encodeURIComponent(instrumentId)}`);
+                }}
               />
             </FormField>
 
