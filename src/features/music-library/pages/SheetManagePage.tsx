@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { TeacherShell } from "@/shared/components/bvc/TeacherShell";
 import { TeacherPageHeader } from "@/shared/components/bvc/TeacherPageHeader";
@@ -16,24 +16,46 @@ import { useVisibilityConfirm } from "@/features/music-library/hooks/useVisibili
 import type { LecturerSheetMusic } from "@/features/music-library/types/lecturerTypes";
 import { pieceLockMessage } from "@/features/music-library/utils/pieceAccess";
 import { sheetViewerHref } from "@/features/music-library/utils/sheetUtils";
+import { clearSheetDraft, getSheetDraft } from "@/features/music-library/utils/sheetDraftStore";
 import type { SheetFormValues } from "@/features/music-library/utils/validateSheet";
 
 type PanelState = { mode: "create"; instrumentId?: string } | { mode: "edit"; sheet: LecturerSheetMusic } | null;
 
 export function SheetManagePage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { songId = "" } = useParams();
   const [params, setParams] = useSearchParams();
+  const incoming = (location.state as { recordedReference?: unknown } | null)?.recordedReference;
+  const recordedFromFile = incoming instanceof File ? incoming : null;
+  const [recordedReference, setRecordedReference] = useState<File | null>(recordedFromFile);
+  // Chỉ nhận bản nháp khi quay về từ trang thu âm có kèm file; lượt mở form bình thường không dính bản cũ
+  const [draft, setDraft] = useState<SheetFormValues | null>(() => (recordedFromFile ? getSheetDraft() : null));
   const { options } = useMusicCategories("lecturer");
   const data = useSongSheets(songId);
   const visibility = useVisibilityConfirm(data.changeVisibility);
-  // Mở sẵn form khi đi từ nút "Tạo bản nhạc" ở trang chi tiết bài hát (?new=1&instrument=...)
+  // Mở sẵn form khi đi từ nút "Tạo bản nhạc" hoặc vừa thu âm xong quay về (?new=1&instrument=...)
   const [panel, setPanel] = useState<PanelState>(() =>
-    params.get("new") ? { mode: "create", instrumentId: params.get("instrument") ?? undefined } : null
+    params.get("new") || recordedFromFile
+      ? { mode: "create", instrumentId: params.get("instrument") ?? undefined }
+      : null
   );
+
+  // File chỉ được giữ trong history state của lần chuyển trang này; xoá sau khi form đã nhận
+  useEffect(() => {
+    if (!recordedFromFile) return;
+    navigate(location.pathname + location.search, { replace: true, state: null });
+  }, [recordedFromFile, location.pathname, location.search, navigate]);
+
+  useEffect(() => {
+    clearSheetDraft();
+  }, []);
 
   const closePanel = () => {
     setPanel(null);
+    setRecordedReference(null);
+    setDraft(null);
+    clearSheetDraft();
     if (params.has("new")) setParams({}, { replace: true });
   };
 
@@ -125,6 +147,8 @@ export function SheetManagePage() {
           sheets={sheets}
           editing={panel.mode === "edit" ? panel.sheet : undefined}
           presetInstrumentId={panel.mode === "create" ? panel.instrumentId : undefined}
+          initialRecording={recordedReference}
+          initialDraft={draft}
           instrumentOptions={data.instrumentOptions}
           levelOptions={options.levels}
           onCancel={closePanel}

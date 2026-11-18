@@ -35,7 +35,7 @@ function isSafePath(path: unknown): path is string {
   return pathnameOf(decoded) !== "/login";
 }
 
-// Tránh quay lại trang của vai trò khác rồi bị ProtectedRoute đá về home — vẫn là mất tiến trình
+// Tránh quay lại trang của vai trò khác rồi bị ProtectedRoute đá về home - vẫn là mất tiến trình
 function isAllowedForRole(path: string, role: number): boolean {
   const pathname = pathnameOf(path).replace(/\/+$/, "") || "/";
   if (role === ROLES.STUDENT && /^\/(?:teacher|admin|songs|categories|community\/(?:verified|approval)|leaderboard)(?:\/|$)/.test(pathname)) {
