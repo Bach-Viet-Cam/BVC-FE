@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SearchX } from "lucide-react";
 import { SearchField } from "@/shared/components/bvc/SearchField";
 import { Pagination } from "@/shared/components/bvc/Pagination";
@@ -13,12 +13,13 @@ import { SongCard } from "@/features/music-library/components/SongCard";
 import { SongGridSkeleton } from "@/features/music-library/components/SongGridSkeleton";
 import { GuestSaveDialog } from "@/features/music-library/components/GuestSaveDialog";
 import { useLibraryQuery } from "@/features/music-library/hooks/useLibraryQuery";
+import { useLibraryGridColumns } from "@/features/music-library/hooks/useLibraryGridColumns";
 import { useLibrarySongs } from "@/features/music-library/hooks/useLibrarySongs";
 import { useMusicCategories } from "@/features/music-library/hooks/useMusicCategories";
 import { useSaveToggle } from "@/features/music-library/hooks/useSaveToggle";
 import { useTrendingSongs } from "@/features/music-library/hooks/useTrendingSongs";
 import { TrendingCarousel } from "@/features/music-library/components/TrendingCarousel";
-import { KEYWORD_MAX_LENGTH, LIBRARY_MESSAGES } from "@/features/music-library/constants/musicLibraryConstants";
+import { KEYWORD_MAX_LENGTH, LIBRARY_GRID_ROWS, LIBRARY_MESSAGES } from "@/features/music-library/constants/musicLibraryConstants";
 import { PageTitle } from "@/shared/components/bvc/PageTitle";
 import { usePageMeta } from "@/shared/hooks/usePageMeta";
 
@@ -35,7 +36,15 @@ export function LibraryPage() {
   usePageMeta({ title: "Thư viện nhạc", description: "Khám phá thư viện bản nhạc và bài hát nhạc cụ truyền thống công khai trên Bách Việt Cầm." });
   const { query, update, clearFilters, activeFilterCount } = useLibraryQuery();
   const { options } = useMusicCategories();
-  const { result, error, isLoading, isFirstLoad, reload, setSongSaved } = useLibrarySongs(query);
+  const columns = useLibraryGridColumns();
+  const pageSize = columns * LIBRARY_GRID_ROWS;
+  const { result, error, isLoading, isFirstLoad, reload, setSongSaved } = useLibrarySongs({ ...query, pageSize });
+  const previousPageSize = useRef(pageSize);
+  useEffect(() => {
+    if (previousPageSize.current === pageSize) return;
+    previousPageSize.current = pageSize;
+    if (query.page > 1) update({ page: 1 });
+  }, [pageSize, query.page, update]);
   const save = useSaveToggle();
   const trending = useTrendingSongs();
   // Banner chỉ hiện ở trang đầu khi chưa tìm / lọc, để kết quả tìm kiếm luôn nằm ngay dưới ô tìm
@@ -94,7 +103,7 @@ export function LibraryPage() {
             actions={<ActionButton onClick={reload}>Thử lại</ActionButton>}
           />
         ) : isFirstLoad ? (
-          <SongGridSkeleton />
+          <SongGridSkeleton count={pageSize} />
         ) : songs.length === 0 ? (
           <EmptyState
             icon={<SearchX className="size-10" strokeWidth={1.5} />}

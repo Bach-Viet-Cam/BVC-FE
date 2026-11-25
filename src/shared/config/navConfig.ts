@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   Activity,
   BadgeCheck,
+  Bot,
   BookOpen,
   ClipboardCheck,
   ClipboardList,
@@ -86,16 +87,34 @@ export const TEACHER_NAV: NavEntry[] = [
 const ADMIN_NAV: NavEntry[] = [
   { label: "Tổng quan", to: "/admin", icon: LayoutDashboard },
   { label: "Người dùng", to: "/admin/users", icon: Users },
-  { label: "Cấu hình hệ thống", to: "/admin/config", icon: Settings2 },
-  { label: "Cấu hình nhạc cụ", to: "/admin/instruments", icon: Music2, activePrefixes: ["/admin/roadmaps"] },
-  { label: "Phân loại nội dung", to: "/admin/categories", icon: FolderTree },
-  { label: "Giám sát hệ thống", to: "/admin/monitoring", icon: Activity },
-  { label: "Đánh giá phản hồi AI", to: "/admin/ai-ratings", icon: Activity },
-  { label: "Quản lý FAQ", to: "/admin/faqs", icon: BookOpen },
-  { label: "API key LLM", to: "/admin/llm-keys", icon: KeyRound },
-  { label: "Quản lý thông báo", to: "/admin/notifications", icon: Megaphone },
-  { label: "Nội dung đã xác minh", to: "/community/verified", icon: BadgeCheck },
-  { label: "Bảng xếp hạng", to: "/leaderboard", icon: Trophy },
+  {
+    label: "Cấu hình",
+    icon: Settings2,
+    children: [
+      { label: "Cấu hình hệ thống", to: "/admin/config", icon: Settings2 },
+      { label: "Cấu hình nhạc cụ", to: "/admin/instruments", icon: Music2, activePrefixes: ["/admin/roadmaps"] },
+      { label: "API key LLM", to: "/admin/llm-keys", icon: KeyRound },
+    ],
+  },
+  {
+    label: "Nội dung",
+    icon: LibraryBig,
+    children: [
+      { label: "Phân loại nội dung", to: "/admin/categories", icon: FolderTree },
+      { label: "Nội dung đã xác minh", to: "/community/verified", icon: BadgeCheck },
+      { label: "Quản lý FAQ", to: "/admin/faqs", icon: BookOpen },
+      { label: "Bảng xếp hạng", to: "/leaderboard", icon: Trophy },
+    ],
+  },
+  {
+    label: "Vận hành",
+    icon: Activity,
+    children: [
+      { label: "Giám sát hệ thống", to: "/admin/monitoring", icon: Activity },
+      { label: "Đánh giá phản hồi AI", to: "/admin/ai-ratings", icon: Bot },
+      { label: "Quản lý thông báo", to: "/admin/notifications", icon: Megaphone },
+    ],
+  },
 ];
 
 export const STUDENT_TABS: NavItem[] = [

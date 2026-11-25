@@ -112,6 +112,7 @@ export interface LibrarySongQuery {
   levelId: string;
   sort: LibrarySort;
   page: number;
+  pageSize?: number;
 }
 
 // Bài đang hot: nhiều lượt nộp nhất từ thứ Hai tuần này (giờ Việt Nam)
