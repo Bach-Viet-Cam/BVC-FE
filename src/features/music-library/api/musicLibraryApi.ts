@@ -35,7 +35,7 @@ const toLibraryParams = (query: LibrarySongQuery) => ({
   levelIds: query.levelId || undefined,
   sort: query.sort,
   page: query.page,
-  pageSize: LIBRARY_PAGE_SIZE,
+  pageSize: query.pageSize ?? LIBRARY_PAGE_SIZE,
 });
 
 // BE trả media dạng { url, durationSec }; name chỉ dùng làm khoá ổn định cho trình phát

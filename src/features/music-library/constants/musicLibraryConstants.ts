@@ -7,6 +7,7 @@ import type {
 } from "@/features/music-library/types/musicLibraryTypes";
 
 export const LIBRARY_PAGE_SIZE = 12;
+export const LIBRARY_GRID_ROWS = 3;
 export const MANAGE_PAGE_SIZE = 20;
 export const KEYWORD_MAX_LENGTH = 100;
 
