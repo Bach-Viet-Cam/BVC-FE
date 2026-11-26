@@ -1,7 +1,9 @@
 import { axiosClient } from "@/shared/api/axiosClient";
+import { type StudentSubmissions } from "@/features/classes/types/teacherAssignmentTypes";
 import { type ApiResponse } from "@/shared/types/commonTypes";
 import {
   type Challenge,
+  type ChallengeDetail,
   type ChallengeFormMeta,
   type ChallengeListParams,
   type ChallengeListResult,
@@ -16,6 +18,10 @@ const BASE_PATH = "/lecturer/challenges";
 export const challengeApi = {
   list: (params: ChallengeListParams) => axiosClient.get<ApiResponse<ChallengeListResult>>(BASE_PATH, { params }),
   get: (challengeId: string) => axiosClient.get<ApiResponse<Challenge>>(`${BASE_PATH}/${challengeId}`),
+  getDetail: (challengeId: string) =>
+    axiosClient.get<ApiResponse<ChallengeDetail>>(`${BASE_PATH}/${challengeId}/detail`),
+  getStudentSubmissions: (challengeId: string, studentId: string) =>
+    axiosClient.get<ApiResponse<StudentSubmissions>>(`${BASE_PATH}/${challengeId}/students/${studentId}/submissions`),
   create: (payload: CreateChallengePayload) => axiosClient.post<ApiResponse<Challenge>>(BASE_PATH, payload),
   update: (challengeId: string, payload: UpdateChallengePayload) =>
     axiosClient.patch<ApiResponse<Challenge>>(`${BASE_PATH}/${challengeId}`, payload),
