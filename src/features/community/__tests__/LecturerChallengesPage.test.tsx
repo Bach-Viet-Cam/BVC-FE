@@ -1,13 +1,13 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { challengeApi } from "@/features/community/api/challengeApi";
 import { LecturerChallengesPage } from "@/features/community/pages/LecturerChallengesPage";
-import { type Challenge } from "@/features/community/types/challenge";
+import { type Challenge, type ChallengeDetail } from "@/features/community/types/challenge";
 
 vi.mock("@/features/community/api/challengeApi", () => ({
-  challengeApi: { list: vi.fn(), remove: vi.fn(), formMeta: vi.fn(() => new Promise(() => {})) },
+  challengeApi: { list: vi.fn(), remove: vi.fn(), getDetail: vi.fn(), formMeta: vi.fn(() => new Promise(() => {})) },
 }));
 vi.mock("@/features/classes/hooks/useLecturerClasses", () => ({
   useLecturerClasses: () => ({ classes: [], isLoading: false }),
@@ -67,6 +67,44 @@ const renderPage = () =>
     </MemoryRouter>
   );
 
+const renderDrawer = (challengeId: string) =>
+  render(
+    <MemoryRouter initialEntries={[`/teacher/challenges/${challengeId}`]}>
+      <Routes>
+        <Route path="/teacher/challenges/:challengeId" element={<LecturerChallengesPage />} />
+      </Routes>
+    </MemoryRouter>
+  );
+
+function detailOf(challenge: Challenge): ChallengeDetail {
+  return {
+    ...challenge,
+    effectiveMinAccuracy: 70,
+    students: [
+      {
+        studentId: "s1",
+        fullName: "Nguyễn Văn An",
+        studentCode: "SV001",
+        classId: "k3",
+        className: "TRD101",
+        status: "PASSED",
+        submissionCount: 2,
+        lastSubmittedAt: "2026-11-25T03:00:00.000Z",
+        bestAccuracy: 88,
+      },
+    ],
+    practiceStats: {
+      totalPractices: 2,
+      practicedStudents: 1,
+      memberCount: 4,
+      averagePerStudent: 2,
+      last7Days: [{ date: "2026-11-25", count: 2 }],
+    },
+    byClass: [{ classId: "k3", className: "TRD101", practicedStudents: 1, memberCount: 4 }],
+    media: null,
+  };
+}
+
 describe("LecturerChallengesPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -111,6 +149,38 @@ describe("LecturerChallengesPage", () => {
     expect(within(publishedRow).queryByRole("button", { name: "Xóa" })).not.toBeInTheDocument();
     await userEvent.click(within(draftRow).getByRole("button", { name: "Sửa" }));
     expect(navigate).toHaveBeenCalledWith("/teacher/challenges/c1/edit");
+  });
+
+  it("links each row to its detail drawer", async () => {
+    mockList([DRAFT]);
+    renderPage();
+    const title = await screen.findByText("Thử thách tuần cuối năm");
+    expect(title.closest("a")).toHaveAttribute("href", "/teacher/challenges/c1");
+  });
+
+  it("opens the detail drawer from the URL with stats and students", async () => {
+    mockList([PUBLISHED]);
+    vi.mocked(challengeApi.getDetail).mockResolvedValue({ data: { data: detailOf(PUBLISHED) } } as never);
+    renderDrawer("c2");
+    const drawer = await screen.findByRole("dialog");
+    expect(await within(drawer).findByText("Chi tiết thử thách")).toBeInTheDocument();
+    expect(challengeApi.getDetail).toHaveBeenCalledWith("c2");
+    expect(within(drawer).getByText("1 / 4")).toBeInTheDocument();
+    const student = within(drawer).getByText("Nguyễn Văn An").closest("a");
+    expect(student).toHaveAttribute("href", "/teacher/challenges/c2/students/s1");
+    expect(within(drawer).getByText("Đạt")).toBeInTheDocument();
+    expect(within(drawer).queryByRole("link", { name: "Sửa" })).not.toBeInTheDocument();
+    expect(within(drawer).queryByRole("button", { name: "Xóa" })).not.toBeInTheDocument();
+  });
+
+  it("offers Sửa and Xóa in the drawer of a draft", async () => {
+    mockList([DRAFT]);
+    vi.mocked(challengeApi.getDetail).mockResolvedValue({ data: { data: detailOf(DRAFT) } } as never);
+    renderDrawer("c1");
+    const drawer = await screen.findByRole("dialog");
+    const edit = await within(drawer).findByRole("link", { name: "Sửa" });
+    expect(edit).toHaveAttribute("href", "/teacher/challenges/c1/edit");
+    expect(within(drawer).getByRole("button", { name: "Xóa" })).toBeInTheDocument();
   });
 
   it("asks for confirmation before deleting", async () => {

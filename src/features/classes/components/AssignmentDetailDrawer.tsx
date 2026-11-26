@@ -1,11 +1,10 @@
-import { useState, type ReactNode } from "react";
-import { X } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { AssignmentInfoTab } from "@/features/classes/components/AssignmentInfoTab";
 import { AssignmentMediaTab } from "@/features/classes/components/AssignmentMediaTab";
 import { AssignmentPracticeStats } from "@/features/classes/components/AssignmentPracticeStats";
 import { AssignmentStudentRow } from "@/features/classes/components/AssignmentStudentRow";
-import { ListState } from "@/features/classes/components/ListState";
+import { DetailDrawerFrame, DetailDrawerShell } from "@/features/classes/components/DetailDrawerShell";
 import { StatusLabel } from "@/features/classes/components/StatusLabel";
 import { useAssignmentActions } from "@/features/classes/hooks/useAssignmentActions";
 import { useSheetGroupDetail } from "@/features/classes/hooks/useSheetGroupDetail";
@@ -16,7 +15,6 @@ import {
   type SheetGroupDetail,
 } from "@/features/classes/types/teacherAssignmentTypes";
 import {
-  DRAWER_TABS,
   DRAWER_TEXT,
   STATUS_ACTIONS,
   confirmCopy,
@@ -28,8 +26,6 @@ import { ASSIGNMENT_KIND_LABELS, ASSIGNMENT_STATUS_LABELS } from "@/features/cla
 import { ActionButton } from "@/shared/components/bvc/ActionButton";
 import { actionButtonClass } from "@/shared/components/bvc/actionButtonStyles";
 import { ConfirmDialog } from "@/shared/components/bvc/ConfirmDialog";
-import { Sheet, SheetClose, SheetPopup, SheetTitle } from "@/shared/components/ui/sheet";
-import { Tabs, TabsList, TabsPanel, TabsTab } from "@/shared/components/ui/tabs";
 import { toast } from "@/shared/components/ui/toast";
 
 export type AssignmentDrawerTarget = { mode: "class"; assignmentId: string } | { mode: "sheet"; sheetMusicId: string };
@@ -51,8 +47,6 @@ function targetKey(target: AssignmentDrawerTarget): string {
   return target.mode === "class" ? `class:${target.assignmentId}` : `sheet:${target.sheetMusicId}`;
 }
 
-const PADDING = "px-[18px] lg:px-[36px]";
-
 // Right-hand drawer over the assignment list. Class mode: one class's copy with its students and actions.
 // Sheet mode: every copy of one sheet music in the current semester.
 export function AssignmentDetailDrawer({ target, onClose, onChanged, onAssign }: AssignmentDetailDrawerProps) {
@@ -62,102 +56,19 @@ export function AssignmentDetailDrawer({ target, onClose, onChanged, onAssign }:
   const shown = target ?? lastTarget;
 
   return (
-    <Sheet open={target !== null} onOpenChange={(open) => !open && onClose()}>
-      <SheetPopup
-        side="right"
-        showCloseButton={false}
-        backdropClassName="bg-bvc-ink/32 backdrop-blur-none"
-        className="w-full max-w-none gap-0 overflow-hidden rounded-none border-0 bg-white p-0 font-bvc-sans text-bvc-ink shadow-[-12px_0_36px_rgba(18,63,51,0.16)] lg:w-[1040px]"
-      >
-        {shown?.mode === "class" && (
-          <ClassModeContent
-            key={shown.assignmentId}
-            assignmentId={shown.assignmentId}
-            onClose={onClose}
-            onChanged={onChanged}
-          />
-        )}
-        {shown?.mode === "sheet" && (
-          <SheetModeContent key={shown.sheetMusicId} sheetMusicId={shown.sheetMusicId} onAssign={onAssign} />
-        )}
-      </SheetPopup>
-    </Sheet>
-  );
-}
-
-interface ShellProps {
-  title: string;
-  meta: ReactNode;
-  state: { isLoading: boolean; error: string | null; onRetry: () => void };
-  tabs: Record<(typeof DRAWER_TABS)[number]["value"], ReactNode> | null;
-  footer: ReactNode;
-}
-
-function DrawerShell({ title, meta, state, tabs, footer }: ShellProps) {
-  return (
-    <Tabs defaultValue="practice" className="flex min-h-0 grow flex-col">
-      <header
-        className={`flex shrink-0 flex-col gap-[16px] border-b border-bvc-border pt-[22px] lg:pt-[26px] ${PADDING}`}
-      >
-        <div className="flex items-start gap-[14px]">
-          <div className="flex min-w-0 grow flex-col gap-[6px]">
-            <span className="text-[12px] font-bold tracking-[0.12em] text-bvc-muted uppercase">
-              {DRAWER_TEXT.overline}
-            </span>
-            <SheetTitle className="m-0 text-[22px] leading-[1.2] font-extrabold tracking-[-0.025em] lg:text-[28px]">
-              {title}
-            </SheetTitle>
-            {meta && <div className="flex flex-wrap items-center gap-[10px] text-[13px] text-bvc-muted">{meta}</div>}
-          </div>
-          <SheetClose
-            aria-label={DRAWER_TEXT.close}
-            className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-bvc-xl border border-bvc-border-strong bg-white text-bvc-ink hover:bg-bvc-surface"
-          >
-            <X size={18} strokeWidth={2} aria-hidden="true" />
-          </SheetClose>
-        </div>
-        <TabsList
-          aria-label={DRAWER_TEXT.tabsLabel}
-          className="flex gap-[4px] overflow-x-auto rounded-none bg-transparent p-0"
-        >
-          {DRAWER_TABS.map((tab) => (
-            <TabsTab
-              key={tab.value}
-              value={tab.value}
-              className="min-h-[48px] shrink-0 cursor-pointer rounded-none border-b-[3px] border-transparent px-[16px] text-[14px] font-semibold whitespace-nowrap text-bvc-muted hover:text-bvc-ink data-selected:border-bvc-ink data-selected:bg-transparent data-selected:font-bold data-selected:text-bvc-ink data-selected:shadow-none lg:px-[20px] lg:text-[15px]"
-            >
-              {tab.label}
-            </TabsTab>
-          ))}
-        </TabsList>
-      </header>
-      <div className={`min-h-0 grow overflow-y-auto pt-[22px] pb-[26px] lg:pt-[28px] lg:pb-[30px] ${PADDING}`}>
-        {tabs ? (
-          DRAWER_TABS.map((tab) => (
-            <TabsPanel key={tab.value} value={tab.value} className="pt-0">
-              {tabs[tab.value]}
-            </TabsPanel>
-          ))
-        ) : (
-          <ListState
-            isLoading={state.isLoading}
-            error={state.error}
-            isEmpty={false}
-            emptyMessage=""
-            onRetry={state.onRetry}
-          >
-            {null}
-          </ListState>
-        )}
-      </div>
-      {tabs && footer && (
-        <footer
-          className={`flex shrink-0 flex-wrap items-center gap-[10px] border-t border-bvc-border pt-[14px] pb-[16px] lg:pt-[16px] lg:pb-[18px] ${PADDING}`}
-        >
-          {footer}
-        </footer>
+    <DetailDrawerFrame open={target !== null} onClose={onClose}>
+      {shown?.mode === "class" && (
+        <ClassModeContent
+          key={shown.assignmentId}
+          assignmentId={shown.assignmentId}
+          onClose={onClose}
+          onChanged={onChanged}
+        />
       )}
-    </Tabs>
+      {shown?.mode === "sheet" && (
+        <SheetModeContent key={shown.sheetMusicId} sheetMusicId={shown.sheetMusicId} onAssign={onAssign} />
+      )}
+    </DetailDrawerFrame>
   );
 }
 
@@ -173,7 +84,9 @@ function ClassModeContent({
   const { assignment, isLoading, error, reload } = useTeacherAssignmentDetail(assignmentId);
   const current = assignment?.id === assignmentId ? assignment : null;
   return (
-    <DrawerShell
+    <DetailDrawerShell
+      overline={DRAWER_TEXT.overline}
+      tabsLabel={DRAWER_TEXT.tabsLabel}
       title={current?.title ?? DRAWER_TEXT.overline}
       meta={
         current && (
@@ -228,7 +141,11 @@ function StudentList({ assignment }: { assignment: AssignmentDetail }) {
       ) : (
         <div className="flex flex-col gap-[10px]">
           {assignment.students.map((student) => (
-            <AssignmentStudentRow key={student.studentId} assignmentId={assignment.id} student={student} />
+            <AssignmentStudentRow
+              key={student.studentId}
+              href={`/teacher/assignments/${assignment.id}/students/${student.studentId}`}
+              student={student}
+            />
           ))}
         </div>
       )}
@@ -317,7 +234,9 @@ function SheetModeContent({ sheetMusicId, onAssign }: { sheetMusicId: string; on
     if (current) onAssign([...new Set(current.assignments.map((copy) => assignmentGroupKey(copy)))]);
   };
   return (
-    <DrawerShell
+    <DetailDrawerShell
+      overline={DRAWER_TEXT.overline}
+      tabsLabel={DRAWER_TEXT.tabsLabel}
       title={current ? current.sheetMusic.pieceTitle || current.sheetMusic.name : DRAWER_TEXT.overline}
       meta={current && <span>{sheetGroupMeta(current.assignments)}</span>}
       state={{ isLoading, error, onRetry: reload }}

@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { ActionButton } from "@/shared/components/bvc/ActionButton";
 import { ConfirmDialog } from "@/shared/components/bvc/ConfirmDialog";
 import { ListState } from "@/features/classes/components/ListState";
 import { ChallengeCreateDialog } from "@/features/community/components/ChallengeCreateDialog";
+import { ChallengeDetailDrawer } from "@/features/community/components/ChallengeDetailDrawer";
 import { ChallengeStatusBadge } from "@/features/community/components/ChallengeStatusBadge";
 import { useLecturerChallenges } from "@/features/community/hooks/useLecturerChallenges";
 import { type Challenge } from "@/features/community/types/challenge";
-import { formatWeekRange } from "@/features/community/utils/challengeFormat";
+import { challengeWeekText } from "@/features/community/utils/challengeFormat";
 import { EmptyState } from "@/shared/components/bvc/EmptyState";
 import { Pagination } from "@/shared/components/bvc/Pagination";
 import { TeacherPageHeader } from "@/shared/components/bvc/TeacherPageHeader";
@@ -24,21 +25,26 @@ interface ChallengeRowProps {
 
 function ChallengeRow({ challenge, onEdit, onDelete }: ChallengeRowProps) {
   const isDraft = challenge.status === "DRAFT";
-  const week =
-    challenge.startsAt && challenge.endsAt ? formatWeekRange(challenge.startsAt, challenge.endsAt) : "Chưa chọn tuần";
+  const week = challengeWeekText(challenge);
   const scope = challenge.classes.length > 0 ? challenge.classes.map((item) => item.name).join(", ") : "Chưa chọn lớp";
 
   return (
-    <li className="flex flex-col gap-[10px] rounded-bvc-xl border border-bvc-border p-[15px] lg:flex-row lg:items-center lg:gap-[16px]">
-      <div className="flex min-w-0 flex-1 flex-col gap-[3px]">
-        <span className="truncate text-[15px] font-semibold text-bvc-ink">{challenge.title}</span>
-        <span className="text-[13px] text-bvc-muted">{challenge.instrument?.name ?? "Chưa chọn nhạc cụ"}</span>
-      </div>
-      <span className="font-mono text-[13px] text-bvc-muted lg:w-[170px]">{week}</span>
-      <span className="min-w-0 text-[13px] text-bvc-muted lg:w-[200px]">{scope}</span>
-      <span className="lg:w-[120px]">
-        <ChallengeStatusBadge status={challenge.displayStatus} />
-      </span>
+    <li className="flex flex-col gap-[10px] rounded-bvc-xl border border-bvc-border p-[15px] hover:bg-bvc-surface lg:flex-row lg:items-center lg:gap-[16px]">
+      {/* Opens the detail drawer; the draft buttons stay outside the link */}
+      <Link
+        to={`/teacher/challenges/${challenge.id}`}
+        className="flex min-w-0 flex-1 flex-col gap-[10px] text-bvc-ink lg:flex-row lg:items-center lg:gap-[16px]"
+      >
+        <span className="flex min-w-0 flex-1 flex-col gap-[3px]">
+          <span className="truncate text-[15px] font-semibold text-bvc-ink">{challenge.title}</span>
+          <span className="text-[13px] text-bvc-muted">{challenge.instrument?.name ?? "Chưa chọn nhạc cụ"}</span>
+        </span>
+        <span className="font-mono text-[13px] text-bvc-muted lg:w-[170px]">{week}</span>
+        <span className="min-w-0 text-[13px] text-bvc-muted lg:w-[200px]">{scope}</span>
+        <span className="lg:w-[120px]">
+          <ChallengeStatusBadge status={challenge.displayStatus} />
+        </span>
+      </Link>
       {isDraft && (
         <div className="flex gap-[8px]">
           <ActionButton variant="secondary" onClick={() => onEdit(challenge)}>
@@ -55,6 +61,8 @@ function ChallengeRow({ challenge, onEdit, onDelete }: ChallengeRowProps) {
 
 export function LecturerChallengesPage() {
   const navigate = useNavigate();
+  const { challengeId } = useParams<{ challengeId: string }>();
+  const closeDrawer = () => navigate("/teacher/challenges", { replace: true });
   const { items, page, totalPages, setPage, isLoading, isWorking, error, reload, remove } = useLecturerChallenges();
   const [pendingDelete, setPendingDelete] = useState<Challenge | null>(null);
   const createDialog = useCreateDialog("challenge");
@@ -62,9 +70,14 @@ export function LecturerChallengesPage() {
   const confirmDelete = async () => {
     if (!pendingDelete) return;
     const outcome = await remove(pendingDelete.id);
+    const deletedOpenChallenge = pendingDelete.id === challengeId;
     setPendingDelete(null);
-    if ("error" in outcome) toast.error(outcome.error);
-    else toast.success(outcome.message);
+    if ("error" in outcome) {
+      toast.error(outcome.error);
+      return;
+    }
+    toast.success(outcome.message);
+    if (deletedOpenChallenge) closeDrawer();
   };
 
   return (
@@ -108,6 +121,7 @@ export function LecturerChallengesPage() {
         onConfirm={confirmDelete}
         onOpenChange={(open) => !open && setPendingDelete(null)}
       />
+      <ChallengeDetailDrawer challengeId={challengeId ?? null} onClose={closeDrawer} onDelete={setPendingDelete} />
       <ChallengeCreateDialog open={createDialog.isOpen} onClose={createDialog.close} onSaved={reload} />
     </TeacherScreen>
   );
