@@ -4,7 +4,7 @@ import { type UserStatus } from "@/features/platform/types/userTypes";
 export const USER_ROLE_OPTIONS = [
   { value: ROLES.STUDENT, label: "Sinh viên" },
   { value: ROLES.TEACHER, label: "Giảng viên" },
-  { value: ROLES.SYSTEM_ADMIN, label: "Quản trị hệ thống" },
+  { value: ROLES.SYSTEM_ADMIN, label: "Quản trị viên" },
 ] as const;
 
 export const USER_ROLE_LABELS: Record<number, string> = Object.fromEntries(

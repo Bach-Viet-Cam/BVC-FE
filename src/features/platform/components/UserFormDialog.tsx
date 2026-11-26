@@ -68,7 +68,7 @@ function UserForm({ user, onSubmit, onCancel, onSaved, onDirtyChange }: UserForm
   };
 
   return (
-    <form onSubmit={handleSubmit(submit)} className="flex flex-col">
+    <form onSubmit={handleSubmit(submit)} noValidate className="flex flex-col">
       <FormBody>
         <FormField label="Vai trò tài khoản" required error={errors.role?.message}>
           <div className="grid gap-2.5 sm:grid-cols-3">

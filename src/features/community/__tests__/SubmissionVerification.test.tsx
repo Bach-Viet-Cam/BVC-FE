@@ -49,12 +49,19 @@ describe("Submission verification lifecycle", () => {
     expect(await screen.findByRole("heading", { name: "Đã xác minh" })).toBeInTheDocument();
     expect(verifiedApi.decide).toHaveBeenCalledWith("submission-b", "APPROVE", undefined, false);
   });
-  it("offers confirmation and cancellation without a rejection action", async () => {
+  it("requires a reason before rejecting and sends it with the decision", async () => {
     render(<SubmissionVerification submissionId="submission-c" />);
     await openVerification();
-    expect(screen.queryByText(/Không bắt buộc|Bản thu chưa phù hợp|Từ chối/i)).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Hủy" })).toBeEnabled();
+    await userEvent.click(screen.getByRole("button", { name: "Từ chối" }));
+    await userEvent.click(screen.getByRole("button", { name: "Gửi từ chối" }));
+    expect(await screen.findByText("Vui lòng nhập lý do từ chối.")).toBeInTheDocument();
     expect(verifiedApi.decide).not.toHaveBeenCalled();
+    await userEvent.type(screen.getByRole("textbox", { name: "Lý do từ chối" }), "Cần tập lại đoạn cuối");
+    await userEvent.click(screen.getByRole("button", { name: "Gửi từ chối" }));
+    await waitFor(() =>
+      expect(verifiedApi.decide).toHaveBeenCalledWith("submission-c", "REJECT", "Cần tập lại đoạn cuối", false)
+    );
   });
   it("keeps approval optional and does not expose the confirmation on the card", async () => {
     render(<SubmissionVerification submissionId="optional" />);

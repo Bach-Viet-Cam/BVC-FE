@@ -2,7 +2,7 @@ import { AiRatingHistoryPage } from "@/features/platform/pages/AiRatingHistoryPa
 import { FaqManagePage } from "@/features/platform/pages/FaqManagePage";
 import { LlmKeyManagePage } from "@/features/platform/pages/LlmKeyManagePage";
 import { AudioAnalysisTestPage } from "@/features/practice/pages/AudioAnalysisTestPage";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { createBrowserRouter, Navigate, Route, RouterProvider, Routes } from "react-router-dom";
 
 // Mobile — practice (M01 Smart Practice Studio)
 import { PracticeDemoProvider } from "@/features/practice/context/PracticeDemoContext";
@@ -95,9 +95,9 @@ import { AssignmentListPage } from "@/features/classes/pages/AssignmentListPage"
 import { LecturerChallengesPage } from "@/features/community/pages/LecturerChallengesPage";
 import { ChallengeStudentSubmissionsPage } from "@/features/community/pages/ChallengeStudentSubmissionsPage";
 
-export function AppRouter() {
+function AppRoutes() {
   return (
-    <BrowserRouter>
+    <>
       <ScrollToTop />
       <Routes>
         {/* Public */}
@@ -252,6 +252,14 @@ export function AppRouter() {
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
-    </BrowserRouter>
+    </>
   );
+}
+
+// Router dạng data để các màn có thể chặn điều hướng trong app (useBlocker); toàn bộ tuyến vẫn khai báo bằng <Routes>
+let appRouter: ReturnType<typeof createBrowserRouter> | null = null;
+
+export function AppRouter() {
+  appRouter ??= createBrowserRouter([{ path: "*", element: <AppRoutes /> }]);
+  return <RouterProvider router={appRouter} />;
 }

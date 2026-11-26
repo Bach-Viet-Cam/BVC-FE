@@ -1,12 +1,28 @@
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, Mic, Trophy } from "lucide-react";
 import { ChallengeStatusBadge } from "@/features/community/components/ChallengeStatusBadge";
-import { useStudentChallenge } from "@/features/community/hooks/useStudentChallenge";
+import { useStudentChallenge, useStudentChallengeSubmissions } from "@/features/community/hooks/useStudentChallenge";
+import { type StudentChallengeDetail } from "@/features/community/types/challenge";
 import { formatWeekRange } from "@/features/community/utils/challengeFormat";
 import { EmptyState } from "@/shared/components/bvc/EmptyState";
 import { StudentShell } from "@/shared/components/bvc/StudentShell";
 import { actionButtonClass } from "@/shared/components/bvc/actionButtonStyles";
 import { PageTitle } from "@/shared/components/bvc/PageTitle";
+
+const STATUS_LABELS = {
+  PROCESSING: "Đang xử lý",
+  COMPLETED: "Hoàn tất",
+  REJECTED: "Bị từ chối",
+  FAILED: "Lỗi",
+} as const;
+
+function disabledReason(challenge: StudentChallengeDetail): string | null {
+  if (challenge.canPractice) return null;
+  if (challenge.displayStatus === "UPCOMING") return "Thử thách chưa bắt đầu.";
+  if (challenge.displayStatus === "ENDED") return "Thử thách đã kết thúc.";
+  if (challenge.usedSubmissions >= challenge.maxSubmissions) return "Bạn đã hết lượt nộp.";
+  return null;
+}
 
 const LIST_PATH = "/community/challenges";
 
@@ -23,6 +39,7 @@ function InfoItem({ label, value }: { label: string; value: string }) {
 export function ChallengeDetailPage() {
   const { challengeId } = useParams();
   const { challenge, isLoading, error } = useStudentChallenge(challengeId);
+  const submissions = useStudentChallengeSubmissions(challengeId);
 
   const backLink = (
     <Link
@@ -69,17 +86,22 @@ export function ChallengeDetailPage() {
             <ChallengeStatusBadge status={challenge.displayStatus} />
             <PageTitle>{challenge.title}</PageTitle>
           </div>
-          {practicePath ? (
-            <Link to={practicePath} className={actionButtonClass("primary", "lg", "hover:text-white")}>
-              <Mic size={18} />
-              Luyện tập
-            </Link>
-          ) : (
-            <button type="button" disabled className={actionButtonClass("primary", "lg")}>
-              <Mic size={18} />
-              Luyện tập
-            </button>
-          )}
+          <div className="flex flex-col items-start gap-1.5 sm:items-end">
+            {practicePath ? (
+              <Link to={practicePath} className={actionButtonClass("primary", "lg", "hover:text-white")}>
+                <Mic size={18} />
+                Tham gia
+              </Link>
+            ) : (
+              <button type="button" disabled className={actionButtonClass("primary", "lg")}>
+                <Mic size={18} />
+                Tham gia
+              </button>
+            )}
+            {disabledReason(challenge) && (
+              <span className="text-[12.5px] text-bvc-muted">{disabledReason(challenge)}</span>
+            )}
+          </div>
         </div>
 
         {challenge.description && (
@@ -99,6 +121,56 @@ export function ChallengeDetailPage() {
             <InfoItem label="Điểm cao nhất" value={`${Math.round(challenge.bestAccuracy)}%`} />
           )}
         </div>
+
+        {challenge.displayStatus === "ENDED" && (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <InfoItem
+              label="Kết quả"
+              value={
+                challenge.bestAccuracy === null
+                  ? "Chưa có bài nộp"
+                  : challenge.bestAccuracy >= challenge.effectiveMinAccuracy
+                    ? "Đạt"
+                    : "Chưa đạt"
+              }
+            />
+            <InfoItem
+              label="Thứ hạng"
+              value={challenge.rank === null ? "Chưa xếp hạng" : `${challenge.rank}/${challenge.participants}`}
+            />
+            <Link to="/community/leaderboard" className={actionButtonClass("secondary", "lg", "self-stretch")}>
+              Xem bảng xếp hạng
+            </Link>
+          </div>
+        )}
+
+        {submissions.length > 0 && (
+          <section className="flex flex-col gap-2">
+            <h2 className="text-[15px] font-semibold text-bvc-ink">Các lần nộp</h2>
+            <ul className="flex flex-col gap-2">
+              {submissions.map((submission) => (
+                <li key={submission.id}>
+                  <Link
+                    to={
+                      submission.status === "PROCESSING"
+                        ? `/practice/submissions/${submission.id}/processing`
+                        : `/practice/submissions/${submission.id}`
+                    }
+                    className="flex items-center justify-between gap-3 rounded-2xl border border-bvc-border bg-white px-4 py-3 text-[14px] transition-colors hover:bg-bvc-surface"
+                  >
+                    <span className="font-semibold text-bvc-ink">Lần {submission.attemptNumber}</span>
+                    <span className="text-bvc-muted">{new Date(submission.submittedAt).toLocaleString("vi-VN")}</span>
+                    <span className="text-bvc-ink">
+                      {submission.accuracy !== null && submission.status === "COMPLETED"
+                        ? `${Math.round(submission.accuracy)}%`
+                        : STATUS_LABELS[submission.status]}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
       </div>
     </StudentShell>
   );

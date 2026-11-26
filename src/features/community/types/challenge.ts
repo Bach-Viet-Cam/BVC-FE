@@ -111,6 +111,20 @@ export interface StudentChallenge extends Challenge {
   canPractice: boolean;
 }
 
+export interface StudentChallengeDetail extends StudentChallenge {
+  // Chỉ có sau khi thử thách kết thúc
+  rank: number | null;
+  participants: number;
+}
+
+export interface StudentChallengeSubmission {
+  id: string;
+  attemptNumber: number;
+  status: "PROCESSING" | "COMPLETED" | "REJECTED" | "FAILED";
+  accuracy: number | null;
+  submittedAt: string;
+}
+
 export interface StudentChallengeListResult {
   items: StudentChallenge[];
   pagination: ChallengePagination;

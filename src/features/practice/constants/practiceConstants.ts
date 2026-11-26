@@ -17,6 +17,8 @@ export const FILE_FORMATS = ["mp3", "wav", "m4a"];
 export const FILE_MAX_MB = 20;
 export const FILE_MIN_S = 10;
 export const FILE_MAX_S = 180;
+// Thời gian dư sau độ dài bản nhạc để sinh viên đánh chậm hơn bản mẫu vẫn thu đủ
+export const RECORD_EXTRA_S = 30;
 
 export const BPM_MIN = 40;
 export const BPM_MAX = 208;
@@ -34,7 +36,8 @@ export const REFERENCE_TONE = {
 export const PRACTICE_DEFAULTS = {
   // Tốc độ mặc định khi bản nhạc không được giao cho lớp hoặc bài tập chưa đặt BPM (khớp PracticeConstant.defaultTargetBpm của BE)
   targetBpm: 60,
-  pieceLen: 120,
+  // Độ dài bản thu tối đa (MSG-15: 00:10–03:00) khi bản nhạc chưa có thời lượng từ BE
+  pieceLen: FILE_MAX_S,
 };
 
 export const MSG = {

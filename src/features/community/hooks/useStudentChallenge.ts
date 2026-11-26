@@ -13,3 +13,11 @@ export function useStudentChallenge(challengeId: string | undefined) {
     error: error ? parseApiError(error, "Tải dữ liệu thất bại. Vui lòng thử lại.").message : null,
   };
 }
+
+export function useStudentChallengeSubmissions(challengeId: string | undefined) {
+  const { data } = useApiQuery(
+    challengeId ? `student-challenge-submissions:${challengeId}` : null,
+    async () => (await challengeApi.listStudentSubmissions(challengeId as string)).data.data
+  );
+  return data ?? [];
+}

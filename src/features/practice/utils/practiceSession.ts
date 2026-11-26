@@ -11,15 +11,16 @@ function hzToNearestMidi(hz: number): number {
 }
 
 // targetBpm lấy từ GET /practice/target-bpm (BPM bài tập của lớp hoặc mặc định 60).
-// TODO(BE): độ dài bài và nốt kỳ vọng vẫn là dữ liệu mô phỏng (GBR-10, GBR-47, GBR-48)
+// TODO(BE): nốt kỳ vọng vẫn là dữ liệu mô phỏng (GBR-10, GBR-47, GBR-48)
 export function buildDemoSession(
   noPitch: boolean,
-  targetBpm: number = PRACTICE_DEFAULTS.targetBpm
+  targetBpm: number = PRACTICE_DEFAULTS.targetBpm,
+  pieceLenSec: number = PRACTICE_DEFAULTS.pieceLen
 ): PracticeSessionConfig {
   return {
     targetBpm,
     beatsPerBar: 4,
-    pieceLenSec: PRACTICE_DEFAULTS.pieceLen,
+    pieceLenSec,
     hasPitch: !noPitch,
     fminHz: DEFAULT_FMIN_HZ,
     fmaxHz: DEFAULT_FMAX_HZ,
