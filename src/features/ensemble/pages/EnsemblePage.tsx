@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useBlocker, useNavigate, useSearchParams } from "react-router-dom";
 import { HeadphonePrompt } from "@/features/ensemble/components/HeadphonePrompt";
 import { EnsemblePreparation } from "@/features/ensemble/components/EnsemblePreparation";
 import { usePartsPreview } from "@/features/ensemble/hooks/usePartsPreview";
@@ -36,10 +36,14 @@ export function EnsemblePage() {
   const assignment = useEnsembleAssignment(assignmentId);
   const peaksByTrack = useTrackPeaks(practice.tracks);
   const { status, cancel, stop, discardTake } = practice;
+  const isLeavingRef = useRef(false);
 
   const handleSubmit = useCallback(async () => {
     const submitted = await practice.submit();
-    if (submitted) navigate(`/practice/submissions/${submitted.id}/processing`);
+    if (submitted) {
+      isLeavingRef.current = true;
+      navigate(`/practice/submissions/${submitted.id}/processing`);
+    }
   }, [navigate, practice]);
 
   const listening = useListeningSetup(Boolean(practice.tracksResult));
@@ -222,6 +226,12 @@ export function EnsemblePage() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [status, isBusy, handleSubmit, playback, requestStart, submitBlockedReason, stop, discardTake, isLeaveDialogOpen]);
 
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      !isLeavingRef.current && (isBusy || hasUnsavedTake) && currentLocation.pathname !== nextLocation.pathname
+  );
+  const isBlocked = blocker.state === "blocked";
+
   const leave = () => {
     if (isBusy || hasUnsavedTake) {
       setIsLeaveDialogOpen(true);
@@ -233,13 +243,24 @@ export function EnsemblePage() {
   const finishLeaving = () => {
     setIsLeaveDialogOpen(false);
     cancel();
+    if (isBlocked) {
+      blocker.proceed();
+      return;
+    }
+    isLeavingRef.current = true;
     navigate(backTarget);
+  };
+
+  const closeLeaveDialog = (next: boolean) => {
+    if (next) return;
+    setIsLeaveDialogOpen(false);
+    if (isBlocked) blocker.reset();
   };
 
   const leaveDialog = (
     <ConfirmDialog
-      open={isLeaveDialogOpen}
-      onOpenChange={setIsLeaveDialogOpen}
+      open={isLeaveDialogOpen || isBlocked}
+      onOpenChange={closeLeaveDialog}
       title="Rời phòng hòa tấu?"
       description={hasUnsavedTake ? "Bản thu chưa được lưu sẽ mất. Bạn có muốn rời đi?" : LEAVE_CONFIRM_MESSAGE}
       confirmLabel="Rời phòng"

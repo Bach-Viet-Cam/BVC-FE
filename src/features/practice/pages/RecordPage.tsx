@@ -23,7 +23,10 @@ import {
   AUDIO_ACCEPT,
   COUNT_IN_BEATS,
   DEMO_AUTO_STOP_TAIL_S,
+  FILE_MAX_S,
+  FILE_MIN_S,
   MSG,
+  RECORD_EXTRA_S,
   TEMPO_TOLERANCE_PERCENT,
 } from "@/features/practice/constants/practiceConstants";
 import { practiceResultApi } from "@/features/practice/api/practiceResultApi";
@@ -137,10 +140,12 @@ export function RecordPage() {
   // Dây chuẩn của nhạc cụ thuộc bản nhạc, cho ngăn lên dây (laptop)
   const tunes = useInstrumentTunes(sheetId);
   const session = useMemo(() => {
-    const base = buildDemoSession(demo.noPitch, targetBpm);
+    const sheetLen = context?.sheet.durationSec;
+    const pieceLen = sheetLen ? Math.min(FILE_MAX_S, Math.max(FILE_MIN_S, Math.round(sheetLen) + RECORD_EXTRA_S)) : undefined;
+    const base = buildDemoSession(demo.noPitch, targetBpm, pieceLen);
     if (!segmentMode) return base;
     return { ...base, pieceLenSec: segEnd - segStart + SEGMENT_TAIL_SEC, countInBeats: segCountIn ? undefined : 0 };
-  }, [demo.noPitch, targetBpm, segmentMode, segStart, segEnd, segCountIn]);
+  }, [demo.noPitch, targetBpm, context?.sheet.durationSec, segmentMode, segStart, segEnd, segCountIn]);
   const audio = usePracticeAudio({ micWanted: mode === "record", fminHz: session.fminHz });
   const micDenied = demo.micDenied || audio.micState === "denied";
   const timelineOffsetSec =
@@ -394,7 +399,11 @@ export function RecordPage() {
                   className="mx-3.5 flex min-h-10 cursor-pointer items-center justify-center gap-1.5 rounded-full border border-bvc-border text-sm font-medium text-bvc-muted"
                 >
                   {advancedOpen ? "Ẩn nâng cao" : "Xem nâng cao"}
-                  {advancedOpen ? <ChevronUp className="size-4" aria-hidden /> : <ChevronDown className="size-4" aria-hidden />}
+                  {advancedOpen ? (
+                    <ChevronUp className="size-4" aria-hidden />
+                  ) : (
+                    <ChevronDown className="size-4" aria-hidden />
+                  )}
                 </button>
               )}
 
@@ -444,15 +453,19 @@ export function RecordPage() {
             )}
 
             {/* Bản thu mẫu nằm trên thẻ ghi âm; gỡ khỏi màn hình khi đang đếm nhịp/ghi để tiếng mẫu không lọt vào micro */}
-            {!segmentMode && showAdvanced && referenceAudio && mode === "record" && (rec === "idle" || rec === "preview") && (
-              <div className="mx-3.5 md:mx-0">
-                <ReferenceAudioPlayer
-                  key={referenceAudio.url}
-                  url={referenceAudio.url}
-                  isFallback={referenceAudio.isFallback}
-                />
-              </div>
-            )}
+            {!segmentMode &&
+              showAdvanced &&
+              referenceAudio &&
+              mode === "record" &&
+              (rec === "idle" || rec === "preview") && (
+                <div className="mx-3.5 md:mx-0">
+                  <ReferenceAudioPlayer
+                    key={referenceAudio.url}
+                    url={referenceAudio.url}
+                    isFallback={referenceAudio.isFallback}
+                  />
+                </div>
+              )}
 
             <div className="contents">
               <div className="mx-3.5 flex min-h-0 flex-1 flex-col gap-2.75 pb-5.5 md:mx-0 md:min-h-98 md:rounded-bvc-xl md:border md:border-bvc-border md:bg-white md:p-5.5 md:pb-5.5">

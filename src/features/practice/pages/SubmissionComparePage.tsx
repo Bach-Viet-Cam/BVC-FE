@@ -8,9 +8,9 @@ import {
   TeacherLineSwatch,
 } from "@/features/practice/components/SubmissionCompareChart";
 import { SubmissionPageTitle } from "@/features/practice/components/SubmissionPageTitle";
-import { MSG_25, MSG_27, MSG_28 } from "@/features/practice/constants/practiceConstants";
+import { MSG, MSG_25, MSG_27, MSG_28 } from "@/features/practice/constants/practiceConstants";
 import { useSubmissionCompare } from "@/features/practice/hooks/useSubmissionCompare";
-import type { CompareSegment, CompareSide } from "@/features/practice/types/submissionHistoryTypes";
+import type { ComparePitchPoint, CompareSegment, CompareSide } from "@/features/practice/types/submissionHistoryTypes";
 import { formatSubmittedDay } from "@/features/practice/utils/submissionHistory";
 import { formatLabelChange, formatSegmentRange } from "@/features/practice/utils/submissionCompare";
 import { StudentShell } from "@/shared/components/bvc/StudentShell";
@@ -24,6 +24,9 @@ const LINES = [
   { key: "older", label: "Bài cũ hơn", Swatch: OlderLineSwatch },
   { key: "newer", label: "Bài mới hơn", Swatch: NewerLineSwatch },
 ] as const;
+
+const hasPitchData = (points: ComparePitchPoint[]) =>
+  points.some(([, ...values]) => values.some((value) => value !== null));
 
 const segmentDomId = (id: string) => `compare-segment-${id}`;
 
@@ -221,13 +224,17 @@ export function SubmissionComparePage() {
 
               <section className="flex shrink-0 flex-col gap-2.5 rounded-bvc-xl border border-bvc-border bg-white px-3 pt-4 pb-3.5">
                 <h2 className="px-1 text-sm font-semibold">Cao độ theo thời gian</h2>
-                <SubmissionCompareChart
-                  chart={data.chart}
-                  segments={data.segments}
-                  selectedId={highlightedId}
-                  visible={visible}
-                  onSelectSegment={selectSegment}
-                />
+                {hasPitchData(data.chart.points) ? (
+                  <SubmissionCompareChart
+                    chart={data.chart}
+                    segments={data.segments}
+                    selectedId={highlightedId}
+                    visible={visible}
+                    onSelectSegment={selectSegment}
+                  />
+                ) : (
+                  <p className="px-1 py-8 text-center text-sm text-bvc-muted">{MSG.pitchUnavailable}</p>
+                )}
                 <div className="flex flex-col gap-2 px-1">
                   <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-bvc-muted">
                     {LINES.map(({ key, label, Swatch }) => (

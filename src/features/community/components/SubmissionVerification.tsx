@@ -5,6 +5,7 @@ import type { ReviewState } from "@/features/community/types/verifiedTypes";
 import { VerificationSeal } from "@/features/community/components/VerificationSeal";
 import { useAsyncData } from "@/shared/hooks/useAsyncData";
 import { ActionButton } from "@/shared/components/bvc/ActionButton";
+import { fieldClass } from "@/shared/components/bvc/fieldStyles";
 import { FormDialog } from "@/shared/components/bvc/FormDialog";
 import { getErrorMessage } from "@/shared/utils/getErrorMessage";
 import { AuthenticatedAudio } from "@/shared/components/bvc/AuthenticatedAudio";
@@ -29,6 +30,8 @@ export function SubmissionVerification({
   const [pending, setPending] = useState(false);
   const [outcome, setOutcome] = useState<ReviewState | null>(null);
   const [manualChecked, setManualChecked] = useState(false);
+  const [rejecting, setRejecting] = useState(false);
+  const [reason, setReason] = useState("");
   const [error, setError] = useState<string | null>(null);
   const saving = useRef(false);
   const current = outcome ?? state.data;
@@ -40,17 +43,35 @@ export function SubmissionVerification({
     setOutcome(null);
     setError(null);
     setManualChecked(false);
+    setRejecting(false);
+    setReason("");
     setOpen(true);
     state.reload();
   }
 
-  async function confirm() {
-    if (saving.current || state.isLoading || !state.data?.canReview || (manual && !manualChecked)) return;
+  async function confirm(decision: "APPROVE" | "REJECT" = "APPROVE") {
+    const trimmedReason = reason.trim();
+    if (decision === "REJECT" && !trimmedReason) {
+      setError("Vui lòng nhập lý do từ chối.");
+      return;
+    }
+    if (
+      saving.current ||
+      state.isLoading ||
+      !state.data?.canReview ||
+      (decision === "APPROVE" && manual && !manualChecked)
+    )
+      return;
     saving.current = true;
     setPending(true);
     setError(null);
     try {
-      const result = await verifiedApi.decide(submissionId, "APPROVE", undefined, manual);
+      const result = await verifiedApi.decide(
+        submissionId,
+        decision,
+        decision === "REJECT" ? trimmedReason : undefined,
+        decision === "APPROVE" && manual
+      );
       setOutcome(result);
       state.mutate(() => result);
     } catch (error: unknown) {
@@ -156,7 +177,20 @@ export function SubmissionVerification({
                     : "Sinh viên chưa đồng ý chia sẻ. Bản thu sẽ được giữ ẩn."}
                 </p>
               </div>
-              {manual && (
+              {rejecting ? (
+                <label className="flex flex-col gap-1.5 text-sm text-bvc-ink">
+                  <span className="font-medium">Lý do từ chối</span>
+                  <textarea
+                    value={reason}
+                    maxLength={2000}
+                    rows={4}
+                    disabled={pending}
+                    onChange={(event) => setReason(event.target.value)}
+                    className={fieldClass(Boolean(error), "py-2.5")}
+                  />
+                </label>
+              ) : null}
+              {manual && !rejecting && (
                 <label className="flex min-h-11 items-start gap-3 text-sm leading-relaxed text-bvc-ink">
                   <input
                     type="checkbox"
@@ -174,12 +208,36 @@ export function SubmissionVerification({
                 </p>
               )}
               <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-                <ActionButton variant="secondary" disabled={pending} onClick={() => setOpen(false)}>
-                  Hủy
+                <ActionButton
+                  variant="secondary"
+                  disabled={pending}
+                  onClick={() => {
+                    if (rejecting) {
+                      setRejecting(false);
+                      setError(null);
+                    } else setOpen(false);
+                  }}
+                >
+                  {rejecting ? "Quay lại" : "Hủy"}
                 </ActionButton>
-                <ActionButton isLoading={pending} disabled={manual && !manualChecked} onClick={() => void confirm()}>
-                  Xác minh
-                </ActionButton>
+                {rejecting ? (
+                  <ActionButton isLoading={pending} onClick={() => void confirm("REJECT")}>
+                    Gửi từ chối
+                  </ActionButton>
+                ) : (
+                  <>
+                    <ActionButton variant="secondary" disabled={pending} onClick={() => setRejecting(true)}>
+                      Từ chối
+                    </ActionButton>
+                    <ActionButton
+                      isLoading={pending}
+                      disabled={manual && !manualChecked}
+                      onClick={() => void confirm()}
+                    >
+                      Xác minh
+                    </ActionButton>
+                  </>
+                )}
               </div>
             </>
           )}

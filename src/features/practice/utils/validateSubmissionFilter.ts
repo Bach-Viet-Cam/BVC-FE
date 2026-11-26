@@ -15,7 +15,7 @@ export const submissionFilterSchema = z
   })
   .refine((value) => !value.fromDate || !value.toDate || value.fromDate <= value.toDate, {
     path: ["toDate"],
-    message: "Ngày kết thúc phải sau ngày bắt đầu",
+    message: "Ngày kết thúc không được trước ngày bắt đầu",
   })
   .refine(
     (value) =>
