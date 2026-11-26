@@ -9,6 +9,8 @@ import {
   type ChallengeListResult,
   type ChallengePieceListResult,
   type ChallengePieceParams,
+  type StudentChallenge,
+  type StudentChallengeListResult,
   type CreateChallengePayload,
   type UpdateChallengePayload,
 } from "@/features/community/types/challenge";
@@ -16,6 +18,10 @@ import {
 const BASE_PATH = "/lecturer/challenges";
 
 export const challengeApi = {
+  listForStudent: (params: ChallengeListParams) =>
+    axiosClient.get<ApiResponse<StudentChallengeListResult>>("/student/challenges", { params }),
+  getForStudent: (challengeId: string) =>
+    axiosClient.get<ApiResponse<StudentChallenge>>(`/student/challenges/${encodeURIComponent(challengeId)}`),
   list: (params: ChallengeListParams) => axiosClient.get<ApiResponse<ChallengeListResult>>(BASE_PATH, { params }),
   get: (challengeId: string) => axiosClient.get<ApiResponse<Challenge>>(`${BASE_PATH}/${challengeId}`),
   getDetail: (challengeId: string) =>

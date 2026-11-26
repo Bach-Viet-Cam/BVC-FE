@@ -81,6 +81,7 @@ export function RecordPage() {
   const { sheetId = "" } = useParams();
   const [searchParams] = useSearchParams();
   const assignmentId = searchParams.get("assignmentId") ?? undefined;
+  const challengeId = searchParams.get("challengeId") ?? undefined;
   const ofRaw = searchParams.get("of");
   const segmentQuery = parseSegmentQuery(searchParams);
   const segmentMode = segmentQuery !== null;
@@ -284,7 +285,7 @@ export function RecordPage() {
     if (!source) return;
     const submission = await submit(
       source,
-      { sheetMusicId: sheetId, assignmentId, shareAfterVerification },
+      { sheetMusicId: sheetId, assignmentId, challengeId, shareAfterVerification },
       mode === "record" ? "recording" : "file"
     );
     if (!submission) {
