@@ -1,3 +1,10 @@
+import {
+  type AssignmentMedia,
+  type AssignmentStudent,
+  type ClassPractice,
+  type PracticeStats,
+} from "@/features/classes/types/teacherAssignmentTypes";
+
 export type ChallengeStatus = "DRAFT" | "PUBLISHED";
 export type ChallengeDisplayStatus = "DRAFT" | "UPCOMING" | "ACTIVE" | "ENDED";
 
@@ -88,4 +95,20 @@ export interface ChallengePieceParams {
 export interface ChallengeFormMeta {
   defaultMinAccuracy: number;
   maxSubmissionsDefault: number;
+}
+
+// A student of the challenge classes; one listed in several classes appears once, under the first by name.
+export interface ChallengeStudent extends AssignmentStudent {
+  classId: string;
+  className: string;
+}
+
+// Lecturer drawer: configuration plus progress of submissions counted toward the challenge.
+export interface ChallengeDetail extends Challenge {
+  // minAccuracy, or the admin default when the challenge has none.
+  effectiveMinAccuracy: number;
+  students: ChallengeStudent[];
+  practiceStats: PracticeStats;
+  byClass: ClassPractice[];
+  media: AssignmentMedia | null;
 }

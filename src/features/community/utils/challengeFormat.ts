@@ -28,3 +28,33 @@ export function formatWeekRange(startsAt: string, endsAt: string): string {
   const endText = `${pad(end.getUTCDate())}/${pad(end.getUTCMonth() + 1)}/${end.getUTCFullYear()}`;
   return `${startText} - ${endText}`;
 }
+
+export const CHALLENGE_DETAIL_TEXT = {
+  overline: "Chi tiết thử thách",
+  tabsLabel: "Nội dung chi tiết thử thách",
+  edit: "Sửa",
+  delete: "Xóa",
+  noStudents: "Các lớp của thử thách chưa có sinh viên.",
+  noDescription: "Chưa có mô tả.",
+  general: "Thông tin chung",
+  config: "Cấu hình",
+  empty: "-",
+} as const;
+
+export const CHALLENGE_INFO_LABELS = {
+  status: "Trạng thái",
+  instrument: "Nhạc cụ",
+  piece: "Bài nhạc",
+  week: "Tuần",
+  classes: "Lớp",
+  publishedAt: "Ngày đăng",
+  tempo: "BPM yêu cầu",
+  threshold: "Ngưỡng đạt",
+  maxSubmissions: "Số lần nộp tối đa",
+} as const;
+
+export function challengeWeekText(challenge: { startsAt: string | null; endsAt: string | null }): string {
+  return challenge.startsAt && challenge.endsAt
+    ? formatWeekRange(challenge.startsAt, challenge.endsAt)
+    : "Chưa chọn tuần";
+}

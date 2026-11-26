@@ -93,6 +93,7 @@ import { VerifiedContentPage } from "@/features/community/pages/VerifiedContentP
 import { ChallengeFormPage } from "@/features/community/pages/ChallengeFormPage";
 import { AssignmentListPage } from "@/features/classes/pages/AssignmentListPage";
 import { LecturerChallengesPage } from "@/features/community/pages/LecturerChallengesPage";
+import { ChallengeStudentSubmissionsPage } from "@/features/community/pages/ChallengeStudentSubmissionsPage";
 
 export function AppRouter() {
   return (
@@ -176,6 +177,12 @@ export function AppRouter() {
               element={<CreateRedirect to="/teacher/challenges" name="challenge" />}
             />
             <Route path="/teacher/challenges/:id/edit" element={<ChallengeFormPage />} />
+            {/* The id opens the detail drawer over the list, like /teacher/assignments/:assignmentId */}
+            <Route path="/teacher/challenges/:challengeId" element={<LecturerChallengesPage />} />
+            <Route
+              path="/teacher/challenges/:challengeId/students/:studentId"
+              element={<ChallengeStudentSubmissionsPage />}
+            />
             <Route path="/categories" element={<CategoriesPage />} />
             {/* M03 classes & members: web-first inside the lecturer shell */}
             {/* Tạo mới mở bằng modal: đường dẫn ".../new" cũ chuyển về trang danh sách và mở sẵn modal */}
