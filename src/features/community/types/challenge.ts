@@ -103,6 +103,19 @@ export interface ChallengeStudent extends AssignmentStudent {
   className: string;
 }
 
+export interface StudentChallenge extends Challenge {
+  sheetMusicId: string | null;
+  effectiveMinAccuracy: number;
+  usedSubmissions: number;
+  bestAccuracy: number | null;
+  canPractice: boolean;
+}
+
+export interface StudentChallengeListResult {
+  items: StudentChallenge[];
+  pagination: ChallengePagination;
+}
+
 // Lecturer drawer: configuration plus progress of submissions counted toward the challenge.
 export interface ChallengeDetail extends Challenge {
   // minAccuracy, or the admin default when the challenge has none.
